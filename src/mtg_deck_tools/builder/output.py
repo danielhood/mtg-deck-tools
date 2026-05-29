@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -10,9 +11,21 @@ from pathlib import Path
 from mtg_deck_tools import __version__
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
-from mtg_deck_tools.rules.validate import ValidationResult
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.rules.commander import format_color_identity
+from mtg_deck_tools.rules.validate import ValidationResult
 from mtg_deck_tools.wizard.slots import load_slot_template_config
+
+_VALIDATION_NOTE_RE = re.compile(r"^\[[\w.]+\]")
+
+NOTE_GROUPS: tuple[tuple[str, str], ...] = (
+    ("unpriced", "Unpriced cards"),
+    ("budget_trim", "Budget trims"),
+    ("mana_base", "Mana base"),
+    ("slot", "Slot filling"),
+    ("build", "Build issues"),
+    ("other", "Other"),
+)
 
 
 def _validation_dict(result: ValidationResult | None) -> dict | None:
@@ -67,6 +80,120 @@ def _avg_cmc_nonland(cards: list[DeckCard]) -> float | None:
     return round(total / count, 2) if count else None
 
 
+def format_generated_timestamp(when: datetime) -> str:
+    """Friendly local timestamp, e.g. 29 May 2026 · 16:06 PDT."""
+    local = when.astimezone()
+    return local.strftime("%d %B %Y · %H:%M %Z")
+
+
+def classify_warning(message: str) -> str:
+    """Bucket a build warning for grouped Notes output."""
+    if message.startswith("No USD price for"):
+        return "unpriced"
+    if message.startswith("Budget trim:"):
+        return "budget_trim"
+    if (
+        message.startswith("Mana base:")
+        or message.startswith("Mana base suggested")
+        or message.startswith("Land count")
+    ):
+        return "mana_base"
+    if message.startswith("Slot '"):
+        return "slot"
+    if message.startswith("Basic land '"):
+        return "build"
+    if _VALIDATION_NOTE_RE.match(message):
+        return "validation"
+    return "other"
+
+
+def group_warnings(
+    warnings: list[str],
+    *,
+    include_validation_notes: bool = False,
+) -> dict[str, list[str]]:
+    """Group warnings by category for the Notes section."""
+    grouped: dict[str, list[str]] = defaultdict(list)
+    for message in warnings:
+        category = classify_warning(message)
+        if category == "validation" and not include_validation_notes:
+            continue
+        grouped[category].append(message)
+    return grouped
+
+
+def format_card_price(card: DeckCard) -> str:
+    if card.price_known and card.price_usd is not None:
+        return f"${card.price_usd:.2f}"
+    return "No price"
+
+
+def format_card_mana_cost(card: DeckCard) -> str:
+    return card.mana_cost.strip() if card.mana_cost and card.mana_cost.strip() else "—"
+
+
+def format_card_description(card: DeckCard) -> str:
+    text = (card.oracle_text or "").strip()
+    if not text:
+        return "—"
+    return " ".join(text.split())
+
+
+def _render_notes_section(
+    warnings: list[str],
+    *,
+    validation: ValidationResult | None,
+) -> list[str]:
+    if not warnings:
+        return []
+
+    include_validation_notes = validation is None
+    grouped = group_warnings(warnings, include_validation_notes=include_validation_notes)
+    if not grouped:
+        return []
+
+    lines = ["## Notes", ""]
+    for key, heading in NOTE_GROUPS:
+        items = grouped.get(key)
+        if not items:
+            continue
+        lines.append(f"### {heading}")
+        for item in items:
+            lines.append(f"- {item}")
+        lines.append("")
+    return lines
+
+
+def _render_card_details_section(
+    cards: list[DeckCard],
+    slot_order: list[str],
+    slot_labels: dict[str, str],
+) -> list[str]:
+    if not cards:
+        return []
+
+    by_slot: dict[str, list[DeckCard]] = defaultdict(list)
+    for card in cards:
+        by_slot[card.slot].append(card)
+
+    lines = ["## Card details", ""]
+    for slot in slot_order:
+        slot_cards = by_slot.get(slot)
+        if not slot_cards:
+            continue
+        label = slot_labels.get(slot, slot)
+        lines.append(f"### {label}")
+        lines.append("")
+        for card in sorted(slot_cards, key=lambda c: (-c.quantity, c.cmc, c.name)):
+            qty = f" ({card.quantity}×)" if card.quantity > 1 else ""
+            lines.append(f"#### {card.name}{qty}")
+            lines.append(f"- **Price:** {format_card_price(card)}")
+            lines.append(f"- **Mana cost:** {format_card_mana_cost(card)}")
+            lines.append(f"- **Description:** {format_card_description(card)}")
+            lines.append("")
+    return lines
+
+
 def write_deck_outputs(
     *,
     base_path: Path,
@@ -77,17 +204,19 @@ def write_deck_outputs(
 ) -> tuple[Path, Path]:
     """Write paired .deck.json and .md files; return json path."""
     slot_config = load_slot_template_config()
-    generated_at = datetime.now(UTC).isoformat()
+    generated_at = datetime.now(UTC)
+    generated_at_iso = generated_at.isoformat()
+    generated_at_display = format_generated_timestamp(generated_at)
     commander_names = ", ".join(c["name"] for c in commanders)
     slug = _slugify(commander_names.split(",")[0])
-    timestamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
+    timestamp = generated_at.strftime("%Y%m%d%H%M%S")
     out_base = base_path.parent / f"{slug}-{timestamp}"
     out_base.parent.mkdir(parents=True, exist_ok=True)
 
     avg_cmc = _avg_cmc_nonland(maindeck.cards)
     deck_json = {
         "schema_version": "1.0",
-        "generated_at": generated_at,
+        "generated_at": generated_at_iso,
         "generator": {"name": "mtg-deck-tools", "version": __version__},
         "criteria": criteria.model_dump(),
         "commanders": commanders,
@@ -128,14 +257,14 @@ def write_deck_outputs(
         f"# {commander_names}",
         "",
         f"**Commander{'s' if len(commanders) > 1 else ''}:** {commander_names}",
-        f"**Color identity:** {', '.join(identity) or 'colorless'}",
+        f"**Color identity:** {format_color_identity(identity)}",
     ]
     if criteria.budget_usd is not None:
         lines.append(
             f"**Budget cap:** ${criteria.budget_usd:.2f} · "
             f"**Estimated maindeck:** ${maindeck.budget_spent:.2f}"
         )
-    lines.append(f"**Generated:** {generated_at}")
+    lines.append(f"**Generated:** {generated_at_display}")
     lines.append(f"**Seed:** {criteria.seed if criteria.seed is not None else 'random'}")
     lines.append("")
 
@@ -221,11 +350,16 @@ def write_deck_outputs(
             lines.append(f"- **Avoid mechanics:** {', '.join(criteria.avoid_mechanics)}")
         lines.append("")
 
-    if maindeck.warnings:
-        lines.extend(["## Notes", ""])
-        for warning in maindeck.warnings:
-            lines.append(f"- {warning}")
-        lines.append("")
+    lines.extend(
+        _render_notes_section(maindeck.warnings, validation=maindeck.validation)
+    )
+    lines.extend(
+        _render_card_details_section(
+            maindeck.cards,
+            slot_config.order,
+            slot_config.labels,
+        )
+    )
 
-    md_path.write_text("\n".join(lines), encoding="utf-8")
+    md_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     return json_path, md_path

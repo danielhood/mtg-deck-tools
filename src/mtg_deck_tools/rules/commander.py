@@ -8,6 +8,14 @@ from mtg_deck_tools.paths import NON_DECKABLE_LAYOUTS
 
 COLOR_ORDER = ("W", "U", "B", "R", "G")
 
+COLOR_NAMES = {
+    "W": "White",
+    "U": "Blue",
+    "B": "Black",
+    "R": "Red",
+    "G": "Green",
+}
+
 # Card types that are lands (not "Enchant Land" enchantments).
 _LAND_TYPE_RE = re.compile(
     r"^(?:Legendary\s+|Basic\s+|Snow\s+|World\s+)?(?:Artifact\s+)?Land(?:\s|$|//)",
@@ -19,6 +27,14 @@ def parse_color_identity(raw: list[str] | None) -> frozenset[str]:
     if not raw:
         return frozenset()
     return frozenset(c for c in raw if c in COLOR_ORDER)
+
+
+def format_color_identity(identity: list[str]) -> str:
+    """Human-readable color identity for deck output."""
+    if not identity:
+        return "Colorless"
+    names = [COLOR_NAMES[color] for color in COLOR_ORDER if color in identity]
+    return ", ".join(names)
 
 
 def color_identity_subset(card_identity: frozenset[str], commander_identity: frozenset[str]) -> bool:
