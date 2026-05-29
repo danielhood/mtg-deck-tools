@@ -14,5 +14,6 @@ class DeckCriteria(BaseModel):
     colors: list[str] = Field(default_factory=list)
     commander_oracle_ids: list[str] = Field(default_factory=list)
     budget_usd: float | None = None
+    strict_budget: bool = False
     slot_template: dict[str, int] = Field(default_factory=dict)
     seed: int | None = None

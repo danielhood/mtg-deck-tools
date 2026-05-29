@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from mtg_deck_tools import __version__
-from mtg_deck_tools.builder.filler import DeckBuildResult, DeckCard
+from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
 from mtg_deck_tools.rules.validate import ValidationResult
 from mtg_deck_tools.models.criteria import DeckCriteria

@@ -65,9 +65,52 @@ def _budget_score(
         return 0.2
     if candidate.price_usd <= budget_remaining * 0.15:
         return 1.5
+    if candidate.price_usd <= budget_remaining * 0.5:
+        return 1.0
     if candidate.price_usd <= budget_remaining:
-        return 0.8
-    return -5.0
+        return 0.5
+    return -15.0
+
+
+def score_land_budget(
+    candidate: CardCandidate,
+    *,
+    budget_remaining: float | None,
+    budget_total: float | None = None,
+) -> float:
+    """Strong preference for cheap nonbasic lands when a budget cap is set."""
+    if candidate.is_basic_land:
+        return 0.0
+    if not candidate.price_known or candidate.price_usd is None:
+        return -0.5
+
+    price = candidate.price_usd
+    score = 0.0
+
+    if price <= 0.5:
+        score += 3.0
+    elif price <= 2.0:
+        score += 2.0
+    elif price <= 5.0:
+        score += 0.5
+    elif price <= 10.0:
+        score -= 1.5
+    elif price <= 25.0:
+        score -= 4.0
+    else:
+        score -= 8.0
+
+    if budget_remaining is not None:
+        if price > budget_remaining:
+            score -= 12.0
+        elif budget_total and budget_total > 0:
+            share = price / budget_total
+            if share > 0.08:
+                score -= 6.0 * share
+            elif share > 0.04:
+                score -= 3.0 * share
+
+    return score
 
 
 def score_candidate(

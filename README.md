@@ -105,13 +105,15 @@ Options:
 | `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, apply mechanic tags |
 | `stats` | Row counts, import metadata, top tags |
 | `wizard` | Interactive wizard: themes, mechanics, colors, commander, budget |
-| `generate` | Slot-filled 99-card maindeck; `--wizard` for criteria; `--stub` for preview |
+| `generate` | Slot-filled 99-card maindeck; `--wizard` for criteria; `--stub` for preview; `--strict-budget` to exclude unpriced cards |
 
 ## Status
 
 **Phase 1** complete: Python package, SQLite import, mechanic taxonomy v0, CLI (`import`, `stats`, `generate` stub).
 
 **Phase 2** complete: wizard, slot filling, dynamic mana base, and Commander rule validation.
+
+**v1 polish:** budget enforcement during fill, post-fill budget trim pass, `--strict-budget`, tighter slot tags (`board_wipe`, `wincon`), and land price bias when a budget cap is set.
 
 ## License
 

@@ -12,7 +12,7 @@ from mtg_deck_tools.paths import SLOT_TEMPLATES_PATH
 COMMANDER_DECK_SIZE = 99
 
 # Theme-layer tags used for slot filling, not archetype selection in the wizard.
-SLOT_FILLER_THEME_TAGS = frozenset({"ramp", "draw", "removal", "board_wipe"})
+SLOT_FILLER_THEME_TAGS = frozenset({"ramp", "draw", "removal", "board_wipe", "wincon"})
 
 
 @dataclass(frozen=True)

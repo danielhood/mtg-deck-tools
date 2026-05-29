@@ -38,3 +38,11 @@ Planning documents for a local Windows utility that walks users through deck-bui
 3. ~~Full slot filling~~ — `mtg-deck-tools generate` fills all template slots
 4. ~~Dynamic mana base~~ — ramp/curve/colors land count heuristic, pip-aware mix
 5. ~~Commander rule validation~~ — CR 903/702.124 checks in generate output
+
+## v1 polish (complete)
+
+- Budget pool filter excludes cards priced above remaining budget
+- Post-fill budget trim swaps expensive cards for cheaper slot alternatives
+- `--strict-budget` excludes unpriced cards from the pool
+- Tighter `board_wipe` / new `wincon` theme tags for slot filling
+- Land scoring deprioritizes expensive nonbasics when a budget cap is set

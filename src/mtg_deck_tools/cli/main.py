@@ -152,6 +152,13 @@ def generate_cmd(
     ] = None,
     db_path: Annotated[Optional[Path], typer.Option("--db")] = None,
     output_dir: Annotated[Optional[Path], typer.Option("--out")] = None,
+    strict_budget: Annotated[
+        bool,
+        typer.Option(
+            "--strict-budget",
+            help="Exclude unpriced cards and enforce budget cap during generation",
+        ),
+    ] = False,
 ) -> None:
     """
     Generate a Commander deck (99-card maindeck + commander metadata).
@@ -178,7 +185,7 @@ def generate_cmd(
 
     runner = run_generate_stub if stub else run_generate
     try:
-        out = runner(
+        kwargs = dict(
             db_path=db_path,
             seed=seed,
             colors=color_list,
@@ -186,6 +193,9 @@ def generate_cmd(
             criteria=criteria,
             output_dir=output_dir,
         )
+        if not stub:
+            kwargs["strict_budget"] = strict_budget
+        out = runner(**kwargs)
     except (FileNotFoundError, RuntimeError) as exc:
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(1) from exc

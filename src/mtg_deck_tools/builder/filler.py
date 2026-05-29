@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 
 import sqlite3
 
+from mtg_deck_tools.builder.budget_backfill import trim_deck_to_budget
+from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard, slot_theme_tags
 from mtg_deck_tools.builder.mana_base import (
     BASIC_NAME_BY_COLOR,
     ManaBasePlan,
@@ -18,46 +20,20 @@ from mtg_deck_tools.builder.mana_base import (
     validate_mana_sources,
 )
 from mtg_deck_tools.builder.pool import CardCandidate, fetch_candidates, fetch_card_tags
-from mtg_deck_tools.builder.scorer import score_candidate
+from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.validate import (
-    ValidationResult,
     adjust_slot_template_for_commanders,
     mainboard_size_for_commanders,
 )
-from mtg_deck_tools.wizard.slots import SLOT_FILLER_THEME_TAGS, load_slot_template_config
+from mtg_deck_tools.wizard.slots import load_slot_template_config
+
+# Re-export for callers that import from filler.
+from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard  # noqa: F401
 
 FILL_ORDER = ("ramp", "draw", "removal", "board_wipe", "synergy", "wincon", "flex", "lands")
 
 TOP_POOL_SIZE = 40
-
-
-@dataclass
-class DeckCard:
-    oracle_id: str
-    name: str
-    slot: str
-    quantity: int
-    cmc: float
-    mana_cost: str
-    type_line: str
-    price_usd: float | None
-    price_known: bool
-    scryfall_uri: str | None
-    image_uri: str | None
-    mechanic_tags: list[str] = field(default_factory=list)
-    oracle_text: str = ""
-    produced_mana: list[str] = field(default_factory=list)
-
-
-@dataclass
-class DeckBuildResult:
-    cards: list[DeckCard]
-    warnings: list[str]
-    budget_spent: float
-    unpriced_names: list[str]
-    mana_base: ManaBasePlan | None = None
-    validation: ValidationResult | None = None
 
 
 @dataclass
@@ -118,14 +94,6 @@ class _BuildState:
             self.warnings.append(f"No USD price for {candidate.name}; not counted toward budget.")
 
 
-def _slot_theme_tags(slot: str, criteria: DeckCriteria) -> list[str] | None:
-    if slot in SLOT_FILLER_THEME_TAGS:
-        return [slot]
-    if slot == "synergy" and criteria.themes:
-        return list(criteria.themes)
-    return None
-
-
 def _type_counts(cards: list[DeckCard]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for card in cards:
@@ -160,22 +128,23 @@ def _filter_budget(
 ) -> list[CardCandidate]:
     if budget_remaining is None:
         return candidates
-    if not strict:
-        return candidates
-    return [
-        c
-        for c in candidates
-        if not c.price_known
-        or c.price_usd is None
-        or c.price_usd <= budget_remaining
-    ]
+    filtered: list[CardCandidate] = []
+    for candidate in candidates:
+        if not candidate.price_known or candidate.price_usd is None:
+            if strict:
+                continue
+            filtered.append(candidate)
+            continue
+        if candidate.price_usd <= budget_remaining:
+            filtered.append(candidate)
+    return filtered
 
 
 def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
     if count <= 0:
         return
 
-    theme_tags = _slot_theme_tags(slot, state.criteria)
+    theme_tags = slot_theme_tags(slot, state.criteria)
     relax_steps: list[list[str] | None] = [theme_tags]
     if theme_tags is not None:
         relax_steps.append(None)
@@ -191,7 +160,11 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
             require_theme_tags=require_tags,
             nonlands_only=True,
         )
-        candidates = _filter_budget(candidates, state.budget_remaining(), strict=False)
+        candidates = _filter_budget(
+            candidates,
+            state.budget_remaining(),
+            strict=state.criteria.strict_budget,
+        )
         if len(candidates) >= count:
             break
         if require_tags is None:
@@ -252,7 +225,11 @@ def _fill_lands(
         limit=400,
     )
     nonbasics = [c for c in nonbasics if not c.is_basic_land]
-    nonbasics = _filter_budget(nonbasics, state.budget_remaining(), strict=False)
+    nonbasics = _filter_budget(
+        nonbasics,
+        state.budget_remaining(),
+        strict=state.criteria.strict_budget,
+    )
 
     tag_map = fetch_card_tags(state.conn, [c.oracle_id for c in nonbasics])
     scored: list[tuple[CardCandidate, float]] = []
@@ -272,7 +249,12 @@ def _fill_lands(
             type_counts=_type_counts(state.cards),
             budget_remaining=state.budget_remaining(),
         )
-        scored.append((candidate, card_score + pip_score))
+        land_budget = score_land_budget(
+            candidate,
+            budget_remaining=state.budget_remaining(),
+            budget_total=state.criteria.budget_usd,
+        )
+        scored.append((candidate, card_score + pip_score + land_budget))
     scored.sort(key=lambda item: item[1], reverse=True)
 
     picked_nonbasics = _pick_weighted(
@@ -385,10 +367,21 @@ def fill_deck(
         else:
             _fill_slot(state, slot, count)
 
-    return DeckBuildResult(
-        cards=state.cards,
+    cards, budget_spent, warnings = trim_deck_to_budget(
+        conn,
+        state.cards,
+        state.criteria,
+        identity=identity,
+        commander_oracle_ids=state.commander_oracle_ids,
+        commander_theme_tags=state.commander_theme_tags,
+        unpriced_names=state.unpriced_names,
         warnings=state.warnings,
-        budget_spent=state.budget_spent,
+    )
+
+    return DeckBuildResult(
+        cards=cards,
+        warnings=warnings,
+        budget_spent=budget_spent,
         unpriced_names=state.unpriced_names,
         mana_base=mana_plan,
     )

@@ -81,6 +81,7 @@ def run_generate(
     slot_template: dict[str, int] | None = None,
     criteria: DeckCriteria | None = None,
     output_dir: Path | None = None,
+    strict_budget: bool = False,
 ) -> Path:
     """Build a full 99-card maindeck from criteria and write output files."""
     db = db_path or DEFAULT_DB_PATH
@@ -148,6 +149,7 @@ def run_generate(
                 "commander_oracle_ids": [c["oracle_id"] for c in commanders],
                 "colors": identity,
                 "seed": effective_seed,
+                "strict_budget": strict_budget or working.strict_budget,
             }
         )
 

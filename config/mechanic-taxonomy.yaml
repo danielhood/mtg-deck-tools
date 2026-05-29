@@ -29,7 +29,14 @@ tags:
     description: Mass removal
     matchers:
       - type: oracle_regex
-        pattern: "(?i)(destroy all |exile all |each (creature|permanent|artifact|enchantment))"
+        pattern: "(?i)(destroy all |exile all |sacrifice all |all creatures get |all permanents |deals? [0-9]+ damage to each |each (creature|permanent|artifact|enchantment) .{0,30}(destroy|exile|sacrifice|deals|-[0-9]+/-[0-9]+))"
+
+  - id: wincon
+    layer: theme
+    description: Win conditions
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(you win the game|each opponent loses|can't lose the game|extra turns|take an extra turn|commander damage|infect)"
 
   - id: tokens
     layer: theme

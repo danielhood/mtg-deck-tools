@@ -191,8 +191,6 @@ def allocate_basics(
     if basic_target <= 0 or not identity:
         return []
 
-    from mtg_deck_tools.builder.filler import BASIC_NAME_BY_COLOR
-
     active = {c: pip_weights.get(c, 1) for c in identity}
     total_pips = sum(active.values()) or 1
     names: list[str] = []
