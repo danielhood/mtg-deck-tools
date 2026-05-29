@@ -20,6 +20,11 @@ from mtg_deck_tools.builder.mana_base import (
 from mtg_deck_tools.builder.pool import CardCandidate, fetch_candidates, fetch_card_tags
 from mtg_deck_tools.builder.scorer import score_candidate
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.rules.validate import (
+    ValidationResult,
+    adjust_slot_template_for_commanders,
+    mainboard_size_for_commanders,
+)
 from mtg_deck_tools.wizard.slots import SLOT_FILLER_THEME_TAGS, load_slot_template_config
 
 FILL_ORDER = ("ramp", "draw", "removal", "board_wipe", "synergy", "wincon", "flex", "lands")
@@ -52,6 +57,7 @@ class DeckBuildResult:
     budget_spent: float
     unpriced_names: list[str]
     mana_base: ManaBasePlan | None = None
+    validation: ValidationResult | None = None
 
 
 @dataclass
@@ -217,7 +223,12 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
         state.register(candidate, slot)
 
 
-def _fill_lands(state: _BuildState, template_lands: int) -> ManaBasePlan:
+def _fill_lands(
+    state: _BuildState,
+    template_lands: int,
+    *,
+    mainboard_size: int,
+) -> ManaBasePlan:
     slot_config = load_slot_template_config()
     land_bounds = slot_config.bounds["lands"]
     plan = plan_mana_base(
@@ -226,6 +237,7 @@ def _fill_lands(state: _BuildState, template_lands: int) -> ManaBasePlan:
         template_lands=template_lands,
         min_lands=land_bounds.min,
         max_lands=land_bounds.max,
+        mainboard_size=mainboard_size,
     )
     state.warnings.extend(plan.warnings)
 
@@ -340,7 +352,10 @@ def fill_deck(
 ) -> DeckBuildResult:
     """Fill all slots from criteria and return the 99-card maindeck."""
     slot_config = load_slot_template_config()
-    slots = criteria.slot_template or dict(slot_config.default)
+    slots = dict(criteria.slot_template or slot_config.default)
+    commander_count = max(1, len(commander_oracle_ids))
+    slots = adjust_slot_template_for_commanders(slots, commander_count)
+    mainboard_size = mainboard_size_for_commanders(commander_count)
 
     commander_tags: set[str] = set()
     if commander_oracle_ids:
@@ -366,7 +381,7 @@ def fill_deck(
     for slot in FILL_ORDER:
         count = slots.get(slot, 0)
         if slot == "lands":
-            mana_plan = _fill_lands(state, count)
+            mana_plan = _fill_lands(state, count, mainboard_size=mainboard_size)
         else:
             _fill_slot(state, slot, count)
 

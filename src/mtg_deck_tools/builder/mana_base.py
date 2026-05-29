@@ -306,12 +306,13 @@ def plan_mana_base(
     template_lands: int,
     min_lands: int = DEFAULT_MIN_LANDS,
     max_lands: int = DEFAULT_MAX_LANDS,
+    mainboard_size: int = COMMANDER_DECK_SIZE,
 ) -> ManaBasePlan:
     """Build mana base plan from filled nonland cards."""
     nonland_cards = [c for c in cards if getattr(c, "slot", None) != "lands"]
     nonland_count = sum(getattr(c, "quantity", 1) for c in nonland_cards)
-    if nonland_count + template_lands == COMMANDER_DECK_SIZE:
-        actual_lands = COMMANDER_DECK_SIZE - nonland_count
+    if nonland_count + template_lands == mainboard_size:
+        actual_lands = mainboard_size - nonland_count
     else:
         actual_lands = template_lands
 

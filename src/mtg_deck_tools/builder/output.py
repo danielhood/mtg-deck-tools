@@ -10,8 +10,25 @@ from pathlib import Path
 from mtg_deck_tools import __version__
 from mtg_deck_tools.builder.filler import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
+from mtg_deck_tools.rules.validate import ValidationResult
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.wizard.slots import load_slot_template_config
+
+
+def _validation_dict(result: ValidationResult | None) -> dict | None:
+    if result is None:
+        return None
+    return {
+        "passed": result.passed,
+        "errors": [
+            {"rule": i.rule, "message": i.message, "card_name": i.card_name}
+            for i in result.errors
+        ],
+        "warnings": [
+            {"rule": i.rule, "message": i.message, "card_name": i.card_name}
+            for i in result.warnings
+        ],
+    }
 
 
 def _mana_base_dict(plan: ManaBasePlan | None) -> dict | None:
@@ -99,6 +116,7 @@ def write_deck_outputs(
             "avg_cmc_nonland": avg_cmc,
         },
         "mana_base": _mana_base_dict(maindeck.mana_base),
+        "validation": _validation_dict(maindeck.validation),
         "warnings": maindeck.warnings,
     }
 
@@ -135,6 +153,23 @@ def write_deck_outputs(
     for cmd in commanders:
         lines.append(f"- {cmd['name']}")
     lines.append("")
+
+    if maindeck.validation:
+        v = maindeck.validation
+        status = "PASSED" if v.passed else "FAILED"
+        lines.extend(["## Validation", "", f"**Status:** {status}", ""])
+        if v.errors:
+            lines.append("### Errors")
+            for issue in v.errors:
+                name = f" — {issue.card_name}" if issue.card_name else ""
+                lines.append(f"- **[{issue.rule}]**{name} {issue.message}")
+            lines.append("")
+        if v.warnings:
+            lines.append("### Warnings")
+            for issue in v.warnings:
+                name = f" — {issue.card_name}" if issue.card_name else ""
+                lines.append(f"- **[{issue.rule}]**{name} {issue.message}")
+            lines.append("")
 
     if maindeck.mana_base:
         mb = maindeck.mana_base

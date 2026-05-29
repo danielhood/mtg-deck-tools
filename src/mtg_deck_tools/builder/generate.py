@@ -9,6 +9,7 @@ from pathlib import Path
 
 from mtg_deck_tools.builder.filler import fill_deck
 from mtg_deck_tools.builder.output import write_deck_outputs
+from mtg_deck_tools.rules.validate import validate_commander_deck, validation_messages
 from mtg_deck_tools.db.connection import connect
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import DEFAULT_DB_PATH, OUTPUT_DIR
@@ -157,6 +158,18 @@ def run_generate(
             commander_oracle_ids=[c["oracle_id"] for c in commanders],
             seed=effective_seed,
         )
+
+        validation = validate_commander_deck(
+            conn,
+            commanders=identity_rows,
+            maindeck=maindeck.cards,
+            identity=identity,
+            budget_usd=output_criteria.budget_usd,
+            budget_spent=maindeck.budget_spent,
+            unpriced_count=len(maindeck.unpriced_names),
+        )
+        maindeck.validation = validation
+        maindeck.warnings.extend(validation_messages(validation))
 
         out_dir = output_dir or OUTPUT_DIR
         out_dir.mkdir(parents=True, exist_ok=True)

@@ -37,4 +37,4 @@ Planning documents for a local Windows utility that walks users through deck-bui
 2. ~~Wizard steps 1–5~~ — full criteria wizard (`mtg-deck-tools wizard` or `generate --wizard`)
 3. ~~Full slot filling~~ — `mtg-deck-tools generate` fills all template slots
 4. ~~Dynamic mana base~~ — ramp/curve/colors land count heuristic, pip-aware mix
-5. Commander rule validation pass + output polish
+5. ~~Commander rule validation~~ — CR 903/702.124 checks in generate output
