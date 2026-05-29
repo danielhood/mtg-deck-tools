@@ -42,6 +42,9 @@ def _deck_card_from_candidate(
         mechanic_tags=tags,
         oracle_text=candidate.oracle_text,
         produced_mana=list(candidate.produced_mana),
+        released_at=candidate.released_at,
+        power=candidate.power,
+        toughness=candidate.toughness,
     )
 
 

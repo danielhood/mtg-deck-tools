@@ -82,6 +82,9 @@ class _BuildState:
                 mechanic_tags=tags,
                 oracle_text=candidate.oracle_text,
                 produced_mana=list(candidate.produced_mana),
+                released_at=candidate.released_at,
+                power=candidate.power,
+                toughness=candidate.toughness,
             )
         )
         if not candidate.is_basic_land:
@@ -292,7 +295,8 @@ def _fill_lands(
             """
             SELECT oracle_id, name, cmc, type_line, mana_cost, color_identity,
                    price_usd, price_known, edhrec_rank, oracle_text, keywords,
-                   is_basic_land, produced_mana, scryfall_uri, image_uri
+                   is_basic_land, produced_mana, scryfall_uri, image_uri, released_at,
+                   power, toughness
             FROM cards
             WHERE is_basic_land = 1 AND name = ?
             LIMIT 1
@@ -318,6 +322,9 @@ def _fill_lands(
             produced_mana=json.loads(row["produced_mana"] or "[]"),
             scryfall_uri=row["scryfall_uri"],
             image_uri=row["image_uri"],
+            released_at=row["released_at"],
+            power=row["power"],
+            toughness=row["toughness"],
         )
         state.register(candidate, "lands")
 

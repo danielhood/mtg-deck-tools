@@ -26,6 +26,9 @@ class DeckCard:
     mechanic_tags: list[str] = field(default_factory=list)
     oracle_text: str = ""
     produced_mana: list[str] = field(default_factory=list)
+    released_at: str | None = None
+    power: str | None = None
+    toughness: str | None = None
 
 
 @dataclass

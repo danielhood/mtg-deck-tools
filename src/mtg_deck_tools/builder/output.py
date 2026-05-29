@@ -5,12 +5,13 @@ from __future__ import annotations
 import json
 import re
 from collections import defaultdict
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 from mtg_deck_tools import __version__
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
+from mtg_deck_tools.builder.mana_symbols import format_mana_notation
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.commander import format_color_identity
 from mtg_deck_tools.rules.validate import ValidationResult
@@ -80,10 +81,15 @@ def _avg_cmc_nonland(cards: list[DeckCard]) -> float | None:
     return round(total / count, 2) if count else None
 
 
+def format_display_date(value: date) -> str:
+    """Display date as 'May 29, 2026'."""
+    return f"{value.strftime('%B')} {value.day}, {value.year}"
+
+
 def format_generated_timestamp(when: datetime) -> str:
-    """Friendly local timestamp, e.g. 29 May 2026 · 16:06 PDT."""
+    """Friendly local timestamp, e.g. May 29, 2026 · 16:06 PDT."""
     local = when.astimezone()
-    return local.strftime("%d %B %Y · %H:%M %Z")
+    return f"{format_display_date(local.date())} · {local.strftime('%H:%M %Z')}"
 
 
 def classify_warning(message: str) -> str:
@@ -129,14 +135,47 @@ def format_card_price(card: DeckCard) -> str:
 
 
 def format_card_mana_cost(card: DeckCard) -> str:
-    return card.mana_cost.strip() if card.mana_cost and card.mana_cost.strip() else "—"
+    raw = card.mana_cost.strip() if card.mana_cost else ""
+    if not raw:
+        return "—"
+    return format_mana_notation(raw, description=False)
 
 
 def format_card_description(card: DeckCard) -> str:
     text = (card.oracle_text or "").strip()
     if not text:
         return "—"
-    return " ".join(text.split())
+    return format_mana_notation(" ".join(text.split()), description=True)
+
+
+def format_card_power_toughness(card: DeckCard) -> str:
+    power = (card.power or "").strip()
+    toughness = (card.toughness or "").strip()
+    if not power and not toughness:
+        return "—"
+    if power and toughness:
+        return f"{power}/{toughness}"
+    return power or toughness
+
+
+def format_card_detail_title(card: DeckCard) -> str:
+    """Card name for the details heading, linked to Scryfall when URI is known."""
+    qty = f" ({card.quantity}×)" if card.quantity > 1 else ""
+    title = f"{card.name}{qty}"
+    if card.scryfall_uri:
+        return f"[{title}]({card.scryfall_uri})"
+    return title
+
+
+def format_card_released_at(card: DeckCard) -> str:
+    """Human-readable release date from Scryfall released_at (YYYY-MM-DD)."""
+    raw = (card.released_at or "").strip()
+    if not raw:
+        return "—"
+    try:
+        return format_display_date(date.fromisoformat(raw[:10]))
+    except ValueError:
+        return raw
 
 
 def _render_notes_section(
@@ -185,10 +224,11 @@ def _render_card_details_section(
         lines.append(f"### {label}")
         lines.append("")
         for card in sorted(slot_cards, key=lambda c: (-c.quantity, c.cmc, c.name)):
-            qty = f" ({card.quantity}×)" if card.quantity > 1 else ""
-            lines.append(f"#### {card.name}{qty}")
+            lines.append(f"#### {format_card_detail_title(card)}")
             lines.append(f"- **Price:** {format_card_price(card)}")
+            lines.append(f"- **Released:** {format_card_released_at(card)}")
             lines.append(f"- **Mana cost:** {format_card_mana_cost(card)}")
+            lines.append(f"- **Power/Toughness:** {format_card_power_toughness(card)}")
             lines.append(f"- **Description:** {format_card_description(card)}")
             lines.append("")
     return lines
@@ -234,6 +274,9 @@ def write_deck_outputs(
                 "scryfall_uri": c.scryfall_uri,
                 "image_uri": c.image_uri,
                 "mechanic_tags": c.mechanic_tags,
+                "released_at": c.released_at,
+                "power": c.power,
+                "toughness": c.toughness,
             }
             for c in maindeck.cards
         ],

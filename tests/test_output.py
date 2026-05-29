@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.output import (
     classify_warning,
     format_card_description,
+    format_card_detail_title,
     format_card_mana_cost,
+    format_card_power_toughness,
     format_card_price,
+    format_card_released_at,
+    format_display_date,
     format_generated_timestamp,
     group_warnings,
     write_deck_outputs,
@@ -24,11 +28,16 @@ def test_format_color_identity() -> None:
     assert format_color_identity([]) == "Colorless"
 
 
+def test_format_display_date() -> None:
+    assert format_display_date(date(2026, 5, 29)) == "May 29, 2026"
+    assert format_display_date(date(1993, 10, 4)) == "October 4, 1993"
+
+
 def test_format_generated_timestamp() -> None:
     when = datetime(2026, 5, 29, 23, 6, 57, tzinfo=UTC)
     formatted = format_generated_timestamp(when)
     local = when.astimezone()
-    assert formatted == local.strftime("%d %B %Y · %H:%M %Z")
+    assert formatted == f"May 29, 2026 · {local.strftime('%H:%M %Z')}"
 
 
 def test_classify_warning() -> None:
@@ -69,7 +78,7 @@ def test_card_detail_formatters() -> None:
         oracle_text="Search your library for a land card,\nreveal it, and put it into your hand.",
     )
     assert format_card_price(priced) == "$3.53"
-    assert format_card_mana_cost(priced) == "{G}"
+    assert format_card_mana_cost(priced) == "(G)"
     assert "Search your library" in format_card_description(priced)
 
     unpriced = DeckCard(
@@ -89,6 +98,107 @@ def test_card_detail_formatters() -> None:
     assert format_card_mana_cost(unpriced) == "—"
 
 
+def test_format_card_detail_title_links_scryfall() -> None:
+    linked = DeckCard(
+        oracle_id="1",
+        name="Sol Ring",
+        slot="ramp",
+        quantity=1,
+        cmc=1.0,
+        mana_cost="{1}",
+        type_line="Artifact",
+        price_usd=1.0,
+        price_known=True,
+        scryfall_uri="https://scryfall.com/card/a25/232/sol-ring",
+        image_uri=None,
+    )
+    assert format_card_detail_title(linked) == (
+        "[Sol Ring](https://scryfall.com/card/a25/232/sol-ring)"
+    )
+    assert format_card_detail_title(
+        DeckCard(
+            oracle_id="2",
+            name="Forest",
+            slot="lands",
+            quantity=9,
+            cmc=0.0,
+            mana_cost="",
+            type_line="Basic Land — Forest",
+            price_usd=None,
+            price_known=False,
+            scryfall_uri=None,
+            image_uri=None,
+        )
+    ) == "Forest (9×)"
+
+
+def test_format_card_power_toughness() -> None:
+    creature = DeckCard(
+        oracle_id="1",
+        name="Bear",
+        slot="synergy",
+        quantity=1,
+        cmc=2.0,
+        mana_cost="{1}{G}",
+        type_line="Creature — Bear",
+        price_usd=0.5,
+        price_known=True,
+        scryfall_uri=None,
+        image_uri=None,
+        power="2",
+        toughness="2",
+    )
+    assert format_card_power_toughness(creature) == "2/2"
+    assert format_card_power_toughness(
+        DeckCard(
+            oracle_id="2",
+            name="Sol Ring",
+            slot="ramp",
+            quantity=1,
+            cmc=1.0,
+            mana_cost="{1}",
+            type_line="Artifact",
+            price_usd=1.0,
+            price_known=True,
+            scryfall_uri=None,
+            image_uri=None,
+        )
+    ) == "—"
+
+
+def test_format_card_released_at() -> None:
+    card = DeckCard(
+        oracle_id="1",
+        name="Test",
+        slot="ramp",
+        quantity=1,
+        cmc=1.0,
+        mana_cost="{G}",
+        type_line="Creature",
+        price_usd=1.0,
+        price_known=True,
+        scryfall_uri=None,
+        image_uri=None,
+        released_at="2015-03-27",
+    )
+    assert format_card_released_at(card) == "March 27, 2015"
+    assert format_card_released_at(
+        DeckCard(
+            oracle_id="2",
+            name="Unknown",
+            slot="flex",
+            quantity=1,
+            cmc=0.0,
+            mana_cost="",
+            type_line="Creature",
+            price_usd=None,
+            price_known=False,
+            scryfall_uri=None,
+            image_uri=None,
+        )
+    ) == "—"
+
+
 def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     cards = [
         DeckCard(
@@ -101,9 +211,12 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
             type_line="Creature — Elf Druid",
             price_usd=1.25,
             price_known=True,
-            scryfall_uri=None,
-            image_uri=None,
-            oracle_text="{T}: Add {G}.",
+        scryfall_uri="https://scryfall.com/card/lea/258/llanowar-elves",
+        image_uri=None,
+        oracle_text="{T}: Add {G}.",
+            released_at="1993-10-04",
+            power="1",
+            toughness="1",
         ),
         DeckCard(
             oracle_id="f1",
@@ -160,8 +273,10 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     assert "### Budget trims" in notes_section
     assert "[budget]" not in notes_section
     assert "## Card details" in text
-    assert "#### Llanowar Elves" in text
+    assert "#### [Llanowar Elves](https://scryfall.com/card/lea/258/llanowar-elves)" in text
     assert "**Price:** $1.25" in text
-    assert "**Mana cost:** {G}" in text
-    assert "**Description:** {T}: Add {G}." in text
+    assert "**Released:** October 4, 1993" in text
+    assert "**Power/Toughness:** 1/1" in text
+    assert "**Mana cost:** (G)" in text
+    assert "**Description:** **Tap**: Add (G)." in text
     assert "#### Forest (98×)" in text
