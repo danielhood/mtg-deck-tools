@@ -28,6 +28,9 @@ share/python-wheels/
 # Virtual environments
 .venv/
 venv/
+
+# Editable install artifacts
+*.egg-info/
 ENV/
 env/
 

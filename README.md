@@ -65,9 +65,43 @@ mtg-deck-tools/
   output/                   # Generated decks (gitignored)
 ```
 
+## Setup (development)
+
+```powershell
+cd mtg-deck-tools
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+```
+
+Ensure oracle cards JSON and Comprehensive Rules are in place (see above).
+
+## Usage
+
+```powershell
+# Import oracle cards into local SQLite (one-time or after bulk refresh)
+mtg-deck-tools import
+
+# Database summary
+mtg-deck-tools stats
+
+# Phase 1 stub: seeded sample commander + synergy cards → output/
+mtg-deck-tools generate --seed 42 --colors B,G --themes aristocrats
+```
+
+Options:
+
+| Command | Description |
+| --- | --- |
+| `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, apply mechanic tags |
+| `stats` | Row counts, import metadata, top tags |
+| `generate` | Stub deck preview (Phase 2 adds full wizard + 100-card build) |
+
 ## Status
 
-**Phase 1** (in progress): project scaffold, import pipeline, mechanic taxonomy, CLI stub.
+**Phase 1** complete: Python package, SQLite import, mechanic taxonomy v0, CLI (`import`, `stats`, `generate` stub).
+
+**Phase 2** (next): interactive wizard, slot filling, full Markdown + `.deck.json` deck output.
 
 ## License
 

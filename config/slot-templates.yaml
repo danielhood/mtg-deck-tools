@@ -1,0 +1,12 @@
+# Default Commander slot counts (99 cards excluding commander).
+# Wizard may override; lands adjusted last by mana base logic (Phase 2+).
+
+default:
+  ramp: 10
+  draw: 8
+  removal: 8
+  board_wipe: 2
+  synergy: 30
+  wincon: 4
+  flex: 6
+  lands: 31

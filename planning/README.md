@@ -31,9 +31,9 @@ Planning documents for a local Windows utility that walks users through deck-bui
 - **Power level:** Deferred (not a simple dial)
 - **Availability:** v1 EDHREC bias; later distinguish obscure vs newly unpriced cards
 
-## Next steps — Phase 1
+## Next steps — Phase 2
 
-1. ~~Planning decisions~~ — complete
-2. Import oracle JSON → SQLite
-3. Mechanic taxonomy v0 + batch tagger
-4. CLI stub (`import`, `generate` with `--seed`)
+1. ~~Phase 1~~ — complete (import, tags, CLI stub)
+2. Interactive wizard (`questionary`)
+3. Full slot filling + mana base
+4. Complete Markdown + `.deck.json` deck output

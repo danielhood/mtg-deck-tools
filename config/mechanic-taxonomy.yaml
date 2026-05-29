@@ -1,0 +1,186 @@
+# Mechanic taxonomy v0 — theme (archetype/slot) and keyword (include/avoid) layers.
+# Matchers run at import time against normalized card fields.
+
+tags:
+  # --- Theme / slot tags ---
+  - id: ramp
+    layer: theme
+    description: Mana acceleration
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(add \\{[WUBRG]\\}|add one mana|add two mana|add three mana|search your library for .{0,40} land|mana rock)"
+
+  - id: draw
+    layer: theme
+    description: Card advantage
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(draw a card|draw two cards|draw three cards|draw four cards|draw X cards)"
+
+  - id: removal
+    layer: theme
+    description: Single-target removal
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(destroy target|exile target|damage to (any )?target|-[0-9]+/-[0-9]+ until end of turn)"
+
+  - id: board_wipe
+    layer: theme
+    description: Mass removal
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(destroy all |exile all |each (creature|permanent|artifact|enchantment))"
+
+  - id: tokens
+    layer: theme
+    description: Token creation
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(create .{0,30} token)"
+
+  - id: aristocrats
+    layer: theme
+    description: Sacrifice synergies
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(sacrifice (a |another |each )?(creature|permanent)|when(ever)? .+ dies)"
+
+  - id: landfall
+    layer: theme
+    description: Landfall triggers
+    matchers:
+      - type: keyword
+        value: Landfall
+
+  - id: recursion
+    layer: theme
+    description: Graveyard recursion
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(return .+ from (your )?graveyard|cast .+ from your graveyard)"
+
+  - id: voltron
+    layer: theme
+    description: Equipment and aura support
+    matchers:
+      - type: type_regex
+        pattern: "(Equipment|Aura)"
+      - type: oracle_regex
+        pattern: "(?i)(equipped creature|enchant creature|enchantment.?aura)"
+
+  # --- Keyword mechanics (include / avoid wizard) ---
+  - id: flying
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Flying
+
+  - id: trample
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Trample
+
+  - id: first_strike
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: First strike
+
+  - id: double_strike
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Double strike
+
+  - id: deathtouch
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Deathtouch
+
+  - id: lifelink
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Lifelink
+
+  - id: menace
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Menace
+
+  - id: hexproof
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Hexproof
+
+  - id: indestructible
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Indestructible
+
+  - id: vigilance
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Vigilance
+
+  - id: haste
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Haste
+
+  - id: reach
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Reach
+
+  - id: scry
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Scry
+      - type: oracle_regex
+        pattern: "(?i)scry [0-9]+"
+
+  - id: energy
+    layer: keyword
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(\\{E\\}|energy counter)"
+
+  - id: vehicles
+    layer: keyword
+    matchers:
+      - type: type_regex
+        pattern: "Vehicle"
+
+  - id: partner
+    layer: keyword
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(partner with|partner —|partners with|choose a background|doctor's companion|^partner\\b)"
+
+  - id: flash
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Flash
+
+  - id: cascade
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Cascade
+
+  - id: equip
+    layer: keyword
+    matchers:
+      - type: keyword
+        value: Equip

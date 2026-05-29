@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mtg-deck-tools"
+version = "0.1.0"
+description = "Local Commander deck builder for Magic: The Gathering"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.15.0",
+    "rich>=13.9.0",
+    "pydantic>=2.10.0",
+    "pyyaml>=6.0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+]
+
+[project.scripts]
+mtg-deck-tools = "mtg_deck_tools.cli.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mtg_deck_tools"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
