@@ -8,6 +8,12 @@ from mtg_deck_tools.paths import NON_DECKABLE_LAYOUTS
 
 COLOR_ORDER = ("W", "U", "B", "R", "G")
 
+# Card types that are lands (not "Enchant Land" enchantments).
+_LAND_TYPE_RE = re.compile(
+    r"^(?:Legendary\s+|Basic\s+|Snow\s+|World\s+)?(?:Artifact\s+)?Land(?:\s|$|//)",
+    re.IGNORECASE,
+)
+
 
 def parse_color_identity(raw: list[str] | None) -> frozenset[str]:
     if not raw:
@@ -18,6 +24,34 @@ def parse_color_identity(raw: list[str] | None) -> frozenset[str]:
 def color_identity_subset(card_identity: frozenset[str], commander_identity: frozenset[str]) -> bool:
     """True if every color in card_identity is in commander_identity (903.5c)."""
     return card_identity <= commander_identity
+
+
+def is_land_card(*, type_line: str, is_basic_land: bool = False) -> bool:
+    """True if the card is a land (903.5d applies to nonbasic lands)."""
+    if is_basic_land:
+        return True
+    if not type_line:
+        return False
+    primary = type_line.split("—")[0].split("//")[0].strip()
+    return bool(_LAND_TYPE_RE.match(primary))
+
+
+def land_produces_only_identity(
+    *,
+    produced_mana: list[str] | frozenset[str] | None,
+    identity: list[str],
+    is_basic_land: bool = False,
+) -> bool:
+    """True if a land's produced_mana is empty or a subset of commander identity (903.5d)."""
+    if is_basic_land or not produced_mana:
+        return True
+    commander_identity = parse_color_identity(list(identity))
+    produced = (
+        produced_mana
+        if isinstance(produced_mana, frozenset)
+        else parse_color_identity(list(produced_mana))
+    )
+    return produced <= commander_identity
 
 
 def is_playable_card(

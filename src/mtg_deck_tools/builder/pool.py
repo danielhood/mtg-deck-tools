@@ -6,7 +6,11 @@ import json
 import sqlite3
 from dataclasses import dataclass
 
-from mtg_deck_tools.rules.commander import COLOR_ORDER
+from mtg_deck_tools.rules.commander import (
+    COLOR_ORDER,
+    is_land_card,
+    land_produces_only_identity,
+)
 
 ALL_COLORS = COLOR_ORDER
 
@@ -102,9 +106,21 @@ def fetch_candidates(
     """
 
     if lands_only:
-        sql += " AND (c.is_basic_land = 1 OR c.type_line LIKE '% Land%')"
+        sql += """
+          AND (
+            c.is_basic_land = 1
+            OR c.type_line = 'Land'
+            OR c.type_line LIKE '% Land%'
+            OR c.type_line LIKE 'Land —%'
+          )
+        """
     elif nonlands_only:
-        sql += " AND c.is_basic_land = 0 AND c.type_line NOT LIKE '% Land%'"
+        sql += """
+          AND c.is_basic_land = 0
+          AND c.type_line != 'Land'
+          AND c.type_line NOT LIKE '% Land%'
+          AND c.type_line NOT LIKE 'Land —%'
+        """
 
     if exclude_oracle_ids:
         placeholders = ",".join("?" * len(exclude_oracle_ids))
@@ -134,7 +150,27 @@ def fetch_candidates(
     params.append(limit)
 
     rows = conn.execute(sql, params).fetchall()
-    return [_row_to_candidate(r) for r in rows]
+    candidates = [_row_to_candidate(r) for r in rows]
+
+    if lands_only:
+        candidates = [
+            c
+            for c in candidates
+            if is_land_card(type_line=c.type_line, is_basic_land=c.is_basic_land)
+            and land_produces_only_identity(
+                produced_mana=c.produced_mana,
+                identity=identity,
+                is_basic_land=c.is_basic_land,
+            )
+        ]
+    elif nonlands_only:
+        candidates = [
+            c
+            for c in candidates
+            if not is_land_card(type_line=c.type_line, is_basic_land=c.is_basic_land)
+        ]
+
+    return candidates
 
 
 def fetch_card_tags(conn: sqlite3.Connection, oracle_ids: list[str]) -> dict[str, list[str]]:

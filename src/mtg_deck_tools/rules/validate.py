@@ -11,6 +11,8 @@ from typing import Protocol
 from mtg_deck_tools.rules.commander import (
     color_identity_subset,
     is_commander_eligible,
+    is_land_card,
+    land_produces_only_identity,
     parse_color_identity,
 )
 
@@ -320,11 +322,15 @@ def validate_commander_deck(
     # 903.5d — land mana production
     for card in maindeck:
         row = rules_by_id.get(card.oracle_id)
-        if not row or row.is_basic_land or "Land" not in card.type_line:
+        if not row or not is_land_card(type_line=card.type_line, is_basic_land=row.is_basic_land):
             continue
         produced = row.produced_mana or parse_color_identity(card.produced_mana)
-        illegal = sorted(produced - commander_identity)
-        if illegal:
+        if not land_produces_only_identity(
+            produced_mana=produced,
+            identity=identity,
+            is_basic_land=row.is_basic_land,
+        ):
+            illegal = sorted(produced - commander_identity)
             result.error(
                 "903.5d",
                 f"{card.name} produces {illegal} outside commander color identity.",

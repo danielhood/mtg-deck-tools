@@ -67,10 +67,21 @@ mtg-deck-tools/
 
 ## Setup (development)
 
+**Windows (PowerShell)**
+
 ```powershell
 cd mtg-deck-tools
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+```
+
+**Linux / macOS (bash)**
+
+```bash
+cd mtg-deck-tools
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 

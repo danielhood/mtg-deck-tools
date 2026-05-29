@@ -165,6 +165,20 @@ def test_fetch_candidates_excludes_avoid_mechanics(deck_db: sqlite3.Connection) 
     assert "Ramp Rock" in names
 
 
+def test_nonlands_only_excludes_type_line_land(deck_db: sqlite3.Connection) -> None:
+    pool = fetch_candidates(
+        deck_db,
+        identity=["G"],
+        exclude_oracle_ids=set(),
+        exclude_names=set(),
+        avoid_mechanics=[],
+        require_theme_tags=None,
+        nonlands_only=True,
+    )
+    names = {c.name for c in pool}
+    assert "Grove Land" not in names
+
+
 def test_score_candidate_boosts_theme_overlap(deck_db: sqlite3.Connection) -> None:
     row = deck_db.execute(
         "SELECT * FROM cards WHERE oracle_id = 'synergy-1'"
