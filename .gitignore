@@ -1,0 +1,92 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-wheel-metadata/
+share/python-wheels/
+*.manifest
+*.spec
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing / type checking / lint
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.hypothesis/
+
+# Build tools
+*.mo
+*.pot
+
+# Jupyter
+.ipynb_checkpoints
+
+# pyenv / local version pins
+.python-version
+
+# Cursor IDE (local editor state; project rules may be committed explicitly)
+.cursor/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Project: generated database (derivative of Scryfall data — keep local)
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Project: external copyrighted content (download locally — see README)
+resources/scryfall/oracle-cards-*.json
+resources/mtg/MagicCompRules*.txt
+
+# Deck output (generated at runtime)
+output/
+
+# Logs
+*.log

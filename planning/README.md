@@ -1,0 +1,39 @@
+# MTG Commander Deck Builder — Planning
+
+Planning documents for a local Windows utility that walks users through deck-building criteria and produces a playable Commander (100-card, singleton) deck list.
+
+## Documents
+
+| Doc | Purpose |
+| --- | --- |
+| [01-goals-and-scope.md](01-goals-and-scope.md) | Problem statement, v1 scope, success criteria |
+| [02-data-sources.md](02-data-sources.md) | Oracle cards JSON, rules text, field reference gap |
+| [03-problem-decomposition.md](03-problem-decomposition.md) | Sub-problems: wizard, filtering, tagging, slots, mana base |
+| [04-architecture-options.md](04-architecture-options.md) | End-to-end pipeline and component options |
+| [05-technology-options.md](05-technology-options.md) | Stack comparison for local Windows + database |
+| [06-open-questions.md](06-open-questions.md) | Resolved planning decisions |
+| [07-deck-output-format.md](07-deck-output-format.md) | Markdown + `.deck.json` schema |
+| [08-card-availability.md](08-card-availability.md) | Budget null prices; future availability heuristic |
+
+## Current preferences
+
+- **Deck generation:** Guided slot template (ramp / draw / removal / win-con / lands, etc.)
+- **Mechanics matching:** Curated taxonomy + rule-based tagging from `oracle_text`
+- **Include / avoid:** User selects keyword-level mechanics to want or exclude (trample, scry, energy, vehicles, …)
+- **Wizard flow:** Theme → colors → commander (partners supported in v1)
+- **Constraints:** Commander rules, budget, commander synergy, include/avoid mechanics
+- **Export:** Markdown (human) + `.deck.json` (machine reload / images / future edits)
+- **UI:** Terminal CLI — Python + `typer` / `questionary` / `rich`
+- **Runtime:** Python + SQLite
+
+- **Budget:** Allow with warning when `prices.usd` is null; optional `--strict-budget`
+- **Variety:** Seeded random slot picks (`--seed`)
+- **Power level:** Deferred (not a simple dial)
+- **Availability:** v1 EDHREC bias; later distinguish obscure vs newly unpriced cards
+
+## Next steps — Phase 1
+
+1. ~~Planning decisions~~ — complete
+2. Import oracle JSON → SQLite
+3. Mechanic taxonomy v0 + batch tagger
+4. CLI stub (`import`, `generate` with `--seed`)
