@@ -14,6 +14,7 @@ Planning documents for a local Windows utility that walks users through deck-bui
 | [06-open-questions.md](06-open-questions.md) | Resolved planning decisions |
 | [07-deck-output-format.md](07-deck-output-format.md) | Markdown + `.deck.json` schema |
 | [08-card-availability.md](08-card-availability.md) | Budget null prices; future availability heuristic |
+| [09-next-steps.md](09-next-steps.md) | **Post-v1 roadmap** — Phase 3 priorities and backlog |
 
 ## Current preferences
 
@@ -31,18 +32,26 @@ Planning documents for a local Windows utility that walks users through deck-bui
 - **Power level:** Deferred (not a simple dial)
 - **Availability:** v1 EDHREC bias; later distinguish obscure vs newly unpriced cards
 
-## Next steps — Phase 2
+## Completed
 
-1. ~~Phase 1~~ — complete (import, tags, CLI stub)
-2. ~~Wizard steps 1–5~~ — full criteria wizard (`mtg-deck-tools wizard` or `generate --wizard`)
-3. ~~Full slot filling~~ — `mtg-deck-tools generate` fills all template slots
-4. ~~Dynamic mana base~~ — ramp/curve/colors land count heuristic, pip-aware mix
-5. ~~Commander rule validation~~ — CR 903/702.124 checks in generate output
+### Phase 1
+- Oracle import, mechanic taxonomy v0, SQLite schema, CLI stub
 
-## v1 polish (complete)
+### Phase 2
+1. ~~Wizard steps 1–5~~ — full criteria wizard (`mtg-deck-tools wizard` or `generate --wizard`)
+2. ~~Full slot filling~~ — `mtg-deck-tools generate` fills all template slots
+3. ~~Dynamic mana base~~ — ramp/curve/colors land count heuristic, pip-aware mix
+4. ~~Commander rule validation~~ — CR 903/702.124 checks in generate output
 
+### v1 polish
 - Budget pool filter excludes cards priced above remaining budget
-- Post-fill budget trim swaps expensive cards for cheaper slot alternatives
+- Post-fill budget trim swaps expensive cards for cheaper slot alternatives (incremental when over cap)
 - `--strict-budget` excludes unpriced cards from the pool
 - Tighter `board_wipe` / new `wincon` theme tags for slot filling
 - Land scoring deprioritizes expensive nonbasics when a budget cap is set
+
+## What's next
+
+See **[09-next-steps.md](09-next-steps.md)** for the Phase 3 roadmap.
+
+**Recommended first task:** build-time legality filters (903.5d land colors, land/nonland slot separation, optional post-validate repair).

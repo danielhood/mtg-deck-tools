@@ -25,6 +25,8 @@ All v1 planning questions are resolved. Revisit only when scope changes.
 
 ## Deferred (post-v1)
 
+See [09-next-steps.md](09-next-steps.md) for the active Phase 3 roadmap and priority order.
+
 | Topic | Notes |
 | --- | --- |
 | Power level / salt | Complicated, context-dependent; not a single dial |
