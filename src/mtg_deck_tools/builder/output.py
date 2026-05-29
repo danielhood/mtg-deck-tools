@@ -5,13 +5,18 @@ from __future__ import annotations
 import json
 import re
 from collections import defaultdict
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from mtg_deck_tools import __version__
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
 from mtg_deck_tools.builder.mana_symbols import format_mana_notation
+from mtg_deck_tools.formatting import (
+    format_display_date,
+    format_price_display,
+    format_released_at_display,
+)
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.commander import format_color_identity
 from mtg_deck_tools.rules.validate import ValidationResult
@@ -81,11 +86,6 @@ def _avg_cmc_nonland(cards: list[DeckCard]) -> float | None:
     return round(total / count, 2) if count else None
 
 
-def format_display_date(value: date) -> str:
-    """Display date as 'May 29, 2026'."""
-    return f"{value.strftime('%B')} {value.day}, {value.year}"
-
-
 def format_generated_timestamp(when: datetime) -> str:
     """Friendly local timestamp, e.g. May 29, 2026 · 16:06 PDT."""
     local = when.astimezone()
@@ -128,25 +128,8 @@ def group_warnings(
     return grouped
 
 
-def format_price_display(*, price_known: bool, price_usd: float | None) -> str:
-    if price_known and price_usd is not None:
-        return f"${price_usd:.2f}"
-    return "No price"
-
-
 def format_card_price(card: DeckCard) -> str:
     return format_price_display(price_known=card.price_known, price_usd=card.price_usd)
-
-
-def format_released_at_display(released_at: str | None) -> str:
-    """Human-readable release date from Scryfall released_at (YYYY-MM-DD)."""
-    raw = (released_at or "").strip()
-    if not raw:
-        return "—"
-    try:
-        return format_display_date(date.fromisoformat(raw[:10]))
-    except ValueError:
-        return raw
 
 
 def format_commander_list_item(cmd: dict) -> str:

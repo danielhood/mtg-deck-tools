@@ -14,6 +14,7 @@ from mtg_deck_tools.wizard.commanders import (
     CommanderRow,
     combined_color_identity,
     fetch_commander,
+    format_commander_choice,
     search_commanders,
 )
 from mtg_deck_tools.wizard.common import WIZARD_STYLE, console, require_tty
@@ -27,13 +28,6 @@ def _require_db(db_path: Path) -> sqlite3.Connection:
     from mtg_deck_tools.db.connection import connect
 
     return connect(db_path)
-
-
-def _format_commander_choice(cmd: CommanderRow) -> str:
-    colors = ", ".join(cmd.color_identity) or "colorless"
-    rank = f" · EDHREC #{cmd.edhrec_rank}" if cmd.edhrec_rank else ""
-    partner = f" · {cmd.partner_kind}" if cmd.partner_kind else ""
-    return f"{cmd.name} ({colors}){rank}{partner}"
 
 
 def _prompt_commander_pick(
@@ -56,7 +50,7 @@ def _prompt_commander_pick(
             continue
 
         options = [
-            questionary.Choice(title=_format_commander_choice(cmd), value=cmd.oracle_id)
+            questionary.Choice(title=format_commander_choice(cmd), value=cmd.oracle_id)
             for cmd in results
         ]
         options.append(questionary.Choice(title="Search again", value="__search__"))

@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import UTC, date, datetime
 
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
+from mtg_deck_tools.formatting import format_display_date
 from mtg_deck_tools.builder.output import (
     classify_warning,
     format_card_description,
@@ -14,7 +15,6 @@ from mtg_deck_tools.builder.output import (
     format_card_power_toughness,
     format_card_price,
     format_card_released_at,
-    format_display_date,
     format_generated_timestamp,
     group_warnings,
     write_deck_outputs,
