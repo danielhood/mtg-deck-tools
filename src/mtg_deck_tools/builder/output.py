@@ -309,6 +309,12 @@ def write_deck_outputs(
         )
     lines.append(f"**Generated:** {generated_at_display}")
     lines.append(f"**Seed:** {criteria.seed if criteria.seed is not None else 'random'}")
+    if criteria.themes:
+        lines.append(f"**Themes:** {', '.join(criteria.themes)}")
+    if criteria.include_mechanics:
+        lines.append(f"**Include mechanics:** {', '.join(criteria.include_mechanics)}")
+    if criteria.avoid_mechanics:
+        lines.append(f"**Avoid mechanics:** {', '.join(criteria.avoid_mechanics)}")
     lines.append("")
 
     if criteria.slot_template:
@@ -381,16 +387,6 @@ def write_deck_outputs(
                 else ""
             )
             lines.append(f"- {qty}{card.name}{price}")
-        lines.append("")
-
-    if criteria.themes or criteria.include_mechanics or criteria.avoid_mechanics:
-        lines.extend(["## Criteria", ""])
-        if criteria.themes:
-            lines.append(f"- **Themes:** {', '.join(criteria.themes)}")
-        if criteria.include_mechanics:
-            lines.append(f"- **Include mechanics:** {', '.join(criteria.include_mechanics)}")
-        if criteria.avoid_mechanics:
-            lines.append(f"- **Avoid mechanics:** {', '.join(criteria.avoid_mechanics)}")
         lines.append("")
 
     lines.extend(

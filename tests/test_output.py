@@ -250,8 +250,10 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     )
 
     criteria = DeckCriteria(
-        themes=["tokens"],
+        themes=["tokens", "voltron"],
         colors=["G"],
+        include_mechanics=["flying"],
+        avoid_mechanics=["reach"],
         commander_oracle_ids=["cmd"],
         slot_template={"ramp": 1, "lands": 98},
         seed=42,
@@ -267,6 +269,10 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
 
     text = md_path.read_text(encoding="utf-8")
     assert "**Color identity:** Green" in text
+    assert "**Themes:** tokens, voltron" in text
+    assert "**Include mechanics:** flying" in text
+    assert "**Avoid mechanics:** reach" in text
+    assert "## Criteria" not in text
     assert " · " in text.split("**Generated:**")[1].splitlines()[0]
     notes_section = text.split("## Notes", 1)[1].split("## Card details", 1)[0]
     assert "### Unpriced cards" in notes_section
