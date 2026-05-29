@@ -27,6 +27,8 @@ def run_generate_stub(
     seed: int | None = None,
     colors: list[str] | None = None,
     themes: list[str] | None = None,
+    slot_template: dict[str, int] | None = None,
+    criteria: DeckCriteria | None = None,
     output_dir: Path | None = None,
 ) -> Path:
     """
@@ -37,8 +39,15 @@ def run_generate_stub(
     conn = _require_db(db)
     rng = random.Random(seed)
 
-    color_filter = colors or []
-    theme_filter = themes or []
+    if criteria is not None:
+        color_filter = criteria.colors
+        theme_filter = criteria.themes
+        slot_counts = criteria.slot_template
+        seed = criteria.seed if criteria.seed is not None else seed
+    else:
+        color_filter = colors or []
+        theme_filter = themes or []
+        slot_counts = slot_template or {}
 
     commander_sql = """
         SELECT oracle_id, name, color_identity, partner_kind, scryfall_uri
@@ -82,6 +91,7 @@ def run_generate_stub(
         themes=theme_filter,
         colors=color_filter or identity,
         commander_oracle_ids=[commander["oracle_id"]],
+        slot_template=slot_counts,
         seed=seed,
     )
 
@@ -131,9 +141,22 @@ def run_generate_stub(
         f"**Color identity:** {', '.join(identity) or 'colorless'}",
         f"**Seed:** {seed if seed is not None else 'random'}",
         "",
-        "## Sample synergy cards",
-        "",
     ]
+    if criteria.themes:
+        lines.append(f"**Themes:** {', '.join(criteria.themes)}")
+        lines.append("")
+    if criteria.slot_template:
+        lines.append("## Slot template")
+        lines.append("")
+        for slot, count in criteria.slot_template.items():
+            lines.append(f"- {slot}: {count}")
+        lines.append("")
+    lines.extend(
+        [
+            "## Sample synergy cards",
+            "",
+        ]
+    )
     for row in sampled:
         lines.append(f"- {row['name']} ({row['type_line']}, CMC {row['cmc']})")
     if not sampled:

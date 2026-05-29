@@ -87,6 +87,12 @@ mtg-deck-tools stats
 
 # Phase 1 stub: seeded sample commander + synergy cards → output/
 mtg-deck-tools generate --seed 42 --colors B,G --themes aristocrats
+
+# Wizard step 1: themes + slot template (interactive)
+mtg-deck-tools wizard
+
+# Step 1 then stub preview
+mtg-deck-tools generate --wizard --seed 42
 ```
 
 Options:
@@ -95,13 +101,14 @@ Options:
 | --- | --- |
 | `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, apply mechanic tags |
 | `stats` | Row counts, import metadata, top tags |
-| `generate` | Stub deck preview (Phase 2 adds full wizard + 100-card build) |
+| `wizard` | Interactive step 1: archetype themes and slot template counts |
+| `generate` | Stub deck preview; `--wizard` runs step 1 first |
 
 ## Status
 
 **Phase 1** complete: Python package, SQLite import, mechanic taxonomy v0, CLI (`import`, `stats`, `generate` stub).
 
-**Phase 2** (next): interactive wizard, slot filling, full Markdown + `.deck.json` deck output.
+**Phase 2** (in progress): wizard step 1 done; steps 2–5, slot filling, full Markdown + `.deck.json` deck output next.
 
 ## License
 

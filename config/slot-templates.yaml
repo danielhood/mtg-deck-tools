@@ -1,5 +1,5 @@
 # Default Commander slot counts (99 cards excluding commander).
-# Wizard may override; lands adjusted last by mana base logic (Phase 2+).
+# Wizard may override within bounds; lands adjusted last by mana base logic (Phase 2+).
 
 default:
   ramp: 10
@@ -10,3 +10,34 @@ default:
   wincon: 4
   flex: 6
   lands: 31
+
+bounds:
+  ramp: { min: 8, max: 12 }
+  draw: { min: 8, max: 10 }
+  removal: { min: 6, max: 10 }
+  board_wipe: { min: 1, max: 4 }
+  synergy: { min: 25, max: 35 }
+  wincon: { min: 3, max: 5 }
+  flex: { min: 5, max: 10 }
+  lands: { min: 30, max: 40 }
+
+# Display order for wizard prompts (lands last).
+order:
+  - ramp
+  - draw
+  - removal
+  - board_wipe
+  - synergy
+  - wincon
+  - flex
+  - lands
+
+labels:
+  ramp: Ramp
+  draw: Card draw
+  removal: Removal
+  board_wipe: Board wipes
+  synergy: Synergy / theme
+  wincon: Win conditions
+  flex: Flex / flavor
+  lands: Lands
