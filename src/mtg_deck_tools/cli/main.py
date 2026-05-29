@@ -10,6 +10,7 @@ from rich.console import Console
 from rich.table import Table
 
 from mtg_deck_tools import __version__
+from mtg_deck_tools.builder.generate import run_generate
 from mtg_deck_tools.builder.stub import run_generate_stub
 from mtg_deck_tools.db.stats import fetch_stats
 from mtg_deck_tools.import_.pipeline import run_import
@@ -123,20 +124,23 @@ def wizard_cmd(
         raise typer.Exit(1) from exc
 
     console.print(
-        "[dim]Use `mtg-deck-tools generate --wizard` to build a stub preview "
-        "from these criteria.[/dim]"
+        "[dim]Use `mtg-deck-tools generate --wizard` to build a deck from these criteria.[/dim]"
     )
 
 
 @app.command("generate")
 def generate_cmd(
+    stub: Annotated[
+        bool,
+        typer.Option("--stub", help="Phase 1 preview only (sample synergy cards)"),
+    ] = False,
     wizard: Annotated[
         bool,
-        typer.Option("--wizard", help="Run full wizard before generating stub output"),
+        typer.Option("--wizard", help="Run full wizard before generating"),
     ] = False,
     seed: Annotated[
         Optional[int],
-        typer.Option("--seed", help="RNG seed for reproducible samples"),
+        typer.Option("--seed", help="RNG seed for reproducible deck builds"),
     ] = None,
     colors: Annotated[
         Optional[str],
@@ -150,10 +154,9 @@ def generate_cmd(
     output_dir: Annotated[Optional[Path], typer.Option("--out")] = None,
 ) -> None:
     """
-    Generate deck output (Phase 1 stub: commander + sample cards).
+    Generate a Commander deck (99-card maindeck + commander metadata).
 
-    Use --wizard for interactive criteria collection, then stub preview.
-    Full 100-card builds are Phase 2.
+    Use --wizard for interactive criteria. Use --stub for the old Phase 1 preview.
     """
     criteria = None
     if wizard:
@@ -173,8 +176,9 @@ def generate_cmd(
     color_list = [c.strip().upper() for c in colors.split(",")] if colors else None
     theme_list = [t.strip() for t in themes.split(",")] if themes else None
 
+    runner = run_generate_stub if stub else run_generate
     try:
-        out = run_generate_stub(
+        out = runner(
             db_path=db_path,
             seed=seed,
             colors=color_list,
@@ -189,9 +193,10 @@ def generate_cmd(
     md_path = out.with_suffix(".md")
     console.print(f"[green]Wrote[/green] {out}")
     console.print(f"[green]Wrote[/green] {md_path}")
-    console.print(
-        "[dim]Phase 1 stub — run import first, then Phase 2 for full deck generation.[/dim]"
-    )
+    if stub:
+        console.print("[dim]Phase 1 stub preview — omit --stub for full slot-filled decks.[/dim]")
+    else:
+        console.print("[dim]Full maindeck generated. Review warnings in the output files.[/dim]")
 
 
 if __name__ == "__main__":
