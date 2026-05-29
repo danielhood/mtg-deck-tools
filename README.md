@@ -111,7 +111,7 @@ Options:
 
 **Phase 1** complete: Python package, SQLite import, mechanic taxonomy v0, CLI (`import`, `stats`, `generate` stub).
 
-**Phase 2** (in progress): wizard and slot filling complete; dynamic mana base tuning and validation next.
+**Phase 2** (in progress): wizard, slot filling, and dynamic mana base complete; Commander validation pass next.
 
 ## License
 

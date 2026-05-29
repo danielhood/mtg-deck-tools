@@ -25,6 +25,7 @@ class CardCandidate:
     oracle_text: str
     keywords: list[str]
     is_basic_land: bool
+    produced_mana: list[str]
     scryfall_uri: str | None
     image_uri: str | None
 
@@ -43,6 +44,7 @@ def _row_to_candidate(row: sqlite3.Row) -> CardCandidate:
         oracle_text=row["oracle_text"] or "",
         keywords=json.loads(row["keywords"] or "[]"),
         is_basic_land=bool(row["is_basic_land"]),
+        produced_mana=json.loads(row["produced_mana"] or "[]"),
         scryfall_uri=row["scryfall_uri"],
         image_uri=row["image_uri"],
     )
@@ -80,7 +82,8 @@ def fetch_candidates(
     sql = """
         SELECT DISTINCT c.oracle_id, c.name, c.cmc, c.type_line, c.mana_cost,
                c.color_identity, c.price_usd, c.price_known, c.edhrec_rank,
-               c.oracle_text, c.keywords, c.is_basic_land, c.scryfall_uri, c.image_uri
+               c.oracle_text, c.keywords, c.is_basic_land, c.produced_mana,
+               c.scryfall_uri, c.image_uri
         FROM cards c
     """
     params: list = []

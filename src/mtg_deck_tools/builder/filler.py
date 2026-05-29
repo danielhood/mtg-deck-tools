@@ -4,25 +4,25 @@ from __future__ import annotations
 
 import json
 import random
-import re
 from dataclasses import dataclass, field
 
 import sqlite3
 
+from mtg_deck_tools.builder.mana_base import (
+    BASIC_NAME_BY_COLOR,
+    ManaBasePlan,
+    allocate_basics,
+    plan_mana_base,
+    score_land_candidate,
+    tally_mana_sources,
+    validate_mana_sources,
+)
 from mtg_deck_tools.builder.pool import CardCandidate, fetch_candidates, fetch_card_tags
 from mtg_deck_tools.builder.scorer import score_candidate
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.wizard.slots import SLOT_FILLER_THEME_TAGS, load_slot_template_config
 
 FILL_ORDER = ("ramp", "draw", "removal", "board_wipe", "synergy", "wincon", "flex", "lands")
-
-BASIC_NAME_BY_COLOR = {
-    "W": "Plains",
-    "U": "Island",
-    "B": "Swamp",
-    "R": "Mountain",
-    "G": "Forest",
-}
 
 TOP_POOL_SIZE = 40
 
@@ -41,6 +41,8 @@ class DeckCard:
     scryfall_uri: str | None
     image_uri: str | None
     mechanic_tags: list[str] = field(default_factory=list)
+    oracle_text: str = ""
+    produced_mana: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -49,6 +51,7 @@ class DeckBuildResult:
     warnings: list[str]
     budget_spent: float
     unpriced_names: list[str]
+    mana_base: ManaBasePlan | None = None
 
 
 @dataclass
@@ -95,6 +98,8 @@ class _BuildState:
                 scryfall_uri=candidate.scryfall_uri,
                 image_uri=candidate.image_uri,
                 mechanic_tags=tags,
+                oracle_text=candidate.oracle_text,
+                produced_mana=list(candidate.produced_mana),
             )
         )
         if not candidate.is_basic_land:
@@ -124,17 +129,6 @@ def _type_counts(cards: list[DeckCard]) -> dict[str, int]:
         key = primary[-1] if primary else "Other"
         counts[key] = counts.get(key, 0) + card.quantity
     return counts
-
-
-def _pip_weights(cards: list[DeckCard], identity: list[str]) -> dict[str, int]:
-    weights = {c: 1 for c in identity}
-    for card in cards:
-        if "Land" in card.type_line:
-            continue
-        for match in re.findall(r"\{([WUBRG])\}", card.mana_cost):
-            if match in weights:
-                weights[match] += 1
-    return weights
 
 
 def _pick_weighted(
@@ -223,12 +217,17 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
         state.register(candidate, slot)
 
 
-def _fill_lands(state: _BuildState, count: int) -> None:
-    if count <= 0:
-        return
-
-    nonbasic_target = max(0, count - len(state.identity))
-    basics_target = count - nonbasic_target
+def _fill_lands(state: _BuildState, template_lands: int) -> ManaBasePlan:
+    slot_config = load_slot_template_config()
+    land_bounds = slot_config.bounds["lands"]
+    plan = plan_mana_base(
+        state.cards,
+        identity=state.identity,
+        template_lands=template_lands,
+        min_lands=land_bounds.min,
+        max_lands=land_bounds.max,
+    )
+    state.warnings.extend(plan.warnings)
 
     nonbasics = fetch_candidates(
         state.conn,
@@ -238,55 +237,68 @@ def _fill_lands(state: _BuildState, count: int) -> None:
         avoid_mechanics=state.criteria.avoid_mechanics,
         require_theme_tags=None,
         lands_only=True,
-        limit=300,
+        limit=400,
     )
     nonbasics = [c for c in nonbasics if not c.is_basic_land]
     nonbasics = _filter_budget(nonbasics, state.budget_remaining(), strict=False)
 
     tag_map = fetch_card_tags(state.conn, [c.oracle_id for c in nonbasics])
-    scored = [
-        (
-            c,
-            score_candidate(
-                c,
-                slot="lands",
-                archetype_themes=state.criteria.themes,
-                include_mechanics=state.criteria.include_mechanics,
-                commander_theme_tags=state.commander_theme_tags,
-                card_tags=tag_map.get(c.oracle_id, []),
-                type_counts=_type_counts(state.cards),
-                budget_remaining=state.budget_remaining(),
-            ),
+    scored: list[tuple[CardCandidate, float]] = []
+    for candidate in nonbasics:
+        pip_score = score_land_candidate(
+            candidate,
+            pip_weights=plan.pip_weights,
+            identity=state.identity,
         )
-        for c in nonbasics
-    ]
+        card_score = score_candidate(
+            candidate,
+            slot="lands",
+            archetype_themes=state.criteria.themes,
+            include_mechanics=state.criteria.include_mechanics,
+            commander_theme_tags=state.commander_theme_tags,
+            card_tags=tag_map.get(candidate.oracle_id, []),
+            type_counts=_type_counts(state.cards),
+            budget_remaining=state.budget_remaining(),
+        )
+        scored.append((candidate, card_score + pip_score))
     scored.sort(key=lambda item: item[1], reverse=True)
-    for candidate in _pick_weighted(state.rng, scored, min(nonbasic_target, len(scored))):
+
+    picked_nonbasics = _pick_weighted(
+        state.rng,
+        scored,
+        min(plan.nonbasic_target, len(scored)),
+    )
+    for candidate in picked_nonbasics:
         state.register(candidate, "lands")
 
-    remaining = count - sum(c.quantity for c in state.cards if c.slot == "lands")
-    if remaining <= 0:
-        return
+    filled_nonbasic_qty = sum(
+        c.quantity for c in state.cards if c.slot == "lands" and "Basic" not in c.type_line
+    )
+    remaining_basics = max(0, plan.actual_lands - filled_nonbasic_qty)
 
-    pip_weights = _pip_weights(state.cards, state.identity)
-    total_pips = sum(pip_weights.values()) or 1
-    basics_by_color: list[str] = []
-    for color in state.identity:
-        name = BASIC_NAME_BY_COLOR[color]
-        share = max(1, round(remaining * pip_weights[color] / total_pips))
-        basics_by_color.extend([name] * share)
+    basics_by_color = allocate_basics(
+        remaining_basics,
+        plan.pip_weights,
+        state.identity,
+    )
 
-    while len(basics_by_color) < remaining:
-        color = state.rng.choice(state.identity)
-        basics_by_color.append(BASIC_NAME_BY_COLOR[color])
-    basics_by_color = basics_by_color[:remaining]
+    sources = tally_mana_sources(
+        identity=state.identity,
+        basics=basics_by_color,
+        nonbasic_candidates=picked_nonbasics,
+        ramp_cards=[c for c in state.cards if c.slot == "ramp"],
+        nonland_cards=state.cards,
+    )
+    state.warnings.extend(
+        validate_mana_sources(sources, state.identity, num_colors=plan.num_colors)
+    )
 
     for basic_name in basics_by_color:
         row = state.conn.execute(
             """
             SELECT oracle_id, name, cmc, type_line, mana_cost, color_identity,
                    price_usd, price_known, edhrec_rank, oracle_text, keywords,
-                   is_basic_land, scryfall_uri, image_uri
+                   is_basic_land, produced_mana, scryfall_uri, image_uri
             FROM cards
             WHERE is_basic_land = 1 AND name = ?
             LIMIT 1
@@ -309,10 +321,13 @@ def _fill_lands(state: _BuildState, count: int) -> None:
             oracle_text=row["oracle_text"] or "",
             keywords=json.loads(row["keywords"] or "[]"),
             is_basic_land=True,
+            produced_mana=json.loads(row["produced_mana"] or "[]"),
             scryfall_uri=row["scryfall_uri"],
             image_uri=row["image_uri"],
         )
         state.register(candidate, "lands")
+
+    return plan
 
 
 def fill_deck(
@@ -347,10 +362,11 @@ def fill_deck(
         rng=random.Random(seed if seed is not None else criteria.seed),
     )
 
+    mana_plan: ManaBasePlan | None = None
     for slot in FILL_ORDER:
         count = slots.get(slot, 0)
         if slot == "lands":
-            _fill_lands(state, count)
+            mana_plan = _fill_lands(state, count)
         else:
             _fill_slot(state, slot, count)
 
@@ -359,4 +375,5 @@ def fill_deck(
         warnings=state.warnings,
         budget_spent=state.budget_spent,
         unpriced_names=state.unpriced_names,
+        mana_base=mana_plan,
     )

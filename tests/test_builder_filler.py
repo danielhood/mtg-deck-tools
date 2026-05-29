@@ -131,6 +131,10 @@ def deck_db() -> sqlite3.Connection:
         mana_cost="",
         is_basic_land=0,
     )
+    conn.execute(
+        "UPDATE cards SET produced_mana = ? WHERE oracle_id = 'land-1'",
+        (json.dumps(["G"]),),
+    )
     _insert_card(
         conn,
         oracle_id="forest-1",
@@ -208,6 +212,8 @@ def test_fill_deck_respects_slot_counts(deck_db: sqlite3.Connection) -> None:
     )
     total = sum(c.quantity for c in result.cards)
     assert total == 5
+    assert result.mana_base is not None
+    assert result.mana_base.actual_lands == 2
     assert sum(1 for c in result.cards if c.slot == "ramp") == 1
     assert sum(c.quantity for c in result.cards if c.slot == "lands") == 2
 

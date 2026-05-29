@@ -9,8 +9,31 @@ from pathlib import Path
 
 from mtg_deck_tools import __version__
 from mtg_deck_tools.builder.filler import DeckBuildResult, DeckCard
+from mtg_deck_tools.builder.mana_base import ManaBasePlan
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.wizard.slots import load_slot_template_config
+
+
+def _mana_base_dict(plan: ManaBasePlan | None) -> dict | None:
+    if plan is None:
+        return None
+    return {
+        "template_lands": plan.template_lands,
+        "suggested_lands": plan.suggested_lands,
+        "actual_lands": plan.actual_lands,
+        "nonbasic_target": plan.nonbasic_target,
+        "basic_target": plan.basic_target,
+        "avg_cmc_nonland": plan.avg_cmc_nonland,
+        "num_colors": plan.num_colors,
+        "pip_weights": plan.pip_weights,
+        "ramp": {
+            "total": plan.ramp.total,
+            "mana_rocks": plan.ramp.mana_rocks,
+            "land_ramp": plan.ramp.land_ramp,
+            "other": plan.ramp.other,
+            "effective_reduction": round(plan.ramp.effective_reduction, 2),
+        },
+    }
 
 
 def _slugify(name: str) -> str:
@@ -75,6 +98,7 @@ def write_deck_outputs(
             "unpriced_card_names": maindeck.unpriced_names,
             "avg_cmc_nonland": avg_cmc,
         },
+        "mana_base": _mana_base_dict(maindeck.mana_base),
         "warnings": maindeck.warnings,
     }
 
@@ -111,6 +135,25 @@ def write_deck_outputs(
     for cmd in commanders:
         lines.append(f"- {cmd['name']}")
     lines.append("")
+
+    if maindeck.mana_base:
+        mb = maindeck.mana_base
+        lines.extend(
+            [
+                "## Mana base",
+                "",
+                f"- **Lands:** {mb.actual_lands} "
+                f"(suggested {mb.suggested_lands}, template {mb.template_lands})",
+                f"- **Mix:** {mb.nonbasic_target} nonbasic / {mb.basic_target} basic",
+                f"- **Avg CMC (nonlands):** {mb.avg_cmc_nonland}",
+                f"- **Ramp:** {mb.ramp.total} "
+                f"({mb.ramp.mana_rocks} rocks, {mb.ramp.land_ramp} land ramp)",
+            ]
+        )
+        if mb.pip_weights:
+            pip_line = ", ".join(f"{c}:{n}" for c, n in sorted(mb.pip_weights.items()))
+            lines.append(f"- **Pip weights:** {pip_line}")
+        lines.append("")
 
     by_slot: dict[str, list[DeckCard]] = defaultdict(list)
     for card in maindeck.cards:
