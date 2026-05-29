@@ -17,6 +17,7 @@ from mtg_deck_tools.formatting import (
     format_price_display,
     format_released_at_display,
 )
+from mtg_deck_tools.tags.labels import format_tag_list
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.commander import format_color_identity
 from mtg_deck_tools.rules.validate import ValidationResult
@@ -314,11 +315,11 @@ def write_deck_outputs(
     lines.append(f"**Generated:** {generated_at_display}")
     lines.append(f"**Seed:** {criteria.seed if criteria.seed is not None else 'random'}")
     if criteria.themes:
-        lines.append(f"**Themes:** {', '.join(criteria.themes)}")
+        lines.append(f"**Themes:** {format_tag_list(criteria.themes)}")
     if criteria.include_mechanics:
-        lines.append(f"**Include mechanics:** {', '.join(criteria.include_mechanics)}")
+        lines.append(f"**Include mechanics:** {format_tag_list(criteria.include_mechanics)}")
     if criteria.avoid_mechanics:
-        lines.append(f"**Avoid mechanics:** {', '.join(criteria.avoid_mechanics)}")
+        lines.append(f"**Avoid mechanics:** {format_tag_list(criteria.avoid_mechanics)}")
     lines.append("")
 
     if criteria.slot_template:

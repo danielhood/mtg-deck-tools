@@ -295,9 +295,9 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
 
     text = md_path.read_text(encoding="utf-8")
     assert "**Color identity:** Green" in text
-    assert "**Themes:** tokens, voltron" in text
-    assert "**Include mechanics:** flying" in text
-    assert "**Avoid mechanics:** reach" in text
+    assert "**Themes:** Token creation, Equipment and aura support" in text
+    assert "**Include mechanics:** Flying" in text
+    assert "**Avoid mechanics:** Reach" in text
     assert "## Criteria" not in text
     assert " · " in text.split("**Generated:**")[1].splitlines()[0]
     notes_section = text.split("## Notes", 1)[1].split("## Card details", 1)[0]
