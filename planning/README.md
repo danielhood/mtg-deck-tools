@@ -34,7 +34,6 @@ Planning documents for a local Windows utility that walks users through deck-bui
 ## Next steps — Phase 2
 
 1. ~~Phase 1~~ — complete (import, tags, CLI stub)
-2. ~~Wizard step 1~~ — themes + slot template (`mtg-deck-tools wizard` or `generate --wizard`)
-3. Wizard steps 2–5 (mechanics, colors, commander, budget)
-4. Full slot filling + mana base
-5. Complete Markdown + `.deck.json` deck output
+2. ~~Wizard steps 1–5~~ — full criteria wizard (`mtg-deck-tools wizard` or `generate --wizard`)
+3. Full slot filling + mana base
+4. Complete Markdown + `.deck.json` deck output

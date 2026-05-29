@@ -2,15 +2,12 @@
 
 from __future__ import annotations
 
-import sys
-
 import questionary
-from questionary import Style
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.wizard.common import WIZARD_STYLE, console, require_tty
 from mtg_deck_tools.wizard.slots import (
     COMMANDER_DECK_SIZE,
     SlotTemplateConfig,
@@ -21,27 +18,6 @@ from mtg_deck_tools.wizard.slots import (
     validate_slot_template,
 )
 from mtg_deck_tools.wizard.themes import ArchetypeChoice, archetype_choices
-
-WIZARD_STYLE = Style(
-    [
-        ("qmark", "fg:cyan bold"),
-        ("question", "bold"),
-        ("answer", "fg:green bold"),
-        ("pointer", "fg:cyan bold"),
-        ("highlighted", "fg:cyan bold"),
-        ("selected", "fg:green"),
-    ]
-)
-
-console = Console()
-
-
-def _require_tty() -> None:
-    if not sys.stdin.isatty() or not sys.stdout.isatty():
-        raise RuntimeError(
-            "Interactive wizard requires a TTY. "
-            "Use --themes and --colors flags on generate instead."
-        )
 
 
 def _prompt_themes(choices: list[ArchetypeChoice]) -> list[str]:
@@ -173,13 +149,13 @@ def print_step1_summary(criteria: DeckCriteria, config: SlotTemplateConfig | Non
     console.print(table)
 
 
-def run_step1(*, seed: int | None = None) -> DeckCriteria:
+def run_step1(*, seed: int | None = None, show_summary: bool = True) -> DeckCriteria:
     """
     Interactive step 1: archetype themes and slot template counts.
 
     Returns partial DeckCriteria (colors, commander, mechanics filled in later steps).
     """
-    _require_tty()
+    require_tty()
     config = load_slot_template_config()
     choices = archetype_choices()
 
@@ -207,5 +183,6 @@ def run_step1(*, seed: int | None = None) -> DeckCriteria:
         slot_template=slot_template,
         seed=seed,
     )
-    print_step1_summary(criteria, config)
+    if show_summary:
+        print_step1_summary(criteria, config)
     return criteria

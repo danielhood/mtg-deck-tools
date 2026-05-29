@@ -14,7 +14,7 @@ from mtg_deck_tools.builder.stub import run_generate_stub
 from mtg_deck_tools.db.stats import fetch_stats
 from mtg_deck_tools.import_.pipeline import run_import
 from mtg_deck_tools.paths import DEFAULT_DB_PATH
-from mtg_deck_tools.wizard.step1 import run_step1
+from mtg_deck_tools.wizard.run import run_wizard
 
 app = typer.Typer(
     name="mtg-deck-tools",
@@ -112,19 +112,19 @@ def wizard_cmd(
         typer.Option("--seed", help="RNG seed stored in criteria for later generate steps"),
     ] = None,
 ) -> None:
-    """Run the deck-building wizard (step 1: themes and slot template)."""
+    """Run the full deck-building wizard (steps 1–5)."""
     try:
-        run_step1(seed=seed)
+        run_wizard(seed=seed)
     except KeyboardInterrupt:
         console.print("\n[dim]Wizard cancelled.[/dim]")
         raise typer.Exit(130) from None
-    except RuntimeError as exc:
+    except (FileNotFoundError, RuntimeError) as exc:
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(1) from exc
 
     console.print(
-        "[dim]Steps 2–5 (mechanics, colors, commander, budget) coming soon. "
-        "Use `mtg-deck-tools generate --wizard` for a stub preview.[/dim]"
+        "[dim]Use `mtg-deck-tools generate --wizard` to build a stub preview "
+        "from these criteria.[/dim]"
     )
 
 
@@ -132,7 +132,7 @@ def wizard_cmd(
 def generate_cmd(
     wizard: Annotated[
         bool,
-        typer.Option("--wizard", help="Run wizard step 1 before generating stub output"),
+        typer.Option("--wizard", help="Run full wizard before generating stub output"),
     ] = False,
     seed: Annotated[
         Optional[int],
@@ -152,7 +152,8 @@ def generate_cmd(
     """
     Generate deck output (Phase 1 stub: commander + sample cards).
 
-    Use --wizard for interactive step 1, then stub preview. Full 100-card builds are Phase 2.
+    Use --wizard for interactive criteria collection, then stub preview.
+    Full 100-card builds are Phase 2.
     """
     criteria = None
     if wizard:
@@ -161,14 +162,13 @@ def generate_cmd(
                 "[yellow]Note:[/yellow] --colors and --themes are ignored when --wizard is set."
             )
         try:
-            criteria = run_step1(seed=seed)
+            criteria = run_wizard(seed=seed, db_path=db_path)
         except KeyboardInterrupt:
             console.print("\n[dim]Wizard cancelled.[/dim]")
             raise typer.Exit(130) from None
-        except RuntimeError as exc:
+        except (FileNotFoundError, RuntimeError) as exc:
             console.print(f"[red]Error:[/red] {exc}")
             raise typer.Exit(1) from exc
-        console.print("[dim]Wizard steps 2–5 skipped in stub mode.[/dim]")
 
     color_list = [c.strip().upper() for c in colors.split(",")] if colors else None
     theme_list = [t.strip() for t in themes.split(",")] if themes else None
