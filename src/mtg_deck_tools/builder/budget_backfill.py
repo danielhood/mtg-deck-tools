@@ -64,6 +64,26 @@ def _type_counts(cards: list[DeckCard]) -> dict[str, int]:
     return counts
 
 
+def _replacement_price_cap(
+    *,
+    budget_cap: float,
+    other_spent: float,
+    card_price: float,
+) -> float:
+    """
+    Maximum USD price allowed for a swap replacement.
+
+    When the deck is already over cap, ``budget_cap - other_spent`` is negative
+    even though cheaper replacements still help — fall back to any card priced
+    below the one being swapped.
+    """
+    cap_by_budget = budget_cap - other_spent
+    cap_by_savings = card_price - 0.01
+    if cap_by_budget <= 0:
+        return max(0.0, cap_by_savings)
+    return min(cap_by_budget, cap_by_savings)
+
+
 def _find_replacement(
     conn: sqlite3.Connection,
     *,
@@ -76,9 +96,14 @@ def _find_replacement(
     budget_cap: float,
     other_spent: float,
 ) -> CardCandidate | None:
-    """Find a cheaper card for the same slot that keeps the deck under budget."""
-    max_price = budget_cap - other_spent
-    if max_price <= 0:
+    """Find a cheaper card for the same slot that moves the deck toward the cap."""
+    card_price = card.price_usd or 0.0
+    max_price = _replacement_price_cap(
+        budget_cap=budget_cap,
+        other_spent=other_spent,
+        card_price=card_price,
+    )
+    if max_price <= 0 or card_price <= 0:
         return None
 
     theme_tags = slot_theme_tags(card.slot, criteria)
@@ -108,7 +133,10 @@ def _find_replacement(
         pool = [
             c
             for c in pool
-            if c.price_known and c.price_usd is not None and c.price_usd <= max_price
+            if c.price_known
+            and c.price_usd is not None
+            and c.price_usd <= max_price
+            and c.price_usd < card_price
         ]
         if pool:
             candidates = pool
@@ -168,8 +196,9 @@ def trim_deck_to_budget(
     working = list(cards)
     new_warnings = list(warnings)
     cap = criteria.budget_usd
+    max_iterations = len(working) * 5
 
-    for _ in range(len(working) * 2):
+    for _ in range(max_iterations):
         spent = _deck_budget_spent(working)
         if spent <= cap:
             break

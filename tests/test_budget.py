@@ -7,7 +7,10 @@ import sqlite3
 
 import pytest
 
-from mtg_deck_tools.builder.budget_backfill import trim_deck_to_budget
+from mtg_deck_tools.builder.budget_backfill import (
+    _replacement_price_cap,
+    trim_deck_to_budget,
+)
 from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.builder.filler import _filter_budget, fill_deck
 from mtg_deck_tools.builder.pool import CardCandidate
@@ -234,6 +237,71 @@ def budget_db() -> sqlite3.Connection:
     return conn
 
 
+def test_replacement_price_cap_when_already_over_budget() -> None:
+    """Mirrors Dromoka trim failure: other_spent alone exceeds the cap."""
+    cap = _replacement_price_cap(budget_cap=150.0, other_spent=179.46, card_price=32.94)
+    assert cap > 0
+    assert cap < 32.94
+
+
+def test_trim_when_deck_already_over_cap(budget_db: sqlite3.Connection) -> None:
+    """Trim must swap incrementally when priced total exceeds cap before any swap."""
+    _insert_card(
+        budget_db,
+        oracle_id="syn-a",
+        name="Synergy A",
+        color_identity=["G"],
+        type_line="Creature — Elf",
+        price_usd=70.0,
+        slot_tag="landfall",
+    )
+    _insert_card(
+        budget_db,
+        oracle_id="syn-b",
+        name="Synergy B",
+        color_identity=["G"],
+        type_line="Creature — Elf",
+        price_usd=65.0,
+        slot_tag="landfall",
+    )
+    budget_db.commit()
+
+    def _deck_card(oid: str, name: str, price: float) -> DeckCard:
+        return DeckCard(
+            oracle_id=oid,
+            name=name,
+            slot="synergy",
+            quantity=1,
+            cmc=3.0,
+            mana_cost="{2}{G}",
+            type_line="Creature — Elf",
+            price_usd=price,
+            price_known=True,
+            scryfall_uri=None,
+            image_uri=None,
+            mechanic_tags=["landfall"],
+        )
+
+    cards = [
+        _deck_card("synergy-0", "Synergy 0", 50.0),
+        _deck_card("syn-a", "Synergy A", 70.0),
+        _deck_card("syn-b", "Synergy B", 65.0),
+    ]
+    criteria = DeckCriteria(themes=["landfall"], colors=["G"], budget_usd=150.0)
+    trimmed, spent, warnings = trim_deck_to_budget(
+        budget_db,
+        cards,
+        criteria,
+        identity=["G"],
+        commander_oracle_ids={"cmd"},
+        commander_theme_tags=set(),
+        unpriced_names=[],
+        warnings=[],
+    )
+    assert spent <= 150.0
+    assert any("Budget trim: replaced" in w for w in warnings)
+
+
 def test_trim_deck_to_budget_swaps_expensive_card(budget_db: sqlite3.Connection) -> None:
     cards = [
         DeckCard(
@@ -282,9 +350,8 @@ def test_trim_deck_to_budget_swaps_expensive_card(budget_db: sqlite3.Connection)
         warnings=[],
     )
     assert spent <= 10.0
-    assert trimmed[0].price_usd == 50.0 or any("Budget trim" in w for w in warnings)
-    names = {c.name for c in trimmed}
-    assert "Synergy 0" not in names or spent <= 10.0
+    assert any("Budget trim: replaced" in w for w in warnings)
+    assert "Synergy 0" not in {c.name for c in trimmed}
 
 
 def test_fill_deck_respects_budget_cap(budget_db: sqlite3.Connection) -> None:
