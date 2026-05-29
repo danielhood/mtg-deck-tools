@@ -128,10 +128,38 @@ def group_warnings(
     return grouped
 
 
-def format_card_price(card: DeckCard) -> str:
-    if card.price_known and card.price_usd is not None:
-        return f"${card.price_usd:.2f}"
+def format_price_display(*, price_known: bool, price_usd: float | None) -> str:
+    if price_known and price_usd is not None:
+        return f"${price_usd:.2f}"
     return "No price"
+
+
+def format_card_price(card: DeckCard) -> str:
+    return format_price_display(price_known=card.price_known, price_usd=card.price_usd)
+
+
+def format_released_at_display(released_at: str | None) -> str:
+    """Human-readable release date from Scryfall released_at (YYYY-MM-DD)."""
+    raw = (released_at or "").strip()
+    if not raw:
+        return "—"
+    try:
+        return format_display_date(date.fromisoformat(raw[:10]))
+    except ValueError:
+        return raw
+
+
+def format_commander_list_item(cmd: dict) -> str:
+    """Single commander bullet with Scryfall link, price, and release date."""
+    name = cmd["name"]
+    if cmd.get("scryfall_uri"):
+        name = f"[{name}]({cmd['scryfall_uri']})"
+    price = format_price_display(
+        price_known=bool(cmd.get("price_known")),
+        price_usd=cmd.get("price_usd"),
+    )
+    released = format_released_at_display(cmd.get("released_at"))
+    return f"- {name} — **Price:** {price} · **Released:** {released}"
 
 
 def format_card_mana_cost(card: DeckCard) -> str:
@@ -168,14 +196,7 @@ def format_card_detail_title(card: DeckCard) -> str:
 
 
 def format_card_released_at(card: DeckCard) -> str:
-    """Human-readable release date from Scryfall released_at (YYYY-MM-DD)."""
-    raw = (card.released_at or "").strip()
-    if not raw:
-        return "—"
-    try:
-        return format_display_date(date.fromisoformat(raw[:10]))
-    except ValueError:
-        return raw
+    return format_released_at_display(card.released_at)
 
 
 def _render_notes_section(
@@ -329,7 +350,7 @@ def write_deck_outputs(
 
     lines.extend(["## Commander", ""])
     for cmd in commanders:
-        lines.append(f"- {cmd['name']}")
+        lines.append(format_commander_list_item(cmd))
     lines.append("")
 
     if maindeck.validation:

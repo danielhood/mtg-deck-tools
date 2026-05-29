@@ -34,7 +34,8 @@ def _fetch_commanders(
     placeholders = ",".join("?" * len(oracle_ids))
     rows = conn.execute(
         f"""
-        SELECT oracle_id, name, color_identity, partner_kind, scryfall_uri, image_uri
+        SELECT oracle_id, name, color_identity, partner_kind, scryfall_uri, image_uri,
+               price_usd, price_known, released_at
         FROM cards
         WHERE commander_eligible = 1 AND oracle_id IN ({placeholders})
         """,
@@ -58,7 +59,8 @@ def _pick_commander(
         return commanders
 
     commander_sql = """
-        SELECT oracle_id, name, color_identity, partner_kind, scryfall_uri, image_uri
+        SELECT oracle_id, name, color_identity, partner_kind, scryfall_uri, image_uri,
+               price_usd, price_known, released_at
         FROM cards
         WHERE commander_eligible = 1
     """
@@ -128,6 +130,9 @@ def run_generate(
                 "partner_kind": c["partner_kind"],
                 "scryfall_uri": c["scryfall_uri"],
                 "image_uri": c["image_uri"],
+                "price_usd": c["price_usd"],
+                "price_known": bool(c["price_known"]),
+                "released_at": c["released_at"],
             }
             for c in commanders
         ]

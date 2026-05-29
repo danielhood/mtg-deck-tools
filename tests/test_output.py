@@ -8,6 +8,7 @@ from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.output import (
     classify_warning,
     format_card_description,
+    format_commander_list_item,
     format_card_detail_title,
     format_card_mana_cost,
     format_card_power_toughness,
@@ -96,6 +97,21 @@ def test_card_detail_formatters() -> None:
     )
     assert format_card_price(unpriced) == "No price"
     assert format_card_mana_cost(unpriced) == "—"
+
+
+def test_format_commander_list_item() -> None:
+    item = format_commander_list_item(
+        {
+            "name": "Yawgmoth, Thran Physician",
+            "scryfall_uri": "https://scryfall.com/card/mh1/116/yawgmoth-thran-physician",
+            "price_usd": 12.34,
+            "price_known": True,
+            "released_at": "2019-06-14",
+        }
+    )
+    assert "[Yawgmoth, Thran Physician]" in item
+    assert "**Price:** $12.34" in item
+    assert "**Released:** June 14, 2019" in item
 
 
 def test_format_card_detail_title_links_scryfall() -> None:
@@ -262,7 +278,17 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     _, md_path = write_deck_outputs(
         base_path=tmp_path / "deck",
         criteria=criteria,
-        commanders=[{"name": "Test Commander", "oracle_id": "cmd", "color_identity": ["G"]}],
+        commanders=[
+            {
+                "name": "Test Commander",
+                "oracle_id": "cmd",
+                "color_identity": ["G"],
+                "scryfall_uri": "https://scryfall.com/card/test/commander",
+                "price_usd": 5.0,
+                "price_known": True,
+                "released_at": "2020-01-15",
+            }
+        ],
         maindeck=result,
         identity=["G"],
     )
@@ -278,6 +304,8 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     assert "### Unpriced cards" in notes_section
     assert "### Budget trims" in notes_section
     assert "[budget]" not in notes_section
+    assert "**Price:** $5.00" in text.split("## Commander")[1].split("## Validation")[0]
+    assert "**Released:** January 15, 2020" in text
     assert "## Card details" in text
     assert "#### [Llanowar Elves](https://scryfall.com/card/lea/258/llanowar-elves)" in text
     assert "**Price:** $1.25" in text
