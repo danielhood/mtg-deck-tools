@@ -5,8 +5,10 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from mtg_deck_tools.builder.dependency_scoring import DeckBuildStats, dependency_pick_score
 from mtg_deck_tools.builder.pool import CardCandidate
 from mtg_deck_tools.builder.slot_quality import WINCON_ORACLE, slot_oracle_score
+from mtg_deck_tools.rules.dependencies import CardEffectRow
 
 COMMANDER_REFERENCE = re.compile(r"(?i)(your commander|command zone|legendary)")
 
@@ -33,6 +35,7 @@ class ScoreWeights:
     budget: float = 1.0
     availability: float = 0.6
     redundancy: float = 0.8
+    dependency: float = 1.0
 
 
 def _edhrec_score(rank: int | None) -> float:
@@ -131,6 +134,9 @@ def score_candidate(
     budget_remaining: float | None,
     budget_usd: float | None = None,
     weights: ScoreWeights | None = None,
+    deck_stats: DeckBuildStats | None = None,
+    candidate_effects: list[CardEffectRow] | None = None,
+    search_pool: list[tuple[str, float]] | None = None,
 ) -> float:
     w = weights or ScoreWeights()
     score = 0.0
@@ -174,5 +180,14 @@ def score_candidate(
     primary_type = (candidate.type_line.split("—")[0].strip().split()[-1] if candidate.type_line else "")
     if primary_type and type_counts.get(primary_type, 0) >= 8:
         score -= w.redundancy
+
+    if deck_stats is not None and candidate_effects is not None and search_pool is not None:
+        score += dependency_pick_score(
+            candidate,
+            candidate_effects,
+            deck_stats,
+            search_pool,
+            weight=w.dependency,
+        )
 
     return score

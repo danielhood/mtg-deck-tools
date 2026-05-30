@@ -106,8 +106,13 @@ def fetch_card_effects(
     return grouped
 
 
-def _type_line_matches(card: DeckCard, payload: dict[str, Any]) -> bool:
-    tl = card.type_line or ""
+def payload_matches_card(
+    type_line: str,
+    cmc: float,
+    payload: dict[str, Any],
+) -> bool:
+    """Whether a card's type line / CMC satisfies a search_library payload (D2/D3)."""
+    tl = type_line or ""
     for supertype in payload.get("supertypes") or []:
         if supertype.lower() == "basic" and "Basic" in tl and "Land" in tl:
             continue
@@ -127,9 +132,13 @@ def _type_line_matches(card: DeckCard, payload: dict[str, Any]) -> bool:
             return False
     max_cmc = payload.get("max_cmc")
     if max_cmc is not None and "Creature" in tl:
-        if card.cmc > float(max_cmc):
+        if cmc > float(max_cmc):
             return False
     return True
+
+
+def _type_line_matches(card: DeckCard, payload: dict[str, Any]) -> bool:
+    return payload_matches_card(card.type_line or "", card.cmc, payload)
 
 
 def _search_targets(

@@ -140,7 +140,7 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 | **D0.5** | D0 ☑ + snapshot ☑ | Audit reports ☑ + profiles revised ☑ |
 | **D1** | All **§ Must complete before D1** ☑ | Import writes `card_effects`; golden tests pass |
 | **D2** | D1 ☑ + output contract ☑ | Warn-only report in MD/JSON; dogfood review — **implemented** |
-| **D3** | D2 false-positive budget met | Scorer uses `deck_stats` during fill |
+| **D3** | D2 false-positive budget met | Scorer uses `deck_stats` during fill — **implemented** |
 | **D4** | D3 ☑ | Optional `--strict-dependencies` at pick time |
 | **D5** | D4 ☑ | Repair pass for top failure classes |
 
