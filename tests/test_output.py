@@ -44,6 +44,18 @@ def test_format_generated_timestamp() -> None:
 
 
 def test_classify_warning() -> None:
+    assert (
+        classify_warning(
+            "Likely obscure: Old Card (no USD price; may be hard to find; not counted toward budget)."
+        )
+        == "availability"
+    )
+    assert (
+        classify_warning(
+            "Price pending: New Card (new or popular; USD price may appear soon; not counted toward budget)."
+        )
+        == "availability"
+    )
     assert classify_warning("No USD price for Forest; not counted toward budget.") == "unpriced"
     assert classify_warning("Budget trim: replaced A with B.") == "budget_trim"
     assert classify_warning("Mana base suggested 32 lands based on ramp/curve/colors; using 31.") == (

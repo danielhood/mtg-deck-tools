@@ -29,6 +29,7 @@ from mtg_deck_tools.wizard.slots import load_slot_template_config
 _VALIDATION_NOTE_RE = re.compile(r"^\[[\w.]+\]")
 
 NOTE_GROUPS: tuple[tuple[str, str], ...] = (
+    ("availability", "Availability / unpriced"),
     ("unpriced", "Unpriced cards"),
     ("budget_trim", "Budget trims"),
     ("mana_base", "Mana base"),
@@ -96,8 +97,19 @@ def format_generated_timestamp(when: datetime) -> str:
     return f"{format_display_date(local.date())} · {local.strftime('%H:%M %Z')}"
 
 
+def _unpriced_classifications(cards: list[DeckCard]) -> dict[str, list[str]]:
+    grouped: dict[str, list[str]] = {"likely_obscure": [], "price_pending": []}
+    for card in cards:
+        label = card.unpriced_classification
+        if label in grouped and card.name not in grouped[label]:
+            grouped[label].append(card.name)
+    return grouped
+
+
 def classify_warning(message: str) -> str:
     """Bucket a build warning for grouped Notes output."""
+    if message.startswith("Likely obscure:") or message.startswith("Price pending:"):
+        return "availability"
     if message.startswith("No USD price for"):
         return "unpriced"
     if message.startswith("Budget trim:"):
@@ -324,6 +336,7 @@ def write_deck_outputs(
 
     avg_cmc = _avg_cmc_nonland(maindeck.cards)
     estimated = estimated_deck_price(maindeck, commanders)
+    unpriced_by_class = _unpriced_classifications(maindeck.cards)
     deck_json = {
         "schema_version": "1.0",
         "generated_at": generated_at_iso,
@@ -348,6 +361,7 @@ def write_deck_outputs(
                 "rarity": c.rarity,
                 "power": c.power,
                 "toughness": c.toughness,
+                "unpriced_classification": c.unpriced_classification,
             }
             for c in maindeck.cards
         ],
@@ -357,6 +371,7 @@ def write_deck_outputs(
             "maindeck_price_usd": round(maindeck.budget_spent, 2),
             "unpriced_card_count": len(maindeck.unpriced_names),
             "unpriced_card_names": maindeck.unpriced_names,
+            "unpriced_by_classification": unpriced_by_class,
             "avg_cmc_nonland": avg_cmc,
         },
         "mana_base": _mana_base_dict(maindeck.mana_base),
@@ -389,6 +404,10 @@ def write_deck_outputs(
         lines.append(f"**Card price range:** {price_range}")
     if criteria.min_rarity != "common":
         lines.append(f"**Minimum rarity:** {format_min_rarity_display(criteria.min_rarity)}")
+    if criteria.strict_budget:
+        lines.append("**Strict budget:** yes (unpriced cards excluded from pool)")
+    if criteria.prefer_available:
+        lines.append("**Prefer available:** yes (low availability score excluded)")
     lines.append(f"**Generated:** {generated_at_display}")
     lines.append(f"**Seed:** {criteria.seed if criteria.seed is not None else 'random'}")
     if criteria.themes:

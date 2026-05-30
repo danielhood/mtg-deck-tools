@@ -106,8 +106,9 @@ def run_step5(criteria: DeckCriteria) -> DeckCriteria:
         Panel(
             "[bold]Step 5 of 5[/bold] — Budget\n"
             "Optional total deck cap and per-card min/max using Scryfall prices. "
-            "Cards without prices are allowed with a warning unless you use "
-            "[bold]--strict-budget[/bold] at generate time.",
+            "When a budget is set, you can exclude unpriced cards and prefer "
+            "readily available picks (same as [bold]--strict-budget[/bold] / "
+            "[bold]--prefer-available[/bold] at generate time).",
             title="MTG Deck Tools",
             border_style="cyan",
         )
@@ -131,6 +132,23 @@ def run_step5(criteria: DeckCriteria) -> DeckCriteria:
         if raw is None:
             raise KeyboardInterrupt
         criteria = criteria.model_copy(update={"budget_usd": float(raw.strip())})
+        exclude_unpriced = questionary.confirm(
+            "Exclude cards without USD prices from the build?",
+            default=True,
+            style=WIZARD_STYLE,
+        ).ask()
+        if exclude_unpriced is None:
+            raise KeyboardInterrupt
+        criteria = criteria.model_copy(update={"strict_budget": exclude_unpriced})
+
+        prefer_available = questionary.confirm(
+            "Prefer readily available cards (filter obscure / hard-to-find picks)?",
+            default=True,
+            style=WIZARD_STYLE,
+        ).ask()
+        if prefer_available is None:
+            raise KeyboardInterrupt
+        criteria = criteria.model_copy(update={"prefer_available": prefer_available})
 
     criteria = _prompt_card_price_range(criteria)
     return _prompt_min_rarity(criteria)

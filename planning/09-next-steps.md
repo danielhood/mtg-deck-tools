@@ -23,7 +23,7 @@ Status as of 2026-05-30. Phase 1, Phase 2, v1 polish, and **Phase 3 §1** are **
 | `.deck.json` reload / edit workflow | Done |
 | Post-validation repair pass | **Not started** — illegal picks are prevented at fill time; no swap-after-validate |
 | Slot pool quality (themed slot misfills) | Done |
-| Unpriced / availability handling | **Partial** — per-card max helps; null-price cards still allowed by default |
+| Unpriced / availability handling | Done |
 
 ## Dogfooding snapshot
 
@@ -89,19 +89,19 @@ mtg-deck-tools generate --from deck.deck.json --refill-slot synergy --seed 42
 
 **Acceptance:** User can tweak `budget_usd`, `card_price_max_usd`, or `themes` in JSON and regenerate without re-running the wizard.
 
-### 4. Unpriced / availability handling
+### 4. Unpriced / availability handling — **Done**
 
-Policy is documented in [08-card-availability.md](08-card-availability.md). Per-card max (`card_price_max_usd`) reduces expensive picks but null-price cards still slip through.
+Policy in [08-card-availability.md](08-card-availability.md). Import computes `availability_score` and stores `availability_p25` for filtering.
 
 | Step | Scope | Status |
 | --- | --- | --- |
 | **Per-card price range** | Wizard step 5 + CLI + fill-time filter | **Done** |
-| **`--strict-budget` in wizard** | Offer during step 5 or as generate default when budget set | Not started |
-| **Availability score at import** | `released_at`, `edhrec_rank`, `reprint`, `set_type` → score column | Not started |
-| **Output classification** | Label null-price cards as `likely_obscure` vs `price_pending` in notes | Not started |
-| **`--prefer-available`** | Optional filter excluding bottom-quartile availability | Not started |
+| **`--strict-budget` in wizard** | Step 5 prompts when budget set (default: exclude unpriced) | **Done** |
+| **Availability score at import** | `released_at`, `edhrec_rank`, `reprint`, `set_type` → `availability_score` | **Done** |
+| **Output classification** | Notes group + stats: `likely_obscure` vs `price_pending` | **Done** |
+| **`--prefer-available`** | Filter below import-time p25; wizard default when budget set | **Done** |
 
-**Acceptance:** Budget builds default to priced, obtainable cards; obscure null-price picks are rare or flagged.
+**Acceptance:** Budget wizard runs default to strict + prefer-available; null-price cards are classified in Notes; re-import refreshes scores.
 
 ### 5. v1 success criteria closure
 
@@ -124,4 +124,4 @@ Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood p
 
 ## Suggested next task
 
-**Start with Phase 3 §4 (unpriced / availability handling).** Reload decks with `generate --from` and optional `--refill-slot`.
+**Start with Phase 3 §5 (v1 success criteria closure).** Re-import if availability scores are missing (`mtg-deck-tools import`).

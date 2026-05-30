@@ -137,6 +137,7 @@ Each slot is filled from `data/cards.db` using color identity, theme tags, mecha
 | `--themes` | Comma-separated archetype tags, e.g. `tokens,aristocrats`. |
 | `--seed` | RNG seed for reproducible picks (also stored in criteria). |
 | `--strict-budget` | Exclude cards with no Scryfall price and enforce the budget cap during fill. |
+| `--prefer-available` | Exclude cards below the import-time availability score (25th percentile). Re-run `import` after updating the card DB. |
 | `--card-price-min` / `--card-price-max` | Per-card USD floor/ceiling when picking cards. |
 | `--min-rarity` | Minimum rarity (`common`, `uncommon`, `rare`, `mythic`; default `common`). |
 | `--db` | Path to SQLite DB (default `data/cards.db`). |
@@ -192,6 +193,7 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 | --- | --- |
 | `--seed` | Overrides `criteria.seed` for this run. |
 | `--strict-budget` | Applied unless already set in the file’s criteria. |
+| `--prefer-available` | Applied unless already set in the file’s criteria. |
 | `--wizard` | **Ignored** — wizard is not run; criteria come from the file. |
 | `--colors` / `--themes` | Ignored (identity and themes come from loaded criteria + commanders). |
 
@@ -202,6 +204,8 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 **Phase 2** complete: wizard, slot filling, dynamic mana base, and Commander rule validation.
 
 **v1 polish:** budget enforcement during fill, post-fill budget trim pass, `--strict-budget`, tighter slot tags (`board_wipe`, `wincon`), and land price bias when a budget cap is set.
+
+**Phase 3:** build-time legality filters, slot pool quality, `.deck.json` reload, and availability scoring (`--prefer-available`, unpriced classification in Notes).
 
 ## License
 

@@ -86,6 +86,7 @@ def run_generate(
     criteria: DeckCriteria | None = None,
     output_dir: Path | None = None,
     strict_budget: bool = False,
+    prefer_available: bool = False,
 ) -> Path:
     """Build a full 99-card maindeck from criteria and write output files."""
     db = db_path or DEFAULT_DB_PATH
@@ -164,6 +165,7 @@ def run_generate(
                 "colors": identity,
                 "seed": effective_seed,
                 "strict_budget": strict_budget or working.strict_budget,
+                "prefer_available": prefer_available or working.prefer_available,
             }
         )
 

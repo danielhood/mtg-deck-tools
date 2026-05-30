@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from mtg_deck_tools.availability.score import compute_availability_score
 from mtg_deck_tools.rules.commander import (
     detect_partner_kind,
     is_commander_eligible,
@@ -82,6 +83,10 @@ def normalize_card(raw: dict[str, Any]) -> dict[str, Any] | None:
         cmc = 0.0
 
     is_basic = type_line.startswith("Basic Land")
+    set_type = raw.get("set_type")
+    reprint = bool(raw.get("reprint"))
+    released_at = raw.get("released_at")
+    edhrec_rank = raw.get("edhrec_rank")
 
     row = {
         "oracle_id": raw["oracle_id"],
@@ -102,15 +107,22 @@ def normalize_card(raw: dict[str, Any]) -> dict[str, Any] | None:
         "commander_eligible": 1 if is_commander_eligible(type_line, oracle_text or "") else 0,
         "is_basic_land": 1 if is_basic else 0,
         "partner_kind": detect_partner_kind(oracle_text or "", keywords),
-        "edhrec_rank": raw.get("edhrec_rank"),
+        "edhrec_rank": edhrec_rank,
         "price_usd": price_usd,
         "price_known": price_known,
-        "released_at": raw.get("released_at"),
+        "released_at": released_at,
         "rarity": raw.get("rarity"),
         "scryfall_uri": raw.get("scryfall_uri"),
         "image_uri": image_uris.get("normal"),
-        "set_type": raw.get("set_type"),
-        "reprint": 1 if raw.get("reprint") else 0,
+        "set_type": set_type,
+        "reprint": 1 if reprint else 0,
+        "availability_score": compute_availability_score(
+            price_known=bool(price_known),
+            edhrec_rank=edhrec_rank,
+            released_at=released_at,
+            set_type=set_type,
+            reprint=reprint,
+        ),
         "playable": playable,
     }
     return row

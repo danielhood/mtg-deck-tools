@@ -1,6 +1,6 @@
 """Database schema definitions."""
 
-SCHEMA_VERSION = "1"
+SCHEMA_VERSION = "2"
 
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS cards (
     scryfall_uri TEXT,
     image_uri TEXT,
     set_type TEXT,
-    reprint INTEGER
+    reprint INTEGER,
+    availability_score REAL
 );
 
 CREATE TABLE IF NOT EXISTS card_mechanic_tags (
@@ -58,8 +59,18 @@ CREATE INDEX IF NOT EXISTS idx_tags_layer ON card_mechanic_tags(layer);
 """
 
 
+def _ensure_columns(conn) -> None:
+    """Add columns introduced after initial schema without full rebuild."""
+    columns = {
+        row[1] for row in conn.execute("PRAGMA table_info(cards)").fetchall()
+    }
+    if "availability_score" not in columns:
+        conn.execute("ALTER TABLE cards ADD COLUMN availability_score REAL")
+
+
 def apply_schema(conn) -> None:
     conn.executescript(SCHEMA_SQL)
+    _ensure_columns(conn)
     conn.execute(
         "INSERT OR REPLACE INTO import_metadata (key, value) VALUES (?, ?)",
         ("schema_version", SCHEMA_VERSION),

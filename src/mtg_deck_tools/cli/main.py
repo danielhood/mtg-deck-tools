@@ -161,6 +161,13 @@ def generate_cmd(
             help="Exclude unpriced cards and enforce budget cap during generation",
         ),
     ] = False,
+    prefer_available: Annotated[
+        bool,
+        typer.Option(
+            "--prefer-available",
+            help="Exclude cards below the import-time availability score threshold",
+        ),
+    ] = False,
     card_price_min: Annotated[
         Optional[float],
         typer.Option("--card-price-min", help="Minimum USD price per card"),
@@ -235,6 +242,10 @@ def generate_cmd(
             patch["card_price_min_usd"] = card_price_min
         if card_price_max is not None:
             patch["card_price_max_usd"] = card_price_max
+        if strict_budget:
+            patch["strict_budget"] = True
+        if prefer_available:
+            patch["prefer_available"] = True
         if criteria is None:
             criteria = DeckCriteria(**patch)
         else:
@@ -249,6 +260,7 @@ def generate_cmd(
                 output_dir=output_dir,
                 refill_slot=refill_slot,
                 strict_budget=strict_budget,
+                prefer_available=prefer_available,
             )
         else:
             runner = run_generate_stub if stub else run_generate
@@ -262,6 +274,7 @@ def generate_cmd(
             )
             if not stub:
                 kwargs["strict_budget"] = strict_budget
+                kwargs["prefer_available"] = prefer_available
             out = runner(**kwargs)
     except (FileNotFoundError, RuntimeError, ValueError) as exc:
         console.print(f"[red]Error:[/red] {exc}")

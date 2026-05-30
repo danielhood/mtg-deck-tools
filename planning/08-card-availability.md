@@ -18,9 +18,9 @@ Scryfall null USD price mixes two different situations:
 | **Older / obscure** | Old `released_at`, low `edhrec_rank` or missing, no recent reprint, niche set | **Deprioritize or exclude** — hard to find, weak for "buildable" lists |
 | **Newly added** | Recent `released_at`, Commander-legal rare/mythic, active set | May be **available soon** — warn but don't treat as obscure |
 
-### Proposed availability heuristic (v2+)
+### Availability heuristic (shipped)
 
-Compute `availability_score` at import:
+Compute `availability_score` at import (schema v2):
 
 ```
 signals:
@@ -42,8 +42,8 @@ Use score as:
 
 The utility should **target cards likely to be available** for purchase or trade:
 
-- v1: soft bias via `edhrec_rank` in scoring (already planned)
-- v2: explicit availability score + optional hard filter on obscure null-price cards
+- v1: soft bias via `edhrec_rank` in scoring
+- shipped: `availability_score` at import, `--prefer-available` filter (p25 threshold), wizard strict/prefer defaults when budget is set, `likely_obscure` / `price_pending` in deck Notes
 
 No LGS inventory integration in scope; heuristics only.
 

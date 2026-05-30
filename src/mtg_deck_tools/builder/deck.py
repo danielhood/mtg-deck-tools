@@ -30,6 +30,7 @@ class DeckCard:
     power: str | None = None
     toughness: str | None = None
     rarity: str | None = None
+    unpriced_classification: str | None = None
 
 
 @dataclass

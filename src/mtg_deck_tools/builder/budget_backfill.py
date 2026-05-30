@@ -6,6 +6,7 @@ import sqlite3
 
 from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.builder.pool import CardCandidate, fetch_candidates, fetch_card_tags
+from mtg_deck_tools.builder.availability_filters import filter_candidates_by_availability
 from mtg_deck_tools.builder.price_filters import filter_candidates_by_price
 from mtg_deck_tools.builder.rarity_filters import filter_candidates_by_rarity
 from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
@@ -135,6 +136,7 @@ def _find_replacement(
         )
         pool = filter_candidates_by_price(pool, criteria, max_price)
         pool = filter_candidates_by_rarity(pool, criteria)
+        pool = filter_candidates_by_availability(conn, pool, criteria)
         pool = [
             c
             for c in pool

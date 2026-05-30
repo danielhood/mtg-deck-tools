@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 import sqlite3
 
 from mtg_deck_tools.builder.budget_backfill import trim_deck_to_budget
+from mtg_deck_tools.availability.score import classify_unpriced_card, format_unpriced_warning
+from mtg_deck_tools.builder.availability_filters import filter_candidates_by_availability
 from mtg_deck_tools.builder.price_filters import filter_candidates_by_price
 from mtg_deck_tools.builder.rarity_filters import filter_candidates_by_rarity
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard, slot_theme_tags
@@ -89,6 +91,7 @@ class _BuildState:
                 power=candidate.power,
                 toughness=candidate.toughness,
                 rarity=candidate.rarity,
+                unpriced_classification=None,
             )
         )
         if not candidate.is_basic_land:
@@ -98,7 +101,14 @@ class _BuildState:
             self.budget_spent += candidate.price_usd * quantity
         elif self.criteria.budget_usd is not None and candidate.name not in self.unpriced_names:
             self.unpriced_names.append(candidate.name)
-            self.warnings.append(f"No USD price for {candidate.name}; not counted toward budget.")
+            classification = classify_unpriced_card(
+                edhrec_rank=candidate.edhrec_rank,
+                released_at=candidate.released_at,
+            )
+            self.cards[-1].unpriced_classification = classification
+            self.warnings.append(
+                format_unpriced_warning(candidate.name, classification)
+            )
 
 
 def _type_counts(cards: list[DeckCard]) -> dict[str, int]:
@@ -148,6 +158,7 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
             state.budget_remaining(),
         )
         pool = filter_candidates_by_rarity(pool, state.criteria)
+        pool = filter_candidates_by_availability(state.conn, pool, state.criteria)
         tag_map = fetch_card_tags(state.conn, [c.oracle_id for c in pool])
         pool = refine_slot_candidates(
             slot,
@@ -222,6 +233,7 @@ def _fill_lands(
         state.criteria,
         state.budget_remaining(),
     )
+    nonbasics = filter_candidates_by_availability(state.conn, nonbasics, state.criteria)
 
     tag_map = fetch_card_tags(state.conn, [c.oracle_id for c in nonbasics])
     scored: list[tuple[CardCandidate, float]] = []
@@ -285,7 +297,7 @@ def _fill_lands(
             SELECT oracle_id, name, cmc, type_line, mana_cost, color_identity,
                    price_usd, price_known, edhrec_rank, oracle_text, keywords,
                    is_basic_land, produced_mana, scryfall_uri, image_uri, released_at,
-                   power, toughness
+                   power, toughness, rarity, availability_score
             FROM cards
             WHERE is_basic_land = 1 AND name = ?
             LIMIT 1
@@ -314,6 +326,8 @@ def _fill_lands(
             released_at=row["released_at"],
             power=row["power"],
             toughness=row["toughness"],
+            rarity=row["rarity"],
+            availability_score=row["availability_score"],
         )
         state.register(candidate, "lands")
 

@@ -31,6 +31,7 @@ class ScoreWeights:
     curve: float = 1.0
     wincon_signal: float = 2.0
     budget: float = 1.0
+    availability: float = 0.6
     redundancy: float = 0.8
 
 
@@ -50,6 +51,13 @@ def _curve_score(cmc: float, slot: str) -> float:
     target = SLOT_TARGET_CMC.get(slot, 3.0)
     distance = abs(cmc - target)
     return max(0.0, 2.5 - distance)
+
+
+def _availability_score(candidate: CardCandidate) -> float:
+    raw = candidate.availability_score
+    if raw is None:
+        return 0.0
+    return raw / 25.0
 
 
 def _budget_score(
@@ -157,6 +165,11 @@ def score_candidate(
             score -= 8.0
 
     score += w.budget * _budget_score(candidate, budget_remaining=budget_remaining)
+    score += w.availability * _availability_score(candidate)
+    if budget_usd is not None and (
+        not candidate.price_known or candidate.price_usd is None
+    ):
+        score -= 6.0
 
     primary_type = (candidate.type_line.split("—")[0].strip().split()[-1] if candidate.type_line else "")
     if primary_type and type_counts.get(primary_type, 0) >= 8:

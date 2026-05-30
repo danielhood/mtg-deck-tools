@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Callable
 
+from mtg_deck_tools.availability.score import record_availability_percentile
 from mtg_deck_tools.db.schema import SCHEMA_VERSION, apply_schema
 from mtg_deck_tools.import_.normalize import normalize_card
 from mtg_deck_tools.paths import DEFAULT_DB_PATH, TAXONOMY_PATH, find_oracle_cards_json
@@ -19,13 +20,13 @@ INSERT OR REPLACE INTO cards (
     colors, color_identity, keywords, produced_mana, power, toughness,
     commander_legal, commander_eligible, is_basic_land, partner_kind,
     edhrec_rank, price_usd, price_known, released_at, rarity,
-    scryfall_uri, image_uri, set_type, reprint
+    scryfall_uri, image_uri, set_type, reprint, availability_score
 ) VALUES (
     :oracle_id, :scryfall_id, :name, :layout, :type_line, :oracle_text, :mana_cost, :cmc,
     :colors, :color_identity, :keywords, :produced_mana, :power, :toughness,
     :commander_legal, :commander_eligible, :is_basic_land, :partner_kind,
     :edhrec_rank, :price_usd, :price_known, :released_at, :rarity,
-    :scryfall_uri, :image_uri, :set_type, :reprint
+    :scryfall_uri, :image_uri, :set_type, :reprint, :availability_score
 )
 """
 
@@ -91,6 +92,10 @@ def run_import(
 
     log(f"Applying {len(tag_rows):,} mechanic tags...")
     conn.executemany(TAG_INSERT_SQL, tag_rows)
+
+    p25 = record_availability_percentile(conn)
+    if p25 is not None:
+        log(f"Availability p25 threshold: {p25:.1f}")
 
     now = datetime.now(UTC).isoformat()
     meta = [

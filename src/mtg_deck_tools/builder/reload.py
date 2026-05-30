@@ -77,6 +77,7 @@ def run_generate_from_deck(
     output_dir: Path | None = None,
     refill_slot: str | None = None,
     strict_budget: bool = False,
+    prefer_available: bool = False,
 ) -> Path:
     """Regenerate a deck from a .deck.json file (full rebuild or single-slot refill)."""
     loaded = load_deck_json(deck_path)
@@ -90,6 +91,7 @@ def run_generate_from_deck(
             update={
                 "seed": effective_seed,
                 "strict_budget": strict_budget or loaded.criteria.strict_budget,
+                "prefer_available": prefer_available or loaded.criteria.prefer_available,
             }
         )
         if not working.slot_template:
