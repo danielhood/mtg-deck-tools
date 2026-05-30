@@ -1,6 +1,6 @@
 # Next steps — post-v1
 
-Status as of 2026-05-29. Phase 1, Phase 2, and v1 polish are **shipped**. This doc captures what to do next, informed by dogfooding (Dragonlord Dromoka, `$150` cap, `seed=42`).
+Status as of 2026-05-30. Phase 1, Phase 2, v1 polish, and **Phase 3 §1** are **shipped**. Recent dogfooding (Dragonlord Dromoka, Jetmir, Pantlaza, Yawgmoth at `$150`, `seed=42`) confirms validation passes after build-time legality filters.
 
 ## Current state
 
@@ -12,49 +12,64 @@ Status as of 2026-05-29. Phase 1, Phase 2, and v1 polish are **shipped**. This d
 | Dynamic mana base | Done |
 | Commander validation (CR 903 / 702.124) | Done |
 | Budget enforcement + trim pass | Done |
-| `--strict-budget` | Done |
+| `--strict-budget` | Done (CLI flag; wizard references it at generate time) |
+| Per-card USD price min/max | Done — wizard step 5 + `--card-price-min` / `--card-price-max` |
+| Build-time legality filters (903.5d, land/nonland slots) | Done |
+| Deck Markdown output polish | Done — grouped notes, card details, mana text, header metadata |
+| Commander price + release date (wizard + MD) | Done |
+| Card name + type display (wizard + MD) | Done |
+| Taxonomy display names in MD header | Done |
+| Linux/bash setup in README | Done |
 | `.deck.json` reload / edit workflow | **Not started** |
-| Build-time rule enforcement (pre-validation) | **Partial** — validate runs after fill; illegal cards can still be picked |
+| Post-validation repair pass | **Not started** — illegal picks are prevented at fill time; no swap-after-validate |
+| Slot pool quality (themed slot misfills) | **Partial** — oracle guards and graduated relaxation shipped; re-import needed for taxonomy tag refresh |
+| Unpriced / availability handling | **Partial** — per-card max helps; null-price cards still allowed by default |
 
 ## Dogfooding snapshot
 
-Latest output: `output/dragonlord-dromoka-20260529033745.md`
+Latest outputs: `output/jetmir-nexus-of-revels-20260530000000.md`, `output/dragonlord-dromoka-20260529235137.md`
 
 | Area | Result |
 | --- | --- |
-| Budget trim | **Works** — `$135.42` estimated vs `$150` cap; two swap notes |
-| Validation | **FAILED** — Command Tower in ramp slot (903.5d: produces B/R/U outside W/G) |
-| Unpriced cards | 15 cards at `$0` toward budget (wincon, flex, two nonbasic lands) |
-| Slot quality | Board wipes slot has Nettlecyst / Ghost Ark (not wipes); wincon/flex are unpriced bulk |
+| Validation (903.5d) | **PASSED** — Command Tower no longer appears in W/G ramp; land color filtering at pool fill works |
+| Budget trim | **Works** — Jetmir `$78.39` vs `$150` cap with `$5` per-card max |
+| Per-card price range | **Works** — wizard step 5 and MD header show min/max when set |
+| Unpriced cards | Still present — Jetmir: 4 null-price cards with budget warning |
+| Slot quality | **Still weak** — Jetmir `board_wipe`: Worldslayer (equipment); Dromoka ramp/draw slots mix on-theme and filler bulk |
+| MD output | Card names show type line; commander/details/maindeck linked to Scryfall; friendly dates and color names |
 
-These are the highest-signal gaps for Phase 3.
+These point to **slot pool quality** as the next highest-signal gap.
 
 ---
 
 ## Phase 3 — recommended order
 
-### 1. Build-time legality filters (priority)
+### 1. Build-time legality filters — **Done**
 
-Validation currently runs **after** fill. Illegal picks should be excluded from the pool (or repaired before output).
+Shipped in `a8f2894`. Pool queries and post-filters now enforce:
 
-| Issue | Example | Fix direction |
-| --- | --- | --- |
-| **903.5d land colors** | Command Tower in a W/G deck | Filter candidates by `produced_mana ⊆ identity` in pool queries and budget trim |
-| **Land vs nonland slot bleed** | Command Tower listed under Ramp | Tighten `nonlands_only` SQL — `type_line = 'Land'` may bypass `NOT LIKE '% Land%'`; use `is_basic_land` + land type detection |
-| **Post-validation repair** | Deck marked FAILED but still written | Optional: swap illegal cards after validate (mirror budget trim), or fail fast and re-fill |
+| Issue | Fix |
+| --- | --- |
+| **903.5d land colors** | `land_produces_only_identity()` filters land candidates to commander identity |
+| **Land vs nonland slot bleed** | `is_land_card()` + tightened SQL/post-filter excludes lands from nonland slots |
+| **Budget trim on lands** | Same identity checks applied during replacement search |
 
-**Acceptance:** `generate --wizard` for Dromoka W/G at `$150` produces validation **PASSED** without manual edits.
+**Acceptance met:** Dromoka W/G at `$150` produces validation **PASSED** without manual edits.
 
-### 2. Slot pool quality
+**Deferred:** Optional post-validation repair (swap illegal cards after validate) — not needed while fill-time filters hold.
 
-When tagged pools are thin, filler relaxes to “any nonland” and misfills slots.
+### 2. Slot pool quality — **Partial (shipped core)**
 
-| Slot | Symptom | Fix direction |
-| --- | --- | --- |
-| `board_wipe` | Stax / equipment instead of mass removal | Re-run `import` after taxonomy changes; add slot-specific oracle guards in scorer; avoid relaxing to untagged pool too early |
-| `wincon` | Unpriced legacy cards | Expand `wincon` taxonomy; prefer priced cards when budget set; fall back to synergy-themed threats |
-| `flex` | No theme tag requirement today | Light tag preference or “any theme overlap” scoring floor |
-| `ramp` | Lands classified as ramp | Exclude all lands from nonland slots; consider `{T}: Add` artifact/enchantment ramp only |
+Graduated tag relaxation, oracle guards, and slot-specific scoring reduce misfills when tagged pools are thin.
+
+| Slot | Fix shipped |
+| --- | --- |
+| `board_wipe` | Tighter taxonomy matcher; oracle guard rejects equipment triggers (e.g. Worldslayer) |
+| `wincon` | Themed fallback step before untagged pool; penalize unpriced cards when budget set |
+| `flex` | Prefer deck `themes` before falling back to any nonland |
+| `ramp` | Oracle guard excludes lands and off-theme picks from relaxed pool |
+
+**Remaining:** Re-run `import` to refresh tags from updated taxonomy; expand `wincon` taxonomy further; slot-specific oracle guards for `draw`/`removal`.
 
 **Acceptance:** Board wipe and wincon slots contain on-theme, priced cards for a standard GW voltron/landfall list.
 
@@ -74,24 +89,25 @@ mtg-deck-tools generate --from deck.json --refill-slot synergy --seed 42
 | Regenerate full deck | Skip wizard; call `run_generate` with loaded criteria |
 | Regenerate one slot (later) | Keep other slots fixed; refill one template slot |
 
-**Acceptance:** User can tweak `budget_usd` or `themes` in JSON and regenerate without re-running the wizard.
+**Acceptance:** User can tweak `budget_usd`, `card_price_max_usd`, or `themes` in JSON and regenerate without re-running the wizard.
 
 ### 4. Unpriced / availability handling
 
-Policy is documented in [08-card-availability.md](08-card-availability.md). Dogfooding shows 15 unpriced cards inflating slot count while hiding real cost.
+Policy is documented in [08-card-availability.md](08-card-availability.md). Per-card max (`card_price_max_usd`) reduces expensive picks but null-price cards still slip through.
 
-| Step | Scope |
-| --- | --- |
-| **`--strict-budget` in wizard** | Offer during step 5 or as generate default when budget set |
-| **Availability score at import** | `released_at`, `edhrec_rank`, `reprint`, `set_type` → score column |
-| **Output classification** | Label null-price cards as `likely_obscure` vs `price_pending` in notes |
-| **`--prefer-available`** | Optional filter excluding bottom-quartile availability |
+| Step | Scope | Status |
+| --- | --- | --- |
+| **Per-card price range** | Wizard step 5 + CLI + fill-time filter | **Done** |
+| **`--strict-budget` in wizard** | Offer during step 5 or as generate default when budget set | Not started |
+| **Availability score at import** | `released_at`, `edhrec_rank`, `reprint`, `set_type` → score column | Not started |
+| **Output classification** | Label null-price cards as `likely_obscure` vs `price_pending` in notes | Not started |
+| **`--prefer-available`** | Optional filter excluding bottom-quartile availability | Not started |
 
 **Acceptance:** Budget builds default to priced, obtainable cards; obscure null-price picks are rare or flagged.
 
 ### 5. v1 success criteria closure
 
-Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood pass (3–5 commanders, varied budgets). Remaining unchecked items mostly work; document known gaps (903.5d at fill time, unpriced cards).
+Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood pass (3–5 commanders, varied budgets). Core generation, validation, budget, and output are working; remaining gaps are slot quality and reload workflow.
 
 ---
 
@@ -110,6 +126,6 @@ Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood p
 
 ## Suggested next task
 
-**Start with Phase 3 §1 (build-time legality filters).** The Dromoka deck proves budget trim works but a single illegal land pick fails validation — fixing pool filters and land typing has the best ratio of user-visible improvement to scope.
+**Start with Phase 3 §3 (`.deck.json` reload).** Slot pool quality guards are in place; re-import the card database to pick up taxonomy changes, then dogfood again.
 
-After that: slot pool quality (§2), then `.deck.json` reload (§3).
+After that: unpriced/availability policy (§4).

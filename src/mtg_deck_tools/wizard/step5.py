@@ -6,6 +6,7 @@ import questionary
 from rich.panel import Panel
 
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.rules.rarity import RARITY_ORDER, format_min_rarity_display
 from mtg_deck_tools.wizard.common import WIZARD_STYLE, console, require_tty
 
 
@@ -81,6 +82,22 @@ def _prompt_card_price_range(criteria: DeckCriteria) -> DeckCriteria:
     )
 
 
+def _prompt_min_rarity(criteria: DeckCriteria) -> DeckCriteria:
+    choices = [
+        questionary.Choice(title=format_min_rarity_display(rarity), value=rarity)
+        for rarity in RARITY_ORDER
+    ]
+    picked = questionary.select(
+        "Minimum card rarity",
+        choices=choices,
+        default=criteria.min_rarity,
+        style=WIZARD_STYLE,
+    ).ask()
+    if picked is None:
+        raise KeyboardInterrupt
+    return criteria.model_copy(update={"min_rarity": picked})
+
+
 def run_step5(criteria: DeckCriteria) -> DeckCriteria:
     """Interactive step 5: optional deck budget and per-card price range."""
     require_tty()
@@ -115,4 +132,5 @@ def run_step5(criteria: DeckCriteria) -> DeckCriteria:
             raise KeyboardInterrupt
         criteria = criteria.model_copy(update={"budget_usd": float(raw.strip())})
 
-    return _prompt_card_price_range(criteria)
+    criteria = _prompt_card_price_range(criteria)
+    return _prompt_min_rarity(criteria)

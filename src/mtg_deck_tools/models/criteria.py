@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+from mtg_deck_tools.rules.rarity import normalize_min_rarity
 
 
 class DeckCriteria(BaseModel):
@@ -17,8 +19,14 @@ class DeckCriteria(BaseModel):
     card_price_min_usd: float | None = None
     card_price_max_usd: float | None = None
     strict_budget: bool = False
+    min_rarity: str = "common"
     slot_template: dict[str, int] = Field(default_factory=dict)
     seed: int | None = None
+
+    @field_validator("min_rarity")
+    @classmethod
+    def _normalize_min_rarity(cls, value: str) -> str:
+        return normalize_min_rarity(value)
 
     @model_validator(mode="after")
     def _card_price_range_valid(self) -> DeckCriteria:

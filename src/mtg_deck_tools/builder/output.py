@@ -22,6 +22,7 @@ from mtg_deck_tools.formatting import (
 from mtg_deck_tools.tags.labels import format_tag_list
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.commander import format_color_identity
+from mtg_deck_tools.rules.rarity import format_min_rarity_display, format_rarity_display
 from mtg_deck_tools.rules.validate import ValidationResult
 from mtg_deck_tools.wizard.slots import load_slot_template_config
 
@@ -185,6 +186,62 @@ def format_card_released_at(card: DeckCard) -> str:
     return format_released_at_display(card.released_at)
 
 
+def format_card_rarity(card: DeckCard) -> str:
+    return format_rarity_display(card.rarity)
+
+
+def _commander_card_cost(cmd: dict) -> float:
+    if cmd.get("price_known") and cmd.get("price_usd") is not None:
+        return float(cmd["price_usd"])
+    return 0.0
+
+
+def estimated_deck_price(maindeck: DeckBuildResult, commanders: list[dict]) -> float:
+    """Sum priced maindeck cards and commander(s) with known USD prices."""
+    total = maindeck.budget_spent + sum(_commander_card_cost(cmd) for cmd in commanders)
+    return round(total, 2)
+
+
+def commanders_to_deck_cards(commanders: list[dict]) -> list[DeckCard]:
+    """Convert commander metadata dicts into DeckCard rows for detail rendering."""
+    cards: list[DeckCard] = []
+    for cmd in commanders:
+        cards.append(
+            DeckCard(
+                oracle_id=cmd.get("oracle_id", ""),
+                name=cmd["name"],
+                slot="commander",
+                quantity=1,
+                cmc=float(cmd.get("cmc") or 0),
+                mana_cost=cmd.get("mana_cost") or "",
+                type_line=cmd.get("type_line") or "",
+                price_usd=cmd.get("price_usd"),
+                price_known=bool(cmd.get("price_known")),
+                scryfall_uri=cmd.get("scryfall_uri"),
+                image_uri=cmd.get("image_uri"),
+                oracle_text=cmd.get("oracle_text") or "",
+                released_at=cmd.get("released_at"),
+                rarity=cmd.get("rarity"),
+                power=cmd.get("power"),
+                toughness=cmd.get("toughness"),
+            )
+        )
+    return cards
+
+
+def _render_single_card_detail(card: DeckCard) -> list[str]:
+    return [
+        f"#### {format_card_detail_title(card)}",
+        f"- **Price:** {format_card_price(card)}",
+        f"- **Rarity:** {format_card_rarity(card)}",
+        f"- **Released:** {format_card_released_at(card)}",
+        f"- **Mana cost:** {format_card_mana_cost(card)}",
+        f"- **Power/Toughness:** {format_card_power_toughness(card)}",
+        f"- **Description:** {format_card_description(card)}",
+        "",
+    ]
+
+
 def _render_notes_section(
     warnings: list[str],
     *,
@@ -214,8 +271,11 @@ def _render_card_details_section(
     cards: list[DeckCard],
     slot_order: list[str],
     slot_labels: dict[str, str],
+    *,
+    commanders: list[dict] | None = None,
 ) -> list[str]:
-    if not cards:
+    commander_cards = commanders_to_deck_cards(commanders or [])
+    if not commander_cards and not cards:
         return []
 
     by_slot: dict[str, list[DeckCard]] = defaultdict(list)
@@ -223,6 +283,12 @@ def _render_card_details_section(
         by_slot[card.slot].append(card)
 
     lines = ["## Card details", ""]
+    if commander_cards:
+        lines.append("### Commander")
+        lines.append("")
+        for card in commander_cards:
+            lines.extend(_render_single_card_detail(card))
+
     for slot in slot_order:
         slot_cards = by_slot.get(slot)
         if not slot_cards:
@@ -231,13 +297,7 @@ def _render_card_details_section(
         lines.append(f"### {label}")
         lines.append("")
         for card in sorted(slot_cards, key=lambda c: (-c.quantity, c.cmc, c.name)):
-            lines.append(f"#### {format_card_detail_title(card)}")
-            lines.append(f"- **Price:** {format_card_price(card)}")
-            lines.append(f"- **Released:** {format_card_released_at(card)}")
-            lines.append(f"- **Mana cost:** {format_card_mana_cost(card)}")
-            lines.append(f"- **Power/Toughness:** {format_card_power_toughness(card)}")
-            lines.append(f"- **Description:** {format_card_description(card)}")
-            lines.append("")
+            lines.extend(_render_single_card_detail(card))
     return lines
 
 
@@ -263,6 +323,7 @@ def write_deck_outputs(
     out_base.parent.mkdir(parents=True, exist_ok=True)
 
     avg_cmc = _avg_cmc_nonland(maindeck.cards)
+    estimated = estimated_deck_price(maindeck, commanders)
     deck_json = {
         "schema_version": "1.0",
         "generated_at": generated_at_iso,
@@ -284,6 +345,7 @@ def write_deck_outputs(
                 "image_uri": c.image_uri,
                 "mechanic_tags": c.mechanic_tags,
                 "released_at": c.released_at,
+                "rarity": c.rarity,
                 "power": c.power,
                 "toughness": c.toughness,
             }
@@ -291,7 +353,8 @@ def write_deck_outputs(
         ],
         "stats": {
             "maindeck_cards": sum(c.quantity for c in maindeck.cards),
-            "estimated_price_usd": round(maindeck.budget_spent, 2),
+            "estimated_price_usd": estimated,
+            "maindeck_price_usd": round(maindeck.budget_spent, 2),
             "unpriced_card_count": len(maindeck.unpriced_names),
             "unpriced_card_names": maindeck.unpriced_names,
             "avg_cmc_nonland": avg_cmc,
@@ -314,14 +377,18 @@ def write_deck_outputs(
     if criteria.budget_usd is not None:
         lines.append(
             f"**Budget cap:** ${criteria.budget_usd:.2f} · "
-            f"**Estimated maindeck:** ${maindeck.budget_spent:.2f}"
+            f"**Estimated deck:** ${estimated:.2f}"
         )
+    else:
+        lines.append(f"**Estimated deck:** ${estimated:.2f}")
     price_range = format_card_price_range_display(
         min_usd=criteria.card_price_min_usd,
         max_usd=criteria.card_price_max_usd,
     )
     if price_range:
         lines.append(f"**Card price range:** {price_range}")
+    if criteria.min_rarity != "common":
+        lines.append(f"**Minimum rarity:** {format_min_rarity_display(criteria.min_rarity)}")
     lines.append(f"**Generated:** {generated_at_display}")
     lines.append(f"**Seed:** {criteria.seed if criteria.seed is not None else 'random'}")
     if criteria.themes:
@@ -413,6 +480,7 @@ def write_deck_outputs(
             maindeck.cards,
             slot_config.order,
             slot_config.labels,
+            commanders=commanders,
         )
     )
 

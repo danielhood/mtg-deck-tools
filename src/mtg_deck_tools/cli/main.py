@@ -168,6 +168,13 @@ def generate_cmd(
         Optional[float],
         typer.Option("--card-price-max", help="Maximum USD price per card"),
     ] = None,
+    min_rarity: Annotated[
+        str,
+        typer.Option(
+            "--min-rarity",
+            help="Minimum card rarity (common, uncommon, rare, mythic)",
+        ),
+    ] = "common",
 ) -> None:
     """
     Generate a Commander deck (99-card maindeck + commander metadata).
@@ -192,8 +199,8 @@ def generate_cmd(
     color_list = [c.strip().upper() for c in colors.split(",")] if colors else None
     theme_list = [t.strip() for t in themes.split(",")] if themes else None
 
-    if not wizard and (card_price_min is not None or card_price_max is not None):
-        patch: dict = {}
+    if not wizard:
+        patch: dict = {"min_rarity": min_rarity}
         if card_price_min is not None:
             patch["card_price_min_usd"] = card_price_min
         if card_price_max is not None:

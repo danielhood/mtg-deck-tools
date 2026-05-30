@@ -8,12 +8,14 @@ from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.formatting import format_display_date
 from mtg_deck_tools.builder.output import (
     classify_warning,
+    estimated_deck_price,
     format_card_description,
     format_commander_list_item,
     format_card_detail_title,
     format_card_mana_cost,
     format_card_power_toughness,
     format_card_price,
+    format_card_rarity,
     format_card_released_at,
     format_generated_timestamp,
     group_warnings,
@@ -183,6 +185,25 @@ def test_format_card_power_toughness() -> None:
     ) == "—"
 
 
+def test_format_card_rarity() -> None:
+    assert format_card_rarity(
+        DeckCard(
+            oracle_id="1",
+            name="Sol Ring",
+            slot="ramp",
+            quantity=1,
+            cmc=1.0,
+            mana_cost="{1}",
+            type_line="Artifact",
+            price_usd=1.0,
+            price_known=True,
+            scryfall_uri=None,
+            image_uri=None,
+            rarity="uncommon",
+        )
+    ) == "Uncommon"
+
+
 def test_format_card_released_at() -> None:
     card = DeckCard(
         oracle_id="1",
@@ -232,6 +253,7 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
         image_uri=None,
         oracle_text="{T}: Add {G}.",
             released_at="1993-10-04",
+            rarity="common",
             power="1",
             toughness="1",
         ),
@@ -296,6 +318,7 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     )
 
     text = md_path.read_text(encoding="utf-8")
+    assert "**Budget cap:** $150.00 · **Estimated deck:** $6.25" in text
     assert "**Commander:** Test Commander - Legendary Creature — Human" in text
     assert "**Color identity:** Green" in text
     assert "- Llanowar Elves - Creature — Elf Druid ($1.25)" in text
@@ -311,10 +334,55 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     assert "**Price:** $5.00" in text.split("## Commander")[1].split("## Validation")[0]
     assert "**Released:** January 15, 2020" in text
     assert "## Card details" in text
-    assert "#### [Llanowar Elves - Creature — Elf Druid](https://scryfall.com/card/lea/258/llanowar-elves)" in text
+    details = text.split("## Card details", 1)[1]
+    assert details.index("### Commander") < details.index("### Ramp")
+    assert "#### [Test Commander - Legendary Creature — Human](https://scryfall.com/card/test/commander)" in details
+    assert "#### [Llanowar Elves - Creature — Elf Druid](https://scryfall.com/card/lea/258/llanowar-elves)" in details
     assert "**Price:** $1.25" in text
+    assert "**Rarity:** Common" in text
     assert "**Released:** October 4, 1993" in text
     assert "**Power/Toughness:** 1/1" in text
     assert "**Mana cost:** (G)" in text
     assert "**Description:** **Tap**: Add (G)." in text
     assert "#### Forest - Basic Land — Forest (98×)" in text
+
+
+def test_write_deck_outputs_shows_estimated_deck_without_budget_cap(tmp_path) -> None:
+    result = DeckBuildResult(
+        cards=[
+            DeckCard(
+                oracle_id="c1",
+                name="Llanowar Elves",
+                slot="ramp",
+                quantity=1,
+                cmc=1.0,
+                mana_cost="{G}",
+                type_line="Creature — Elf Druid",
+                price_usd=2.50,
+                price_known=True,
+                scryfall_uri=None,
+                image_uri=None,
+            )
+        ],
+        warnings=[],
+        budget_spent=2.50,
+        unpriced_names=[],
+    )
+    _, md_path = write_deck_outputs(
+        base_path=tmp_path / "deck",
+        criteria=DeckCriteria(colors=["G"], commander_oracle_ids=["cmd"]),
+        commanders=[
+            {
+                "name": "Commander",
+                "type_line": "Legendary Creature",
+                "oracle_id": "cmd",
+                "price_usd": 1.0,
+                "price_known": True,
+            }
+        ],
+        maindeck=result,
+        identity=["G"],
+    )
+    text = md_path.read_text(encoding="utf-8")
+    assert "**Estimated deck:** $3.50" in text
+    assert "**Budget cap:**" not in text

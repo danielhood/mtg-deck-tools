@@ -29,6 +29,7 @@ class DeckCard:
     released_at: str | None = None
     power: str | None = None
     toughness: str | None = None
+    rarity: str | None = None
 
 
 @dataclass

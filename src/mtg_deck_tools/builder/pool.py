@@ -35,6 +35,7 @@ class CardCandidate:
     released_at: str | None = None
     power: str | None = None
     toughness: str | None = None
+    rarity: str | None = None
 
 
 def _row_to_candidate(row: sqlite3.Row) -> CardCandidate:
@@ -57,6 +58,7 @@ def _row_to_candidate(row: sqlite3.Row) -> CardCandidate:
         released_at=row["released_at"],
         power=row["power"],
         toughness=row["toughness"],
+        rarity=row["rarity"],
     )
 
 
@@ -93,7 +95,8 @@ def fetch_candidates(
         SELECT DISTINCT c.oracle_id, c.name, c.cmc, c.type_line, c.mana_cost,
                c.color_identity, c.price_usd, c.price_known, c.edhrec_rank,
                c.oracle_text, c.keywords, c.is_basic_land, c.produced_mana,
-               c.scryfall_uri, c.image_uri, c.released_at, c.power, c.toughness
+               c.scryfall_uri, c.image_uri, c.released_at, c.power, c.toughness,
+               c.rarity
         FROM cards c
     """
     params: list = []
