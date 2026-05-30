@@ -113,6 +113,7 @@ Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood p
 
 | Topic | Notes | Doc |
 | --- | --- | --- |
+| Card dependency engine | Tutor targets, type payoffs, energy produce/consume balance; preprocess + validate | [10-card-dependency-engine.md](10-card-dependency-engine.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
 | Local web / desktop UI | Reuse Python core | [06-open-questions.md](06-open-questions.md) |

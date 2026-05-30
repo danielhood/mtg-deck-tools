@@ -15,6 +15,7 @@ Planning documents for a local Windows utility that walks users through deck-bui
 | [07-deck-output-format.md](07-deck-output-format.md) | Markdown + `.deck.json` schema |
 | [08-card-availability.md](08-card-availability.md) | Budget null prices; future availability heuristic |
 | [09-next-steps.md](09-next-steps.md) | **Post-v1 roadmap** — Phase 3 priorities and backlog |
+| [10-card-dependency-engine.md](10-card-dependency-engine.md) | **Planned** — cross-card synergy / tutor-target / resource-balance checks (not full CR) |
 
 ## Current preferences
 
