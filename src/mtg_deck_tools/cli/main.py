@@ -16,7 +16,8 @@ from mtg_deck_tools.builder.stub import run_generate_stub
 from mtg_deck_tools.db.stats import fetch_stats
 from mtg_deck_tools.import_.pipeline import run_import
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.paths import DEFAULT_DB_PATH
+from mtg_deck_tools.effects.audit import run_audit_to_disk
+from mtg_deck_tools.paths import DEFAULT_DB_PATH, DEPENDENCY_RESOURCES_DIR
 from mtg_deck_tools.wizard.run import run_wizard
 
 app = typer.Typer(
@@ -94,6 +95,9 @@ def stats_cmd(
     table.add_row("With partner ability", str(stats["with_partner"]))
     table.add_row("Tag assignments", str(stats["tag_assignments"]))
     table.add_row("Distinct tags", str(stats["distinct_tags"]))
+    if stats.get("effect_rows"):
+        table.add_row("Effect atom rows", str(stats["effect_rows"]))
+        table.add_row("Distinct effect kinds", str(stats["distinct_effect_kinds"]))
     for key, value in stats["metadata"].items():
         table.add_row(key, value)
     console.print(table)
@@ -106,6 +110,51 @@ def stats_cmd(
         for row in stats["top_tags"]:
             tag_table.add_row(row["tag"], row["layer"], str(row["n"]))
         console.print(tag_table)
+
+
+@app.command("dependency-audit")
+def dependency_audit_cmd(
+    db_path: Annotated[
+        Optional[Path],
+        typer.Option("--db", help="SQLite database path"),
+    ] = None,
+    out_dir: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--out",
+            help="Directory for audit JSON/CSV (default: resources/dependency/reports)",
+        ),
+    ] = None,
+) -> None:
+    """Scan cards.db and write dependency inventory reports (D0.5)."""
+    path = db_path or DEFAULT_DB_PATH
+    if not path.exists():
+        console.print(f"[red]Database not found:[/red] {path}\nRun: mtg-deck-tools import")
+        raise typer.Exit(1)
+
+    output = out_dir or (DEPENDENCY_RESOURCES_DIR / "reports")
+    try:
+        audit = run_audit_to_disk(path, output)
+    except Exception as exc:
+        console.print(f"[red]Audit failed:[/red] {exc}")
+        raise typer.Exit(1) from exc
+
+    console.print(f"[green]Audit complete.[/green] {audit['commander_legal_cards']} commander-legal cards.")
+    table = Table(title="Reports")
+    table.add_column("Artifact")
+    table.add_column("Path")
+    for key, rel in audit.get("report_paths", {}).items():
+        table.add_row(key, rel)
+    console.print(table)
+
+    energy = audit.get("profile_summary", {}).get("global", {}).get("energy", {})
+    if energy:
+        console.print(f"Energy (global): producers={energy.get('producer', 0)}, consumers={energy.get('consumer', 0)}")
+    unmatched = audit.get("review_queue", {}).get("unmatched_search_total", 0)
+    if unmatched:
+        console.print(
+            f"[yellow]Review queue:[/yellow] {unmatched} cards mention library search without a tutor atom"
+        )
 
 
 @app.command("wizard")

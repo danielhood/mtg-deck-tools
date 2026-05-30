@@ -1,0 +1,23 @@
+{
+  "bulk_snapshot": "oracle-cards-20260530090316.json",
+  "commander_legal_cards": 30969,
+  "extraction_version": 1,
+  "profile_global": {
+    "energy": { "producer": 55, "consumer": 84 },
+    "aura_support": { "aura_spell": 1220, "aura_tutor": 7 },
+    "elves": { "creature": 662, "payoff": 9 },
+    "artifacts": { "payoff": 23 }
+  },
+  "energy_tag_gap": {
+    "cards_with_energy_tag": 142,
+    "producers_tagged": 55,
+    "consumers_tagged": 84,
+    "producers_untagged": 0,
+    "consumers_untagged": 0
+  },
+  "review_queue": {
+    "unmatched_search_total": 447,
+    "low_confidence_total": 0
+  },
+  "notes": "Full reports under resources/dependency/reports/ (gitignored). Regenerate with mtg-deck-tools dependency-audit."
+}

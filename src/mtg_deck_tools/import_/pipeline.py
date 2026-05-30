@@ -11,7 +11,8 @@ from typing import Callable
 from mtg_deck_tools.availability.score import record_availability_percentile
 from mtg_deck_tools.db.schema import SCHEMA_VERSION, apply_schema
 from mtg_deck_tools.import_.normalize import normalize_card
-from mtg_deck_tools.paths import DEFAULT_DB_PATH, TAXONOMY_PATH, find_oracle_cards_json
+from mtg_deck_tools.effects.extract import EffectExtractor
+from mtg_deck_tools.paths import DEFAULT_DB_PATH, EFFECT_PATTERNS_PATH, TAXONOMY_PATH, find_oracle_cards_json
 from mtg_deck_tools.tags.tagger import Tagger, load_taxonomy
 
 CARD_INSERT_SQL = """
@@ -33,6 +34,12 @@ INSERT OR REPLACE INTO cards (
 TAG_INSERT_SQL = """
 INSERT OR REPLACE INTO card_mechanic_tags (oracle_id, tag, layer, source)
 VALUES (?, ?, ?, ?)
+"""
+
+EFFECT_INSERT_SQL = """
+INSERT OR REPLACE INTO card_effects (
+    oracle_id, face_index, effect_kind, payload, confidence, source
+) VALUES (?, ?, ?, ?, ?, ?)
 """
 
 
@@ -60,14 +67,17 @@ def run_import(
     apply_schema(conn)
 
     conn.execute("DELETE FROM card_mechanic_tags")
+    conn.execute("DELETE FROM card_effects")
     conn.execute("DELETE FROM cards")
 
     tag_defs = load_taxonomy(taxonomy)
     tagger = Tagger(tag_defs)
+    extractor = EffectExtractor.from_yaml(EFFECT_PATTERNS_PATH)
 
     inserted = 0
     playable = 0
     tag_rows: list[tuple[str, str, str, str]] = []
+    effect_rows: list[tuple[str, int, str, str, float, str]] = []
 
     for raw in raw_cards:
         row = normalize_card(raw)
@@ -90,8 +100,25 @@ def run_import(
                 (row["oracle_id"], assignment.tag, assignment.layer, assignment.source)
             )
 
+        for atom in extractor.extract(
+            oracle_text=row["oracle_text"],
+            type_line=row["type_line"],
+        ):
+            effect_rows.append(
+                (
+                    row["oracle_id"],
+                    atom.face_index,
+                    atom.effect_kind,
+                    json.dumps(atom.payload),
+                    atom.confidence,
+                    atom.source,
+                )
+            )
+
     log(f"Applying {len(tag_rows):,} mechanic tags...")
     conn.executemany(TAG_INSERT_SQL, tag_rows)
+    log(f"Writing {len(effect_rows):,} card effect atoms...")
+    conn.executemany(EFFECT_INSERT_SQL, effect_rows)
 
     p25 = record_availability_percentile(conn)
     if p25 is not None:
@@ -105,6 +132,8 @@ def run_import(
         ("source_count", str(len(raw_cards))),
         ("playable_count", str(playable)),
         ("tag_count", str(len(tag_rows))),
+        ("effect_count", str(len(effect_rows))),
+        ("extraction_version", str(extractor._registry.extraction_version)),
     ]
     conn.executemany(
         "INSERT OR REPLACE INTO import_metadata (key, value) VALUES (?, ?)",
@@ -119,5 +148,6 @@ def run_import(
         "source_count": len(raw_cards),
         "playable_count": playable,
         "tag_count": len(tag_rows),
+        "effect_count": len(effect_rows),
         "db_path": str(db),
     }

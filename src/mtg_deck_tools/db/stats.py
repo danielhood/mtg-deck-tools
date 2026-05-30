@@ -37,6 +37,18 @@ def fetch_stats(db_path: Path | None = None) -> dict:
             LIMIT 10
             """
         ).fetchall()
+        effect_rows = 0
+        effect_kinds = 0
+        tables = {
+            row[0] for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            ).fetchall()
+        }
+        if "card_effects" in tables:
+            effect_rows = conn.execute("SELECT COUNT(*) AS c FROM card_effects").fetchone()["c"]
+            effect_kinds = conn.execute(
+                "SELECT COUNT(DISTINCT effect_kind) AS c FROM card_effects"
+            ).fetchone()["c"]
         return {
             "metadata": meta,
             "total_cards": total,
@@ -44,6 +56,8 @@ def fetch_stats(db_path: Path | None = None) -> dict:
             "with_partner": partners,
             "tag_assignments": tag_count,
             "distinct_tags": distinct_tags,
+            "effect_rows": effect_rows,
+            "distinct_effect_kinds": effect_kinds,
             "top_tags": [dict(r) for r in top_tags],
         }
     finally:

@@ -14,7 +14,7 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 | ◐ | In progress |
 | ☑ | Done — link PR, commit, or artifact path in notes column |
 
-**Rule:** Do not merge D1 (import writes `card_effects`) until all items in **§ Must complete before D1** are ☑.
+**Rule:** Do not merge D1 (import writes `card_effects`) until all items in **§ Must complete before D1** are ☑. **D0.5 complete; D1 implemented** — proceed to D2 (validator).
 
 **Suggested order:** § Snapshot → § D0 → § D0.5 → § Decisions → § Output contract → then D1 → D2.
 
@@ -26,9 +26,9 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 
 | ☐ | Item | Notes / artifact |
 | --- | --- | --- |
-| ◐ | Oracle bulk file pinned for the team (`resources/scryfall/oracle-cards-<date>.json` or documented CI fetch) | [resources/scryfall/README.md](../resources/scryfall/README.md) — file not committed (large) |
-| ☐ | `mtg-deck-tools import` run on that file → `data/cards.db` | Maintainer after download |
-| ☐ | Bulk date recorded in `import_metadata` (and noted in release/README) | After import |
+| ☑ | Oracle bulk file pinned for the team (`resources/scryfall/oracle-cards-<date>.json` or documented CI fetch) | [resources/scryfall/README.md](../resources/scryfall/README.md) — gitignored bulk |
+| ☑ | `mtg-deck-tools import` run on that file → `data/cards.db` | Local `data/cards.db` (gitignored) |
+| ☑ | Bulk date recorded in `import_metadata` (and noted in release/README) | `oracle-cards-20260530090316.json` |
 
 ### D0 — Spec and pattern contract
 
@@ -45,13 +45,13 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 
 | ☐ | Item | Notes / artifact |
 | --- | --- | --- |
-| ☐ | `dependency-audit` command or maintainer script runs over commander-legal cards | |
-| ☐ | `reports/dependency-pattern-hits.json` (or committed under `resources/dependency/`) | |
-| ☐ | `reports/dependency-profile-summary.json` — producer/consumer counts per profile | |
-| ☐ | `reports/tutor-predicates.csv` — clustered search constraints + frequencies | |
-| ☐ | False-positive review queue (top N unmatched / low-confidence hits) | |
-| ☐ | `dependency-profiles.yaml` updated with **evidence-based** defaults (counts in comments or companion JSON) | |
-| ☐ | Profiles with negligible pool size marked **deferred** or warn-only in doc 10/11 | |
+| ☑ | `dependency-audit` command or maintainer script runs over commander-legal cards | `mtg-deck-tools dependency-audit` |
+| ☑ | `reports/dependency-pattern-hits.json` (or committed under `resources/dependency/`) | `resources/dependency/reports/` (gitignored) |
+| ☑ | `reports/dependency-profile-summary.json` — producer/consumer counts per profile | same |
+| ☑ | `reports/tutor-predicates.csv` — clustered search constraints + frequencies | same |
+| ☑ | False-positive review queue (top N unmatched / low-confidence hits) | `dependency-review-queue.json` (447 unmatched search) |
+| ☑ | `dependency-profiles.yaml` updated with **evidence-based** defaults (counts in comments or companion JSON) | + `audit-evidence-20260530.json` |
+| ☑ | Profiles with negligible pool size marked **deferred** or warn-only in doc 10/11 | `sacrifice` deferred in profiles YAML |
 
 ### Decisions locked (avoid D1 rework)
 
