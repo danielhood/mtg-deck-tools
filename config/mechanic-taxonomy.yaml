@@ -15,14 +15,14 @@ tags:
     description: Card advantage
     matchers:
       - type: oracle_regex
-        pattern: "(?i)(draw a card|draw two cards|draw three cards|draw four cards|draw X cards)"
+        pattern: "(?i)(draw a card|draw two cards|draw three cards|draw four cards|draw X cards|draw cards equal to|draw that many cards|draw the top [0-9]+)"
 
   - id: removal
     layer: theme
     description: Single-target removal
     matchers:
       - type: oracle_regex
-        pattern: "(?i)(destroy target|exile target|damage to (any )?target|-[0-9]+/-[0-9]+ until end of turn)"
+        pattern: "(?i)((?:destroy|exile|sacrifice) target|deals? [0-9]+ damage to (?:any )?target|fight target creature|target creature gets -[0-9]+/-[0-9]+)"
 
   - id: board_wipe
     layer: theme
@@ -36,7 +36,7 @@ tags:
     description: Win conditions
     matchers:
       - type: oracle_regex
-        pattern: "(?i)(you win the game|each opponent loses|can't lose the game|extra turns|take an extra turn|infect|deal [0-9]+ combat damage to a player|opponents lose half their life)"
+        pattern: "(?i)(you win the game|each opponent loses|can't lose the game|extra turns|take an extra turn|infect|toxic|deal [0-9]+ combat damage to a player|opponents lose half their life|each opponent mills|loses [0-9]+ life for each|power and toughness are each equal to)"
 
   - id: tokens
     layer: theme

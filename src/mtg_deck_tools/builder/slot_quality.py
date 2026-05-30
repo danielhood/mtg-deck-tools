@@ -10,7 +10,9 @@ from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.commander import is_land_card
 
 # Slots where an untagged pool needs oracle validation before picking.
-GUARDED_SLOTS = frozenset({"ramp", "board_wipe", "wincon"})
+GUARDED_SLOTS = frozenset({"ramp", "draw", "removal", "board_wipe", "wincon"})
+
+THEMED_RELAX_SLOTS = frozenset({"draw", "removal", "wincon"})
 
 BOARD_WIPE_ORACLE = re.compile(
     r"(?im)^(?:destroy all (?:creatures|permanents|nonland permanents|artifacts|enchantments)"
@@ -41,8 +43,27 @@ WINCON_ORACLE = re.compile(
     r"|extra turns"
     r"|take an extra turn"
     r"|infect"
+    r"|toxic"
     r"|deal [0-9]+ combat damage to a player"
-    r"|opponents lose half their life)"
+    r"|opponents lose half their life"
+    r"|each opponent mills"
+    r"|loses [0-9]+ life for each"
+    r"|power and toughness are each equal to)"
+)
+
+DRAW_ORACLE = re.compile(
+    r"(?i)(draw a card|draw two cards|draw three cards|draw four cards|draw X cards"
+    r"|draw cards equal to|draw that many cards|draw the top [0-9]+)"
+)
+
+REMOVAL_ORACLE = re.compile(
+    r"(?i)((?:destroy|exile|sacrifice) target"
+    r"|deals? [0-9]+ damage to (?:any )?target"
+    r"|fight target creature"
+    r"|target creature gets -[0-9]+/-[0-9]+)"
+)
+REMOVAL_ANTIPATTERN = re.compile(
+    r"(?im)^(destroy all|exile all|sacrifice all|deals? [0-9]+ damage to each)"
 )
 
 
@@ -53,7 +74,7 @@ def slot_relax_steps(slot: str, criteria: DeckCriteria) -> list[list[str] | None
     if primary is not None:
         steps.append(primary)
 
-    if slot == "wincon" and criteria.themes:
+    if slot in THEMED_RELAX_SLOTS and criteria.themes:
         themed = list(dict.fromkeys(criteria.themes))
         if primary != themed:
             steps.append(themed)
@@ -98,6 +119,20 @@ def passes_slot_oracle_guard(
             return True
         return "ramp" in tag_set and not BOARD_WIPE_FALSE_POSITIVE.search(text)
 
+    if slot == "draw":
+        if RAMP_ORACLE.search(text) and not DRAW_ORACLE.search(text):
+            return False
+        if DRAW_ORACLE.search(text):
+            return True
+        return "draw" in tag_set
+
+    if slot == "removal":
+        if REMOVAL_ANTIPATTERN.search(text):
+            return False
+        if REMOVAL_ORACLE.search(text):
+            return True
+        return "removal" in tag_set
+
     if slot == "wincon":
         if WINCON_ORACLE.search(text):
             return True
@@ -128,6 +163,7 @@ def refine_slot_candidates(
         and require_theme_tags is not None
         and require_theme_tags != [slot]
         and bool(criteria.themes)
+        and criteria.themes != require_theme_tags
     )
     refined = [
         c
@@ -151,6 +187,8 @@ def slot_oracle_score(
     candidate: CardCandidate,
     slot: str,
     card_tags: list[str],
+    *,
+    archetype_themes: list[str] | None = None,
 ) -> float:
     """Score adjustment for slot-oracle fit (used during candidate ranking)."""
     text = candidate.oracle_text or ""
@@ -178,11 +216,33 @@ def slot_oracle_score(
         else:
             score -= 4.0
 
+    elif slot == "draw":
+        if RAMP_ORACLE.search(text) and not DRAW_ORACLE.search(text):
+            score -= 8.0
+        elif DRAW_ORACLE.search(text):
+            score += 5.0
+        elif "draw" in tag_set:
+            score += 2.0
+        else:
+            score -= 6.0
+
+    elif slot == "removal":
+        if REMOVAL_ANTIPATTERN.search(text):
+            score -= 12.0
+        elif REMOVAL_ORACLE.search(text):
+            score += 5.0
+        elif "removal" in tag_set:
+            score += 2.0
+        else:
+            score -= 6.0
+
     elif slot == "wincon":
         if WINCON_ORACLE.search(text):
             score += 6.0
         elif "wincon" in tag_set:
             score += 3.0
+        elif archetype_themes and tag_set.intersection(archetype_themes) and "Creature" in type_line:
+            score += 2.5 if candidate.cmc >= 4.0 else 0.5
         elif tag_set.intersection({"tokens", "aristocrats", "voltron", "landfall"}):
             score += 1.0
 

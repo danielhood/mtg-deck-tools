@@ -22,7 +22,7 @@ Status as of 2026-05-30. Phase 1, Phase 2, v1 polish, and **Phase 3 §1** are **
 | Linux/bash setup in README | Done |
 | `.deck.json` reload / edit workflow | **Not started** |
 | Post-validation repair pass | **Not started** — illegal picks are prevented at fill time; no swap-after-validate |
-| Slot pool quality (themed slot misfills) | **Partial** — oracle guards and graduated relaxation shipped; re-import needed for taxonomy tag refresh |
+| Slot pool quality (themed slot misfills) | Done |
 | Unpriced / availability handling | **Partial** — per-card max helps; null-price cards still allowed by default |
 
 ## Dogfooding snapshot
@@ -58,18 +58,17 @@ Shipped in `a8f2894`. Pool queries and post-filters now enforce:
 
 **Deferred:** Optional post-validation repair (swap illegal cards after validate) — not needed while fill-time filters hold.
 
-### 2. Slot pool quality — **Partial (shipped core)**
+### 2. Slot pool quality — **Done**
 
-Graduated tag relaxation, oracle guards, and slot-specific scoring reduce misfills when tagged pools are thin.
+Graduated tag relaxation, oracle guards, and slot-specific scoring reduce misfills when tagged pools are thin. Re-import after taxonomy changes to refresh `card_mechanic_tags`.
 
-| Slot | Fix shipped |
+| Slot | Fix |
 | --- | --- |
 | `board_wipe` | Tighter taxonomy matcher; oracle guard rejects equipment triggers (e.g. Worldslayer) |
-| `wincon` | Themed fallback step before untagged pool; penalize unpriced cards when budget set |
+| `wincon` | Expanded taxonomy; themed fallback; penalize unpriced cards when budget set |
+| `draw` / `removal` | Oracle guards reject ramp rocks and mass removal in single-target slots |
 | `flex` | Prefer deck `themes` before falling back to any nonland |
 | `ramp` | Oracle guard excludes lands and off-theme picks from relaxed pool |
-
-**Remaining:** Re-run `import` to refresh tags from updated taxonomy; expand `wincon` taxonomy further; slot-specific oracle guards for `draw`/`removal`.
 
 **Acceptance:** Board wipe and wincon slots contain on-theme, priced cards for a standard GW voltron/landfall list.
 
@@ -126,6 +125,6 @@ Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood p
 
 ## Suggested next task
 
-**Start with Phase 3 §3 (`.deck.json` reload).** Slot pool quality guards are in place; re-import the card database to pick up taxonomy changes, then dogfood again.
+**Start with Phase 3 §3 (`.deck.json` reload).** Slot pool quality and post-import tagging are in place.
 
 After that: unpriced/availability policy (§4).

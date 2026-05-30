@@ -145,7 +145,9 @@ def score_candidate(
 
     score += w.edhrec * _edhrec_score(candidate.edhrec_rank)
     score += w.curve * _curve_score(candidate.cmc, slot)
-    score += slot_oracle_score(candidate, slot, card_tags)
+    score += slot_oracle_score(
+        candidate, slot, card_tags, archetype_themes=archetype_themes
+    )
 
     if slot == "wincon" and WINCON_ORACLE.search(candidate.oracle_text):
         score += w.wincon_signal

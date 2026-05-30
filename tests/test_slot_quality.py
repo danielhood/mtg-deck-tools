@@ -116,6 +116,67 @@ def test_slot_relax_steps_wincon_includes_themed_fallback() -> None:
     assert steps[-1] is None
 
 
+def test_slot_relax_steps_draw_includes_themed_fallback() -> None:
+    criteria = DeckCriteria(themes=["voltron", "landfall"], colors=["G"])
+    steps = slot_relax_steps("draw", criteria)
+    assert steps[0] == ["draw"]
+    assert steps[1] == ["voltron", "landfall"]
+    assert steps[-1] is None
+
+
+def test_passes_slot_oracle_guard_draw_rejects_ramp_rock() -> None:
+    rock = _candidate(
+        oracle_id="rock",
+        name="Rock",
+        type_line="Artifact",
+        oracle_text="{T}: Add one mana of any color.",
+    )
+    assert not passes_slot_oracle_guard(rock, "draw", [])
+
+
+def test_passes_slot_oracle_guard_draw_accepts_divination() -> None:
+    draw = _candidate(
+        oracle_id="div",
+        name="Divination",
+        type_line="Sorcery",
+        oracle_text="Draw two cards.",
+    )
+    assert passes_slot_oracle_guard(draw, "draw", ["draw"])
+
+
+def test_passes_slot_oracle_guard_removal_rejects_wrath() -> None:
+    wrath = _candidate(
+        oracle_id="wr",
+        name="Wrath of God",
+        type_line="Sorcery",
+        oracle_text="Destroy all creatures. They can't be regenerated.",
+    )
+    assert not passes_slot_oracle_guard(wrath, "removal", ["removal"])
+
+
+def test_passes_slot_oracle_guard_removal_accepts_destroy_target() -> None:
+    bolt = _candidate(
+        oracle_id="bolt",
+        name="Bolt",
+        type_line="Instant",
+        oracle_text="Destroy target creature.",
+    )
+    assert passes_slot_oracle_guard(bolt, "removal", ["removal"])
+
+
+def test_wincon_tag_matches_mill() -> None:
+    tagger = Tagger(load_taxonomy(TAXONOMY_PATH))
+    result = tagger.tag_card(
+        {
+            "oracle_id": "x",
+            "type_line": "Sorcery",
+            "oracle_text": "Each opponent mills thirteen cards.",
+            "keywords": [],
+        }
+    )
+    assert any(a.tag == "wincon" for a in result)
+
+
 def test_refine_slot_candidates_drops_equipment_board_wipes() -> None:
     wrath = _candidate(
         oracle_id="wr",
