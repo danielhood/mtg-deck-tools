@@ -1,0 +1,66 @@
+# Manual review set for effect extraction (D0). ≥50 cards; expand during D0.5 audit.
+# Fields: name, layout, oracle_excerpt, v1_stance, notes
+
+schema_version: 1
+cases:
+  - { name: "Lightning Bolt", layout: normal, oracle_excerpt: "deals 3 damage", v1_stance: no_atoms, notes: "No dependency atoms expected" }
+  - { name: "Sol Ring", layout: normal, oracle_excerpt: "Add {C}{C}", v1_stance: no_atoms, notes: "Mana only" }
+  - { name: "Demonic Tutor", layout: normal, oracle_excerpt: "Search your library for a card", v1_stance: search_any, notes: "any_card low confidence" }
+  - { name: "Rampant Growth", layout: normal, oracle_excerpt: "basic land card", v1_stance: search_land, notes: "basic_land pattern" }
+  - { name: "Worldly Tutor", layout: normal, oracle_excerpt: "creature card", v1_stance: search_creature, notes: "" }
+  - { name: "Enlightened Tutor", layout: normal, oracle_excerpt: "artifact or enchantment", v1_stance: search_combo, notes: "artifact_or_enchantment pattern" }
+  - { name: "Idyllic Tutor", layout: normal, oracle_excerpt: "enchantment card", v1_stance: search_enchantment, notes: "" }
+  - { name: "Fabricate", layout: normal, oracle_excerpt: "artifact card", v1_stance: search_artifact, notes: "" }
+  - { name: "Chord of Calling", layout: normal, oracle_excerpt: "mana value X or less", v1_stance: warn_only, notes: "Variable CMC not parsed in v1" }
+  - { name: "Aether Hub", layout: normal, oracle_excerpt: "you get {E}", v1_stance: energy_produce, notes: "" }
+  - { name: "Galvanic Bombardment", layout: normal, oracle_excerpt: "number of {E} you have", v1_stance: no_atoms, notes: "Reference not pay; defer" }
+  - { name: "Attune with Aether", layout: normal, oracle_excerpt: "basic land and Aether Hub", v1_stance: search_land, notes: "Named card search deferred" }
+  - { name: "Elvish Archdruid", layout: normal, oracle_excerpt: "Other Elves you control", v1_stance: buff_subtype, notes: "Elf singularization" }
+  - { name: "Maskwood Nexus", layout: normal, oracle_excerpt: "every creature type", v1_stance: warn_only, notes: "Choose type — no static proof" }
+  - { name: "Changeling Outcast", layout: normal, oracle_excerpt: "Changeling", v1_stance: warn_only, notes: "All creature types" }
+  - { name: "Fable of the Mirror-Breaker", layout: modal_dfc, oracle_excerpt: "//", v1_stance: merged_faces, notes: "Adventure/creature on one row" }
+  - { name: "Valki, God of Lies", layout: modal_dfc, oracle_excerpt: "Choose one", v1_stance: merged_faces, notes: "Modal modes both in text" }
+  - { name: "Brazen Borrower", layout: modal_dfc, oracle_excerpt: "Flash", v1_stance: merged_faces, notes: "" }
+  - { name: "Delver of Secrets", layout: transform, oracle_excerpt: "transform", v1_stance: merged_faces, notes: "" }
+  - { name: "Snapcaster Mage", layout: normal, oracle_excerpt: "Flashback", v1_stance: defer_graveyard, notes: "Graveyard synergy v2" }
+  - { name: "Laboratory Maniac", layout: normal, oracle_excerpt: "win the game", v1_stance: no_atoms, notes: "" }
+  - { name: "Thassa's Oracle", layout: normal, oracle_excerpt: "win the game", v1_stance: no_atoms, notes: "" }
+  - { name: "Dockside Extortionist", layout: normal, oracle_excerpt: "Treasure tokens", v1_stance: defer_tokens, notes: "Token typing soft" }
+  - { name: "Krenko, Mob Boss", layout: normal, oracle_excerpt: "Goblin tokens", v1_stance: defer_tokens, notes: "" }
+  - { name: "Purphoros, God of the Forge", layout: normal, oracle_excerpt: "creature you control", v1_stance: no_atoms, notes: "Generic, not other subtype" }
+  - { name: "Urza, Lord High Artificer", layout: normal, oracle_excerpt: "artifact spell", v1_stance: whenever_cast_type, notes: "" }
+  - { name: "Sythis, Harvest's Hand", layout: normal, oracle_excerpt: "enchantment spell", v1_stance: whenever_cast_type, notes: "" }
+  - { name: "Sram, Senior Edificer", layout: normal, oracle_excerpt: "Aura spell", v1_stance: warn_only, notes: "Cast trigger may need aura_cast kind" }
+  - { name: "Kor Spiritdancer", layout: normal, oracle_excerpt: "Aura spell", v1_stance: whenever_cast_type, notes: "Enchantment — Aura on other cards" }
+  - { name: "Ethereal Armor", layout: normal, oracle_excerpt: "Enchant creature", v1_stance: type_line_aura, notes: "" }
+  - { name: "Rancor", layout: normal, oracle_excerpt: "Aura", v1_stance: type_line_aura, notes: "" }
+  - { name: "Swords to Plowshares", layout: normal, oracle_excerpt: "exile target creature", v1_stance: no_atoms, notes: "" }
+  - { name: "Cyclonic Rift", layout: normal, oracle_excerpt: "return to owner's hand", v1_stance: no_atoms, notes: "" }
+  - { name: "Teferi's Protection", layout: normal, oracle_excerpt: "phase out", v1_stance: no_atoms, notes: "" }
+  - { name: "Smothering Tithe", layout: normal, oracle_excerpt: "Treasure token", v1_stance: defer_tokens, notes: "" }
+  - { name: "Ashnod's Altar", layout: normal, oracle_excerpt: "sacrifice a creature", v1_stance: defer_sacrifice, notes: "Sacrifice profile D1.5" }
+  - { name: "Grave Pact", layout: normal, oracle_excerpt: "sacrifice a creature", v1_stance: defer_sacrifice, notes: "" }
+  - { name: "Blood Artist", layout: normal, oracle_excerpt: "creature dies", v1_stance: defer_sacrifice, notes: "" }
+  - { name: "Yawgmoth, Thran Physician", layout: normal, oracle_excerpt: "blood counter", v1_stance: defer_blood, notes: "Audit hit count" }
+  - { name: "K'rrik, Son of Yawgmoth", layout: normal, oracle_excerpt: "pay life rather than {B}", v1_stance: no_atoms, notes: "" }
+  - { name: "Atraxa, Praetors' Voice", layout: normal, oracle_excerpt: "proliferate", v1_stance: defer_counters, notes: "" }
+  - name: "Jace, the Mind Sculptor"
+    layout: normal
+    oracle_excerpt: "brainstorm"
+    v1_stance: no_atoms
+    notes: ""
+  - { name: "Thrasios, Triton Hero", layout: normal, oracle_excerpt: "Partner", v1_stance: no_atoms, notes: "Commander layer" }
+  - { name: "Vial Smasher the Fierce", layout: normal, oracle_excerpt: "Partner", v1_stance: no_atoms, notes: "" }
+  - { name: "Ishai, Ojutai Dragonspeaker", layout: normal, oracle_excerpt: "Partner with", v1_stance: no_atoms, notes: "" }
+  - { name: "Esper Sentinel", layout: normal, oracle_excerpt: "draw a card", v1_stance: no_atoms, notes: "" }
+  - { name: "Rhystic Study", layout: normal, oracle_excerpt: "draw a card", v1_stance: no_atoms, notes: "" }
+  - { name: "Smuggler's Copter", layout: normal, oracle_excerpt: "Vehicle", v1_stance: defer_vehicles, notes: "Vehicle profile" }
+  - { name: "Chief of the Foundry", layout: normal, oracle_excerpt: "Vehicles you control", v1_stance: buff_subtype, notes: "Vehicle as subtype" }
+  - { name: "Finale of Devastation", layout: normal, oracle_excerpt: "creature or planeswalker card", v1_stance: warn_only, notes: "Multi-type tutor partial" }
+  - { name: "Green Sun's Zenith", layout: normal, oracle_excerpt: "green creature card", v1_stance: warn_only, notes: "Color in search deferred" }
+  - { name: "Three Visits", layout: normal, oracle_excerpt: "Forest card", v1_stance: warn_only, notes: "Subtype land search deferred" }
+  - { name: "Nature's Lore", layout: normal, oracle_excerpt: "Forest card", v1_stance: warn_only, notes: "" }
+  - { name: "Fierce Empath", layout: normal, oracle_excerpt: "creature card with mana value 6 or greater", v1_stance: warn_only, notes: "CMC greater not in v1" }
+  - { name: "Recruiter of the Guard", layout: normal, oracle_excerpt: "creature card with mana value 3 or less", v1_stance: search_creature_cmc, notes: "" }
+  - { name: "Imperial Seal", layout: normal, oracle_excerpt: "Search your library for a card", v1_stance: search_any, notes: "" }
+  - { name: "Gamble", layout: normal, oracle_excerpt: "Search your library for a card", v1_stance: search_any, notes: "" }

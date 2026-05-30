@@ -26,20 +26,20 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 
 | ☐ | Item | Notes / artifact |
 | --- | --- | --- |
-| ☐ | Oracle bulk file pinned for the team (`resources/scryfall/oracle-cards-<date>.json` or documented CI fetch) | |
-| ☐ | `mtg-deck-tools import` run on that file → `data/cards.db` | |
-| ☐ | Bulk date recorded in `import_metadata` (and noted in release/README) | |
+| ◐ | Oracle bulk file pinned for the team (`resources/scryfall/oracle-cards-<date>.json` or documented CI fetch) | [resources/scryfall/README.md](../resources/scryfall/README.md) — file not committed (large) |
+| ☐ | `mtg-deck-tools import` run on that file → `data/cards.db` | Maintainer after download |
+| ☐ | Bulk date recorded in `import_metadata` (and noted in release/README) | After import |
 
 ### D0 — Spec and pattern contract
 
 | ☐ | Item | Notes / artifact |
 | --- | --- | --- |
-| ☐ | `config/effect-patterns.yaml` skeleton with version field | |
-| ☐ | Canonical **effect atom** schema (Pydantic models + `payload` JSON shape) | |
-| ☐ | Pattern ID → `effect_kind` mapping documented | |
-| ☐ | Face policy documented (per `face_index` vs merged oracle; align with `normalize.py`) | |
-| ☐ | **Golden tests:** ≥20 oracle texts → expected atoms (pass / warn-only / no atom) | `tests/test_effect_extraction.py` or similar |
-| ☐ | **Hard-case sample set:** ≥50 cards (modal DFC, adventure, choose-one, changeling, partner) reviewed manually | List in repo or audit output |
+| ☑ | `config/effect-patterns.yaml` skeleton with version field | `config/effect-patterns.yaml` |
+| ☑ | Canonical **effect atom** schema (Pydantic models + `payload` JSON shape) | `src/mtg_deck_tools/models/effects.py` |
+| ☑ | Pattern ID → `effect_kind` mapping documented | `config/effect-patterns.yaml` + [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md) |
+| ☑ | Face policy documented (per `face_index` vs merged oracle; align with `normalize.py`) | [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md) |
+| ☑ | **Golden tests:** ≥20 oracle texts → expected atoms (pass / warn-only / no atom) | `tests/fixtures/effect_golden.yaml`, `tests/test_effect_extraction.py` (20 cases) |
+| ☑ | **Hard-case sample set:** ≥50 cards (modal DFC, adventure, choose-one, changeling, partner) reviewed manually | `resources/dependency/hard-cases.yaml` (50 cases, v1_stance) |
 
 ### D0.5 — Inventory audit
 
@@ -55,17 +55,17 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 
 ### Decisions locked (avoid D1 rework)
 
-Record answers in this section or a short addendum PR. Defaults below match current planning bias.
+Record answers in [13-dependency-engine-decisions.md](13-dependency-engine-decisions.md).
 
 | ☐ | Decision | Recommended v1 answer |
 | --- | --- | --- |
-| ☐ | Threshold source | `dependency-profiles.yaml`; optional theme multiplier later |
-| ☐ | Tutor matching depth | Type/subtype + simple CMC; defer “nonbasic land”, “basic Plains” |
-| ☐ | Commander as tutor target | Yes for creature/legendary searches where CI allows; document edge cases |
-| ☐ | `strict_dependencies` default | **Off** until D2 false-positive rate reviewed |
-| ☐ | Storage | `card_effects` + JSON `payload`; no `effect_predicates` table until needed |
-| ☐ | Include mechanic vs `mechanic_focus` | Independent unless product decides otherwise |
-| ☐ | Combined themed share cap | Define `max_themed_nonland_share` or defer to UX6 |
+| ☑ | Threshold source | `dependency-profiles.yaml`; optional theme multiplier later |
+| ☑ | Tutor matching depth | Type/subtype + simple CMC; defer “nonbasic land”, “basic Plains” |
+| ☑ | Commander as tutor target | Yes for creature/legendary searches where CI allows; document edge cases |
+| ☑ | `strict_dependencies` default | **Off** until D2 false-positive rate reviewed |
+| ☑ | Storage | `card_effects` + JSON `payload`; no `effect_predicates` table until needed |
+| ☑ | Include mechanic vs `mechanic_focus` | Independent unless product decides otherwise |
+| ☑ | Combined themed share cap | Defer to UX6 |
 
 ### Output contract (before D2, design before D1)
 
@@ -136,7 +136,7 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 
 | Phase | Enter when | Exit criteria |
 | --- | --- | --- |
-| **D0** | Checklist § D0 rows started | Patterns + golden tests + atom schema ☑ |
+| **D0** | Checklist § D0 rows started | Patterns + golden tests + atom schema ☑ — **complete** (2026-05-30) |
 | **D0.5** | D0 ☑ + snapshot ☑ | Audit reports ☑ + profiles revised ☑ |
 | **D1** | All **§ Must complete before D1** ☑ | Import writes `card_effects`; golden tests pass |
 | **D2** | D1 ☑ + output contract ☑ | Warn-only report in MD/JSON; dogfood review |

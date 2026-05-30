@@ -1,0 +1,165 @@
+# Effect pattern registry — D0 contract for dependency extraction (see planning/10, planning/14).
+# Pattern id (source) → effect_kind; payload is static or built from regex capture groups.
+
+schema_version: 1
+extraction_version: 1
+
+# Face policy: planning/14-effect-extraction-face-policy.md
+# v1 import uses merged oracle_text (// separated), face_index always 0.
+
+patterns:
+  # --- search_library (tutor / search) ---
+  - id: search_library_basic_land
+    effect_kind: search_library
+    confidence: 1.0
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |up to \\w+ )?basic land"
+    payload:
+      types: [land]
+      supertypes: [basic]
+
+  - id: search_library_land
+    effect_kind: search_library
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an |up to \\w+ )?(?:[\\w'-]+\\s+)*land card"
+    payload:
+      types: [land]
+    exclude_if_matched:
+      - search_library_basic_land
+
+  - id: search_library_creature_cmc
+    effect_kind: search_library
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an )?creature card with mana value (\\d+) or less"
+    payload:
+      types: [creature]
+    capture:
+      max_cmc: 1
+
+  - id: search_library_creature
+    effect_kind: search_library
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an |up to \\d+ )?creature cards?"
+    payload:
+      types: [creature]
+    exclude_if_matched:
+      - search_library_creature_cmc
+
+  - id: search_library_aura
+    effect_kind: search_library
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an )?Aura card"
+    payload:
+      types: [enchantment]
+      subtypes: [Aura]
+
+  - id: search_library_artifact_or_enchantment
+    effect_kind: search_library
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an )?artifact or enchantment card"
+    payload:
+      types: [artifact, enchantment]
+
+  - id: search_library_enchantment
+    effect_kind: search_library
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an )?enchantment card"
+    payload:
+      types: [enchantment]
+    exclude_if_matched:
+      - search_library_artifact_or_enchantment
+
+  - id: search_library_artifact
+    effect_kind: search_library
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an )?artifact card"
+    payload:
+      types: [artifact]
+    exclude_if_matched:
+      - search_library_artifact_or_enchantment
+
+  - id: search_library_any_card
+    effect_kind: search_library
+    confidence: 0.5
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an )?card(?:,|\\b)"
+    payload:
+      any_card: true
+    exclude_if_matched:
+      - search_library_land
+      - search_library_basic_land
+      - search_library_creature
+      - search_library_creature_cmc
+      - search_library_aura
+      - search_library_enchantment
+      - search_library_artifact
+
+  # --- energy (consume before produce in file order; produce excludes consume) ---
+  - id: energy_consume
+    effect_kind: energy_consume
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)pay (?:\\d+ )?\\{E\\}"
+    payload:
+      resource: energy
+      min_cost: 1
+
+  - id: energy_produce
+    effect_kind: energy_produce
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(you get \\{E\\}|you get [^.\\n]*energy counters?|get [^.\\n]*energy counters?)"
+    payload:
+      resource: energy
+    exclude_if_matched:
+      - energy_consume
+
+  # --- type / subtype payoffs ---
+  - id: buff_subtype_other
+    effect_kind: buff_subtype
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "[Oo]ther ([A-Z][a-z]+s) you control"
+    payload: {}
+    capture:
+      subtypes_plural: 1
+
+  - id: whenever_cast_type
+    effect_kind: whenever_cast_type
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever you cast an? ([A-Za-z]+) spell"
+    payload: {}
+    capture:
+      types: 1
+
+  # --- type line (not oracle) ---
+  - id: type_line_aura
+    effect_kind: type_line_aura
+    confidence: 1.0
+    matchers:
+      - type: type_regex
+        pattern: "(?i)Enchantment — Aura"
+    payload:
+      types: [enchantment]
+      subtypes: [Aura]
