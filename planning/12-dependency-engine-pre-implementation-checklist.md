@@ -124,7 +124,7 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 | --- | --- |
 | Progressive wizard restrictions (UX6) | D2 calibrated + D0.5 `profile_counts_by_ci` |
 | `ConstraintState` / criteria linter (UX3) | D2 rules stable; can parallel D2 |
-| Pick-time strict pool filter (D4) | D2 dogfood |
+| Pick-time strict pool filter (D4) | **Shipped** — `--strict-dependencies` |
 | Repair / swap pass (D5) | D4 optional |
 | Web constraint panel (UX7) | Separate milestone |
 | Wizard reorder (colors → commander first) | UX6c |
@@ -141,7 +141,7 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 | **D1** | All **§ Must complete before D1** ☑ | Import writes `card_effects`; golden tests pass |
 | **D2** | D1 ☑ + output contract ☑ | Warn-only report in MD/JSON; dogfood review — **implemented** |
 | **D3** | D2 false-positive budget met | Scorer uses `deck_stats` during fill — **implemented** |
-| **D4** | D3 ☑ | Optional `--strict-dependencies` at pick time |
+| **D4** | D3 ☑ | Optional `--strict-dependencies` at pick time — **implemented** |
 | **D5** | D4 ☑ | Repair pass for top failure classes |
 
 ---

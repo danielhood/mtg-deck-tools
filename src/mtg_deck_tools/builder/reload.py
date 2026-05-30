@@ -78,6 +78,7 @@ def run_generate_from_deck(
     output_dir: Path | None = None,
     refill_slot: str | None = None,
     strict_budget: bool = False,
+    strict_dependencies: bool = False,
     prefer_available: bool = False,
 ) -> Path:
     """Regenerate a deck from a .deck.json file (full rebuild or single-slot refill)."""
@@ -92,6 +93,7 @@ def run_generate_from_deck(
             update={
                 "seed": effective_seed,
                 "strict_budget": strict_budget or loaded.criteria.strict_budget,
+                "strict_dependencies": strict_dependencies or loaded.criteria.strict_dependencies,
                 "prefer_available": prefer_available or loaded.criteria.prefer_available,
             }
         )
@@ -152,6 +154,7 @@ def run_generate_from_deck(
             conn,
             maindeck=maindeck.cards,
             commanders=identity_rows,
+            strict=output_criteria.strict_dependencies,
         )
         maindeck.warnings.extend(dependency_messages(maindeck.dependency_report))
 

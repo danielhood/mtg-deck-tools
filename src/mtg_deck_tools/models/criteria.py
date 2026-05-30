@@ -19,6 +19,7 @@ class DeckCriteria(BaseModel):
     card_price_min_usd: float | None = None
     card_price_max_usd: float | None = None
     strict_budget: bool = False
+    strict_dependencies: bool = False
     prefer_available: bool = False
     min_rarity: str = "common"
     slot_template: dict[str, int] = Field(default_factory=dict)

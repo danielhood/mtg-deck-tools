@@ -177,3 +177,59 @@ def dependency_pick_score(
         score += 2.5 * weight
 
     return score
+
+
+def passes_strict_dependency_filter(
+    candidate: CardCandidate,
+    candidate_effects: list[CardEffectRow],
+    stats: DeckBuildStats,
+    search_pool: list[SearchPoolEntry],
+) -> bool:
+    """
+    Pick-time exclusion (D4): reject candidates that would be dead or unsupported
+    given the partial deck and commander search pool.
+    """
+    for effect in candidate_effects or []:
+        if effect.effect_kind == "search_library":
+            if effect.confidence < 0.6 and effect.payload.get("any_card"):
+                continue
+            if count_search_targets(search_pool, effect.payload) == 0:
+                return False
+        elif effect.effect_kind == "energy_consume" and stats.energy_producers == 0:
+            return False
+        elif effect.effect_kind == "buff_subtype":
+            subtypes = effect.payload.get("subtypes") or []
+            if subtypes == ["Elf"]:
+                others = stats.subtype_counts.get("Elf", 0)
+                if others < stats.elf_other_minimum:
+                    return False
+    return True
+
+
+def filter_strict_dependency_candidates(
+    candidates: list[CardCandidate],
+    *,
+    conn: sqlite3.Connection,
+    partial: list[DeckCard],
+    commander_oracle_ids: set[str],
+) -> list[CardCandidate]:
+    """Return candidates allowed under strict pick-time dependency rules."""
+    if not candidates:
+        return candidates
+    deck_stats = build_deck_build_stats(
+        conn,
+        partial,
+        commander_oracle_ids=commander_oracle_ids,
+    )
+    search_pool = build_search_pool(conn, partial, commander_oracle_ids)
+    effect_map = fetch_card_effects(conn, [c.oracle_id for c in candidates])
+    return [
+        candidate
+        for candidate in candidates
+        if passes_strict_dependency_filter(
+            candidate,
+            effect_map.get(candidate.oracle_id, []),
+            deck_stats,
+            search_pool,
+        )
+    ]

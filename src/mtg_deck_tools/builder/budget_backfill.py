@@ -13,6 +13,7 @@ from mtg_deck_tools.builder.dependency_scoring import (
     build_deck_build_stats,
     build_search_pool,
     card_effects_enabled,
+    filter_strict_dependency_candidates,
 )
 from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
 from mtg_deck_tools.builder.slot_quality import refine_slot_candidates, slot_relax_steps
@@ -168,6 +169,15 @@ def _find_replacement(
         return None
 
     remaining_cards = [c for c in cards if c.oracle_id != card.oracle_id]
+    if criteria.strict_dependencies and card_effects_enabled(conn):
+        candidates = filter_strict_dependency_candidates(
+            candidates,
+            conn=conn,
+            partial=remaining_cards,
+            commander_oracle_ids=commander_oracle_ids,
+        )
+        if not candidates:
+            return None
     type_counts = _type_counts(remaining_cards)
     tag_map = fetch_card_tags(conn, [c.oracle_id for c in candidates])
 
