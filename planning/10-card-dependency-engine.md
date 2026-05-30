@@ -330,7 +330,7 @@ Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-de
 | **D0.5 — Audit** | Inventory reports + feasibility indexes | Profile list and thresholds updated with evidence — **shipped** (`dependency-audit`) |
 | **D1 — Extract** | Import writes `card_effects` for tutors, `{E}`, simple type triggers | Golden tests; re-import updates atoms — **shipped** (schema v3) |
 | **D2 — Validate** | Post-build report in MD/JSON (warn only) | Known bad list (e.g. elf lord + 2 elves) flags warning — **shipped** (`rules/dependencies.py`) |
-| **D3 — Score** | Scorer uses deck_stats during fill | Energy deck gets ≥1 `{E}` payoff without manual include |
+| **D3 — Score** | Scorer uses deck_stats during fill | Energy deck gets ≥1 `{E}` payoff without manual include — **shipped** (`builder/dependency_scoring.py`, `scorer.py`, `filler.py`) |
 | **D4 — Filter** | Optional strict mode excludes cards that create unfulfillable tutors | Tutor for Aura deck with 0 auras excluded at pick time |
 | **D5 — Repair** | Swap pass for top failure classes | One-click regen reduces warnings |
 

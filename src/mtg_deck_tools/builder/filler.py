@@ -13,9 +13,8 @@ from mtg_deck_tools.availability.score import classify_unpriced_card, format_unp
 from mtg_deck_tools.builder.availability_filters import filter_candidates_by_availability
 from mtg_deck_tools.builder.price_filters import filter_candidates_by_price
 from mtg_deck_tools.builder.rarity_filters import filter_candidates_by_rarity
-from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard, slot_theme_tags
+from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.mana_base import (
-    BASIC_NAME_BY_COLOR,
     ManaBasePlan,
     allocate_basics,
     plan_mana_base,
@@ -24,7 +23,13 @@ from mtg_deck_tools.builder.mana_base import (
     validate_mana_sources,
 )
 from mtg_deck_tools.builder.pool import CardCandidate, fetch_candidates, fetch_card_tags
+from mtg_deck_tools.builder.dependency_scoring import (
+    build_deck_build_stats,
+    build_search_pool,
+    card_effects_enabled,
+)
 from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
+from mtg_deck_tools.rules.dependencies import fetch_card_effects
 from mtg_deck_tools.builder.slot_quality import refine_slot_candidates, slot_relax_steps
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.validate import (
@@ -32,9 +37,6 @@ from mtg_deck_tools.rules.validate import (
     mainboard_size_for_commanders,
 )
 from mtg_deck_tools.wizard.slots import load_slot_template_config
-
-# Re-export for callers that import from filler.
-from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard  # noqa: F401
 
 FILL_ORDER = ("ramp", "draw", "removal", "board_wipe", "synergy", "wincon", "flex", "lands")
 
@@ -180,6 +182,24 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
     tag_map = fetch_card_tags(state.conn, [c.oracle_id for c in candidates])
     scored: list[tuple[CardCandidate, float]] = []
     type_counts = _type_counts(state.cards)
+    deck_stats = None
+    search_pool: list[tuple[str, float]] = []
+    effect_map: dict[str, list] = {}
+    if card_effects_enabled(state.conn):
+        deck_stats = build_deck_build_stats(
+            state.conn,
+            state.cards,
+            commander_oracle_ids=state.commander_oracle_ids,
+        )
+        search_pool = build_search_pool(
+            state.conn,
+            state.cards,
+            state.commander_oracle_ids,
+        )
+        effect_map = fetch_card_effects(
+            state.conn,
+            [c.oracle_id for c in candidates],
+        )
     for candidate in candidates:
         score = score_candidate(
             candidate,
@@ -191,6 +211,9 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
             type_counts=type_counts,
             budget_remaining=state.budget_remaining(),
             budget_usd=state.criteria.budget_usd,
+            deck_stats=deck_stats,
+            candidate_effects=effect_map.get(candidate.oracle_id, []),
+            search_pool=search_pool,
         )
         scored.append((candidate, score))
     scored.sort(key=lambda item: item[1], reverse=True)

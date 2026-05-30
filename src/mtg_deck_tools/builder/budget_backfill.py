@@ -9,9 +9,15 @@ from mtg_deck_tools.builder.pool import CardCandidate, fetch_candidates, fetch_c
 from mtg_deck_tools.builder.availability_filters import filter_candidates_by_availability
 from mtg_deck_tools.builder.price_filters import filter_candidates_by_price
 from mtg_deck_tools.builder.rarity_filters import filter_candidates_by_rarity
+from mtg_deck_tools.builder.dependency_scoring import (
+    build_deck_build_stats,
+    build_search_pool,
+    card_effects_enabled,
+)
 from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
 from mtg_deck_tools.builder.slot_quality import refine_slot_candidates, slot_relax_steps
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.rules.dependencies import fetch_card_effects
 
 
 def _card_cost(card: DeckCard) -> float:
@@ -165,6 +171,25 @@ def _find_replacement(
     type_counts = _type_counts(remaining_cards)
     tag_map = fetch_card_tags(conn, [c.oracle_id for c in candidates])
 
+    deck_stats = None
+    search_pool: list[tuple[str, float]] = []
+    effect_map: dict[str, list] = {}
+    if card_effects_enabled(conn):
+        deck_stats = build_deck_build_stats(
+            conn,
+            remaining_cards,
+            commander_oracle_ids=commander_oracle_ids,
+        )
+        search_pool = build_search_pool(
+            conn,
+            remaining_cards,
+            commander_oracle_ids,
+        )
+        effect_map = fetch_card_effects(
+            conn,
+            [c.oracle_id for c in candidates],
+        )
+
     best: CardCandidate | None = None
     best_score = float("-inf")
     for candidate in candidates:
@@ -178,6 +203,9 @@ def _find_replacement(
             type_counts=type_counts,
             budget_remaining=max_price,
             budget_usd=criteria.budget_usd,
+            deck_stats=deck_stats,
+            candidate_effects=effect_map.get(candidate.oracle_id, []),
+            search_pool=search_pool,
         )
         if card.slot == "lands":
             card_score += score_land_budget(
