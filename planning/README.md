@@ -16,6 +16,7 @@ Planning documents for a local Windows utility that walks users through deck-bui
 | [08-card-availability.md](08-card-availability.md) | Budget null prices; future availability heuristic |
 | [09-next-steps.md](09-next-steps.md) | **Post-v1 roadmap** — Phase 3 priorities and backlog |
 | [10-card-dependency-engine.md](10-card-dependency-engine.md) | **Planned** — cross-card synergy / tutor-target / resource-balance checks (not full CR) |
+| [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) | **Planned** — user control, balance presets, feedback, CLI vs UI (parallel to doc 10) |
 
 ## Current preferences
 
@@ -31,7 +32,8 @@ Planning documents for a local Windows utility that walks users through deck-bui
 - **Budget:** Allow with warning when `prices.usd` is null; optional `--strict-budget`
 - **Variety:** Seeded random slot picks (`--seed`)
 - **Power level:** Deferred (not a simple dial)
-- **Availability:** v1 EDHREC bias; later distinguish obscure vs newly unpriced cards
+- **Card data:** Static Scryfall oracle snapshot; manual refresh — used-card audience (6+ months), not day-one meta
+- **Availability:** v1 EDHREC bias + import-time score; deprioritize obscure over chasing new printings
 
 ## Completed
 

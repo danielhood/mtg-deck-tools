@@ -27,7 +27,7 @@ Example (filename will match the bulk export date):
 resources/scryfall/oracle-cards-20260528210654.json
 ```
 
-Scryfall provides gameplay and price data under their [API terms](https://scryfall.com/docs/api). Prices are stale after ~24 hours; gameplay fields change less often (weekly refresh is usually enough).
+Scryfall provides gameplay and price data under their [API terms](https://scryfall.com/docs/api). This project uses a **static oracle bulk snapshot** (see `resources/scryfall/`). Prices and oracle text reflect import time only — fine for building with **older used cards**; run `import` again when you intentionally update the snapshot.
 
 Field reference for card objects: [`resources/scryfall/oracle-card-fields.md`](resources/scryfall/oracle-card-fields.md).
 
@@ -137,7 +137,7 @@ Each slot is filled from `data/cards.db` using color identity, theme tags, mecha
 | `--themes` | Comma-separated archetype tags, e.g. `tokens,aristocrats`. |
 | `--seed` | RNG seed for reproducible picks (also stored in criteria). |
 | `--strict-budget` | Exclude cards with no Scryfall price and enforce the budget cap during fill. |
-| `--prefer-available` | Exclude cards below the import-time availability score (25th percentile). Re-run `import` after updating the card DB. |
+| `--prefer-available` | Exclude cards below the import-time availability score (25th percentile). Uses scores from the current `cards.db` snapshot. |
 | `--card-price-min` / `--card-price-max` | Per-card USD floor/ceiling when picking cards. |
 | `--min-rarity` | Minimum rarity (`common`, `uncommon`, `rare`, `mythic`; default `common`). |
 | `--db` | Path to SQLite DB (default `data/cards.db`). |

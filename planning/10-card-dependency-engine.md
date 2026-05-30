@@ -305,11 +305,29 @@ Defer until warn-only mode is trustworthy.
 
 ---
 
+## D0.5 — Inventory audit (feasibility for restrictions)
+
+Before tightening **wizard restrictions** or default thresholds, run a read-only scan over commander-legal cards in `cards.db` (same patterns as D1).
+
+| Output | Purpose |
+| --- | --- |
+| Pattern hit counts + examples | Prioritize which atoms to implement |
+| `profile_counts_by_ci` (companion table or JSON) | Layer-1 wizard: disable focus presets with no pool support |
+| `predicate_target_counts` | Tutor feasibility per search predicate × color identity |
+| False-positive review queue | Do not hard-disable UI until confidence is high |
+
+Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) (UX6). The audit can ship as `dependency-audit` CLI or import sidecar without enabling generate-time strict mode.
+
+**Static DB:** Audit results are valid for the **bundled oracle snapshot** only. Re-run audit when maintainers refresh bulk import ([02-data-sources.md](02-data-sources.md)); users are not expected to update for new sets.
+
+---
+
 ## Implementation phases
 
 | Phase | Deliverable | Acceptance |
 | --- | --- | --- |
 | **D0 — Spec** | This doc + `effect-patterns.yaml` skeleton + atom schema | Reviewed taxonomy of 10–15 high-value patterns |
+| **D0.5 — Audit** | Inventory reports + feasibility indexes | Profile list and thresholds updated with evidence |
 | **D1 — Extract** | Import writes `card_effects` for tutors, `{E}`, simple type triggers | Golden tests; re-import updates atoms |
 | **D2 — Validate** | Post-build report in MD/JSON (warn only) | Known bad list (e.g. elf lord + 2 elves) flags warning |
 | **D3 — Score** | Scorer uses deck_stats during fill | Energy deck gets ≥1 `{E}` payoff without manual include |
@@ -357,9 +375,21 @@ Defer until warn-only mode is trustworthy.
 
 ---
 
+## User experience and control
+
+User-facing mechanics (energy focus, aura density, dominance caps, strict vs warn-only, future swap workflows) are specified in **[11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)**. That doc defines:
+
+- `config/dependency-profiles.yaml` — default min/max and share targets per mechanic profile
+- Planned `DeckCriteria` extensions (`mechanic_focus`, `dependency_preferences`)
+- `dependency_report` shape for Markdown Notes and future UI
+
+Engine implementation should read profile thresholds from YAML rather than hard-coding counts, so CLI and future web UI share one source of truth.
+
+---
+
 ## Open questions
 
-1. **Thresholds:** Global constants vs per-archetype in `slot-templates.yaml`?
+1. **Thresholds:** Global constants vs per-archetype in `slot-templates.yaml`? (See also per-profile defaults in `dependency-profiles.yaml` — [11](11-dependency-engine-user-experience.md).)
 2. **Tutor depth:** Match only type/subtype, or parse “nonbasic land”, “basic Plains”, mana value?
 3. **Commander zone:** Count commander as tutor target for all “creature” searches?
 4. **User overrides:** `criteria.strict_dependencies` vs warn-only?

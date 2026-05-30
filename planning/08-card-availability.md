@@ -1,5 +1,7 @@
 # Card availability and pricing
 
+**Audience context:** Users typically build from **used inventory** (cards that have been on the market for months or years). The tool should bias toward cards that are **findable and familiar**, not toward the newest releases. A **static** card DB is acceptable — see [01-goals-and-scope.md](01-goals-and-scope.md) and [02-data-sources.md](02-data-sources.md).
+
 ## v1 — Budget null prices
 
 **Policy:** **Allow with warning** (decided).
@@ -9,14 +11,16 @@
 - Markdown and `.deck.json` flag each with `price_known: false` and summarize count in notes.
 - Optional CLI: `--strict-budget` → treat null as ineligible (exclude from pool).
 
-## Future — Obscure vs newly unpriced
+## Obscure vs newly unpriced (low priority)
 
-Scryfall null USD price mixes two different situations:
+Scryfall null USD price mixes two different situations. For this product, **older/obscure** matters more than **newly added**:
 
 | Situation | Typical signals | Deck-builder intent |
 | --- | --- | --- |
-| **Older / obscure** | Old `released_at`, low `edhrec_rank` or missing, no recent reprint, niche set | **Deprioritize or exclude** — hard to find, weak for "buildable" lists |
-| **Newly added** | Recent `released_at`, Commander-legal rare/mythic, active set | May be **available soon** — warn but don't treat as obscure |
+| **Older / obscure** | Old `released_at`, low `edhrec_rank` or missing, no recent reprint, niche set | **Deprioritize or exclude** — aligns with used-card audience |
+| **Newly added** | Recent `released_at`, Commander-legal rare/mythic, active set | **Low priority** — audience rarely needs day-one cards; `price_pending` warning is enough |
+
+Fine-grained “new vs obscure” classification remains optional polish, not a blocker for static DB releases.
 
 ### Availability heuristic (shipped)
 

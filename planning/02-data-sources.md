@@ -91,9 +91,32 @@ Use as authoritative reference for:
 | `commander_synergy` scores | Commander ↔ card relevance |
 | `mana_pips` | Parsed from `mana_cost` ({W}, {U}, hybrid, etc.) |
 
-## Scryfall refresh workflow (future)
+## Static database policy
 
-1. Download latest oracle-cards bulk from Scryfall
-2. Run import/preprocess script
-3. Re-run tagging rules
-4. Version-stamp in DB (`updated_at` from bulk metadata)
+The card library is a **versioned snapshot**, not a live feed. This matches the product goal in [01-goals-and-scope.md](01-goals-and-scope.md): decks for **older used cards**, where same-day oracle or price accuracy is unnecessary.
+
+| Aspect | Policy |
+| --- | --- |
+| **Bundled default** | Commit or ship a known `oracle-cards-<date>.json` (and derived `data/cards.db` optional) |
+| **User expectation** | “Card pool as of May 2026” — sufficient for kitchen-table and LGS used inventory |
+| **Prices** | Whatever Scryfall embedded at import time; no intraday refresh |
+| **Gameplay text** | Oracle text from snapshot; errata lag until next manual refresh is acceptable |
+| **Companion datasets** | `card_mechanic_tags`, future `card_effects`, dependency audit reports — rebuilt **with** the same import, not on their own schedule |
+
+### Maintainer refresh workflow (explicit, infrequent)
+
+When the team chooses to advance the snapshot (new sets, errata, dependency pattern work):
+
+1. Download oracle-cards bulk from Scryfall (or replace file under `resources/scryfall/`).
+2. `mtg-deck-tools import` → regenerate `data/cards.db`.
+3. Re-run tagging (part of import) and any **dependency audit** / effect extraction (planned).
+4. Update golden tests and `dependency-profiles.yaml` if inventory counts shift materially.
+5. Record versions in `import_metadata` (bulk date, extractor version, audit version).
+
+No requirement for users to refresh before every deck build. Document the snapshot date in `stats` / README.
+
+### What we do not build
+
+- Background Scryfall sync or “check for updates” on launch
+- Per-deck API calls for oracle or price
+- Penalizing decks for cards “too new” unless user opts in (availability heuristic already biases **toward** established cards)
