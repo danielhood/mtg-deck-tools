@@ -36,15 +36,29 @@ From CR 903 ([`resources/mtg/MagicCompRules 20260417.txt`](../resources/mtg/Magi
 
 ## Success criteria for v1
 
-- [ ] User completes a multi-step wizard and receives a legal Commander deck
-- [ ] Wizard order: theme → colors → commander (including partner pairs)
-- [ ] Deck respects color identity, singleton, and 100-card count
-- [ ] Land count is computed from deck characteristics (not a fixed 33%)
-- [ ] Cards match user-selected theme tags, slot targets, and include/avoid mechanics
-- [ ] Budget cap honored when prices known; null prices flagged (allow with warning)
-- [ ] Commander synergy influences card ranking within slots
-- [ ] Dual export: Markdown summary + `.deck.json` for reload/modification
-- [ ] Runs fully offline after initial data import
+- [x] User completes a multi-step wizard and receives a legal Commander deck
+- [x] Wizard order: theme → colors → commander (including partner pairs)
+- [x] Deck respects color identity, singleton, and 100-card count
+- [x] Land count is computed from deck characteristics (not a fixed 33%)
+- [x] Cards match user-selected theme tags, slot targets, and include/avoid mechanics
+- [x] Budget cap honored when prices known; null prices flagged (allow with warning)
+- [x] Commander synergy influences card ranking within slots
+- [x] Dual export: Markdown summary + `.deck.json` for reload/modification
+- [x] Runs fully offline after initial data import
+
+### v1 closure (2026-05-30)
+
+Dogfood pass (`seed=42`, five commanders, varied budgets) — outputs under `output/dogfood-v1-closure/`:
+
+| Commander | Budget | Filters | Validation | Est. deck |
+| --- | ---: | --- | --- | ---: |
+| Dragonlord Dromoka | $150 | $5/card max | **PASSED** | $86.91 |
+| Jetmir, Nexus of Revels | $150 | $5/card max | **PASSED** | $82.30 |
+| Pantlaza, Sun-Favored | $75 | $3/card max, strict + prefer-available | **PASSED** | $65.50 |
+| Yawgmoth, Thran Physician | $150 | $5/card max, aristocrats | **PASSED** | $93.49 |
+| Dragonlord Dromoka | none | — | **PASSED** | $374.80 |
+
+Also verified: `.deck.json` full regen and `--refill-slot synergy`; 116 automated tests passing. Known edge case: very thin pools (e.g. mono-B + prefer-available + narrow themes) can under-fill slots — use `--strict-budget` / relax availability filters or broaden themes.
 
 ## User workflow
 

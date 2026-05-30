@@ -205,7 +205,7 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 
 **v1 polish:** budget enforcement during fill, post-fill budget trim pass, `--strict-budget`, tighter slot tags (`board_wipe`, `wincon`), and land price bias when a budget cap is set.
 
-**Phase 3:** build-time legality filters, slot pool quality, `.deck.json` reload, and availability scoring (`--prefer-available`, unpriced classification in Notes).
+**Phase 3 (v1):** build-time legality filters, slot pool quality, `.deck.json` reload, availability scoring (`--prefer-available`, unpriced classification in Notes), and v1 success criteria closure — **complete** as of 2026-05-30.
 
 ## License
 

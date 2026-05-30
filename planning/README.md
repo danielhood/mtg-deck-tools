@@ -51,8 +51,15 @@ Planning documents for a local Windows utility that walks users through deck-bui
 - Tighter `board_wipe` / new `wincon` theme tags for slot filling
 - Land scoring deprioritizes expensive nonbasics when a budget cap is set
 
+### Phase 3 (v1 closure)
+- Build-time legality filters (903.5d land colors, land/nonland slot separation)
+- Slot pool quality (oracle guards, tag relaxation, slot-specific scoring)
+- `.deck.json` reload / `--refill-slot` workflow
+- Availability scoring, `--prefer-available`, unpriced classification in Notes
+- **v1 success criteria** — checked off 2026-05-30 ([01-goals-and-scope.md](01-goals-and-scope.md))
+
 ## What's next
 
-See **[09-next-steps.md](09-next-steps.md)** for the Phase 3 roadmap.
+See **[09-next-steps.md](09-next-steps.md)** for the post-v1 backlog.
 
-**Recommended first task:** build-time legality filters (903.5d land colors, land/nonland slot separation, optional post-validate repair).
+**Recommended first task:** card dependency engine ([10-card-dependency-engine.md](10-card-dependency-engine.md)).

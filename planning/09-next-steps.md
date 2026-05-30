@@ -1,6 +1,6 @@
 # Next steps — post-v1
 
-Status as of 2026-05-30. Phase 1, Phase 2, v1 polish, and **Phase 3 §1** are **shipped**. Recent dogfooding (Dragonlord Dromoka, Jetmir, Pantlaza, Yawgmoth at `$150`, `seed=42`) confirms validation passes after build-time legality filters.
+Status as of 2026-05-30. **v1 is complete.** Phase 1, Phase 2, v1 polish, and **Phase 3 (§1–§5)** are **shipped**. Dogfood pass (`seed=42`, five commanders, varied budgets) confirms validation, budget, reload, and output polish — see [01-goals-and-scope.md](01-goals-and-scope.md#v1-closure-2026-05-30).
 
 ## Current state
 
@@ -25,20 +25,19 @@ Status as of 2026-05-30. Phase 1, Phase 2, v1 polish, and **Phase 3 §1** are **
 | Slot pool quality (themed slot misfills) | Done |
 | Unpriced / availability handling | Done |
 
-## Dogfooding snapshot
+## Dogfooding snapshot (v1 closure)
 
-Latest outputs: `output/jetmir-nexus-of-revels-20260530000000.md`, `output/dragonlord-dromoka-20260529235137.md`
+Latest pass: `output/dogfood-v1-closure/` (`seed=42`).
 
 | Area | Result |
 | --- | --- |
-| Validation (903.5d) | **PASSED** — Command Tower no longer appears in W/G ramp; land color filtering at pool fill works |
-| Budget trim | **Works** — Jetmir `$78.39` vs `$150` cap with `$5` per-card max |
-| Per-card price range | **Works** — wizard step 5 and MD header show min/max when set |
-| Unpriced cards | Still present — Jetmir: 4 null-price cards with budget warning |
-| Slot quality | **Still weak** — Jetmir `board_wipe`: Worldslayer (equipment); Dromoka ramp/draw slots mix on-theme and filler bulk |
-| MD output | Card names show type line; commander/details/maindeck linked to Scryfall; friendly dates and color names |
-
-These point to **slot pool quality** as the next highest-signal gap.
+| Validation (903 / 702.124) | **PASSED** — all five closure decks legal (100 cards, singleton, identity, 903.5d lands) |
+| Budget trim | **Works** — Pantlaza `$65.50` vs `$75` cap; Dromoka `$86.91` vs `$150` |
+| Per-card price range | **Works** — `$3` and `$5` per-card caps honored in MD header and fill |
+| Unpriced cards | Classified in Notes (`price_pending` / `likely_obscure`); budget warnings when not strict |
+| Slot quality | **Improved** — oracle guards and tag relaxation reduce misfills (Phase 3 §2) |
+| MD output | Card names + type line; Scryfall links; commander price/release; taxonomy display names |
+| Reload | **Works** — `--from` full regen and `--refill-slot synergy` verified |
 
 ---
 
@@ -103,9 +102,19 @@ Policy in [08-card-availability.md](08-card-availability.md). Import computes `a
 
 **Acceptance:** Budget wizard runs default to strict + prefer-available; null-price cards are classified in Notes; re-import refreshes scores.
 
-### 5. v1 success criteria closure
+### 5. v1 success criteria closure — **Done**
 
-Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood pass (3–5 commanders, varied budgets). Core generation, validation, budget, output, and deck reload are working; remaining gaps are availability policy polish.
+Checked off all items in [01-goals-and-scope.md](01-goals-and-scope.md) after dogfood pass (five commanders, varied budgets, `seed=42`).
+
+| Commander | Budget | Validation | Notes |
+| --- | ---: | --- | --- |
+| Dragonlord Dromoka | $150 / $5 max | **PASSED** | GW landfall + voltron |
+| Jetmir, Nexus of Revels | $150 / $5 max | **PASSED** | Naya voltron |
+| Pantlaza, Sun-Favored | $75 / $3 max, strict | **PASSED** | Tight budget + prefer-available |
+| Yawgmoth, Thran Physician | $150 / $5 max | **PASSED** | Mono-B aristocrats |
+| Dragonlord Dromoka | none | **PASSED** | Uncapped sanity check |
+
+**Acceptance met:** All v1 success criteria satisfied; 116 tests passing; `.deck.json` reload workflow verified.
 
 ---
 
@@ -125,4 +134,4 @@ Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood p
 
 ## Suggested next task
 
-**Start with Phase 3 §5 (v1 success criteria closure).** Re-import if availability scores are missing (`mtg-deck-tools import`).
+**Start with the card dependency engine** — tutor targets, type payoffs, and resource-balance checks. See [10-card-dependency-engine.md](10-card-dependency-engine.md).
