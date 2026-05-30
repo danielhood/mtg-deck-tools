@@ -559,6 +559,7 @@ Decisions here should **constrain** doc 10 implementation early:
 
 ## References
 
+- [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) — gate before D1+ engine code
 - [10-card-dependency-engine.md](10-card-dependency-engine.md) — atoms, rules, D0–D5
 - [07-deck-output-format.md](07-deck-output-format.md) — `.deck.json` schema
 - [04-architecture-options.md](04-architecture-options.md) — CLI vs web vs desktop

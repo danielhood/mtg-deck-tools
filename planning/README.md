@@ -17,6 +17,7 @@ Planning documents for a local Windows utility that walks users through deck-bui
 | [09-next-steps.md](09-next-steps.md) | **Post-v1 roadmap** — Phase 3 priorities and backlog |
 | [10-card-dependency-engine.md](10-card-dependency-engine.md) | **Planned** — cross-card synergy / tutor-target / resource-balance checks (not full CR) |
 | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) | **Planned** — user control, balance presets, feedback, CLI vs UI (parallel to doc 10) |
+| [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) | **Gate** — checklist before D1+ engine code (D0, D0.5, decisions, contracts) |
 
 ## Current preferences
 
@@ -64,4 +65,4 @@ Planning documents for a local Windows utility that walks users through deck-bui
 
 See **[09-next-steps.md](09-next-steps.md)** for the post-v1 backlog.
 
-**Recommended first task:** card dependency engine ([10-card-dependency-engine.md](10-card-dependency-engine.md)).
+**Recommended first task:** card dependency engine ([10-card-dependency-engine.md](10-card-dependency-engine.md)). Complete [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) before D1.

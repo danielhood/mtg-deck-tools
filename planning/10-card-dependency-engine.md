@@ -334,7 +334,9 @@ Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-de
 | **D4 — Filter** | Optional strict mode excludes cards that create unfulfillable tutors | Tutor for Aura deck with 0 auras excluded at pick time |
 | **D5 — Repair** | Swap pass for top failure classes | One-click regen reduces warnings |
 
-**Suggested order:** D0 → D1 → D2 → D3 → D4 → D5.
+**Suggested order:** D0 → D0.5 → D1 → D2 → D3 → D4 → D5.
+
+**Pre-implementation gate:** [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) — complete before merging D1.
 
 ---
 
