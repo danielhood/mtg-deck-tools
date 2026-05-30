@@ -21,7 +21,8 @@ All v1 planning questions are resolved. Revisit only when scope changes.
 | Field reference | Split: `bulk-data-metadata-fields.md` + `oracle-card-fields.md` |
 | Deck variety | **Seeded random** slot selection (`--seed` for reproducibility) |
 | Power level dial | **Deferred** — needs richer model than a simple dial |
-| Card availability | v1: EDHREC bias; v2: obscure vs new-unpriced analysis — [08-card-availability.md](08-card-availability.md) |
+| Card availability | v1: EDHREC bias + `availability_score`; obscure > new-unpriced — [08-card-availability.md](08-card-availability.md) |
+| Card data freshness | **Static snapshot** — manual bulk refresh; used-card audience — [01-goals-and-scope.md](01-goals-and-scope.md), [02-data-sources.md](02-data-sources.md) |
 
 ## Deferred (post-v1)
 
@@ -30,7 +31,7 @@ See [09-next-steps.md](09-next-steps.md) for the active Phase 3 roadmap and prio
 | Topic | Notes |
 | --- | --- |
 | Power level / salt | Complicated, context-dependent; not a single dial |
-| Obscure vs new null-price classification | Heuristic spec in [08-card-availability.md](08-card-availability.md) |
+| Obscure vs new null-price classification | Optional; shipped heuristic favors obscure detection — [08-card-availability.md](08-card-availability.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` |
 | Local web / desktop UI | Reuse Python core |
 

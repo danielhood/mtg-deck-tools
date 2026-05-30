@@ -439,6 +439,8 @@ Operate on the main inventory (`cards.db` after import) to build **feasibility i
 
 See **D0.5 inventory audit** in [10-card-dependency-engine.md](10-card-dependency-engine.md) — restriction quality is bounded by audit accuracy.
 
+**Static card pool:** Feasibility indexes (`profile_counts_by_ci`, etc.) are built from the **same versioned** `cards.db` as deck generation. The product targets **older used cards** ([01-goals-and-scope.md](01-goals-and-scope.md)); refreshing companion data is a **maintainer** step alongside `import`, not an end-user concern.
+
 ### UI interaction patterns (parked — specify now)
 
 These apply to **CLI wizard**, future **local web**, and **interactive refill** alike. Use a shared `ConstraintState` model in the core library; shells only render it.

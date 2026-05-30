@@ -32,7 +32,8 @@ Planning documents for a local Windows utility that walks users through deck-bui
 - **Budget:** Allow with warning when `prices.usd` is null; optional `--strict-budget`
 - **Variety:** Seeded random slot picks (`--seed`)
 - **Power level:** Deferred (not a simple dial)
-- **Availability:** v1 EDHREC bias; later distinguish obscure vs newly unpriced cards
+- **Card data:** Static Scryfall oracle snapshot; manual refresh — used-card audience (6+ months), not day-one meta
+- **Availability:** v1 EDHREC bias + import-time score; deprioritize obscure over chasing new printings
 
 ## Completed
 

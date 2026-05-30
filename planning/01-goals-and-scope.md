@@ -13,6 +13,22 @@ A **local Windows utility** that:
 3. Applies Commander format rules from the Comprehensive Rules
 4. Outputs a 100-card deck list (commander + 99 unique cards) that is structurally playable (including a sensible mana base)
 
+## Target audience and data freshness
+
+**Product assumption:** Users are building with **older, used cards** (roughly **six months or more** on the secondary market), not chasing day-one Standard or Commander precon lists. For this audience:
+
+| Implication | Decision |
+| --- | --- |
+| Latest printings / set releases | **Not important** for v1 product value |
+| Card library | **Static** Scryfall oracle bulk snapshot bundled or imported once per release cycle |
+| Prices | Point-in-time USD from bulk import; stale prices are acceptable |
+| Updating `cards.db` and companion data | **Manual, explicit** maintainer step — not automatic background sync |
+| Availability heuristics | Favor **established, tradable** cards; deprioritize obscure — see [08-card-availability.md](08-card-availability.md) |
+
+The tool should not optimize for “newest cards” or frequent Scryfall polling. Version-stamp the bulk file and derived DB in metadata so users know which snapshot they are on. See [02-data-sources.md](02-data-sources.md) for refresh workflow.
+
+**Engineering consequence:** Dependency inventory (`card_effects`, feasibility indexes, `dependency-profiles.yaml` calibration) is computed against the **same static snapshot** as the builder. Re-running audit + import together on upgrade is fine; incremental daily updates are out of scope.
+
 ## Commander format constraints (hard rules)
 
 From CR 903 ([`resources/mtg/MagicCompRules 20260417.txt`](../resources/mtg/MagicCompRules%2020260417.txt)):
@@ -31,7 +47,8 @@ From CR 903 ([`resources/mtg/MagicCompRules 20260417.txt`](../resources/mtg/Magi
 - Sideboards (not used in Commander)
 - Brawl / Commander Draft variants
 - Collection ownership tracking
-- Real-time Scryfall API sync (bulk JSON is sufficient for offline)
+- Real-time Scryfall API sync (static bulk JSON per release is sufficient for offline)
+- Automatic or scheduled card-data updates (manual bulk refresh only)
 - Third-party site export (Moxfield/Archidekt) — v2; v1 uses Markdown + `.deck.json`
 
 ## Success criteria for v1

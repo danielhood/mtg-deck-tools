@@ -28,9 +28,11 @@ ruff check src tests        # configured in pyproject.toml; ruff is not a declar
 
 Tests do **not** need Scryfall bulk JSON. Manual `import` / `generate` do:
 
-1. Download [Scryfall Oracle Cards bulk](https://scryfall.com/docs/api/bulk-data) into `resources/scryfall/oracle-cards-<timestamp>.json` (see README for `curl` via `GET https://api.scryfall.com/bulk-data/oracle-cards`).
+1. Use the bundled snapshot under `resources/scryfall/oracle-cards-*.json`, or download [Scryfall Oracle Cards bulk](https://scryfall.com/docs/api/bulk-data) when intentionally refreshing (see README).
 2. `mtg-deck-tools import` → `data/cards.db` (gitignored).
 3. Example full flow: `mtg-deck-tools stats` then `mtg-deck-tools generate --seed 42 --colors G --themes tokens`.
+
+**Data freshness:** Static DB is intentional — target users build with older used cards; no live Scryfall sync. Companion datasets (tags, future `card_effects`) update only when maintainers re-run `import` + audit.
 
 `generate --stub` exercises the CLI without a database but only produces the Phase 1 preview, not a slot-filled deck.
 

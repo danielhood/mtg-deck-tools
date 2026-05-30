@@ -318,6 +318,8 @@ Before tightening **wizard restrictions** or default thresholds, run a read-only
 
 Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) (UX6). The audit can ship as `dependency-audit` CLI or import sidecar without enabling generate-time strict mode.
 
+**Static DB:** Audit results are valid for the **bundled oracle snapshot** only. Re-run audit when maintainers refresh bulk import ([02-data-sources.md](02-data-sources.md)); users are not expected to update for new sets.
+
 ---
 
 ## Implementation phases
