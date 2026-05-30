@@ -71,10 +71,10 @@ Record answers in [13-dependency-engine-decisions.md](13-dependency-engine-decis
 
 | ☐ | Item | Notes / artifact |
 | --- | --- | --- |
-| ☐ | `dependency_report` JSON schema documented in [07-deck-output-format.md](07-deck-output-format.md) | |
-| ☐ | Markdown **Deck dependencies** Notes group format | |
-| ☐ | `.deck.json` schema bump plan (`1.0` vs `1.1`) for `dependency_preferences` / `mechanic_focus` | |
-| ☐ | `generate --from` behavior when report fields absent | |
+| ☑ | `dependency_report` JSON schema documented in [07-deck-output-format.md](07-deck-output-format.md) | Optional field on schema 1.0 |
+| ☑ | Markdown **Deck dependencies** Notes group format | Section + Notes bucket `dependencies` |
+| ◐ | `.deck.json` schema bump plan (`1.0` vs `1.1`) for `dependency_preferences` / `mechanic_focus` | Deferred — criteria unchanged |
+| ☑ | `generate --from` behavior when report fields absent | Report omitted when DB has no effects / not run |
 
 ### v1 rule scope (agreed set)
 
@@ -82,10 +82,10 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 
 | ☐ | Rule ID | Trigger | Default severity |
 | --- | --- | --- | --- |
-| ☐ | `TUTOR_TARGET_EXISTS` | `search_library` atom | warn |
-| ☐ | `ENERGY_BALANCE` | energy producers in deck | warn |
-| ☐ | `TYPE_SYNERGY_MIN` | type/subtype amplifier atoms | warn |
-| ☐ | `AURA_SUPPORT_MIN` | aura cast / aura tutor (if audit justifies) | warn |
+| ☑ | `TUTOR_TARGET_EXISTS` | `search_library` atom | warn |
+| ☑ | `ENERGY_BALANCE` | energy producers in deck | warn |
+| ☑ | `TYPE_SYNERGY_MIN` | type/subtype amplifier atoms | warn |
+| ☑ | `AURA_SUPPORT_MIN` | aura cast / aura tutor (if audit justifies) | warn |
 | ☐ | _(optional)_ `SUBTYPE_SYNERGY_MIN` | e.g. Elf lords | warn |
 | ☐ | _(defer)_ graveyard / delve / escape | — | v2 |
 
@@ -139,7 +139,7 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 | **D0** | Checklist § D0 rows started | Patterns + golden tests + atom schema ☑ — **complete** (2026-05-30) |
 | **D0.5** | D0 ☑ + snapshot ☑ | Audit reports ☑ + profiles revised ☑ |
 | **D1** | All **§ Must complete before D1** ☑ | Import writes `card_effects`; golden tests pass |
-| **D2** | D1 ☑ + output contract ☑ | Warn-only report in MD/JSON; dogfood review |
+| **D2** | D1 ☑ + output contract ☑ | Warn-only report in MD/JSON; dogfood review — **implemented** |
 | **D3** | D2 false-positive budget met | Scorer uses `deck_stats` during fill |
 | **D4** | D3 ☑ | Optional `--strict-dependencies` at pick time |
 | **D5** | D4 ☑ | Repair pass for top failure classes |

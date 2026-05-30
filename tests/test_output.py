@@ -63,6 +63,7 @@ def test_classify_warning() -> None:
     )
     assert classify_warning("Slot 'ramp': only 2 candidates available (wanted 10).") == "slot"
     assert classify_warning("[budget] 3 card(s) had no USD price.") == "validation"
+    assert classify_warning("Dependency: no energy payoffs.") == "dependencies"
 
 
 def test_group_warnings_skips_validation_when_section_exists() -> None:

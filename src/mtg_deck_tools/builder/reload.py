@@ -12,6 +12,7 @@ from mtg_deck_tools.builder.generate import _fetch_commanders, _require_db
 from mtg_deck_tools.builder.output import write_deck_outputs
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import DEFAULT_DB_PATH, OUTPUT_DIR
+from mtg_deck_tools.rules.dependencies import dependency_messages, validate_dependencies
 from mtg_deck_tools.rules.validate import validate_commander_deck, validation_messages
 from mtg_deck_tools.wizard.commanders import CommanderRow, combined_color_identity
 from mtg_deck_tools.wizard.slots import load_slot_template_config, validate_slot_template
@@ -146,6 +147,13 @@ def run_generate_from_deck(
         )
         maindeck.validation = validation
         maindeck.warnings.extend(validation_messages(validation))
+
+        maindeck.dependency_report = validate_dependencies(
+            conn,
+            maindeck=maindeck.cards,
+            commanders=identity_rows,
+        )
+        maindeck.warnings.extend(dependency_messages(maindeck.dependency_report))
 
         out_dir = output_dir or OUTPUT_DIR
         out_dir.mkdir(parents=True, exist_ok=True)

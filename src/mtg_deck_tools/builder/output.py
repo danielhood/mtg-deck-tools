@@ -23,12 +23,14 @@ from mtg_deck_tools.tags.labels import format_tag_list
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.commander import format_color_identity
 from mtg_deck_tools.rules.rarity import format_min_rarity_display, format_rarity_display
+from mtg_deck_tools.rules.dependencies import DependencyReport, dependency_report_to_dict
 from mtg_deck_tools.rules.validate import ValidationResult
 from mtg_deck_tools.wizard.slots import load_slot_template_config
 
 _VALIDATION_NOTE_RE = re.compile(r"^\[[\w.]+\]")
 
 NOTE_GROUPS: tuple[tuple[str, str], ...] = (
+    ("dependencies", "Deck dependencies"),
     ("availability", "Availability / unpriced"),
     ("unpriced", "Unpriced cards"),
     ("budget_trim", "Budget trims"),
@@ -108,6 +110,8 @@ def _unpriced_classifications(cards: list[DeckCard]) -> dict[str, list[str]]:
 
 def classify_warning(message: str) -> str:
     """Bucket a build warning for grouped Notes output."""
+    if message.startswith("Dependency:"):
+        return "dependencies"
     if message.startswith("Likely obscure:") or message.startswith("Price pending:"):
         return "availability"
     if message.startswith("No USD price for"):
@@ -254,6 +258,25 @@ def _render_single_card_detail(card: DeckCard) -> list[str]:
     ]
 
 
+def _render_dependency_section(report: DependencyReport) -> list[str]:
+    status = "OK" if report.passed else "WARNINGS"
+    lines = ["## Deck dependencies", "", f"**Status:** {status}", ""]
+    if report.profiles:
+        lines.append("### Profile summary")
+        for profile in report.profiles:
+            counts = ", ".join(f"{k}={v}" for k, v in sorted(profile.counts.items()))
+            lines.append(f"- **{profile.profile_id}:** {counts} ({profile.status})")
+        lines.append("")
+    warns = [i for i in report.issues if i.status == "warn"]
+    if warns:
+        lines.append("### Warnings")
+        for issue in warns:
+            name = f" — {issue.card_name}" if issue.card_name else ""
+            lines.append(f"- **[{issue.rule_id}]**{name} {issue.message}")
+        lines.append("")
+    return lines
+
+
 def _render_notes_section(
     warnings: list[str],
     *,
@@ -376,6 +399,11 @@ def write_deck_outputs(
         },
         "mana_base": _mana_base_dict(maindeck.mana_base),
         "validation": _validation_dict(maindeck.validation),
+        "dependency_report": (
+            dependency_report_to_dict(maindeck.dependency_report)
+            if maindeck.dependency_report
+            else None
+        ),
         "warnings": maindeck.warnings,
     }
 
@@ -432,6 +460,9 @@ def write_deck_outputs(
     for cmd in commanders:
         lines.append(format_commander_list_item(cmd))
     lines.append("")
+
+    if maindeck.dependency_report and maindeck.dependency_report.issues:
+        lines.extend(_render_dependency_section(maindeck.dependency_report))
 
     if maindeck.validation:
         v = maindeck.validation
