@@ -20,7 +20,7 @@ Status as of 2026-05-30. Phase 1, Phase 2, v1 polish, and **Phase 3 §1** are **
 | Card name + type display (wizard + MD) | Done |
 | Taxonomy display names in MD header | Done |
 | Linux/bash setup in README | Done |
-| `.deck.json` reload / edit workflow | **Not started** |
+| `.deck.json` reload / edit workflow | Done |
 | Post-validation repair pass | **Not started** — illegal picks are prevented at fill time; no swap-after-validate |
 | Slot pool quality (themed slot misfills) | Done |
 | Unpriced / availability handling | **Partial** — per-card max helps; null-price cards still allowed by default |
@@ -72,21 +72,20 @@ Graduated tag relaxation, oracle guards, and slot-specific scoring reduce misfil
 
 **Acceptance:** Board wipe and wincon slots contain on-theme, priced cards for a standard GW voltron/landfall list.
 
-### 3. `.deck.json` reload workflow
+### 3. `.deck.json` reload workflow — **Done**
 
-Planned in [07-deck-output-format.md](07-deck-output-format.md) but not implemented. Enables the review loop in [01-goals-and-scope.md](01-goals-and-scope.md).
+Reload criteria and commanders from a saved `.deck.json`, regenerate the full maindeck, or refill a single slot.
 
-```powershell
-# Proposed
+```bash
 mtg-deck-tools generate --from output/dragonlord-dromoka-....deck.json
-mtg-deck-tools generate --from deck.json --refill-slot synergy --seed 42
+mtg-deck-tools generate --from deck.deck.json --refill-slot synergy --seed 42
 ```
 
-| Step | Scope |
-| --- | --- |
-| Load criteria + commanders from `.deck.json` | Read `criteria`, `commanders`, optional `seed` |
-| Regenerate full deck | Skip wizard; call `run_generate` with loaded criteria |
-| Regenerate one slot (later) | Keep other slots fixed; refill one template slot |
+| Step | Scope | Status |
+| --- | --- | --- |
+| Load criteria + commanders from `.deck.json` | Read `criteria`, `commanders`, optional `seed` | **Done** |
+| Regenerate full deck | Skip wizard; call `run_generate_from_deck` | **Done** |
+| Regenerate one slot | `--refill-slot` keeps other slots fixed | **Done** |
 
 **Acceptance:** User can tweak `budget_usd`, `card_price_max_usd`, or `themes` in JSON and regenerate without re-running the wizard.
 
@@ -106,7 +105,7 @@ Policy is documented in [08-card-availability.md](08-card-availability.md). Per-
 
 ### 5. v1 success criteria closure
 
-Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood pass (3–5 commanders, varied budgets). Core generation, validation, budget, and output are working; remaining gaps are slot quality and reload workflow.
+Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood pass (3–5 commanders, varied budgets). Core generation, validation, budget, output, and deck reload are working; remaining gaps are availability policy polish.
 
 ---
 
@@ -125,6 +124,4 @@ Check off [01-goals-and-scope.md](01-goals-and-scope.md) after a short dogfood p
 
 ## Suggested next task
 
-**Start with Phase 3 §3 (`.deck.json` reload).** Slot pool quality and post-import tagging are in place.
-
-After that: unpriced/availability policy (§4).
+**Start with Phase 3 §4 (unpriced / availability handling).** Reload decks with `generate --from` and optional `--refill-slot`.

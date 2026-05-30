@@ -320,6 +320,110 @@ def _fill_lands(
     return plan
 
 
+def _budget_totals_from_cards(cards: list[DeckCard]) -> tuple[float, list[str]]:
+    spent = 0.0
+    unpriced: list[str] = []
+    for card in cards:
+        if card.price_known and card.price_usd is not None:
+            spent += card.price_usd * card.quantity
+        elif card.name not in unpriced:
+            unpriced.append(card.name)
+    return spent, unpriced
+
+
+def _init_state_from_cards(state: _BuildState, cards: list[DeckCard]) -> None:
+    """Seed build state from an existing maindeck (for slot refill)."""
+    state.cards = [card for card in cards]
+    state.used_oracle_ids = {
+        c.oracle_id for c in cards if "Basic" not in c.type_line
+    }
+    state.used_names = {c.name for c in cards if "Basic" not in c.type_line}
+    state.budget_spent, state.unpriced_names = _budget_totals_from_cards(cards)
+
+
+def refill_deck_slot(
+    conn: sqlite3.Connection,
+    criteria: DeckCriteria,
+    *,
+    identity: list[str],
+    commander_oracle_ids: list[str],
+    fixed_cards: list[DeckCard],
+    refill_slot: str,
+    seed: int | None = None,
+) -> DeckBuildResult:
+    """Keep all cards outside refill_slot and generate new picks for that slot only."""
+    slot_config = load_slot_template_config()
+    if refill_slot not in slot_config.default:
+        known = ", ".join(slot_config.default)
+        raise ValueError(f"Unknown slot {refill_slot!r}; expected one of: {known}")
+
+    slots = dict(criteria.slot_template or slot_config.default)
+    commander_count = max(1, len(commander_oracle_ids))
+    slots = adjust_slot_template_for_commanders(slots, commander_count)
+    mainboard_size = mainboard_size_for_commanders(commander_count)
+
+    kept = [c for c in fixed_cards if c.slot != refill_slot]
+    count = slots.get(refill_slot, 0)
+
+    commander_tags: set[str] = set()
+    if commander_oracle_ids:
+        tag_rows = conn.execute(
+            """
+            SELECT tag FROM card_mechanic_tags
+            WHERE oracle_id IN ({})
+            """.format(",".join("?" * len(commander_oracle_ids))),
+            commander_oracle_ids,
+        ).fetchall()
+        commander_tags = {row["tag"] for row in tag_rows}
+
+    state = _BuildState(
+        conn=conn,
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=set(commander_oracle_ids),
+        commander_theme_tags=commander_tags,
+        rng=random.Random(seed if seed is not None else criteria.seed),
+    )
+    _init_state_from_cards(state, kept)
+    state.warnings.append(f"Refilled slot '{refill_slot}' from saved deck.")
+
+    mana_plan: ManaBasePlan | None = None
+    if refill_slot == "lands":
+        mana_plan = _fill_lands(state, count, mainboard_size=mainboard_size)
+    else:
+        _fill_slot(state, refill_slot, count)
+
+    cards, budget_spent, warnings = trim_deck_to_budget(
+        conn,
+        state.cards,
+        state.criteria,
+        identity=identity,
+        commander_oracle_ids=state.commander_oracle_ids,
+        commander_theme_tags=state.commander_theme_tags,
+        unpriced_names=state.unpriced_names,
+        warnings=state.warnings,
+    )
+
+    mana_plan = plan_mana_base(
+        cards,
+        identity=identity,
+        template_lands=slots.get("lands", 0),
+        min_lands=slot_config.bounds["lands"].min,
+        max_lands=slot_config.bounds["lands"].max,
+        mainboard_size=mainboard_size,
+    )
+    warnings = list(warnings)
+    warnings.extend(mana_plan.warnings)
+
+    return DeckBuildResult(
+        cards=cards,
+        warnings=warnings,
+        budget_spent=budget_spent,
+        unpriced_names=state.unpriced_names,
+        mana_base=mana_plan,
+    )
+
+
 def fill_deck(
     conn: sqlite3.Connection,
     criteria: DeckCriteria,

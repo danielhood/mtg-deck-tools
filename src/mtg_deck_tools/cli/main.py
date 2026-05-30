@@ -11,6 +11,7 @@ from rich.table import Table
 
 from mtg_deck_tools import __version__
 from mtg_deck_tools.builder.generate import run_generate
+from mtg_deck_tools.builder.reload import run_generate_from_deck
 from mtg_deck_tools.builder.stub import run_generate_stub
 from mtg_deck_tools.db.stats import fetch_stats
 from mtg_deck_tools.import_.pipeline import run_import
@@ -175,14 +176,43 @@ def generate_cmd(
             help="Minimum card rarity (common, uncommon, rare, mythic)",
         ),
     ] = "common",
+    deck_from: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--from",
+            help="Regenerate from a saved .deck.json (criteria and commanders)",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ] = None,
+    refill_slot: Annotated[
+        Optional[str],
+        typer.Option(
+            "--refill-slot",
+            help="When using --from, refill only this slot (e.g. synergy, lands)",
+        ),
+    ] = None,
 ) -> None:
     """
     Generate a Commander deck (99-card maindeck + commander metadata).
 
-    Use --wizard for interactive criteria. Use --stub for the old Phase 1 preview.
+    Use --wizard for interactive criteria. Use --from to reload a .deck.json.
+    Use --stub for the old Phase 1 preview.
     """
+    if deck_from and stub:
+        console.print("[red]Error:[/red] --from cannot be used with --stub.")
+        raise typer.Exit(1)
+    if refill_slot and not deck_from:
+        console.print("[red]Error:[/red] --refill-slot requires --from.")
+        raise typer.Exit(1)
+
     criteria = None
     if wizard:
+        if deck_from:
+            console.print(
+                "[yellow]Note:[/yellow] --from is ignored when --wizard is set."
+            )
         if colors or themes:
             console.print(
                 "[yellow]Note:[/yellow] --colors and --themes are ignored when --wizard is set."
@@ -199,7 +229,7 @@ def generate_cmd(
     color_list = [c.strip().upper() for c in colors.split(",")] if colors else None
     theme_list = [t.strip() for t in themes.split(",")] if themes else None
 
-    if not wizard:
+    if not wizard and not deck_from:
         patch: dict = {"min_rarity": min_rarity}
         if card_price_min is not None:
             patch["card_price_min_usd"] = card_price_min
@@ -210,20 +240,30 @@ def generate_cmd(
         else:
             criteria = criteria.model_copy(update=patch)
 
-    runner = run_generate_stub if stub else run_generate
     try:
-        kwargs = dict(
-            db_path=db_path,
-            seed=seed,
-            colors=color_list,
-            themes=theme_list,
-            criteria=criteria,
-            output_dir=output_dir,
-        )
-        if not stub:
-            kwargs["strict_budget"] = strict_budget
-        out = runner(**kwargs)
-    except (FileNotFoundError, RuntimeError) as exc:
+        if deck_from:
+            out = run_generate_from_deck(
+                deck_from,
+                db_path=db_path,
+                seed=seed,
+                output_dir=output_dir,
+                refill_slot=refill_slot,
+                strict_budget=strict_budget,
+            )
+        else:
+            runner = run_generate_stub if stub else run_generate
+            kwargs = dict(
+                db_path=db_path,
+                seed=seed,
+                colors=color_list,
+                themes=theme_list,
+                criteria=criteria,
+                output_dir=output_dir,
+            )
+            if not stub:
+                kwargs["strict_budget"] = strict_budget
+            out = runner(**kwargs)
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(1) from exc
 
@@ -232,6 +272,10 @@ def generate_cmd(
     console.print(f"[green]Wrote[/green] {md_path}")
     if stub:
         console.print("[dim]Phase 1 stub preview — omit --stub for full slot-filled decks.[/dim]")
+    elif deck_from and refill_slot:
+        console.print(f"[dim]Refilled slot '{refill_slot}' from {deck_from.name}.[/dim]")
+    elif deck_from:
+        console.print(f"[dim]Regenerated deck from {deck_from.name}.[/dim]")
     else:
         console.print("[dim]Full maindeck generated. Review warnings in the output files.[/dim]")
 
