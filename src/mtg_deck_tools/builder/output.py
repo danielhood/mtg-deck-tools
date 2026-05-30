@@ -267,6 +267,13 @@ def _render_dependency_section(report: DependencyReport) -> list[str]:
             counts = ", ".join(f"{k}={v}" for k, v in sorted(profile.counts.items()))
             lines.append(f"- **{profile.profile_id}:** {counts} ({profile.status})")
         lines.append("")
+    fails = [i for i in report.issues if i.status == "fail"]
+    if fails:
+        lines.append("### Failures (strict)")
+        for issue in fails:
+            name = f" — {issue.card_name}" if issue.card_name else ""
+            lines.append(f"- **[{issue.rule_id}]**{name} {issue.message}")
+        lines.append("")
     warns = [i for i in report.issues if i.status == "warn"]
     if warns:
         lines.append("### Warnings")

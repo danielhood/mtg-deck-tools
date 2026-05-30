@@ -87,6 +87,7 @@ def run_generate(
     criteria: DeckCriteria | None = None,
     output_dir: Path | None = None,
     strict_budget: bool = False,
+    strict_dependencies: bool = False,
     prefer_available: bool = False,
 ) -> Path:
     """Build a full 99-card maindeck from criteria and write output files."""
@@ -166,6 +167,7 @@ def run_generate(
                 "colors": identity,
                 "seed": effective_seed,
                 "strict_budget": strict_budget or working.strict_budget,
+                "strict_dependencies": strict_dependencies or working.strict_dependencies,
                 "prefer_available": prefer_available or working.prefer_available,
             }
         )
@@ -194,6 +196,7 @@ def run_generate(
             conn,
             maindeck=maindeck.cards,
             commanders=identity_rows,
+            strict=output_criteria.strict_dependencies,
         )
         maindeck.warnings.extend(dependency_messages(maindeck.dependency_report))
 

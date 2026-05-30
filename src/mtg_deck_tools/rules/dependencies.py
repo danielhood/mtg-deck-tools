@@ -159,18 +159,24 @@ def _count_type(pool: list[DeckCard], card_type: str) -> int:
     return sum(1 for c in pool if needle in (c.type_line or ""))
 
 
+def _issue_status(*, strict: bool) -> DependencyStatus:
+    return "fail" if strict else "warn"
+
+
 def validate_dependencies(
     conn: sqlite3.Connection,
     *,
     maindeck: list[DeckCard],
     commanders: list[dict[str, Any]],
     profiles: dict[str, dict[str, Any]] | None = None,
+    strict: bool = False,
 ) -> DependencyReport:
     """
-    Evaluate v1 dependency rules. Default severity is warn (never fail unless strict in D4).
+    Evaluate v1 dependency rules. Default severity is warn; with strict=True, issues are fail.
     """
     profile_cfg = profiles or load_profile_defaults()
     report = DependencyReport()
+    severity = _issue_status(strict=strict)
 
     commander_cards = [
         DeckCard(
@@ -220,7 +226,7 @@ def validate_dependencies(
             report.issues.append(
                 DependencyIssue(
                     rule_id="TUTOR_TARGET_EXISTS",
-                    status="warn",
+                    status=severity,
                     message=(
                         f"{card.name} searches your library but no card in the deck "
                         f"matches { _describe_payload(effect.payload) }."
@@ -235,7 +241,7 @@ def validate_dependencies(
         report.issues.append(
             DependencyIssue(
                 rule_id="ENERGY_BALANCE",
-                status="warn",
+                status=severity,
                 message=(
                     f"Deck has {len(energy_producers)} energy producer(s) "
                     f"({', '.join(energy_producers[:5])}"
@@ -249,7 +255,7 @@ def validate_dependencies(
         report.issues.append(
             DependencyIssue(
                 rule_id="ENERGY_BALANCE",
-                status="warn",
+                status=severity,
                 message=(
                     f"Deck has {len(energy_consumers)} card(s) that pay {{E}} but no energy producers."
                 ),
@@ -262,10 +268,18 @@ def validate_dependencies(
         ProfileSummary(
             profile_id="energy",
             counts={"producer": len(energy_producers), "consumer": len(energy_consumers)},
-            status="warn"
-            if (energy_producers and not energy_consumers)
-            or (energy_consumers and not energy_producers)
-            else "pass",
+            status=severity
+            if strict
+            and (
+                (energy_producers and not energy_consumers)
+                or (energy_consumers and not energy_producers)
+            )
+            else (
+                "warn"
+                if (energy_producers and not energy_consumers)
+                or (energy_consumers and not energy_producers)
+                else "pass"
+            ),
             messages=[],
         )
     )
@@ -286,7 +300,7 @@ def validate_dependencies(
                 report.issues.append(
                     DependencyIssue(
                         rule_id="TYPE_SYNERGY_MIN",
-                        status="warn",
+                        status=severity,
                         message=(
                             f"{card.name} benefits from other {subtype}s, but the deck has "
                             f"only {others} other {subtype}(s) (suggested minimum {elf_min})."
@@ -312,7 +326,7 @@ def validate_dependencies(
                 report.issues.append(
                     DependencyIssue(
                         rule_id="TYPE_SYNERGY_MIN",
-                        status="warn",
+                        status=severity,
                         message=(
                             f"{card.name} cares about {card_type} spells, but the deck has "
                             f"only {count} {card_type} cards (suggested minimum {artifact_min})."
@@ -336,7 +350,7 @@ def validate_dependencies(
             for e in effects
         )
         if has_aura_payoff or aura_spells > 0:
-            aura_status = "warn"
+            aura_status = severity
             msg = (
                 f"Only {aura_spells} Aura card(s) in the deck "
                 f"(suggested minimum {aura_min} for aura support)."
@@ -345,7 +359,7 @@ def validate_dependencies(
             report.issues.append(
                 DependencyIssue(
                     rule_id="AURA_SUPPORT_MIN",
-                    status="warn",
+                    status=severity,
                     message=msg,
                     profile_id="aura_support",
                     detail={"aura_count": aura_spells, "minimum": aura_min},
@@ -407,4 +421,10 @@ def dependency_report_to_dict(report: DependencyReport) -> dict[str, Any]:
 
 def dependency_messages(report: DependencyReport) -> list[str]:
     """Flatten dependency issues into build warning strings."""
-    return [f"Dependency: {issue.message}" for issue in report.issues if issue.status == "warn"]
+    messages: list[str] = []
+    for issue in report.issues:
+        if issue.status == "warn":
+            messages.append(f"Dependency: {issue.message}")
+        elif issue.status == "fail":
+            messages.append(f"Dependency (strict): {issue.message}")
+    return messages

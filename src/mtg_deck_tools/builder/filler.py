@@ -27,6 +27,7 @@ from mtg_deck_tools.builder.dependency_scoring import (
     build_deck_build_stats,
     build_search_pool,
     card_effects_enabled,
+    filter_strict_dependency_candidates,
 )
 from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
 from mtg_deck_tools.rules.dependencies import fetch_card_effects
@@ -178,6 +179,29 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
         state.warnings.append(
             f"Slot '{slot}': only {len(candidates)} candidates available (wanted {count})."
         )
+
+    if (
+        state.criteria.strict_dependencies
+        and candidates
+        and card_effects_enabled(state.conn)
+    ):
+        before = len(candidates)
+        candidates = filter_strict_dependency_candidates(
+            candidates,
+            conn=state.conn,
+            partial=state.cards,
+            commander_oracle_ids=state.commander_oracle_ids,
+        )
+        excluded = before - len(candidates)
+        if excluded:
+            state.warnings.append(
+                f"Strict dependencies: excluded {excluded} candidate(s) in slot '{slot}'."
+            )
+        if len(candidates) < count:
+            state.warnings.append(
+                f"Slot '{slot}': only {len(candidates)} candidates after strict "
+                f"dependency filter (wanted {count})."
+            )
 
     tag_map = fetch_card_tags(state.conn, [c.oracle_id for c in candidates])
     scored: list[tuple[CardCandidate, float]] = []
