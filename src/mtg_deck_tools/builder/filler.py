@@ -10,6 +10,7 @@ import sqlite3
 
 from mtg_deck_tools.builder.budget_backfill import trim_deck_to_budget
 from mtg_deck_tools.builder.price_filters import filter_candidates_by_price
+from mtg_deck_tools.builder.rarity_filters import filter_candidates_by_rarity
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard, slot_theme_tags
 from mtg_deck_tools.builder.mana_base import (
     BASIC_NAME_BY_COLOR,
@@ -22,6 +23,7 @@ from mtg_deck_tools.builder.mana_base import (
 )
 from mtg_deck_tools.builder.pool import CardCandidate, fetch_candidates, fetch_card_tags
 from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
+from mtg_deck_tools.builder.slot_quality import refine_slot_candidates, slot_relax_steps
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.validate import (
     adjust_slot_template_for_commanders,
@@ -86,6 +88,7 @@ class _BuildState:
                 released_at=candidate.released_at,
                 power=candidate.power,
                 toughness=candidate.toughness,
+                rarity=candidate.rarity,
             )
         )
         if not candidate.is_basic_land:
@@ -128,14 +131,9 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
     if count <= 0:
         return
 
-    theme_tags = slot_theme_tags(slot, state.criteria)
-    relax_steps: list[list[str] | None] = [theme_tags]
-    if theme_tags is not None:
-        relax_steps.append(None)
-
     candidates: list[CardCandidate] = []
-    for require_tags in relax_steps:
-        candidates = fetch_candidates(
+    for require_tags in slot_relax_steps(slot, state.criteria):
+        pool = fetch_candidates(
             state.conn,
             identity=state.identity,
             exclude_oracle_ids=state.used_oracle_ids | state.commander_oracle_ids,
@@ -144,14 +142,23 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
             require_theme_tags=require_tags,
             nonlands_only=True,
         )
-        candidates = filter_candidates_by_price(
-            candidates,
+        pool = filter_candidates_by_price(
+            pool,
             state.criteria,
             state.budget_remaining(),
         )
+        pool = filter_candidates_by_rarity(pool, state.criteria)
+        tag_map = fetch_card_tags(state.conn, [c.oracle_id for c in pool])
+        pool = refine_slot_candidates(
+            slot,
+            pool,
+            tag_map,
+            criteria=state.criteria,
+            require_theme_tags=require_tags,
+        )
+        if pool:
+            candidates = pool
         if len(candidates) >= count:
-            break
-        if require_tags is None:
             break
 
     if len(candidates) < count:
@@ -172,6 +179,7 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
             card_tags=tag_map.get(candidate.oracle_id, []),
             type_counts=type_counts,
             budget_remaining=state.budget_remaining(),
+            budget_usd=state.criteria.budget_usd,
         )
         scored.append((candidate, score))
     scored.sort(key=lambda item: item[1], reverse=True)

@@ -6,10 +6,8 @@ import re
 from dataclasses import dataclass
 
 from mtg_deck_tools.builder.pool import CardCandidate
+from mtg_deck_tools.builder.slot_quality import WINCON_ORACLE, slot_oracle_score
 
-WINCON_ORACLE = re.compile(
-    r"(?i)(you win the game|each opponent loses|can't lose the game|extra turns)"
-)
 COMMANDER_REFERENCE = re.compile(r"(?i)(your commander|command zone|legendary)")
 
 SLOT_TARGET_CMC: dict[str, float] = {
@@ -123,6 +121,7 @@ def score_candidate(
     card_tags: list[str],
     type_counts: dict[str, int],
     budget_remaining: float | None,
+    budget_usd: float | None = None,
     weights: ScoreWeights | None = None,
 ) -> float:
     w = weights or ScoreWeights()
@@ -130,7 +129,10 @@ def score_candidate(
     tag_set = set(card_tags)
 
     if archetype_themes and tag_set.intersection(archetype_themes):
-        score += w.theme_overlap * 1.5
+        overlap = w.theme_overlap * 1.5
+        if slot == "flex":
+            overlap *= 1.5
+        score += overlap
 
     if commander_theme_tags and tag_set.intersection(commander_theme_tags):
         score += w.commander_synergy
@@ -143,9 +145,14 @@ def score_candidate(
 
     score += w.edhrec * _edhrec_score(candidate.edhrec_rank)
     score += w.curve * _curve_score(candidate.cmc, slot)
+    score += slot_oracle_score(candidate, slot, card_tags)
 
     if slot == "wincon" and WINCON_ORACLE.search(candidate.oracle_text):
         score += w.wincon_signal
+
+    if slot == "wincon" and budget_usd is not None:
+        if not candidate.price_known or candidate.price_usd is None:
+            score -= 8.0
 
     score += w.budget * _budget_score(candidate, budget_remaining=budget_remaining)
 

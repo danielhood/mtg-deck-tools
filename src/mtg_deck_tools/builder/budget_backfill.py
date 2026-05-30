@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import sqlite3
 
-from mtg_deck_tools.builder.deck import DeckCard, slot_theme_tags
+from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.builder.pool import CardCandidate, fetch_candidates, fetch_card_tags
 from mtg_deck_tools.builder.price_filters import filter_candidates_by_price
+from mtg_deck_tools.builder.rarity_filters import filter_candidates_by_rarity
 from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
+from mtg_deck_tools.builder.slot_quality import refine_slot_candidates, slot_relax_steps
 from mtg_deck_tools.models.criteria import DeckCriteria
 
 
@@ -46,6 +48,7 @@ def _deck_card_from_candidate(
         released_at=candidate.released_at,
         power=candidate.power,
         toughness=candidate.toughness,
+        rarity=candidate.rarity,
     )
 
 
@@ -110,19 +113,15 @@ def _find_replacement(
     if max_price <= 0 or card_price <= 0:
         return None
 
-    theme_tags = slot_theme_tags(card.slot, criteria)
-    relax_steps: list[list[str] | None] = [theme_tags]
-    if theme_tags is not None:
-        relax_steps.append(None)
-
     exclude_ids = (_used_ids(cards) | commander_oracle_ids) - {card.oracle_id}
     exclude_names = _used_names(cards) - {card.name}
 
+    theme_tags = slot_relax_steps(card.slot, criteria)
     lands_only = card.slot == "lands" and "Basic" not in card.type_line
     nonlands_only = not lands_only
 
     candidates: list[CardCandidate] = []
-    for require_tags in relax_steps:
+    for require_tags in theme_tags:
         pool = fetch_candidates(
             conn,
             identity=identity,
@@ -135,6 +134,7 @@ def _find_replacement(
             limit=300,
         )
         pool = filter_candidates_by_price(pool, criteria, max_price)
+        pool = filter_candidates_by_rarity(pool, criteria)
         pool = [
             c
             for c in pool
@@ -142,6 +142,16 @@ def _find_replacement(
             and c.price_usd is not None
             and c.price_usd < card_price
         ]
+        if not pool:
+            continue
+        tag_map = fetch_card_tags(conn, [c.oracle_id for c in pool])
+        pool = refine_slot_candidates(
+            card.slot,
+            pool,
+            tag_map,
+            criteria=criteria,
+            require_theme_tags=require_tags,
+        )
         if pool:
             candidates = pool
             break
@@ -165,6 +175,7 @@ def _find_replacement(
             card_tags=tag_map.get(candidate.oracle_id, []),
             type_counts=type_counts,
             budget_remaining=max_price,
+            budget_usd=criteria.budget_usd,
         )
         if card.slot == "lands":
             card_score += score_land_budget(
