@@ -327,8 +327,8 @@ Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-de
 | Phase | Deliverable | Acceptance |
 | --- | --- | --- |
 | **D0 — Spec** | This doc + `effect-patterns.yaml` skeleton + atom schema | Reviewed taxonomy of 10–15 high-value patterns |
-| **D0.5 — Audit** | Inventory reports + feasibility indexes | Profile list and thresholds updated with evidence |
-| **D1 — Extract** | Import writes `card_effects` for tutors, `{E}`, simple type triggers | Golden tests; re-import updates atoms |
+| **D0.5 — Audit** | Inventory reports + feasibility indexes | Profile list and thresholds updated with evidence — **shipped** (`dependency-audit`) |
+| **D1 — Extract** | Import writes `card_effects` for tutors, `{E}`, simple type triggers | Golden tests; re-import updates atoms — **shipped** (schema v3) |
 | **D2 — Validate** | Post-build report in MD/JSON (warn only) | Known bad list (e.g. elf lord + 2 elves) flags warning |
 | **D3 — Score** | Scorer uses deck_stats during fill | Energy deck gets ≥1 `{E}` payoff without manual include |
 | **D4 — Filter** | Optional strict mode excludes cards that create unfulfillable tutors | Tutor for Aura deck with 0 auras excluded at pick time |

@@ -1,6 +1,6 @@
 """Database schema definitions."""
 
-SCHEMA_VERSION = "2"
+SCHEMA_VERSION = "3"
 
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
@@ -56,6 +56,19 @@ CREATE INDEX IF NOT EXISTS idx_cards_cmc ON cards(cmc);
 CREATE INDEX IF NOT EXISTS idx_cards_name ON cards(name);
 CREATE INDEX IF NOT EXISTS idx_tags_tag ON card_mechanic_tags(tag);
 CREATE INDEX IF NOT EXISTS idx_tags_layer ON card_mechanic_tags(layer);
+
+CREATE TABLE IF NOT EXISTS card_effects (
+    oracle_id TEXT NOT NULL REFERENCES cards(oracle_id) ON DELETE CASCADE,
+    face_index INTEGER NOT NULL DEFAULT 0,
+    effect_kind TEXT NOT NULL,
+    payload TEXT NOT NULL,
+    confidence REAL NOT NULL DEFAULT 1.0,
+    source TEXT NOT NULL,
+    PRIMARY KEY (oracle_id, face_index, effect_kind, source)
+);
+
+CREATE INDEX IF NOT EXISTS idx_effects_kind ON card_effects(effect_kind);
+CREATE INDEX IF NOT EXISTS idx_effects_oracle ON card_effects(oracle_id);
 """
 
 

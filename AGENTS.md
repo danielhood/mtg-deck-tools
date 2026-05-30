@@ -32,7 +32,7 @@ Tests do **not** need Scryfall bulk JSON. Manual `import` / `generate` do:
 2. `mtg-deck-tools import` → `data/cards.db` (gitignored).
 3. Example full flow: `mtg-deck-tools stats` then `mtg-deck-tools generate --seed 42 --colors G --themes tokens`.
 
-**Data freshness:** Static DB is intentional — target users build with older used cards; no live Scryfall sync. Companion datasets (tags, future `card_effects`) update only when maintainers re-run `import` + audit.
+**Data freshness:** Static DB is intentional — target users build with older used cards; no live Scryfall sync. Companion datasets (tags, `card_effects`, audit reports) update when maintainers re-run `import` and `dependency-audit`.
 
 `generate --stub` exercises the CLI without a database but only produces the Phase 1 preview, not a slot-filled deck.
 

@@ -96,6 +96,9 @@ mtg-deck-tools import
 # Database summary
 mtg-deck-tools stats
 
+# Dependency inventory audit (after import; writes resources/dependency/reports/)
+mtg-deck-tools dependency-audit
+
 # Full deck: slot-filled 99-card maindeck → output/
 mtg-deck-tools generate --seed 42 --colors G --themes tokens
 
@@ -117,8 +120,9 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 
 | Command | Description |
 | --- | --- |
-| `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, apply mechanic tags |
-| `stats` | Row counts, import metadata, top tags |
+| `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms |
+| `stats` | Row counts, import metadata, top tags, effect counts |
+| `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
 | `wizard` | Interactive wizard: themes, mechanics, colors, commander, budget (criteria only; does not write a deck) |
 | `generate` | Build a 99-card maindeck plus commander metadata → `output/*.deck.json` and `output/*.md` |
 

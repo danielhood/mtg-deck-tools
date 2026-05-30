@@ -21,6 +21,7 @@ focus_presets:
     description: Deck built around this mechanic; suppress over-cap warnings unless user lowers cap
 
 profiles:
+  # Audit 2026-05-30 (30,969 commander-legal): 55 producers, 84 consumers; see audit-evidence-20260530.json
   energy:
     label: Energy counters
     roles: [producer, consumer]
@@ -32,6 +33,7 @@ profiles:
       share_max: 0.12
       consumer_per_producer_min: 0.5
 
+  # Audit 2026-05-30: 1,220 aura spells (type_line), 7 aura tutors extracted
   aura_support:
     label: Auras
     roles: [aura_spell, aura_payoff]
@@ -40,6 +42,7 @@ profiles:
       aura_spell_max: 15
       share_max: 0.18
 
+  # Audit 2026-05-30: 662 elf creatures, 9 other-elf payoffs (buff_subtype)
   elves:
     label: Elf tribal
     roles: [subtype_payoff, subtype_creature]
@@ -48,6 +51,7 @@ profiles:
       payoff_creature_min: 5
       share_max: 0.25
 
+  # Audit 2026-05-30: 23 whenever-cast-artifact payoffs (partial coverage)
   artifacts:
     label: Artifacts matter
     roles: [artifact_spell, artifact_payoff]
@@ -55,6 +59,7 @@ profiles:
       artifact_min: 8
       share_max: 0.22
 
+  # Deferred — no effect patterns yet; aristocrats theme tag only
   sacrifice:
     label: Sacrifice / aristocrats
     roles: [outlet, fodder, payoff]

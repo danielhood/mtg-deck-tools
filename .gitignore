@@ -88,6 +88,10 @@ data/*.db-shm
 resources/scryfall/oracle-cards-*.json
 resources/mtg/MagicCompRules*.txt
 
+# Dependency audit reports (regenerate via dependency-audit; evidence JSON may be committed)
+resources/dependency/reports/*.json
+resources/dependency/reports/*.csv
+
 # Deck output (generated at runtime)
 output/
 
