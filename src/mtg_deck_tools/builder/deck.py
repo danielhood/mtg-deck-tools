@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.validate import ValidationResult
+
+if TYPE_CHECKING:
+    from mtg_deck_tools.rules.dependencies import DependencyReport
 from mtg_deck_tools.wizard.slots import SLOT_FILLER_THEME_TAGS
 
 
@@ -41,6 +45,7 @@ class DeckBuildResult:
     unpriced_names: list[str]
     mana_base: ManaBasePlan | None = None
     validation: ValidationResult | None = None
+    dependency_report: DependencyReport | None = None
 
 
 def slot_theme_tags(slot: str, criteria: DeckCriteria) -> list[str] | None:

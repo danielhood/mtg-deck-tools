@@ -100,6 +100,39 @@ For reload, modification, image lookup, and future UI versions. Versioned schema
 
 Unpriced cards use `price_known: false`. See [08-card-availability.md](../planning/08-card-availability.md) for budget policy and future obscure-vs-new classification.
 
+### `dependency_report` (schema 1.0, optional)
+
+Populated after a successful build when `card_effects` data exists in the database (post–D2). Warn-only by default.
+
+```json
+{
+  "dependency_report": {
+    "passed": false,
+    "issues": [
+      {
+        "rule_id": "ENERGY_BALANCE",
+        "status": "warn",
+        "message": "Deck has 2 energy producer(s) (Aether Hub, …) but no cards that pay {E}.",
+        "card_name": null,
+        "card_oracle_id": null,
+        "profile_id": "energy",
+        "detail": { "producers": ["Aether Hub"], "consumers": [] }
+      }
+    ],
+    "profiles": [
+      {
+        "profile_id": "energy",
+        "counts": { "producer": 2, "consumer": 0 },
+        "status": "warn",
+        "messages": []
+      }
+    ]
+  }
+}
+```
+
+Markdown output includes a **Deck dependencies** section (and dependency lines under **Notes** when folded into `warnings`).
+
 ### Design choices
 
 | Field | Purpose |

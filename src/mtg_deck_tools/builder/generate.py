@@ -9,6 +9,7 @@ from pathlib import Path
 
 from mtg_deck_tools.builder.filler import fill_deck
 from mtg_deck_tools.builder.output import write_deck_outputs
+from mtg_deck_tools.rules.dependencies import dependency_messages, validate_dependencies
 from mtg_deck_tools.rules.validate import validate_commander_deck, validation_messages
 from mtg_deck_tools.db.connection import connect
 from mtg_deck_tools.models.criteria import DeckCriteria
@@ -188,6 +189,13 @@ def run_generate(
         )
         maindeck.validation = validation
         maindeck.warnings.extend(validation_messages(validation))
+
+        maindeck.dependency_report = validate_dependencies(
+            conn,
+            maindeck=maindeck.cards,
+            commanders=identity_rows,
+        )
+        maindeck.warnings.extend(dependency_messages(maindeck.dependency_report))
 
         out_dir = output_dir or OUTPUT_DIR
         out_dir.mkdir(parents=True, exist_ok=True)
