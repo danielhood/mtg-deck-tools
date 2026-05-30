@@ -12,7 +12,10 @@ RESOURCES_DIR = PROJECT_ROOT / "resources"
 SCRYFALL_DIR = RESOURCES_DIR / "scryfall"
 DEFAULT_DB_PATH = DATA_DIR / "cards.db"
 TAXONOMY_PATH = CONFIG_DIR / "mechanic-taxonomy.yaml"
+EFFECT_PATTERNS_PATH = CONFIG_DIR / "effect-patterns.yaml"
+DEPENDENCY_PROFILES_PATH = CONFIG_DIR / "dependency-profiles.yaml"
 SLOT_TEMPLATES_PATH = CONFIG_DIR / "slot-templates.yaml"
+DEPENDENCY_RESOURCES_DIR = RESOURCES_DIR / "dependency"
 OUTPUT_DIR = PROJECT_ROOT / "output"
 
 NON_DECKABLE_LAYOUTS = frozenset(

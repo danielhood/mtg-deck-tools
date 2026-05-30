@@ -338,6 +338,8 @@ Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-de
 
 **Pre-implementation gate:** [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) — complete before merging D1.
 
+**D0 shipped in repo:** `config/effect-patterns.yaml`, `src/mtg_deck_tools/effects/`, `models/effects.py`, golden tests — see [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md), [13-dependency-engine-decisions.md](13-dependency-engine-decisions.md).
+
 ---
 
 ## Relationship to existing systems

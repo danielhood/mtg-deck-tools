@@ -1,0 +1,153 @@
+# Golden oracle texts for effect extraction (D0). Run via tests/test_effect_extraction.py
+
+cases:
+  - name: rampant_growth
+    oracle_text: "Search your library for a basic land card, reveal it, put it into your hand, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_basic_land
+        payload:
+          types: [land]
+          supertypes: [basic]
+
+  - name: cultivate
+    oracle_text: "Search your library for up to two basic land cards, put them onto the battlefield tapped, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_basic_land
+
+  - name: elvish_vanguard
+    oracle_text: "Other Elves you control get +1/+1."
+    type_line: "Creature — Elf Warrior"
+    expected:
+      - effect_kind: buff_subtype
+        source: buff_subtype_other
+        payload:
+          subtypes: [Elf]
+
+  - name: aether_hub
+    oracle_text: "Whenever a land enters the battlefield under your control, you get {E} (an energy counter)."
+    type_line: "Land"
+    expected:
+      - effect_kind: energy_produce
+        source: energy_produce
+
+  - name: enlightened_tutor
+    oracle_text: "Search your library for an artifact or enchantment card, reveal it, put it into your hand, then shuffle."
+    type_line: "Instant"
+    expected:
+      - effect_kind: search_library
+        source: search_library_artifact_or_enchantment
+        payload:
+          types: [artifact, enchantment]
+
+  - name: worldly_tutor
+    oracle_text: "Search your library for a creature card, reveal it, put it into your hand, then shuffle."
+    type_line: "Instant"
+    expected:
+      - effect_kind: search_library
+        source: search_library_creature
+        payload:
+          types: [creature]
+
+  - name: chord_cmc_capture
+    oracle_text: "Search your library for a creature card with mana value 3 or less, put it onto the battlefield, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_creature_cmc
+        payload:
+          max_cmc: 3
+
+  - name: idyllic_tutor
+    oracle_text: "Search your library for an enchantment card, reveal it, put it into your hand, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_enchantment
+
+  - name: fabricate
+    oracle_text: "Search your library for an artifact card, reveal it, put it into your hand, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_artifact
+
+  - name: shade_of_aura
+    oracle_text: "Enchant creature"
+    type_line: "Enchantment — Aura"
+    expected:
+      - effect_kind: type_line_aura
+        source: type_line_aura
+
+  - name: sai_master_thopterist
+    oracle_text: "Whenever you cast an artifact spell, create a 1/1 colorless Thopter artifact creature token with flying."
+    type_line: "Legendary Creature — Human Artificer"
+    expected:
+      - effect_kind: whenever_cast_type
+        source: whenever_cast_type
+        payload:
+          types: [artifact]
+
+  - name: lightning_bolt
+    oracle_text: "Lightning Bolt deals 3 damage to any target."
+    type_line: "Instant"
+    expected: []
+
+  - name: sol_ring
+    oracle_text: "{T}: Add {C}{C}."
+    type_line: "Artifact"
+    expected: []
+
+  - name: demonic_tutor
+    oracle_text: "Search your library for a card, put that card into your hand, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_any_card
+        payload:
+          any_card: true
+
+  - name: energy_produce_only
+    oracle_text: "Pay {E}{E}: Draw a card."
+    type_line: "Creature"
+    expected:
+      - effect_kind: energy_consume
+        source: energy_consume
+
+  - name: attune_with_aether
+    oracle_text: "Search your library for a basic land card and a card named Aether Hub, reveal them, put them into your hand, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_basic_land
+
+  - name: regal_force
+    oracle_text: "Other Elves you control get +1/+1 for each Elf you control."
+    type_line: "Creature — Elf"
+    expected:
+      - effect_kind: buff_subtype
+        source: buff_subtype_other
+
+  - name: sylvan_tutor
+    oracle_text: "Search your library for a creature card, reveal it, put it into your hand, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_creature
+
+  - name: kenrith_buff
+    oracle_text: "Other creatures you control get +1/+1."
+    type_line: "Legendary Creature — Human Noble"
+    expected: []
+
+  - name: double_search_creature
+    oracle_text: "Search your library for a creature card, then search your library for a land card."
+    type_line: "Sorcery"
+    expected_min:
+      - effect_kind: search_library
+        source: search_library_creature
+      - effect_kind: search_library
+        source: search_library_land

@@ -18,6 +18,8 @@ Planning documents for a local Windows utility that walks users through deck-bui
 | [10-card-dependency-engine.md](10-card-dependency-engine.md) | **Planned** — cross-card synergy / tutor-target / resource-balance checks (not full CR) |
 | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) | **Planned** — user control, balance presets, feedback, CLI vs UI (parallel to doc 10) |
 | [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) | **Gate** — checklist before D1+ engine code (D0, D0.5, decisions, contracts) |
+| [13-dependency-engine-decisions.md](13-dependency-engine-decisions.md) | Locked D0 decisions and v1 rule scope |
+| [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md) | Merged-face extraction policy (v1) |
 
 ## Current preferences
 
