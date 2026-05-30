@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from rich.table import Table
 
+from mtg_deck_tools.formatting import format_card_price_range_display
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.wizard.common import console
 from mtg_deck_tools.wizard.slots import (
@@ -51,6 +52,12 @@ def print_wizard_summary(criteria: DeckCriteria) -> None:
         table.add_row("Budget", f"${criteria.budget_usd:.2f}")
     else:
         table.add_row("Budget", "(none)")
+
+    price_range = format_card_price_range_display(
+        min_usd=criteria.card_price_min_usd,
+        max_usd=criteria.card_price_max_usd,
+    )
+    table.add_row("Card price range", price_range or "(none)")
 
     if criteria.seed is not None:
         table.add_row("Seed", str(criteria.seed))

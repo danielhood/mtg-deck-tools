@@ -14,6 +14,7 @@ from mtg_deck_tools.builder.generate import run_generate
 from mtg_deck_tools.builder.stub import run_generate_stub
 from mtg_deck_tools.db.stats import fetch_stats
 from mtg_deck_tools.import_.pipeline import run_import
+from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import DEFAULT_DB_PATH
 from mtg_deck_tools.wizard.run import run_wizard
 
@@ -159,6 +160,14 @@ def generate_cmd(
             help="Exclude unpriced cards and enforce budget cap during generation",
         ),
     ] = False,
+    card_price_min: Annotated[
+        Optional[float],
+        typer.Option("--card-price-min", help="Minimum USD price per card"),
+    ] = None,
+    card_price_max: Annotated[
+        Optional[float],
+        typer.Option("--card-price-max", help="Maximum USD price per card"),
+    ] = None,
 ) -> None:
     """
     Generate a Commander deck (99-card maindeck + commander metadata).
@@ -182,6 +191,17 @@ def generate_cmd(
 
     color_list = [c.strip().upper() for c in colors.split(",")] if colors else None
     theme_list = [t.strip() for t in themes.split(",")] if themes else None
+
+    if not wizard and (card_price_min is not None or card_price_max is not None):
+        patch: dict = {}
+        if card_price_min is not None:
+            patch["card_price_min_usd"] = card_price_min
+        if card_price_max is not None:
+            patch["card_price_max_usd"] = card_price_max
+        if criteria is None:
+            criteria = DeckCriteria(**patch)
+        else:
+            criteria = criteria.model_copy(update=patch)
 
     runner = run_generate_stub if stub else run_generate
     try:

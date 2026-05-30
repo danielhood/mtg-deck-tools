@@ -12,7 +12,8 @@ from mtg_deck_tools.builder.budget_backfill import (
     trim_deck_to_budget,
 )
 from mtg_deck_tools.builder.deck import DeckCard
-from mtg_deck_tools.builder.filler import _filter_budget, fill_deck
+from mtg_deck_tools.builder.filler import fill_deck
+from mtg_deck_tools.builder.price_filters import filter_budget_remaining
 from mtg_deck_tools.builder.pool import CardCandidate
 from mtg_deck_tools.builder.scorer import score_land_budget
 from mtg_deck_tools.db.schema import apply_schema
@@ -52,7 +53,7 @@ def test_filter_budget_excludes_over_remaining() -> None:
         _candidate(price_usd=25.0),
         _candidate(price_usd=None, price_known=False),
     ]
-    filtered = _filter_budget(pool, budget_remaining=10.0, strict=False)
+    filtered = filter_budget_remaining(pool, budget_remaining=10.0, strict=False)
     assert len(filtered) == 2
     assert all(c.price_usd is None or c.price_usd <= 10.0 for c in filtered)
 
@@ -62,7 +63,7 @@ def test_filter_budget_strict_excludes_unpriced() -> None:
         _candidate(price_usd=5.0),
         _candidate(price_usd=None, price_known=False),
     ]
-    filtered = _filter_budget(pool, budget_remaining=10.0, strict=True)
+    filtered = filter_budget_remaining(pool, budget_remaining=10.0, strict=True)
     assert len(filtered) == 1
     assert filtered[0].price_usd == 5.0
 

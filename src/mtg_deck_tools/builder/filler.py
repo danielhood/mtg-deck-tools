@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 import sqlite3
 
 from mtg_deck_tools.builder.budget_backfill import trim_deck_to_budget
+from mtg_deck_tools.builder.price_filters import filter_candidates_by_price
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard, slot_theme_tags
 from mtg_deck_tools.builder.mana_base import (
     BASIC_NAME_BY_COLOR,
@@ -123,26 +124,6 @@ def _pick_weighted(
     return picked
 
 
-def _filter_budget(
-    candidates: list[CardCandidate],
-    budget_remaining: float | None,
-    *,
-    strict: bool,
-) -> list[CardCandidate]:
-    if budget_remaining is None:
-        return candidates
-    filtered: list[CardCandidate] = []
-    for candidate in candidates:
-        if not candidate.price_known or candidate.price_usd is None:
-            if strict:
-                continue
-            filtered.append(candidate)
-            continue
-        if candidate.price_usd <= budget_remaining:
-            filtered.append(candidate)
-    return filtered
-
-
 def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
     if count <= 0:
         return
@@ -163,10 +144,10 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
             require_theme_tags=require_tags,
             nonlands_only=True,
         )
-        candidates = _filter_budget(
+        candidates = filter_candidates_by_price(
             candidates,
+            state.criteria,
             state.budget_remaining(),
-            strict=state.criteria.strict_budget,
         )
         if len(candidates) >= count:
             break
@@ -228,10 +209,10 @@ def _fill_lands(
         limit=400,
     )
     nonbasics = [c for c in nonbasics if not c.is_basic_land]
-    nonbasics = _filter_budget(
+    nonbasics = filter_candidates_by_price(
         nonbasics,
+        state.criteria,
         state.budget_remaining(),
-        strict=state.criteria.strict_budget,
     )
 
     tag_map = fetch_card_tags(state.conn, [c.oracle_id for c in nonbasics])

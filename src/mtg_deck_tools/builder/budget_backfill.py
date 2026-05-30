@@ -6,6 +6,7 @@ import sqlite3
 
 from mtg_deck_tools.builder.deck import DeckCard, slot_theme_tags
 from mtg_deck_tools.builder.pool import CardCandidate, fetch_candidates, fetch_card_tags
+from mtg_deck_tools.builder.price_filters import filter_candidates_by_price
 from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
 from mtg_deck_tools.models.criteria import DeckCriteria
 
@@ -133,12 +134,12 @@ def _find_replacement(
             nonlands_only=nonlands_only,
             limit=300,
         )
+        pool = filter_candidates_by_price(pool, criteria, max_price)
         pool = [
             c
             for c in pool
             if c.price_known
             and c.price_usd is not None
-            and c.price_usd <= max_price
             and c.price_usd < card_price
         ]
         if pool:
