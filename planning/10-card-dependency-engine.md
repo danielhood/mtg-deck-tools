@@ -357,9 +357,21 @@ Defer until warn-only mode is trustworthy.
 
 ---
 
+## User experience and control
+
+User-facing mechanics (energy focus, aura density, dominance caps, strict vs warn-only, future swap workflows) are specified in **[11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)**. That doc defines:
+
+- `config/dependency-profiles.yaml` — default min/max and share targets per mechanic profile
+- Planned `DeckCriteria` extensions (`mechanic_focus`, `dependency_preferences`)
+- `dependency_report` shape for Markdown Notes and future UI
+
+Engine implementation should read profile thresholds from YAML rather than hard-coding counts, so CLI and future web UI share one source of truth.
+
+---
+
 ## Open questions
 
-1. **Thresholds:** Global constants vs per-archetype in `slot-templates.yaml`?
+1. **Thresholds:** Global constants vs per-archetype in `slot-templates.yaml`? (See also per-profile defaults in `dependency-profiles.yaml` — [11](11-dependency-engine-user-experience.md).)
 2. **Tutor depth:** Match only type/subtype, or parse “nonbasic land”, “basic Plains”, mana value?
 3. **Commander zone:** Count commander as tutor target for all “creature” searches?
 4. **User overrides:** `criteria.strict_dependencies` vs warn-only?

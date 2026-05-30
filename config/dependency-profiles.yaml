@@ -1,0 +1,64 @@
+# Mechanic profiles for dependency balance and user-facing focus presets.
+# Consumed by the dependency engine (planned) and documented in:
+# planning/11-dependency-engine-user-experience.md
+#
+# focus_presets multiply defaults; criteria.mechanic_focus selects a preset per profile.
+
+schema_version: 1
+
+focus_presets:
+  incidental:
+    share_multiplier: 0.5
+    description: Splash — mechanic appears but is not a main plan
+  supported:
+    share_multiplier: 1.0
+    description: Mechanic should work when drawn; typical Commander support package
+  focused:
+    share_multiplier: 1.5
+    description: Main secondary plan; higher counts and share
+  engine:
+    share_multiplier: 2.0
+    description: Deck built around this mechanic; suppress over-cap warnings unless user lowers cap
+
+profiles:
+  energy:
+    label: Energy counters
+    roles: [producer, consumer]
+    defaults:
+      producer_min: 2
+      producer_max: 6
+      consumer_min: 2
+      consumer_max: 8
+      share_max: 0.12
+      consumer_per_producer_min: 0.5
+
+  aura_support:
+    label: Auras
+    roles: [aura_spell, aura_payoff]
+    defaults:
+      aura_spell_min: 6
+      aura_spell_max: 15
+      share_max: 0.18
+
+  elves:
+    label: Elf tribal
+    roles: [subtype_payoff, subtype_creature]
+    defaults:
+      subtype: Elf
+      payoff_creature_min: 5
+      share_max: 0.25
+
+  artifacts:
+    label: Artifacts matter
+    roles: [artifact_spell, artifact_payoff]
+    defaults:
+      artifact_min: 8
+      share_max: 0.22
+
+  sacrifice:
+    label: Sacrifice / aristocrats
+    roles: [outlet, fodder, payoff]
+    defaults:
+      outlet_min: 2
+      payoff_min: 3
+      fodder_min: 8
