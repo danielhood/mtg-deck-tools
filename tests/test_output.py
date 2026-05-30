@@ -103,13 +103,14 @@ def test_format_commander_list_item() -> None:
     item = format_commander_list_item(
         {
             "name": "Yawgmoth, Thran Physician",
+            "type_line": "Legendary Creature — Human Cleric",
             "scryfall_uri": "https://scryfall.com/card/mh1/116/yawgmoth-thran-physician",
             "price_usd": 12.34,
             "price_known": True,
             "released_at": "2019-06-14",
         }
     )
-    assert "[Yawgmoth, Thran Physician]" in item
+    assert "[Yawgmoth, Thran Physician - Legendary Creature — Human Cleric]" in item
     assert "**Price:** $12.34" in item
     assert "**Released:** June 14, 2019" in item
 
@@ -129,7 +130,7 @@ def test_format_card_detail_title_links_scryfall() -> None:
         image_uri=None,
     )
     assert format_card_detail_title(linked) == (
-        "[Sol Ring](https://scryfall.com/card/a25/232/sol-ring)"
+        "[Sol Ring - Artifact](https://scryfall.com/card/a25/232/sol-ring)"
     )
     assert format_card_detail_title(
         DeckCard(
@@ -145,7 +146,7 @@ def test_format_card_detail_title_links_scryfall() -> None:
             scryfall_uri=None,
             image_uri=None,
         )
-    ) == "Forest (9×)"
+    ) == "Forest - Basic Land — Forest (9×)"
 
 
 def test_format_card_power_toughness() -> None:
@@ -281,6 +282,7 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
         commanders=[
             {
                 "name": "Test Commander",
+                "type_line": "Legendary Creature — Human",
                 "oracle_id": "cmd",
                 "color_identity": ["G"],
                 "scryfall_uri": "https://scryfall.com/card/test/commander",
@@ -294,7 +296,9 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     )
 
     text = md_path.read_text(encoding="utf-8")
+    assert "**Commander:** Test Commander - Legendary Creature — Human" in text
     assert "**Color identity:** Green" in text
+    assert "- Llanowar Elves - Creature — Elf Druid ($1.25)" in text
     assert "**Themes:** Token creation, Equipment and aura support" in text
     assert "**Include mechanics:** Flying" in text
     assert "**Avoid mechanics:** Reach" in text
@@ -307,10 +311,10 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     assert "**Price:** $5.00" in text.split("## Commander")[1].split("## Validation")[0]
     assert "**Released:** January 15, 2020" in text
     assert "## Card details" in text
-    assert "#### [Llanowar Elves](https://scryfall.com/card/lea/258/llanowar-elves)" in text
+    assert "#### [Llanowar Elves - Creature — Elf Druid](https://scryfall.com/card/lea/258/llanowar-elves)" in text
     assert "**Price:** $1.25" in text
     assert "**Released:** October 4, 1993" in text
     assert "**Power/Toughness:** 1/1" in text
     assert "**Mana cost:** (G)" in text
     assert "**Description:** **Tap**: Add (G)." in text
-    assert "#### Forest (98×)" in text
+    assert "#### Forest - Basic Land — Forest (98×)" in text

@@ -29,9 +29,10 @@ def test_format_commander_choice_includes_price_and_date() -> None:
         price_usd=8.5,
         price_known=True,
         released_at="2019-06-14",
+        type_line="Legendary Creature — Human Cleric",
     )
     label = format_commander_choice(cmd)
-    assert "Yawgmoth, Thran Physician (B)" in label
+    assert "Yawgmoth, Thran Physician - Legendary Creature — Human Cleric (B)" in label
     assert "$8.50" in label
     assert "June 14, 2019" in label
     assert "EDHREC #42" in label
@@ -69,5 +70,7 @@ def test_search_commanders_loads_price_and_date(commander_db: sqlite3.Connection
     assert results[0].price_usd == 3.25
     assert results[0].price_known is True
     assert results[0].released_at == "2020-03-15"
+    assert results[0].type_line == "Legendary Creature"
     assert "$3.25" in format_commander_choice(results[0])
+    assert "Test Commander - Legendary Creature" in format_commander_choice(results[0])
     assert "March 15, 2020" in format_commander_choice(results[0])

@@ -13,6 +13,8 @@ from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
 from mtg_deck_tools.builder.mana_symbols import format_mana_notation
 from mtg_deck_tools.formatting import (
+    format_card_name_with_type,
+    format_card_price_range_display,
     format_display_date,
     format_price_display,
     format_released_at_display,
@@ -135,15 +137,15 @@ def format_card_price(card: DeckCard) -> str:
 
 def format_commander_list_item(cmd: dict) -> str:
     """Single commander bullet with Scryfall link, price, and release date."""
-    name = cmd["name"]
+    display = format_card_name_with_type(cmd["name"], cmd.get("type_line"))
     if cmd.get("scryfall_uri"):
-        name = f"[{name}]({cmd['scryfall_uri']})"
+        display = f"[{display}]({cmd['scryfall_uri']})"
     price = format_price_display(
         price_known=bool(cmd.get("price_known")),
         price_usd=cmd.get("price_usd"),
     )
     released = format_released_at_display(cmd.get("released_at"))
-    return f"- {name} — **Price:** {price} · **Released:** {released}"
+    return f"- {display} — **Price:** {price} · **Released:** {released}"
 
 
 def format_card_mana_cost(card: DeckCard) -> str:
@@ -173,7 +175,7 @@ def format_card_power_toughness(card: DeckCard) -> str:
 def format_card_detail_title(card: DeckCard) -> str:
     """Card name for the details heading, linked to Scryfall when URI is known."""
     qty = f" ({card.quantity}×)" if card.quantity > 1 else ""
-    title = f"{card.name}{qty}"
+    title = format_card_name_with_type(card.name, card.type_line) + qty
     if card.scryfall_uri:
         return f"[{title}]({card.scryfall_uri})"
     return title
@@ -252,8 +254,10 @@ def write_deck_outputs(
     generated_at = datetime.now(UTC)
     generated_at_iso = generated_at.isoformat()
     generated_at_display = format_generated_timestamp(generated_at)
-    commander_names = ", ".join(c["name"] for c in commanders)
-    slug = _slugify(commander_names.split(",")[0])
+    commander_names = ", ".join(
+        format_card_name_with_type(c["name"], c.get("type_line")) for c in commanders
+    )
+    slug = _slugify(commanders[0]["name"] if commanders else "deck")
     timestamp = generated_at.strftime("%Y%m%d%H%M%S")
     out_base = base_path.parent / f"{slug}-{timestamp}"
     out_base.parent.mkdir(parents=True, exist_ok=True)
@@ -312,6 +316,12 @@ def write_deck_outputs(
             f"**Budget cap:** ${criteria.budget_usd:.2f} · "
             f"**Estimated maindeck:** ${maindeck.budget_spent:.2f}"
         )
+    price_range = format_card_price_range_display(
+        min_usd=criteria.card_price_min_usd,
+        max_usd=criteria.card_price_max_usd,
+    )
+    if price_range:
+        lines.append(f"**Card price range:** {price_range}")
     lines.append(f"**Generated:** {generated_at_display}")
     lines.append(f"**Seed:** {criteria.seed if criteria.seed is not None else 'random'}")
     if criteria.themes:
@@ -391,7 +401,8 @@ def write_deck_outputs(
                 if card.price_known and card.price_usd is not None
                 else ""
             )
-            lines.append(f"- {qty}{card.name}{price}")
+            display = format_card_name_with_type(card.name, card.type_line)
+            lines.append(f"- {qty}{display}{price}")
         lines.append("")
 
     lines.extend(

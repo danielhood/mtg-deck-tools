@@ -6,7 +6,11 @@ import json
 import sqlite3
 from dataclasses import dataclass
 
-from mtg_deck_tools.formatting import format_price_display, format_released_at_display
+from mtg_deck_tools.formatting import (
+    format_card_name_with_type,
+    format_price_display,
+    format_released_at_display,
+)
 
 
 @dataclass(frozen=True)
@@ -19,16 +23,18 @@ class CommanderRow:
     price_usd: float | None = None
     price_known: bool = False
     released_at: str | None = None
+    type_line: str = ""
 
 
 def format_commander_choice(cmd: CommanderRow) -> str:
     """Label for commander selection prompts."""
+    label = format_card_name_with_type(cmd.name, cmd.type_line)
     colors = ", ".join(cmd.color_identity) or "colorless"
     price = format_price_display(price_known=cmd.price_known, price_usd=cmd.price_usd)
     released = format_released_at_display(cmd.released_at)
     rank = f" · EDHREC #{cmd.edhrec_rank}" if cmd.edhrec_rank else ""
     partner = f" · {cmd.partner_kind}" if cmd.partner_kind else ""
-    return f"{cmd.name} ({colors}) · {price} · {released}{rank}{partner}"
+    return f"{label} ({colors}) · {price} · {released}{rank}{partner}"
 
 
 def _row_to_commander(row: sqlite3.Row) -> CommanderRow:
@@ -41,6 +47,7 @@ def _row_to_commander(row: sqlite3.Row) -> CommanderRow:
         price_usd=row["price_usd"],
         price_known=bool(row["price_known"]),
         released_at=row["released_at"],
+        type_line=row["type_line"] or "",
     )
 
 
@@ -53,7 +60,7 @@ def search_commanders(
 ) -> list[CommanderRow]:
     """Find commander-eligible cards matching color filter and optional name substring."""
     sql = """
-        SELECT oracle_id, name, color_identity, partner_kind, edhrec_rank,
+        SELECT oracle_id, name, type_line, color_identity, partner_kind, edhrec_rank,
                price_usd, price_known, released_at
         FROM cards
         WHERE commander_eligible = 1
@@ -74,7 +81,7 @@ def search_commanders(
 def fetch_commander(conn: sqlite3.Connection, oracle_id: str) -> CommanderRow | None:
     row = conn.execute(
         """
-        SELECT oracle_id, name, color_identity, partner_kind, edhrec_rank,
+        SELECT oracle_id, name, type_line, color_identity, partner_kind, edhrec_rank,
                price_usd, price_known, released_at
         FROM cards
         WHERE oracle_id = ? AND commander_eligible = 1

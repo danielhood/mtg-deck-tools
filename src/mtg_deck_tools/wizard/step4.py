@@ -8,6 +8,7 @@ from pathlib import Path
 import questionary
 from rich.panel import Panel
 
+from mtg_deck_tools.formatting import format_card_name_with_type
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import DEFAULT_DB_PATH
 from mtg_deck_tools.wizard.commanders import (
@@ -74,7 +75,8 @@ def _prompt_add_partner(commander: CommanderRow) -> bool:
     if not commander.partner_kind:
         return False
     choice = questionary.confirm(
-        f"{commander.name} supports partners. Add a second commander?",
+        f"{format_card_name_with_type(commander.name, commander.type_line)} supports partners. "
+        "Add a second commander?",
         default=False,
         style=WIZARD_STYLE,
     ).ask()
