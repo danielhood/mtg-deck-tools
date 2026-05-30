@@ -124,6 +124,7 @@ Checked off all items in [01-goals-and-scope.md](01-goals-and-scope.md) after do
 | --- | --- | --- |
 | Card dependency engine | Tutor targets, type payoffs, energy produce/consume balance; preprocess + validate | [10-card-dependency-engine.md](10-card-dependency-engine.md) |
 | Dependency UX / control model | Focus presets, producer/consumer bands, feedback, swap workflow; `dependency-profiles.yaml` | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
+| Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck; needs D0.5 + D1–D4 | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
 | Local web / desktop UI | Reuse Python core | [06-open-questions.md](06-open-questions.md) |

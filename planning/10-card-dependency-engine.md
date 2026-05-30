@@ -305,11 +305,27 @@ Defer until warn-only mode is trustworthy.
 
 ---
 
+## D0.5 — Inventory audit (feasibility for restrictions)
+
+Before tightening **wizard restrictions** or default thresholds, run a read-only scan over commander-legal cards in `cards.db` (same patterns as D1).
+
+| Output | Purpose |
+| --- | --- |
+| Pattern hit counts + examples | Prioritize which atoms to implement |
+| `profile_counts_by_ci` (companion table or JSON) | Layer-1 wizard: disable focus presets with no pool support |
+| `predicate_target_counts` | Tutor feasibility per search predicate × color identity |
+| False-positive review queue | Do not hard-disable UI until confidence is high |
+
+Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) (UX6). The audit can ship as `dependency-audit` CLI or import sidecar without enabling generate-time strict mode.
+
+---
+
 ## Implementation phases
 
 | Phase | Deliverable | Acceptance |
 | --- | --- | --- |
 | **D0 — Spec** | This doc + `effect-patterns.yaml` skeleton + atom schema | Reviewed taxonomy of 10–15 high-value patterns |
+| **D0.5 — Audit** | Inventory reports + feasibility indexes | Profile list and thresholds updated with evidence |
 | **D1 — Extract** | Import writes `card_effects` for tutors, `{E}`, simple type triggers | Golden tests; re-import updates atoms |
 | **D2 — Validate** | Post-build report in MD/JSON (warn only) | Known bad list (e.g. elf lord + 2 elves) flags warning |
 | **D3 — Score** | Scorer uses deck_stats during fill | Energy deck gets ≥1 `{E}` payoff without manual include |

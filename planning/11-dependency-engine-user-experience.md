@@ -358,6 +358,166 @@ Engine requirements for swaps:
 | **UX3** | `criteria` linter warnings in wizard | D2 + profiles |
 | **UX4** | `.deck.json` per-card `dependency_roles` | D2 |
 | **UX5** | Local web: dependency dashboard + swap | D5 + API wrapper |
+| **UX6** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
+
+---
+
+## Progressive constraints during deck building (parked — plan now, ship later)
+
+**Goal (future):** As the user moves through criteria collection and (eventually) interactive deck construction, **narrow valid choices** so they cannot easily commit to combinations that the dependency engine would flag — or that the card pool cannot support in their colors.
+
+**Is this the right time?**
+
+| Action | Timing | Rationale |
+| --- | --- | --- |
+| **Add to the plan** (interaction model, phases, data prerequisites) | **Now** | Shapes `card_effects` schema, inventory audit, and criteria fields before code hardens |
+| **Implement restrictive wizard UI** | **Not yet** | Needs reliable atoms, inventory-backed feasibility tables, and warn-only calibration first |
+| **Implement generate-time pool restriction** | **After D2–D3** | Same engine as post-build report; start warn-only, then opt-in strict |
+| **Full “dependency tree” UI** | **After UX5+** | Rich UI for hierarchy visualization and per-node overrides |
+
+Treat progressive constraints as **UX6**, dependent on **D0.5 inventory audit** and **D1–D4** — not a v1 wizard change.
+
+### Three layers of “restriction” (do not conflate)
+
+```mermaid
+flowchart TB
+  L1[Layer 1 - Criteria feasibility]
+  L2[Layer 2 - Slot fill pool]
+  L3[Layer 3 - Post-build / edit]
+  L1 -->|colors commander themes focus| L2
+  L2 -->|each card pick updates deck_stats| L3
+```
+
+| Layer | When | What gets restricted | Inventory data needed |
+| --- | --- | --- | --- |
+| **1 — Criteria feasibility** | Wizard steps 1–5 (and future step 2b) | Disable or warn on theme/mechanic/focus combos that **cannot** be satisfied in chosen colors | Per-CI counts: e.g. `energy_producer` cards in `WUBRG`, aura spells in `GW` |
+| **2 — Slot fill** | `generate` / future interactive builder | Remove or deprioritize candidates that **worsen** open dependencies (tutor with 0 targets in partial deck) | `card_effects` + running `deck_stats` + remaining pool |
+| **3 — Post-build edit** | `--from`, `--refill-slot`, swap UI | Limit replacements that break satisfied rules | Full deck + same as layer 2 |
+
+Layer 1 can use **precomputed inventory aggregates** (no deck yet). Layers 2–3 need the **dependency engine** and trustworthy extraction.
+
+### Constraint hierarchy (order of precedence)
+
+When multiple rules apply, evaluate in this order (highest wins first):
+
+| Priority | Source | Example restriction |
+| ---: | --- | --- |
+| 1 | **Comprehensive Rules / format** | Singleton, CI, 903.5d — already in pool |
+| 2 | **Explicit user avoid** | `avoid_mechanics` — hard exclude |
+| 3 | **Budget / availability** | `--strict-budget`, `--prefer-available` |
+| 4 | **Explicit user include** | Boost, do not auto-disable include tag |
+| 5 | **Dependency strict mode** | No tutor without target in deck+commander |
+| 6 | **Mechanic focus floors/ceilings** | Cannot select `engine` energy if CI has &lt; N producers in pool |
+| 7 | **Dependency warn-only** | Allow selection but show inline warning |
+| 8 | **Scoring preferences** | Soft nudge only |
+
+**Plan implication:** Progressive UI must respect **user include** over automatic dependency narrowing unless user enables strict mode or acknowledges a conflict.
+
+### “Dependency tree” vs rule list
+
+Colloquial “dependency tree” maps to:
+
+| Concept | Implementation |
+| --- | --- |
+| **Nodes** | Committed criteria + commander + cards in partial deck |
+| **Edges** | Rules triggered by atoms on cards (tutor → needs Aura in deck) |
+| **Hierarchy** | Rule priority table above + profile parent/child (e.g. `aura_support` ⊃ `SEARCH_FOR` Aura) |
+
+A literal tree UI is **optional** (web). Minimum viable product is a **flat list of active constraints** with status (satisfied / at risk / violated) updating after each wizard answer or card pick.
+
+### Inventory companion data for accurate restriction
+
+Operate on the main inventory (`cards.db` after import) to build **feasibility indexes** (companion tables or gitignored audit JSON):
+
+| Dataset | Used for |
+| --- | --- |
+| `profile_counts_by_ci` | “Energy focused” greyed out in mono-R if producers &lt; floor |
+| `predicate_target_counts` | Tutor for Aura: count aura spells legal in CI |
+| `role_counts_by_ci` | producer/consumer counts per profile per color identity |
+| `commander_implied_profiles` | Auto-suggest focus when commander extracts Elf lord, enchantress, etc. |
+| `confidence_by_pattern` | Only **hard-disable** wizard options when extraction confidence ≥ threshold |
+
+See **D0.5 inventory audit** in [10-card-dependency-engine.md](10-card-dependency-engine.md) — restriction quality is bounded by audit accuracy.
+
+### UI interaction patterns (parked — specify now)
+
+These apply to **CLI wizard**, future **local web**, and **interactive refill** alike. Use a shared `ConstraintState` model in the core library; shells only render it.
+
+#### Restriction strength (per option)
+
+| Mode | UX behavior | Default phase |
+| --- | --- | --- |
+| **hidden** | Option not shown | Strict + high-confidence rule only |
+| **disabled** | Visible, cannot select; short reason | Layer 1 feasibility (later UX6) |
+| **warn** | Selectable; confirmation prompt | UX3 linter, early UX6 |
+| **info** | Selectable; badge “needs payoffs” | UX2 focus presets |
+| **off** | No restriction | Until dependency engine enabled |
+
+**Escape hatch (required):** “Show incompatible options” / `--no-progressive-constraints` so experts are not blocked by false positives.
+
+#### Wizard step behaviors (future UX6)
+
+Current order: themes → mechanics → colors → commander → budget ([`wizard/run.py`](../src/mtg_deck_tools/wizard/run.py)).
+
+| Step | Progressive behavior (when enabled) |
+| --- | --- |
+| **1 — Themes / slots** | Warn if theme implies profile (tokens + aristocrats) that shares `max_themed_share` |
+| **2 — Include / avoid** | Disable include tags with **zero** matching cards in pool (all colors) or later in chosen CI |
+| **2b — Mechanic focus** | Disable `engine` if `profile_counts_by_ci` below floor; suggest `supported` |
+| **3 — Colors** | Recompute feasibility; disable focuses that fail in this CI |
+| **4 — Commander** | Merge commander atoms into implied profiles; narrow mechanics (“your commander wants auras”) |
+| **5 — Budget** | Warn if strict budget makes focus floors unreachable (inventory + price histogram) |
+| **After wizard** | `criteria_warnings` + optional “Fix” loop before `generate` |
+
+**Open product question:** Reorder to **colors → commander → themes → mechanics** so layer-1 restrictions use CI + commander earlier. Defer reorder until UX6; document as breaking wizard UX change.
+
+#### During generate (layer 2 — not wizard, but same mental model)
+
+| Behavior | Strict off | Strict on |
+| --- | --- | --- |
+| Tutor in ramp slot with 0 targets in deck+commander | Pick allowed; post-build warn | Candidate excluded from pool |
+| Energy producer when consumers = 0 | Allowed; warn | Penalize heavily or exclude |
+| Profile over `share_max` | Allowed; warn | Deprioritize matching tags |
+
+This is **D3–D4** engine work; UI “restriction” here is the generator silently narrowing picks unless user passes `--strict-dependencies`.
+
+#### Interactive deck build (future, beyond batch generate)
+
+| Interaction | Description |
+| --- | --- |
+| **Constraint panel** | Live list: “Need ≥2 energy payoffs (0 now)” |
+| **Pick preview** | Hover card → “Would add 1 producer; still need 2 consumers” |
+| **Slot lock** | User locks “aura package”; refill only swaps within profile |
+| **Undo** | Revert pick; recompute `ConstraintState` |
+
+Batch CLI `generate` may never expose pick-by-pick UI; `.deck.json` reload + `--refill-slot` is the interim.
+
+### What to build before restricting choices
+
+| Prerequisite | Why |
+| --- | --- |
+| D0.5 inventory audit | Know which profiles exist in pool and per-CI |
+| D1 `card_effects` | Atoms for predicates and roles |
+| D2 warn-only report | Calibrate false positive rate before disabling UI options |
+| Golden tests on patterns | Avoid hiding valid commander strategies |
+| `ConstraintState` API in core | One module consumed by wizard, filler, web |
+
+### Phased delivery for progressive constraints
+
+| Sub-phase | User-visible | Restricts? |
+| --- | --- | --- |
+| **UX3** | End-of-wizard warnings; user confirms | No — warn only |
+| **UX6a** | Disable wizard options with **zero** pool support in CI (high confidence) | Yes — layer 1, narrow |
+| **UX6b** | `--strict-dependencies` on generate | Yes — layer 2 |
+| **UX6c** | Reorder wizard; commander-driven suggestions | Yes — layer 1 enriched |
+| **UX7** | Web constraint panel + pick preview | Yes — layers 2–3 interactive |
+
+### Success criteria (when UX6 ships)
+
+- With progressive constraints **on** and strict **off**, user never sees a disabled option unless pool count in CI is 0 for that tag/profile.
+- With strict **on**, generated deck has no `fail` rows in `dependency_report` for enabled rule classes.
+- User can always override via escape hatch or by lowering focus / disabling profile.
+- Every disabled/warn state cites `rule_id` + count (“only 1 Aura spell legal in UWR”).
 
 ---
 
