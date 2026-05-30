@@ -7,6 +7,9 @@ import random
 import sqlite3
 from pathlib import Path
 
+from mtg_deck_tools.builder.budget_backfill import _deck_budget_spent
+from mtg_deck_tools.builder.dependency_repair import repair_dependency_issues
+from mtg_deck_tools.builder.dependency_scoring import card_effects_enabled
 from mtg_deck_tools.builder.filler import fill_deck
 from mtg_deck_tools.builder.output import write_deck_outputs
 from mtg_deck_tools.rules.dependencies import dependency_messages, validate_dependencies
@@ -45,6 +48,23 @@ def _fetch_commanders(
     ).fetchall()
     by_id = {row["oracle_id"]: row for row in rows}
     return [by_id[oid] for oid in oracle_ids if oid in by_id]
+
+
+def _commander_theme_tags(
+    conn: sqlite3.Connection,
+    commander_oracle_ids: list[str],
+) -> set[str]:
+    if not commander_oracle_ids:
+        return set()
+    placeholders = ",".join("?" * len(commander_oracle_ids))
+    rows = conn.execute(
+        f"""
+        SELECT tag FROM card_mechanic_tags
+        WHERE oracle_id IN ({placeholders})
+        """,
+        commander_oracle_ids,
+    ).fetchall()
+    return {row["tag"] for row in rows}
 
 
 def _pick_commander(
@@ -88,6 +108,7 @@ def run_generate(
     output_dir: Path | None = None,
     strict_budget: bool = False,
     strict_dependencies: bool = False,
+    repair_dependencies: bool = False,
     prefer_available: bool = False,
 ) -> Path:
     """Build a full 99-card maindeck from criteria and write output files."""
@@ -168,6 +189,7 @@ def run_generate(
                 "seed": effective_seed,
                 "strict_budget": strict_budget or working.strict_budget,
                 "strict_dependencies": strict_dependencies or working.strict_dependencies,
+                "repair_dependencies": repair_dependencies or working.repair_dependencies,
                 "prefer_available": prefer_available or working.prefer_available,
             }
         )
@@ -179,6 +201,24 @@ def run_generate(
             commander_oracle_ids=[c["oracle_id"] for c in commanders],
             seed=effective_seed,
         )
+
+        if output_criteria.repair_dependencies and card_effects_enabled(conn):
+            repair = repair_dependency_issues(
+                conn,
+                maindeck.cards,
+                criteria=output_criteria,
+                identity=identity,
+                commanders=identity_rows,
+                commander_oracle_ids=set(output_criteria.commander_oracle_ids),
+                commander_theme_tags=_commander_theme_tags(
+                    conn, output_criteria.commander_oracle_ids
+                ),
+                strict=output_criteria.strict_dependencies,
+            )
+            if repair.swaps:
+                maindeck.cards = repair.cards
+                maindeck.warnings.extend(repair.messages)
+                maindeck.budget_spent = _deck_budget_spent(maindeck.cards)
 
         validation = validate_commander_deck(
             conn,

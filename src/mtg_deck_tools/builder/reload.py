@@ -7,8 +7,15 @@ import sqlite3
 from pathlib import Path
 
 from mtg_deck_tools.builder.deck_load import load_deck_json
+from mtg_deck_tools.builder.budget_backfill import _deck_budget_spent
+from mtg_deck_tools.builder.dependency_repair import repair_dependency_issues
+from mtg_deck_tools.builder.dependency_scoring import card_effects_enabled
 from mtg_deck_tools.builder.filler import fill_deck, refill_deck_slot
-from mtg_deck_tools.builder.generate import _fetch_commanders, _require_db
+from mtg_deck_tools.builder.generate import (
+    _commander_theme_tags,
+    _fetch_commanders,
+    _require_db,
+)
 from mtg_deck_tools.builder.output import write_deck_outputs
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import DEFAULT_DB_PATH, OUTPUT_DIR
@@ -79,6 +86,7 @@ def run_generate_from_deck(
     refill_slot: str | None = None,
     strict_budget: bool = False,
     strict_dependencies: bool = False,
+    repair_dependencies: bool = False,
     prefer_available: bool = False,
 ) -> Path:
     """Regenerate a deck from a .deck.json file (full rebuild or single-slot refill)."""
@@ -94,6 +102,7 @@ def run_generate_from_deck(
                 "seed": effective_seed,
                 "strict_budget": strict_budget or loaded.criteria.strict_budget,
                 "strict_dependencies": strict_dependencies or loaded.criteria.strict_dependencies,
+                "repair_dependencies": repair_dependencies or loaded.criteria.repair_dependencies,
                 "prefer_available": prefer_available or loaded.criteria.prefer_available,
             }
         )
@@ -137,6 +146,22 @@ def run_generate_from_deck(
                 commander_oracle_ids=commander_ids,
                 seed=effective_seed,
             )
+
+        if output_criteria.repair_dependencies and card_effects_enabled(conn):
+            repair = repair_dependency_issues(
+                conn,
+                maindeck.cards,
+                criteria=output_criteria,
+                identity=identity,
+                commanders=identity_rows,
+                commander_oracle_ids=set(commander_ids),
+                commander_theme_tags=_commander_theme_tags(conn, commander_ids),
+                strict=output_criteria.strict_dependencies,
+            )
+            if repair.swaps:
+                maindeck.cards = repair.cards
+                maindeck.warnings.extend(repair.messages)
+                maindeck.budget_spent = _deck_budget_spent(maindeck.cards)
 
         validation = validate_commander_deck(
             conn,

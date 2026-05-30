@@ -332,7 +332,7 @@ Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-de
 | **D2 — Validate** | Post-build report in MD/JSON (warn only) | Known bad list (e.g. elf lord + 2 elves) flags warning — **shipped** (`rules/dependencies.py`) |
 | **D3 — Score** | Scorer uses deck_stats during fill | Energy deck gets ≥1 `{E}` payoff without manual include — **shipped** (`builder/dependency_scoring.py`, `scorer.py`, `filler.py`) |
 | **D4 — Filter** | Optional strict mode excludes cards that create unfulfillable tutors | Tutor for Aura deck with 0 auras excluded at pick time — **shipped** (`--strict-dependencies`, `filter_strict_dependency_candidates`) |
-| **D5 — Repair** | Swap pass for top failure classes | One-click regen reduces warnings |
+| **D5 — Repair** | Swap pass for top failure classes | One-click regen reduces warnings — **shipped** (`--repair-dependencies`, `dependency_repair.py`) |
 
 **Suggested order:** D0 → D0.5 → D1 → D2 → D3 → D4 → D5.
 

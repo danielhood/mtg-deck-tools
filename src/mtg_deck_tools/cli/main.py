@@ -220,6 +220,13 @@ def generate_cmd(
             ),
         ),
     ] = False,
+    repair_dependencies: Annotated[
+        bool,
+        typer.Option(
+            "--repair-dependencies",
+            help="After fill, swap flex/synergy cards to fix dependency warnings when possible",
+        ),
+    ] = False,
     prefer_available: Annotated[
         bool,
         typer.Option(
@@ -305,6 +312,8 @@ def generate_cmd(
             patch["strict_budget"] = True
         if strict_dependencies:
             patch["strict_dependencies"] = True
+        if repair_dependencies:
+            patch["repair_dependencies"] = True
         if prefer_available:
             patch["prefer_available"] = True
         if criteria is None:
@@ -322,6 +331,7 @@ def generate_cmd(
                 refill_slot=refill_slot,
                 strict_budget=strict_budget,
                 strict_dependencies=strict_dependencies,
+                repair_dependencies=repair_dependencies,
                 prefer_available=prefer_available,
             )
         else:
@@ -337,6 +347,7 @@ def generate_cmd(
             if not stub:
                 kwargs["strict_budget"] = strict_budget
                 kwargs["strict_dependencies"] = strict_dependencies
+                kwargs["repair_dependencies"] = repair_dependencies
                 kwargs["prefer_available"] = prefer_available
             out = runner(**kwargs)
     except (FileNotFoundError, RuntimeError, ValueError) as exc:
