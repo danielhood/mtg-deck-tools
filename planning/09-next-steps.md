@@ -137,3 +137,5 @@ Checked off all items in [01-goals-and-scope.md](01-goals-and-scope.md) after do
 ## Suggested next task
 
 **Start with the card dependency engine** — tutor targets, type payoffs, and resource-balance checks. See [10-card-dependency-engine.md](10-card-dependency-engine.md).
+
+**Before D1 code:** work through [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) (D0, D0.5 inventory audit, locked decisions, output contract).
