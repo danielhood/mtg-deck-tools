@@ -1,0 +1,28 @@
+# Minimal matrix for CI (tiny slot template + in-memory test DB).
+
+schema_version: 1
+
+defaults:
+  seed: 42
+
+scenarios:
+  - id: mini-tokens
+    label: Mini tokens fill
+    commander_names: ["Test Commander"]
+    criteria:
+      themes: [tokens]
+      colors: [G]
+      commander_oracle_ids: [cmd-1]
+      slot_template:
+        ramp: 1
+        draw: 1
+        removal: 0
+        board_wipe: 0
+        synergy: 1
+        wincon: 0
+        flex: 0
+        lands: 2
+    expect:
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE]
+        max_inappropriate_warnings: 0

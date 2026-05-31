@@ -10,6 +10,8 @@ from rich.console import Console
 from rich.table import Table
 
 from mtg_deck_tools import __version__
+from mtg_deck_tools.analysis.matrix import DEFAULT_MATRIX_PATH
+from mtg_deck_tools.analysis.runner import run_analysis_suite
 from mtg_deck_tools.builder.generate import run_generate
 from mtg_deck_tools.builder.reload import run_generate_from_deck
 from mtg_deck_tools.builder.stub import run_generate_stub
@@ -365,6 +367,92 @@ def generate_cmd(
         console.print(f"[dim]Regenerated deck from {deck_from.name}.[/dim]")
     else:
         console.print("[dim]Full maindeck generated. Review warnings in the output files.[/dim]")
+
+
+analyze_app = typer.Typer(
+    help="Run repeatable deck validation and dependency analysis suites.",
+    no_args_is_help=True,
+)
+app.add_typer(analyze_app, name="analyze")
+
+
+@analyze_app.command("run")
+def analyze_run_cmd(
+    matrix: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--matrix",
+            help="Scenario matrix YAML (default: config/dogfood-matrix.yaml)",
+        ),
+    ] = None,
+    db_path: Annotated[
+        Optional[Path],
+        typer.Option("--db", help="SQLite database path"),
+    ] = None,
+    output_dir: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--output-dir",
+            "-o",
+            help="Report directory (default: output/analysis-<timestamp>)",
+        ),
+    ] = None,
+    write_decks: Annotated[
+        bool,
+        typer.Option(
+            "--write-decks",
+            help="Also write .deck.json and .md under <output-dir>/decks/",
+        ),
+    ] = False,
+    fail_on_expect: Annotated[
+        bool,
+        typer.Option(
+            "--fail-on-expect",
+            help="Exit 1 if any scenario fails its expect block",
+        ),
+    ] = False,
+) -> None:
+    """Generate decks from a matrix and write summary + per-case JSON reports."""
+    matrix_path = matrix or DEFAULT_MATRIX_PATH
+    if not matrix_path.exists():
+        console.print(f"[red]Matrix not found:[/red] {matrix_path}")
+        raise typer.Exit(1)
+
+    def progress(msg: str) -> None:
+        console.print(msg)
+
+    try:
+        result = run_analysis_suite(
+            matrix_path=matrix_path,
+            db_path=db_path,
+            output_dir=output_dir,
+            write_decks=write_decks,
+            progress=progress,
+        )
+    except FileNotFoundError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
+
+    s = result.summary
+    console.print(f"\n[green]Analysis complete.[/green] {result.output_dir}")
+    table = Table(title="Summary")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value")
+    table.add_row("Scenarios", str(s.scenario_count))
+    table.add_row("Expect passed", str(s.scenarios_passed))
+    table.add_row("Expect failed", str(s.scenarios_failed))
+    table.add_row("Errors", str(s.scenarios_errored))
+    table.add_row("Validation passed", str(s.validation_pass_count))
+    table.add_row("Dependency warnings", str(s.total_dependency_warnings))
+    table.add_row("Inappropriate (heuristic)", str(s.inappropriate_warning_count))
+    if s.false_positive_rate is not None:
+        table.add_row("False-positive rate", f"{s.false_positive_rate:.1%}")
+    console.print(table)
+    console.print(f"Summary: {result.summary_json_path}")
+    console.print(f"Markdown: {result.summary_md_path}")
+
+    if fail_on_expect and (s.scenarios_failed > 0 or s.scenarios_errored > 0):
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":

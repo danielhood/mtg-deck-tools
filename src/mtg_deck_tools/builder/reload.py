@@ -11,10 +11,10 @@ from mtg_deck_tools.builder.budget_backfill import _deck_budget_spent
 from mtg_deck_tools.builder.dependency_repair import repair_dependency_issues
 from mtg_deck_tools.builder.dependency_scoring import card_effects_enabled
 from mtg_deck_tools.builder.filler import fill_deck, refill_deck_slot
-from mtg_deck_tools.builder.generate import (
-    _commander_theme_tags,
-    _fetch_commanders,
-    _require_db,
+from mtg_deck_tools.builder.commander_resolve import (
+    commander_theme_tags,
+    fetch_commanders,
+    require_db,
 )
 from mtg_deck_tools.builder.output import write_deck_outputs
 from mtg_deck_tools.models.criteria import DeckCriteria
@@ -37,7 +37,7 @@ def _commander_rows_from_db(
     if not oracle_ids:
         raise ValueError("Deck file has no commander_oracle_ids.")
 
-    rows = _fetch_commanders(conn, oracle_ids)
+    rows = fetch_commanders(conn, oracle_ids)
     if len(rows) != len(oracle_ids):
         raise RuntimeError("Commander(s) from deck file not found in database. Re-run import.")
 
@@ -92,7 +92,7 @@ def run_generate_from_deck(
     """Regenerate a deck from a .deck.json file (full rebuild or single-slot refill)."""
     loaded = load_deck_json(deck_path)
     db = db_path or DEFAULT_DB_PATH
-    conn = _require_db(db)
+    conn = require_db(db)
     slot_config = load_slot_template_config()
 
     try:
@@ -155,7 +155,7 @@ def run_generate_from_deck(
                 identity=identity,
                 commanders=identity_rows,
                 commander_oracle_ids=set(commander_ids),
-                commander_theme_tags=_commander_theme_tags(conn, commander_ids),
+                commander_theme_tags=commander_theme_tags(conn, commander_ids),
                 strict=output_criteria.strict_dependencies,
             )
             if repair.swaps:
