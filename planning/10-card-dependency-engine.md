@@ -8,7 +8,7 @@ This is distinct from:
 | --- | --- | --- |
 | **Construction legality** | Is the 100-card list legal in Commander? (CI, singleton, 903.5d, …) | Shipped — `rules/validate.py`, pool filters |
 | **Archetype / slot fit** | Is this card on-theme for ramp / draw / tokens? | Shipped — `mechanic-taxonomy.yaml`, slot filler, scorer |
-| **Card dependencies** (this doc) | If I play A, does the deck contain B (or enough Bs) that A’s text actually works? | **Not started** |
+| **Card dependencies** (this doc) | If I play A, does the deck contain B (or enough Bs) that A’s text actually works? | **Shipped (D0–D5)** — `effects/`, `rules/dependencies.py`, `--strict-dependencies`, `--repair-dependencies` |
 
 ---
 
@@ -384,7 +384,7 @@ Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-de
 User-facing mechanics (energy focus, aura density, dominance caps, strict vs warn-only, future swap workflows) are specified in **[11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)**. That doc defines:
 
 - `config/dependency-profiles.yaml` — default min/max and share targets per mechanic profile
-- Planned `DeckCriteria` extensions (`mechanic_focus`, `dependency_preferences`)
+- `DeckCriteria` extensions (`strict_dependencies`, `repair_dependencies`; `mechanic_focus` planned for UX2)
 - `dependency_report` shape for Markdown Notes and future UI
 
 Engine implementation should read profile thresholds from YAML rather than hard-coding counts, so CLI and future web UI share one source of truth.
@@ -416,4 +416,4 @@ Engine implementation should read profile thresholds from YAML rather than hard-
 - [03-problem-decomposition.md](03-problem-decomposition.md) — tagging vs filtering
 - [05-technology-options.md](05-technology-options.md) — why not full rules engine
 - [08-card-availability.md](08-card-availability.md) — similar preprocess + score pattern
-- [09-next-steps.md](09-next-steps.md) — slot for Phase 4+ backlog entry
+- [09-next-steps.md](09-next-steps.md) — active backlog (dependency UX, export, UI)

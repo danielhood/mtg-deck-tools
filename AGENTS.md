@@ -20,7 +20,7 @@ From repo root:
 
 ```bash
 source .venv/bin/activate   # after update script creates .venv
-pytest                      # 116 tests; uses in-memory SQLite, no Scryfall file
+pytest                      # 142 tests; uses in-memory SQLite, no Scryfall file
 ruff check src tests        # configured in pyproject.toml; ruff is not a declared dev dep — pip install ruff if needed
 ```
 

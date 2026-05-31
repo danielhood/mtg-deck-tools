@@ -2,6 +2,8 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [10-card-dependency-engine.md](10-card-dependency-engine.md).
 
+**Status (2026-05-31):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2** (wizard synergy strictness + `mechanic_focus` presets) is the next milestone — see [09-next-steps.md](09-next-steps.md).
+
 This document is intentionally **UI-agnostic at the core** (criteria + reports in `.deck.json`) but evaluates **terminal CLI vs richer UI** per interaction type, and defines schema hooks the engine must support so any future shell can reuse the same logic.
 
 ---
@@ -559,7 +561,7 @@ Decisions here should **constrain** doc 10 implementation early:
 
 ## References
 
-- [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) — gate before D1+ engine code
+- [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) — D0–D5 gate (complete); dogfood acceptance open
 - [10-card-dependency-engine.md](10-card-dependency-engine.md) — atoms, rules, D0–D5
 - [07-deck-output-format.md](07-deck-output-format.md) — `.deck.json` schema
 - [04-architecture-options.md](04-architecture-options.md) — CLI vs web vs desktop

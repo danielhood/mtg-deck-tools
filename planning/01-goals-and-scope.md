@@ -75,7 +75,7 @@ Dogfood pass (`seed=42`, five commanders, varied budgets) — outputs under `out
 | Yawgmoth, Thran Physician | $150 | $5/card max, aristocrats | **PASSED** | $93.49 |
 | Dragonlord Dromoka | none | — | **PASSED** | $374.80 |
 
-Also verified: `.deck.json` full regen and `--refill-slot synergy`; 116 automated tests passing. Known edge case: very thin pools (e.g. mono-B + prefer-available + narrow themes) can under-fill slots — use `--strict-budget` / relax availability filters or broaden themes.
+Also verified: `.deck.json` full regen and `--refill-slot synergy`; 142 automated tests passing. Known edge case: very thin pools (e.g. mono-B + prefer-available + narrow themes) can under-fill slots — use `--strict-budget` / relax availability filters or broaden themes.
 
 ## User workflow
 

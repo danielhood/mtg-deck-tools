@@ -112,6 +112,10 @@ mtg-deck-tools generate --wizard --seed 42
 mtg-deck-tools generate --from output/my-deck-20260530.deck.json --seed 42
 mtg-deck-tools generate --from output/my-deck-20260530.deck.json --refill-slot synergy --seed 42
 
+# Stricter synergy: filter dead tutors at pick time, or repair after fill
+mtg-deck-tools generate --wizard --seed 42 --strict-dependencies
+mtg-deck-tools generate --from output/my-deck.deck.json --repair-dependencies --seed 42
+
 # Phase 1 stub preview only (sample synergy cards)
 mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 ```
@@ -130,7 +134,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 
 The builder fills a **99-card maindeck** (commander is separate) using **slots**: fixed-size buckets such as ramp, draw, removal, synergy, lands, and so on. Default counts live in [`config/slot-templates.yaml`](config/slot-templates.yaml) (e.g. 30 synergy, 31 lands); the wizard can change them within bounds, and the saved `.deck.json` stores the template under `criteria.slot_template`.
 
-Each slot is filled from `data/cards.db` using color identity, theme tags, mechanic tags, budget, and scoring. After nonland slots are filled, **lands** are chosen to match the mana base plan. Outputs include validation notes, budget totals, and per-card detail in Markdown.
+Each slot is filled from `data/cards.db` using color identity, theme tags, mechanic tags, budget, and scoring. After nonland slots are filled, **lands** are chosen to match the mana base plan. A **dependency pass** (when `card_effects` is populated after `import`) scores picks during fill, validates cross-card synergy after the build, and can optionally filter or repair gaps (tutor targets, energy balance, type payoffs). Outputs include validation notes, a **Deck dependencies** section, budget totals, and per-card detail in Markdown.
 
 #### Fresh generate (no `--from`)
 
@@ -141,6 +145,8 @@ Each slot is filled from `data/cards.db` using color identity, theme tags, mecha
 | `--themes` | Comma-separated archetype tags, e.g. `tokens,aristocrats`. |
 | `--seed` | RNG seed for reproducible picks (also stored in criteria). |
 | `--strict-budget` | Exclude cards with no Scryfall price and enforce the budget cap during fill. |
+| `--strict-dependencies` | Exclude cards at pick time that would create unfulfillable tutors or one-sided resource loops (requires `card_effects` from `import`). |
+| `--repair-dependencies` | After fill, swap cards to fix dependency warnings (tutor targets, energy consumers, type support). |
 | `--prefer-available` | Exclude cards below the import-time availability score (25th percentile). Uses scores from the current `cards.db` snapshot. |
 | `--card-price-min` / `--card-price-max` | Per-card USD floor/ceiling when picking cards. |
 | `--min-rarity` | Minimum rarity (`common`, `uncommon`, `rare`, `mythic`; default `common`). |
@@ -197,6 +203,8 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 | --- | --- |
 | `--seed` | Overrides `criteria.seed` for this run. |
 | `--strict-budget` | Applied unless already set in the file’s criteria. |
+| `--strict-dependencies` | Applied unless already set in the file’s criteria. |
+| `--repair-dependencies` | Applied unless already set in the file’s criteria. |
 | `--prefer-available` | Applied unless already set in the file’s criteria. |
 | `--wizard` | **Ignored** — wizard is not run; criteria come from the file. |
 | `--colors` / `--themes` | Ignored (identity and themes come from loaded criteria + commanders). |
@@ -211,8 +219,11 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 
 **Phase 3 (v1):** build-time legality filters, slot pool quality, `.deck.json` reload, availability scoring (`--prefer-available`, unpriced classification in Notes), and v1 success criteria closure — **complete** as of 2026-05-30.
 
+**Dependency engine (D0–D5):** effect extraction at import (`card_effects`), post-build `dependency_report` in Markdown/JSON, pick-time scoring (D3), `--strict-dependencies` (D4), and `--repair-dependencies` (D5) — **complete** as of 2026-05-31. Next: dogfood calibration and wizard UX for dependency controls — see [`planning/09-next-steps.md`](planning/09-next-steps.md).
+
 ## License
 
-Project code: see repository license when added.  
+Project code is licensed under the [MIT License](LICENSE).
+
 Magic: The Gathering and card data are © Wizards of the Coast.  
 Card data via [Scryfall](https://scryfall.com) is unofficial Fan Content permitted under the Wizards Fan Content Policy.

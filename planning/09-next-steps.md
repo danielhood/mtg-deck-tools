@@ -1,6 +1,6 @@
 # Next steps — post-v1
 
-Status as of 2026-05-30. **v1 is complete.** Phase 1, Phase 2, v1 polish, and **Phase 3 (§1–§5)** are **shipped**. Dogfood pass (`seed=42`, five commanders, varied budgets) confirms validation, budget, reload, and output polish — see [01-goals-and-scope.md](01-goals-and-scope.md#v1-closure-2026-05-30).
+Status as of 2026-05-31. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phase 3 (§1–§5)**, and the **card dependency engine (D0–D5)** are **shipped**. Dogfood pass (`seed=42`, five commanders, varied budgets) confirms validation, budget, reload, and output polish — see [01-goals-and-scope.md](01-goals-and-scope.md#v1-closure-2026-05-30).
 
 ## Current state
 
@@ -21,9 +21,15 @@ Status as of 2026-05-30. **v1 is complete.** Phase 1, Phase 2, v1 polish, and **
 | Taxonomy display names in MD header | Done |
 | Linux/bash setup in README | Done |
 | `.deck.json` reload / edit workflow | Done |
-| Post-validation repair pass | **Not started** — illegal picks are prevented at fill time; no swap-after-validate |
 | Slot pool quality (themed slot misfills) | Done |
 | Unpriced / availability handling | Done |
+| Effect extraction (`card_effects`) | Done — D1 import pass |
+| Dependency validation report | Done — D2 `dependency_report` in MD/JSON |
+| Pick-time dependency scoring | Done — D3 during slot fill |
+| `--strict-dependencies` | Done — D4 pick-time filter |
+| `--repair-dependencies` | Done — D5 post-build swap pass |
+| Wizard dependency controls (UX2) | **Not started** — CLI flags only today |
+| Dependency dogfood calibration | **In progress** — rules shipped; false-positive review pending |
 
 ## Dogfooding snapshot (v1 closure)
 
@@ -39,103 +45,131 @@ Latest pass: `output/dogfood-v1-closure/` (`seed=42`).
 | MD output | Card names + type line; Scryfall links; commander price/release; taxonomy display names |
 | Reload | **Works** — `--from` full regen and `--refill-slot synergy` verified |
 
+## Dogfooding snapshot (dependency engine)
+
+Early pass: `output/muldrotha-the-gravetide-20260530180919.md` (`seed=42`, tokens theme).
+
+| Area | Result |
+| --- | --- |
+| Validation | **PASSED** |
+| Dependency report | **WARNINGS** — `AURA_SUPPORT_MIN` (2 auras vs suggested min 6) on a tokens build |
+| Strict / repair flags | Available via CLI; not yet exposed in wizard |
+
+**Calibration note:** Profile rules (e.g. aura support) may warn on decks that did not opt into that mechanic — tune thresholds or scope rules to `mechanic_focus` / themes before UX2.
+
 ---
 
-## Phase 3 — recommended order
+## Phase 3 — complete
+
+All five Phase 3 items shipped 2026-05-30. Summary:
+
+| # | Item | Status |
+| --- | --- | --- |
+| 1 | Build-time legality filters (903.5d, land/nonland) | **Done** |
+| 2 | Slot pool quality (oracle guards, tag relaxation) | **Done** |
+| 3 | `.deck.json` reload / `--refill-slot` | **Done** |
+| 4 | Availability scoring, `--prefer-available`, unpriced classification | **Done** |
+| 5 | v1 success criteria closure | **Done** — 142 automated tests |
+
+Details and acceptance criteria remain in the sections below for reference.
 
 ### 1. Build-time legality filters — **Done**
 
-Shipped in `a8f2894`. Pool queries and post-filters now enforce:
-
-| Issue | Fix |
-| --- | --- |
-| **903.5d land colors** | `land_produces_only_identity()` filters land candidates to commander identity |
-| **Land vs nonland slot bleed** | `is_land_card()` + tightened SQL/post-filter excludes lands from nonland slots |
-| **Budget trim on lands** | Same identity checks applied during replacement search |
-
-**Acceptance met:** Dromoka W/G at `$150` produces validation **PASSED** without manual edits.
-
-**Deferred:** Optional post-validation repair (swap illegal cards after validate) — not needed while fill-time filters hold.
+Pool queries and post-filters enforce 903.5d land colors and land/nonland slot separation. Optional post-validation repair for illegal cards was deferred — fill-time filters hold.
 
 ### 2. Slot pool quality — **Done**
 
 Graduated tag relaxation, oracle guards, and slot-specific scoring reduce misfills when tagged pools are thin. Re-import after taxonomy changes to refresh `card_mechanic_tags`.
 
-| Slot | Fix |
-| --- | --- |
-| `board_wipe` | Tighter taxonomy matcher; oracle guard rejects equipment triggers (e.g. Worldslayer) |
-| `wincon` | Expanded taxonomy; themed fallback; penalize unpriced cards when budget set |
-| `draw` / `removal` | Oracle guards reject ramp rocks and mass removal in single-target slots |
-| `flex` | Prefer deck `themes` before falling back to any nonland |
-| `ramp` | Oracle guard excludes lands and off-theme picks from relaxed pool |
-
-**Acceptance:** Board wipe and wincon slots contain on-theme, priced cards for a standard GW voltron/landfall list.
-
 ### 3. `.deck.json` reload workflow — **Done**
-
-Reload criteria and commanders from a saved `.deck.json`, regenerate the full maindeck, or refill a single slot.
 
 ```bash
 mtg-deck-tools generate --from output/dragonlord-dromoka-....deck.json
 mtg-deck-tools generate --from deck.deck.json --refill-slot synergy --seed 42
 ```
 
-| Step | Scope | Status |
-| --- | --- | --- |
-| Load criteria + commanders from `.deck.json` | Read `criteria`, `commanders`, optional `seed` | **Done** |
-| Regenerate full deck | Skip wizard; call `run_generate_from_deck` | **Done** |
-| Regenerate one slot | `--refill-slot` keeps other slots fixed | **Done** |
-
-**Acceptance:** User can tweak `budget_usd`, `card_price_max_usd`, or `themes` in JSON and regenerate without re-running the wizard.
-
 ### 4. Unpriced / availability handling — **Done**
 
-Policy in [08-card-availability.md](08-card-availability.md). Import computes `availability_score` and stores `availability_p25` for filtering.
-
-| Step | Scope | Status |
-| --- | --- | --- |
-| **Per-card price range** | Wizard step 5 + CLI + fill-time filter | **Done** |
-| **`--strict-budget` in wizard** | Step 5 prompts when budget set (default: exclude unpriced) | **Done** |
-| **Availability score at import** | `released_at`, `edhrec_rank`, `reprint`, `set_type` → `availability_score` | **Done** |
-| **Output classification** | Notes group + stats: `likely_obscure` vs `price_pending` | **Done** |
-| **`--prefer-available`** | Filter below import-time p25; wizard default when budget set | **Done** |
-
-**Acceptance:** Budget wizard runs default to strict + prefer-available; null-price cards are classified in Notes; re-import refreshes scores.
+Policy in [08-card-availability.md](08-card-availability.md). Wizard step 5 defaults to strict + prefer-available when a budget is set.
 
 ### 5. v1 success criteria closure — **Done**
 
 Checked off all items in [01-goals-and-scope.md](01-goals-and-scope.md) after dogfood pass (five commanders, varied budgets, `seed=42`).
 
-| Commander | Budget | Validation | Notes |
-| --- | ---: | --- | --- |
-| Dragonlord Dromoka | $150 / $5 max | **PASSED** | GW landfall + voltron |
-| Jetmir, Nexus of Revels | $150 / $5 max | **PASSED** | Naya voltron |
-| Pantlaza, Sun-Favored | $75 / $3 max, strict | **PASSED** | Tight budget + prefer-available |
-| Yawgmoth, Thran Physician | $150 / $5 max | **PASSED** | Mono-B aristocrats |
-| Dragonlord Dromoka | none | **PASSED** | Uncapped sanity check |
+---
 
-**Acceptance met:** All v1 success criteria satisfied; 116 tests passing; `.deck.json` reload workflow verified.
+## Dependency engine — complete (D0–D5)
+
+Shipped 2026-05-30 / 2026-05-31. Technical phases in [10-card-dependency-engine.md](10-card-dependency-engine.md); pre-implementation gate in [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md).
+
+| Phase | Deliverable | CLI / module |
+| --- | --- | --- |
+| **D0** | Pattern spec + golden tests | `config/effect-patterns.yaml`, `effects/extract.py` |
+| **D0.5** | Inventory audit | `mtg-deck-tools dependency-audit` |
+| **D1** | Import writes `card_effects` | `import` command |
+| **D2** | Post-build report (warn default) | **Deck dependencies** in MD/JSON |
+| **D3** | Pick-time scoring | `dependency_scoring.py`, `scorer.py` |
+| **D4** | Strict pick-time filter | `--strict-dependencies` |
+| **D5** | Post-build repair swaps | `--repair-dependencies` |
+
+**v1 rules:** `TUTOR_TARGET_EXISTS`, `ENERGY_BALANCE`, `TYPE_SYNERGY_MIN`, `AURA_SUPPORT_MIN` — thresholds in [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml).
+
+**Maintainer workflow:** After bulk refresh, run `import` then `dependency-audit` to refresh `card_effects` and audit reports.
 
 ---
 
-## Backlog (post–Phase 3)
+## Active work — dependency UX and calibration
+
+Recommended order after D5:
+
+### 1. Dogfood acceptance (dependency rules)
+
+Manual review per [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md#dogfood-acceptance-after-d2):
+
+| Scenario | Pass? |
+| --- | --- |
+| Land tutor deck — no “no land” false warn | ☐ |
+| Energy producers, zero consumers — clear Energy note | ☐ |
+| Elf lord, &lt;5 elves — warning with suggested minimum | ☐ |
+| Enchantress / low aura count + aura tutor | ☐ |
+| Goodstuff deck — no spam warnings from arbitrary thresholds | ☐ |
+
+Set false-positive budget (e.g. &lt;5% warn rate on N hand-reviewed decks) before turning on strict mode by default.
+
+### 2. UX2 — wizard synergy controls
+
+From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md):
+
+- Wizard step or generate prompt for **synergy strictness** (`strict_dependencies`, `repair_dependencies`)
+- **Focus presets** (`mechanic_focus`: energy, auras) wired to `dependency-profiles.yaml`
+- Surface dependency summary during wizard review (optional)
+
+### 3. Rule scoping and threshold tuning
+
+- Scope profile rules to user intent (themes, `mechanic_focus`, include mechanics) — e.g. no `AURA_SUPPORT_MIN` on unrelated token builds
+- Review `AURA_SUPPORT_MIN` / `TYPE_SYNERGY_MIN` thresholds against audit evidence
+- Optional: `SUBTYPE_SYNERGY_MIN` (e.g. Elf lords) — deferred in checklist
+
+---
+
+## Backlog (post–dependency v1)
 
 | Topic | Notes | Doc |
 | --- | --- | --- |
-| Card dependency engine | Tutor targets, type payoffs, energy produce/consume balance; preprocess + validate | [10-card-dependency-engine.md](10-card-dependency-engine.md) |
-| Dependency UX / control model | Focus presets, producer/consumer bands, feedback, swap workflow; `dependency-profiles.yaml` | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
-| Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck; needs D0.5 + D1–D4 | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
+| Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
+| Dependency swap packages | `generate --swap-profile energy` — needs UX5 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
-| Local web / desktop UI | Reuse Python core | [06-open-questions.md](06-open-questions.md) |
+| Local web / desktop UI | Reuse Python core; dependency dashboard | [06-open-questions.md](06-open-questions.md) |
 | Image gallery / diff | Utility ops on `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
 | Parquet / faster import | Only if import time hurts | [05-technology-options.md](05-technology-options.md) |
 | DFC / adventure normalization | Risk in [03-problem-decomposition.md](03-problem-decomposition.md) | Import layer |
+| Post-validation CR repair | Swap illegal cards after validate | Deferred — fill-time filters sufficient today |
 
 ---
 
 ## Suggested next task
 
-**Start with the card dependency engine** — tutor targets, type payoffs, and resource-balance checks. See [10-card-dependency-engine.md](10-card-dependency-engine.md).
+**Complete dependency dogfood acceptance**, then **UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. In parallel, **scope aura/type profile rules** to user-selected themes so token and goodstuff decks do not inherit unrelated warnings.
 
-**Before D1 code:** work through [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) (D0, D0.5 inventory audit, locked decisions, output contract).
+See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX2 → UX3 criteria linter → UX5 local web).

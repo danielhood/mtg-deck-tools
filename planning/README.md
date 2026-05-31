@@ -13,11 +13,11 @@ Planning documents for a local Windows utility that walks users through deck-bui
 | [05-technology-options.md](05-technology-options.md) | Stack comparison for local Windows + database |
 | [06-open-questions.md](06-open-questions.md) | Resolved planning decisions |
 | [07-deck-output-format.md](07-deck-output-format.md) | Markdown + `.deck.json` schema |
-| [08-card-availability.md](08-card-availability.md) | Budget null prices; future availability heuristic |
-| [09-next-steps.md](09-next-steps.md) | **Post-v1 roadmap** — Phase 3 priorities and backlog |
-| [10-card-dependency-engine.md](10-card-dependency-engine.md) | **Planned** — cross-card synergy / tutor-target / resource-balance checks (not full CR) |
-| [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) | **Planned** — user control, balance presets, feedback, CLI vs UI (parallel to doc 10) |
-| [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) | **Gate** — checklist before D1+ engine code (D0, D0.5, decisions, contracts) |
+| [08-card-availability.md](08-card-availability.md) | Budget null prices; availability heuristic |
+| [09-next-steps.md](09-next-steps.md) | **Active roadmap** — post-v1 backlog and dependency UX |
+| [10-card-dependency-engine.md](10-card-dependency-engine.md) | **Shipped (D0–D5)** — cross-card synergy / tutor-target / resource-balance checks |
+| [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) | **Active** — user control, focus presets, feedback; UX2+ not yet in wizard |
+| [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) | **Complete gate** — D0–D5 checklist; dogfood acceptance open |
 | [13-dependency-engine-decisions.md](13-dependency-engine-decisions.md) | Locked D0 decisions and v1 rule scope |
 | [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md) | Merged-face extraction policy (v1) |
 
@@ -28,6 +28,7 @@ Planning documents for a local Windows utility that walks users through deck-bui
 - **Include / avoid:** User selects keyword-level mechanics to want or exclude (trample, scry, energy, vehicles, …)
 - **Wizard flow:** Theme → colors → commander (partners supported in v1)
 - **Constraints:** Commander rules, budget, commander synergy, include/avoid mechanics
+- **Dependencies:** Warn by default; `--strict-dependencies` / `--repair-dependencies` on CLI
 - **Export:** Markdown (human) + `.deck.json` (machine reload / images / future edits)
 - **UI:** Terminal CLI — Python + `typer` / `questionary` / `rich`
 - **Runtime:** Python + SQLite
@@ -63,8 +64,15 @@ Planning documents for a local Windows utility that walks users through deck-bui
 - Availability scoring, `--prefer-available`, unpriced classification in Notes
 - **v1 success criteria** — checked off 2026-05-30 ([01-goals-and-scope.md](01-goals-and-scope.md))
 
+### Dependency engine (D0–D5)
+- Effect pattern spec, golden tests, face policy ([10](10-card-dependency-engine.md), [14](14-effect-extraction-face-policy.md))
+- Inventory audit (`dependency-audit`) and evidence-backed profiles
+- Import writes `card_effects`; post-build `dependency_report` in MD/JSON
+- Pick-time dependency scoring during slot fill
+- `--strict-dependencies` and `--repair-dependencies` on `generate`
+
 ## What's next
 
-See **[09-next-steps.md](09-next-steps.md)** for the post-v1 backlog.
+See **[09-next-steps.md](09-next-steps.md)** for the active backlog.
 
-**Recommended first task:** card dependency engine ([10-card-dependency-engine.md](10-card-dependency-engine.md)). Complete [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) before D1.
+**Recommended first tasks:** dependency dogfood acceptance (calibrate false positives), then **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).

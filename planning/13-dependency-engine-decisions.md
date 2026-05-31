@@ -1,6 +1,6 @@
 # Dependency engine — locked decisions (D0)
 
-Resolved before D1 implementation. Revisit only with evidence from [D0.5 inventory audit](12-dependency-engine-pre-implementation-checklist.md).
+Resolved before D1 implementation (2026-05-30). Revisit only with evidence from [D0.5 inventory audit](12-dependency-engine-pre-implementation-checklist.md) or dogfood calibration in [09-next-steps.md](09-next-steps.md).
 
 | Decision | Answer | Notes |
 | --- | --- | --- |

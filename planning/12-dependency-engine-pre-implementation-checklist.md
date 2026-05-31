@@ -14,7 +14,7 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 | ◐ | In progress |
 | ☑ | Done — link PR, commit, or artifact path in notes column |
 
-**Rule:** Do not merge D1 (import writes `card_effects`) until all items in **§ Must complete before D1** are ☑. **D0.5 complete; D1 implemented** — proceed to D2 (validator).
+**Rule:** D0–D5 are **complete** (2026-05-31). Use this checklist for dogfood acceptance and UX2+ work; do not reopen D1 gate unless schema or pattern contracts change.
 
 **Suggested order:** § Snapshot → § D0 → § D0.5 → § Decisions → § Output contract → then D1 → D2.
 
@@ -106,15 +106,15 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 
 ---
 
-## Builder integration (before D3, not before D1)
+## Builder integration — **Done** (D3–D5)
 
 | ☐ | Item | Notes |
 | --- | --- | --- |
-| ☐ | `deck_stats` computation module spec | Counts by type/subtype, profile roles, name set |
-| ☐ | Incremental `deck_stats` update during slot fill order | Matches `filler.py` order |
-| ☐ | Scorer: dependency penalty/bonus weights vs existing heuristics | |
-| ☐ | `budget_backfill`: do not remove sole tutor target | |
-| ☐ | Module layout: `effects/extract.py`, `rules/dependencies.py` (no logic in `validate.py`) | |
+| ☑ | `deck_stats` computation module spec | `dependency_scoring.py` — `DeckBuildStats`, profile roles |
+| ☑ | Incremental `deck_stats` update during slot fill order | Matches `filler.py` order |
+| ☑ | Scorer: dependency penalty/bonus weights vs existing heuristics | `scorer.py` + `dependency_pick_score` |
+| ☐ | `budget_backfill`: do not remove sole tutor target | Not implemented — trim may swap tutor targets |
+| ☑ | Module layout: `effects/extract.py`, `rules/dependencies.py` (no logic in `validate.py`) | Shipped |
 
 ---
 
@@ -146,9 +146,9 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 
 ---
 
-## Dogfood acceptance (after D2)
+## Dogfood acceptance (after D2) — **open**
 
-Before D3, manually review generated decks:
+Before UX2 / default strict mode, manually review generated decks:
 
 | ☐ | Scenario | Pass? |
 | --- | --- | --- |

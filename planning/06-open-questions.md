@@ -26,15 +26,16 @@ All v1 planning questions are resolved. Revisit only when scope changes.
 
 ## Deferred (post-v1)
 
-See [09-next-steps.md](09-next-steps.md) for the active Phase 3 roadmap and priority order.
+See [09-next-steps.md](09-next-steps.md) for the active backlog (dependency UX calibration, export, UI).
 
 | Topic | Notes |
 | --- | --- |
+| Dependency wizard UX (UX2+) | CLI flags shipped; wizard presets and `mechanic_focus` not yet — [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | Complicated, context-dependent; not a single dial |
-| Obscure vs new null-price classification | Optional; shipped heuristic favors obscure detection — [08-card-availability.md](08-card-availability.md) |
+| Obscure vs new null-price classification | Shipped heuristic favors obscure detection — [08-card-availability.md](08-card-availability.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` |
 | Local web / desktop UI | Reuse Python core |
 
-## Implementation start
+## Historical
 
-**Phase 1:** import script + mechanic taxonomy v0 + SQLite schema + CLI stub.
+**Phase 1 start (2025):** import script + mechanic taxonomy v0 + SQLite schema + CLI stub — superseded by Phase 2–3 and dependency engine work above.
