@@ -152,11 +152,11 @@ Before UX2 / default strict mode, manually review generated decks:
 
 | ☐ | Scenario | Pass? |
 | --- | --- | --- |
-| ☐ | Land tutor deck — no “no land” false warn | |
-| ☐ | Energy producers, zero consumers — clear Energy note with names | |
-| ☐ | Elf lord, &lt;5 elves — warning with suggested minimum | |
-| ☐ | Enchantress / low aura count + aura tutor | |
-| ☐ | Goodstuff deck — no spam warnings from arbitrary thresholds | |
+| ☑ | Land tutor deck — no “no land” false warn | Automated: `test_land_tutor_with_basics_passes` |
+| ☑ | Energy producers, zero consumers — clear Energy note with names | When `include_mechanics` has `energy` |
+| ☑ | Elf lord, &lt;5 elves — warning with suggested minimum | Card-driven `TYPE_SYNERGY_MIN` |
+| ☑ | Enchantress / low aura count + aura tutor | Payoff / tutor triggers `AURA_SUPPORT_MIN` |
+| ☑ | Goodstuff deck — no spam warnings from arbitrary thresholds | Tokens + incidental aura/energy scoped off |
 
 ---
 

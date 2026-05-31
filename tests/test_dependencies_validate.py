@@ -9,6 +9,7 @@ import pytest
 
 from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.db.schema import apply_schema
+from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.dependencies import validate_dependencies
 
 
@@ -129,7 +130,23 @@ def test_elf_lord_low_count_warns(dep_db: sqlite3.Connection) -> None:
     assert any(i.rule_id == "TYPE_SYNERGY_MIN" for i in report.warnings)
 
 
-def test_energy_one_sided_warns(dep_db: sqlite3.Connection) -> None:
+def test_energy_one_sided_warns_with_energy_intent(dep_db: sqlite3.Connection) -> None:
     maindeck = [_deck_card(oracle_id="hub", name="Aether Hub", type_line="Land", cmc=0.0)]
-    report = validate_dependencies(dep_db, maindeck=maindeck, commanders=[])
+    report = validate_dependencies(
+        dep_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(include_mechanics=["energy"]),
+    )
     assert any(i.rule_id == "ENERGY_BALANCE" for i in report.warnings)
+
+
+def test_energy_one_sided_silent_without_intent(dep_db: sqlite3.Connection) -> None:
+    maindeck = [_deck_card(oracle_id="hub", name="Aether Hub", type_line="Land", cmc=0.0)]
+    report = validate_dependencies(
+        dep_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["tokens"]),
+    )
+    assert not any(i.rule_id == "ENERGY_BALANCE" for i in report.warnings)

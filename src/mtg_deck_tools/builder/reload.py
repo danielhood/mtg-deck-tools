@@ -179,6 +179,7 @@ def run_generate_from_deck(
             conn,
             maindeck=maindeck.cards,
             commanders=identity_rows,
+            criteria=output_criteria,
             strict=output_criteria.strict_dependencies,
         )
         maindeck.warnings.extend(dependency_messages(maindeck.dependency_report))

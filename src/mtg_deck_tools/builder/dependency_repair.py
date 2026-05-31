@@ -542,6 +542,7 @@ def repair_dependency_issues(
             conn,
             maindeck=working,
             commanders=commanders,
+            criteria=criteria,
             strict=strict,
         )
         if report.passed:

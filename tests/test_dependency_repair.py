@@ -123,7 +123,11 @@ def test_repair_adds_energy_consumer(repair_db: sqlite3.Connection) -> None:
         _deck_card(oracle_id="hub", name="Aether Hub", type_line="Land", slot="lands", cmc=0.0),
         _deck_card(oracle_id="filler", name="Cancel", type_line="Instant", slot="flex"),
     ]
-    criteria = DeckCriteria(colors=["G"], repair_dependencies=True)
+    criteria = DeckCriteria(
+        colors=["G"],
+        include_mechanics=["energy"],
+        repair_dependencies=True,
+    )
     result = repair_dependency_issues(
         repair_db,
         cards,
