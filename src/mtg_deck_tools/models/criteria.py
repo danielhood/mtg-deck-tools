@@ -21,6 +21,7 @@ class DeckCriteria(BaseModel):
     strict_budget: bool = False
     strict_dependencies: bool = False
     repair_dependencies: bool = False
+    mechanic_focus: dict[str, str] = Field(default_factory=dict)
     prefer_available: bool = False
     min_rarity: str = "common"
     slot_template: dict[str, int] = Field(default_factory=dict)

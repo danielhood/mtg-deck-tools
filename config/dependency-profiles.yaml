@@ -24,6 +24,8 @@ profiles:
   # Audit 2026-05-30 (30,969 commander-legal): 55 producers, 84 consumers; see audit-evidence-20260530.json
   energy:
     label: Energy counters
+    activation:
+      include_mechanics: [energy]
     roles: [producer, consumer]
     defaults:
       producer_min: 2
@@ -36,6 +38,8 @@ profiles:
   # Audit 2026-05-30: 1,220 aura spells (type_line), 7 aura tutors extracted
   aura_support:
     label: Auras
+    activation:
+      themes: [voltron]
     roles: [aura_spell, aura_payoff]
     defaults:
       aura_spell_min: 6

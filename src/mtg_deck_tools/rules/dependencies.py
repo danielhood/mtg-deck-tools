@@ -11,7 +11,12 @@ from typing import Any, Literal
 import yaml
 
 from mtg_deck_tools.builder.deck import DeckCard
+from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import DEPENDENCY_PROFILES_PATH
+from mtg_deck_tools.rules.dependency_scope import (
+    DependencyScope,
+    build_dependency_scope,
+)
 
 DependencyStatus = Literal["pass", "warn", "fail"]
 
@@ -163,18 +168,85 @@ def _issue_status(*, strict: bool) -> DependencyStatus:
     return "fail" if strict else "warn"
 
 
+def _payload_searches_auras(payload: dict[str, Any]) -> bool:
+    subtypes = [s.lower() for s in (payload.get("subtypes") or [])]
+    if "aura" in subtypes:
+        return True
+    types = [t.lower() for t in (payload.get("types") or [])]
+    return "enchantment" in types and "aura" in subtypes
+
+
+def _deck_has_aura_payoff(effects_map: dict[str, list[CardEffectRow]]) -> bool:
+    for effects in effects_map.values():
+        for effect in effects:
+            if effect.effect_kind != "whenever_cast_type":
+                continue
+            types = effect.payload.get("types") or []
+            if types == ["enchantment"]:
+                return True
+    return False
+
+
+def _deck_has_aura_tutor(
+    maindeck: list[DeckCard],
+    effects_map: dict[str, list[CardEffectRow]],
+) -> bool:
+    for card in maindeck:
+        for effect in effects_map.get(card.oracle_id, []):
+            if effect.effect_kind == "search_library" and _payload_searches_auras(
+                effect.payload
+            ):
+                return True
+    return False
+
+
+def _should_check_aura_support_min(
+    *,
+    scope: DependencyScope,
+    aura_spells: int,
+    effects_map: dict[str, list[CardEffectRow]],
+    maindeck: list[DeckCard],
+) -> bool:
+    if scope.aura_support_min:
+        return True
+    if _deck_has_aura_payoff(effects_map):
+        return True
+    if _deck_has_aura_tutor(maindeck, effects_map):
+        return True
+    return False
+
+
+def _should_warn_energy_imbalance(
+    *,
+    scope: DependencyScope,
+    producer_count: int,
+    consumer_count: int,
+) -> bool:
+    if producer_count == 0 and consumer_count == 0:
+        return False
+    if producer_count > 0 and consumer_count > 0:
+        return False
+    if scope.energy_user_intent:
+        return True
+    dominant = max(producer_count, consumer_count)
+    return dominant >= 2
+
+
 def validate_dependencies(
     conn: sqlite3.Connection,
     *,
     maindeck: list[DeckCard],
     commanders: list[dict[str, Any]],
     profiles: dict[str, dict[str, Any]] | None = None,
+    criteria: DeckCriteria | None = None,
+    scope: DependencyScope | None = None,
     strict: bool = False,
 ) -> DependencyReport:
     """
     Evaluate v1 dependency rules. Default severity is warn; with strict=True, issues are fail.
     """
     profile_cfg = profiles or load_profile_defaults()
+    dep_scope = scope if scope is not None else build_dependency_scope(criteria)
     report = DependencyReport()
     severity = _issue_status(strict=strict)
 
@@ -237,7 +309,15 @@ def validate_dependencies(
                 )
             )
 
-    if energy_producers and not energy_consumers:
+    energy_imbalanced = (energy_producers and not energy_consumers) or (
+        energy_consumers and not energy_producers
+    )
+    energy_warn = energy_imbalanced and _should_warn_energy_imbalance(
+        scope=dep_scope,
+        producer_count=len(energy_producers),
+        consumer_count=len(energy_consumers),
+    )
+    if energy_warn and energy_producers and not energy_consumers:
         report.issues.append(
             DependencyIssue(
                 rule_id="ENERGY_BALANCE",
@@ -251,7 +331,7 @@ def validate_dependencies(
                 detail={"producers": energy_producers, "consumers": []},
             )
         )
-    elif energy_consumers and not energy_producers:
+    elif energy_warn and energy_consumers and not energy_producers:
         report.issues.append(
             DependencyIssue(
                 rule_id="ENERGY_BALANCE",
@@ -268,18 +348,7 @@ def validate_dependencies(
         ProfileSummary(
             profile_id="energy",
             counts={"producer": len(energy_producers), "consumer": len(energy_consumers)},
-            status=severity
-            if strict
-            and (
-                (energy_producers and not energy_consumers)
-                or (energy_consumers and not energy_producers)
-            )
-            else (
-                "warn"
-                if (energy_producers and not energy_consumers)
-                or (energy_consumers and not energy_producers)
-                else "pass"
-            ),
+            status=severity if strict and energy_warn else ("warn" if energy_warn else "pass"),
             messages=[],
         )
     )
@@ -342,29 +411,28 @@ def validate_dependencies(
     aura_min = int(aura_cfg.get("aura_spell_min", 6))
     aura_status = "pass"
     aura_messages: list[str] = []
-    if aura_spells < aura_min:
-        has_aura_payoff = any(
-            e.effect_kind == "whenever_cast_type"
-            and (e.payload.get("types") == ["enchantment"] or "Aura" in str(e.payload))
-            for effects in effects_map.values()
-            for e in effects
+    check_aura_floor = _should_check_aura_support_min(
+        scope=dep_scope,
+        aura_spells=aura_spells,
+        effects_map=effects_map,
+        maindeck=maindeck,
+    )
+    if check_aura_floor and aura_spells < aura_min:
+        aura_status = severity
+        msg = (
+            f"Only {aura_spells} Aura card(s) in the deck "
+            f"(suggested minimum {aura_min} for aura support)."
         )
-        if has_aura_payoff or aura_spells > 0:
-            aura_status = severity
-            msg = (
-                f"Only {aura_spells} Aura card(s) in the deck "
-                f"(suggested minimum {aura_min} for aura support)."
+        aura_messages.append(msg)
+        report.issues.append(
+            DependencyIssue(
+                rule_id="AURA_SUPPORT_MIN",
+                status=severity,
+                message=msg,
+                profile_id="aura_support",
+                detail={"aura_count": aura_spells, "minimum": aura_min},
             )
-            aura_messages.append(msg)
-            report.issues.append(
-                DependencyIssue(
-                    rule_id="AURA_SUPPORT_MIN",
-                    status=severity,
-                    message=msg,
-                    profile_id="aura_support",
-                    detail={"aura_count": aura_spells, "minimum": aura_min},
-                )
-            )
+        )
     report.profiles.append(
         ProfileSummary(
             profile_id="aura_support",

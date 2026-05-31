@@ -29,7 +29,7 @@ Status as of 2026-05-31. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | `--strict-dependencies` | Done — D4 pick-time filter |
 | `--repair-dependencies` | Done — D5 post-build swap pass |
 | Wizard dependency controls (UX2) | **Not started** — CLI flags only today |
-| Dependency dogfood calibration | **In progress** — rules shipped; false-positive review pending |
+| Dependency dogfood calibration | **In progress** — profile scoping + incidental energy tuning shipped; manual deck review pending |
 
 ## Dogfooding snapshot (v1 closure)
 
@@ -55,7 +55,7 @@ Early pass: `output/muldrotha-the-gravetide-20260530180919.md` (`seed=42`, token
 | Dependency report | **WARNINGS** — `AURA_SUPPORT_MIN` (2 auras vs suggested min 6) on a tokens build |
 | Strict / repair flags | Available via CLI; not yet exposed in wizard |
 
-**Calibration note:** Profile rules (e.g. aura support) may warn on decks that did not opt into that mechanic — tune thresholds or scope rules to `mechanic_focus` / themes before UX2.
+**Calibration note:** Deck-level rules are now scoped to themes / `include_mechanics` / `mechanic_focus` (see `dependency_scope.py`). Incidental single-card energy no longer warns unless the user includes `energy`. Card-level rules (tutors, lords, enchantress payoffs) still fire when relevant cards are present.
 
 ---
 
@@ -144,11 +144,12 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 - **Focus presets** (`mechanic_focus`: energy, auras) wired to `dependency-profiles.yaml`
 - Surface dependency summary during wizard review (optional)
 
-### 3. Rule scoping and threshold tuning
+### 3. Rule scoping and threshold tuning — **partial**
 
-- Scope profile rules to user intent (themes, `mechanic_focus`, include mechanics) — e.g. no `AURA_SUPPORT_MIN` on unrelated token builds
-- Review `AURA_SUPPORT_MIN` / `TYPE_SYNERGY_MIN` thresholds against audit evidence
-- Optional: `SUBTYPE_SYNERGY_MIN` (e.g. Elf lords) — deferred in checklist
+- ☑ Scope deck-level profile rules to themes / `include_mechanics` / `mechanic_focus` (`rules/dependency_scope.py`, `activation` in `dependency-profiles.yaml`)
+- ☑ Suppress `ENERGY_BALANCE` for a lone incidental producer unless user includes `energy` or has 2+ imbalanced cards
+- ☐ Review `AURA_SUPPORT_MIN` / `TYPE_SYNERGY_MIN` thresholds against audit evidence
+- ☐ Optional: `SUBTYPE_SYNERGY_MIN` (e.g. Elf lords) — deferred in checklist
 
 ---
 
@@ -170,6 +171,6 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 ## Suggested next task
 
-**Complete dependency dogfood acceptance**, then **UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. In parallel, **scope aura/type profile rules** to user-selected themes so token and goodstuff decks do not inherit unrelated warnings.
+**Finish manual dogfood on real generated decks** (false-positive budget on ~20 builds), then **UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. Threshold review against `dependency-audit` evidence remains optional follow-up.
 
 See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX2 → UX3 criteria linter → UX5 local web).
