@@ -50,7 +50,7 @@ scenarios:
 
   # --- Energy intent ---
   - id: energy-simic
-    label: Energy included — balance warn if one-sided
+    label: Energy included — balanced producer/consumer package
     commander_names: ["Muldrotha, the Gravetide"]
     criteria:
       themes: [ramp]
@@ -59,6 +59,9 @@ scenarios:
     expect:
       validation:
         passed: true
+      dependency:
+        rules_must_not_warn: [ENERGY_BALANCE]
+        max_inappropriate_warnings: 0
 
   # --- Tribal / aristocrats (card-driven rules) ---
   - id: aristocrats-yawgmoth

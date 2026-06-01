@@ -8,6 +8,8 @@ from typing import Any
 
 from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.builder.pool import CardCandidate
+from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.rules.dependency_profiles import energy_profile_floors
 from mtg_deck_tools.rules.dependencies import (
     CardEffectRow,
     fetch_card_effects,
@@ -29,6 +31,9 @@ class DeckBuildStats:
     subtype_counts: dict[str, int] = field(default_factory=dict)
     needs_energy_consumer: bool = False
     needs_energy_producer: bool = False
+    energy_producer_floor: int = 0
+    energy_consumer_floor: int = 0
+    energy_package_requested: bool = False
     needs_elf_support: bool = False
     elf_other_minimum: int = 5
 
@@ -79,6 +84,7 @@ def build_deck_build_stats(
     *,
     commander_oracle_ids: set[str] | None = None,
     profiles: dict[str, dict[str, Any]] | None = None,
+    criteria: DeckCriteria | None = None,
 ) -> DeckBuildStats:
     """Compute running stats from cards already in the partial deck."""
     profile_cfg = profiles or load_profile_defaults()
@@ -106,6 +112,19 @@ def build_deck_build_stats(
 
     stats.needs_energy_consumer = stats.energy_producers > 0 and stats.energy_consumers == 0
     stats.needs_energy_producer = stats.energy_consumers > 0 and stats.energy_producers == 0
+
+    if criteria is not None:
+        from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
+
+        if build_dependency_scope(criteria).energy_user_intent:
+            p_min, c_min = energy_profile_floors(profile_cfg)
+            stats.energy_package_requested = True
+            stats.energy_producer_floor = p_min
+            stats.energy_consumer_floor = c_min
+            if stats.energy_producers < p_min:
+                stats.needs_energy_producer = True
+            if stats.energy_consumers < c_min:
+                stats.needs_energy_consumer = True
 
     elf_min = int(profile_cfg.get("elves", {}).get("payoff_creature_min", 5))
     stats.elf_other_minimum = elf_min
@@ -149,6 +168,12 @@ def dependency_pick_score(
     """Additive score adjustment for a pool candidate (higher = more desirable)."""
     score = 0.0
     for effect in candidate_effects or []:
+        if effect.effect_kind == "energy_produce" and stats.energy_package_requested:
+            if stats.energy_producers < stats.energy_producer_floor:
+                score += 8.0 * weight
+        elif effect.effect_kind == "energy_consume" and stats.energy_package_requested:
+            if stats.energy_consumers < stats.energy_consumer_floor:
+                score += 8.0 * weight
         if effect.effect_kind == "energy_consume" and stats.needs_energy_consumer:
             score += 5.0 * weight
         elif effect.effect_kind == "energy_produce" and stats.needs_energy_producer:

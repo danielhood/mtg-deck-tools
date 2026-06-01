@@ -214,6 +214,7 @@ def _fill_slot(state: _BuildState, slot: str, count: int) -> None:
             state.conn,
             state.cards,
             commander_oracle_ids=state.commander_oracle_ids,
+            criteria=state.criteria,
         )
         search_pool = build_search_pool(
             state.conn,
