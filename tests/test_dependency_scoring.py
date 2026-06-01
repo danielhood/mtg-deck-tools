@@ -178,6 +178,22 @@ def test_build_deck_build_stats_energy_gap(scoring_db: sqlite3.Connection) -> No
     assert stats.needs_energy_consumer
 
 
+def test_build_deck_build_stats_energy_floors_when_included(
+    scoring_db: sqlite3.Connection,
+) -> None:
+    from mtg_deck_tools.models.criteria import DeckCriteria
+
+    partial = [_deck_card(oracle_id="hub", name="Aether Hub", type_line="Land", cmc=0.0)]
+    stats = build_deck_build_stats(
+        scoring_db,
+        partial,
+        criteria=DeckCriteria(include_mechanics=["energy"]),
+    )
+    assert stats.energy_package_requested
+    assert stats.energy_producer_floor == 2
+    assert stats.needs_energy_producer
+
+
 def test_score_candidate_prefers_energy_payoff_after_producer(
     scoring_db: sqlite3.Connection,
 ) -> None:

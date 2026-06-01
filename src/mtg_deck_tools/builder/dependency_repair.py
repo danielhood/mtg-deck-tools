@@ -162,6 +162,7 @@ def _score_repair_pick(
         conn,
         partial,
         commander_oracle_ids=commander_oracle_ids,
+        criteria=criteria,
     )
     search_pool = build_search_pool(conn, partial, commander_oracle_ids)
     effect_map = fetch_card_effects(conn, [c.oracle_id for c in candidates])
@@ -278,21 +279,19 @@ def _fix_tutor_target(
     )
 
 
-def _fix_energy_balance(
+def swap_energy_card(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
-    issue: DependencyIssue,
+    effect_kind: str,
     *,
     criteria: DeckCriteria,
     identity: list[str],
     commander_oracle_ids: set[str],
     commander_theme_tags: set[str],
+    protect_oracle_ids: set[str] | None = None,
 ) -> tuple[list[DeckCard], str] | None:
-    detail = issue.detail or {}
-    producers = detail.get("producers") or []
-    consumers = detail.get("consumers") or []
-    effect_kind = "energy_consume" if producers and not consumers else "energy_produce"
-    victim = _pick_victim(cards, protect_oracle_ids=set())
+    """Replace a flex/synergy card with an energy producer or consumer."""
+    victim = _pick_victim(cards, protect_oracle_ids=protect_oracle_ids or set())
     if victim is None:
         return None
 
@@ -330,6 +329,31 @@ def _fix_energy_balance(
     return (
         updated,
         f"Dependency repair: replaced {victim.name} with {pick.name} (energy {role}).",
+    )
+
+
+def _fix_energy_balance(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    issue: DependencyIssue,
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> tuple[list[DeckCard], str] | None:
+    detail = issue.detail or {}
+    producers = detail.get("producers") or []
+    consumers = detail.get("consumers") or []
+    effect_kind = "energy_consume" if producers and not consumers else "energy_produce"
+    return swap_energy_card(
+        conn,
+        cards,
+        effect_kind,
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=commander_oracle_ids,
+        commander_theme_tags=commander_theme_tags,
     )
 
 

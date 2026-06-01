@@ -19,6 +19,7 @@ from mtg_deck_tools.builder.deck import DeckBuildResult
 from mtg_deck_tools.builder.dependency_repair import repair_dependency_issues
 from mtg_deck_tools.builder.dependency_scoring import card_effects_enabled
 from mtg_deck_tools.builder.filler import fill_deck
+from mtg_deck_tools.builder.mechanic_packages import ensure_included_mechanic_packages
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import DEFAULT_DB_PATH
 from mtg_deck_tools.rules.dependencies import (
@@ -170,6 +171,22 @@ def build_generate_outcome(
             commander_oracle_ids=[c["oracle_id"] for c in commanders],
             seed=effective_seed,
         )
+
+        if card_effects_enabled(conn):
+            package = ensure_included_mechanic_packages(
+                conn,
+                maindeck.cards,
+                criteria=output_criteria,
+                identity=identity,
+                commander_oracle_ids=set(output_criteria.commander_oracle_ids),
+                commander_theme_tags=commander_theme_tags(
+                    conn, output_criteria.commander_oracle_ids
+                ),
+            )
+            if package.swaps:
+                maindeck.cards = package.cards
+                maindeck.warnings.extend(package.messages)
+                maindeck.budget_spent = _deck_budget_spent(maindeck.cards)
 
         if output_criteria.repair_dependencies and card_effects_enabled(conn):
             repair = repair_dependency_issues(
