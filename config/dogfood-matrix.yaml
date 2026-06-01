@@ -1,0 +1,139 @@
+# Repeatable dependency / validation analysis matrix.
+# Run: mtg-deck-tools analyze run [--write-decks]
+# Requires: mtg-deck-tools import (cards.db + card_effects)
+
+schema_version: 1
+
+defaults:
+  seed: 42
+
+scenarios:
+  # --- Goodstuff / unrelated (post-calibration: no deck-level aura/energy noise) ---
+  - id: tokens-muldrotha
+    label: Tokens (Muldrotha) — no unrelated profile warnings
+    commander_names: ["Muldrotha, the Gravetide"]
+    criteria:
+      themes: [tokens]
+      colors: [B, G]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: draw-removal-golgari
+    label: Generic draw/removal — no profile spam
+    commander_names: ["Muldrotha, the Gravetide"]
+    criteria:
+      themes: [draw, removal]
+      colors: [B, G]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE]
+        max_inappropriate_warnings: 0
+
+  # --- Voltron / auras (deck-level aura floor may apply) ---
+  - id: voltron-dromoka
+    label: Voltron theme (Dromoka) — aura support in scope
+    commander_names: ["Dragonlord Dromoka"]
+    criteria:
+      themes: [voltron]
+      colors: [G, W]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [ENERGY_BALANCE]
+
+  # --- Energy intent ---
+  - id: energy-simic
+    label: Energy included — balance warn if one-sided
+    commander_names: ["Muldrotha, the Gravetide"]
+    criteria:
+      themes: [ramp]
+      colors: [G, U]
+      include_mechanics: [energy]
+    expect:
+      validation:
+        passed: true
+
+  # --- Tribal / aristocrats (card-driven rules) ---
+  - id: aristocrats-yawgmoth
+    label: Aristocrats (Yawgmoth)
+    commander_names: ["Yawgmoth, Thran Physician"]
+    criteria:
+      themes: [aristocrats]
+      colors: [B]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN]
+
+  # --- Budget / availability (v1 closure parity) ---
+  - id: budget-pantlaza-strict
+    label: Pantlaza budget strict + prefer-available
+    commander_names: ["Pantlaza, Sun-Favored"]
+    criteria:
+      themes: [tokens]
+      colors: [G, W, R]
+      budget_usd: 75
+      card_price_max_usd: 3
+    strict_budget: true
+    prefer_available: true
+    expect:
+      validation:
+        passed: true
+
+  - id: budget-dromoka-cap
+    label: Dromoka $150 / $5 per card
+    commander_names: ["Dragonlord Dromoka"]
+    criteria:
+      themes: [ramp, removal]
+      colors: [G, W]
+      budget_usd: 150
+      card_price_max_usd: 5
+    expect:
+      validation:
+        passed: true
+
+  - id: jetmir-tokens
+    label: Jetmir tokens
+    commander_names: ["Jetmir, Nexus of Revels"]
+    criteria:
+      themes: [tokens]
+      colors: [R, G, W]
+      budget_usd: 150
+      card_price_max_usd: 5
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE]
+        max_inappropriate_warnings: 0
+
+  # --- Strict / repair (subset) ---
+  - id: tokens-strict-deps
+    label: Tokens with strict pick-time dependencies
+    commander_names: ["Muldrotha, the Gravetide"]
+    criteria:
+      themes: [tokens]
+      colors: [B, G]
+    strict_dependencies: true
+    expect:
+      validation:
+        passed: true
+
+  - id: tokens-repair-deps
+    label: Tokens with post-build repair
+    commander_names: ["Muldrotha, the Gravetide"]
+    criteria:
+      themes: [tokens]
+      colors: [B, G]
+    repair_dependencies: true
+    expect:
+      validation:
+        passed: true

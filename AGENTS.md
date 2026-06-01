@@ -20,7 +20,8 @@ From repo root:
 
 ```bash
 source .venv/bin/activate   # after update script creates .venv
-pytest                      # 142 tests; uses in-memory SQLite, no Scryfall file
+pytest                      # uses in-memory SQLite, no Scryfall file
+mtg-deck-tools analyze run --fail-on-expect  # after import; see planning/14-deck-analysis.md
 ruff check src tests        # configured in pyproject.toml; ruff is not a declared dev dep — pip install ruff if needed
 ```
 

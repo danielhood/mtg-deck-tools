@@ -240,7 +240,7 @@ def test_run_generate_from_deck_full_regen(tmp_path, reload_db: sqlite3.Connecti
     def fake_require_db(_path):
         return reload_db
 
-    monkeypatch.setattr("mtg_deck_tools.builder.reload._require_db", fake_require_db)
+    monkeypatch.setattr("mtg_deck_tools.builder.reload.require_db", fake_require_db)
 
     out = run_generate_from_deck(
         deck_path,

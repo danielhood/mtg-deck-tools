@@ -99,6 +99,9 @@ mtg-deck-tools stats
 # Dependency inventory audit (after import; writes resources/dependency/reports/)
 mtg-deck-tools dependency-audit
 
+# Repeatable validation + dependency dogfood (matrix in config/dogfood-matrix.yaml)
+mtg-deck-tools analyze run --write-decks --fail-on-expect
+
 # Full deck: slot-filled 99-card maindeck → output/
 mtg-deck-tools generate --seed 42 --colors G --themes tokens
 

@@ -29,7 +29,7 @@ Status as of 2026-05-31. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | `--strict-dependencies` | Done — D4 pick-time filter |
 | `--repair-dependencies` | Done — D5 post-build swap pass |
 | Wizard dependency controls (UX2) | **Not started** — CLI flags only today |
-| Dependency dogfood calibration | **In progress** — profile scoping + incidental energy tuning shipped; manual deck review pending |
+| Dependency dogfood calibration | **In progress** — automated `analyze run`; full-matrix pass after `import` |
 
 ## Dogfooding snapshot (v1 closure)
 
@@ -124,7 +124,9 @@ Recommended order after D5:
 
 ### 1. Dogfood acceptance (dependency rules)
 
-Manual review per [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md#dogfood-acceptance-after-d2):
+**Automated:** `mtg-deck-tools analyze run` (matrix: [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml), docs: [14-deck-analysis.md](14-deck-analysis.md)). Writes `output/analysis-*/summary.json` with false-positive rate and per-case JSON. Use `--fail-on-expect` in CI after import.
+
+Manual spot-check optional per [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md#dogfood-acceptance-after-d2):
 
 | Scenario | Pass? |
 | --- | --- |
@@ -171,6 +173,6 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 ## Suggested next task
 
-**Finish manual dogfood on real generated decks** (false-positive budget on ~20 builds), then **UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. Threshold review against `dependency-audit` evidence remains optional follow-up.
+**Run `analyze run` on a fresh import** and confirm false-positive rate &lt; 5%, then **UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. Threshold review against `dependency-audit` evidence remains optional follow-up.
 
 See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX2 → UX3 criteria linter → UX5 local web).

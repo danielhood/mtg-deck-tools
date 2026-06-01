@@ -15,6 +15,7 @@ Planning documents for a local Windows utility that walks users through deck-bui
 | [07-deck-output-format.md](07-deck-output-format.md) | Markdown + `.deck.json` schema |
 | [08-card-availability.md](08-card-availability.md) | Budget null prices; availability heuristic |
 | [09-next-steps.md](09-next-steps.md) | **Active roadmap** — post-v1 backlog and dependency UX |
+| [14-deck-analysis.md](14-deck-analysis.md) | **Automated dogfood** — `analyze run` matrix and reports |
 | [10-card-dependency-engine.md](10-card-dependency-engine.md) | **Shipped (D0–D5)** — cross-card synergy / tutor-target / resource-balance checks |
 | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) | **Active** — user control, focus presets, feedback; UX2+ not yet in wizard |
 | [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) | **Complete gate** — D0–D5 checklist; dogfood acceptance open |
