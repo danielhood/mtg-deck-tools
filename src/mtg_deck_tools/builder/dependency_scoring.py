@@ -9,7 +9,11 @@ from typing import Any
 from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.builder.pool import CardCandidate
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.rules.dependency_profiles import energy_profile_floors
+from mtg_deck_tools.rules.dependency_profiles import (
+    artifact_spell_min,
+    aura_spell_min,
+    energy_profile_floors,
+)
 from mtg_deck_tools.rules.dependencies import (
     CardEffectRow,
     fetch_card_effects,
@@ -34,6 +38,10 @@ class DeckBuildStats:
     energy_producer_floor: int = 0
     energy_consumer_floor: int = 0
     energy_package_requested: bool = False
+    aura_spell_floor: int = 0
+    artifact_spell_floor: int = 0
+    aura_package_requested: bool = False
+    artifact_package_requested: bool = False
     needs_elf_support: bool = False
     elf_other_minimum: int = 5
 
@@ -116,7 +124,8 @@ def build_deck_build_stats(
     if criteria is not None:
         from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
 
-        if build_dependency_scope(criteria).energy_user_intent:
+        scope = build_dependency_scope(criteria)
+        if scope.energy_user_intent:
             p_min, c_min = energy_profile_floors(profile_cfg)
             stats.energy_package_requested = True
             stats.energy_producer_floor = p_min
@@ -125,6 +134,12 @@ def build_deck_build_stats(
                 stats.needs_energy_producer = True
             if stats.energy_consumers < c_min:
                 stats.needs_energy_consumer = True
+        if scope.aura_support_min:
+            stats.aura_package_requested = True
+            stats.aura_spell_floor = aura_spell_min(profile_cfg)
+        if scope.artifacts_user_intent:
+            stats.artifact_package_requested = True
+            stats.artifact_spell_floor = artifact_spell_min(profile_cfg)
 
     elf_min = int(profile_cfg.get("elves", {}).get("payoff_creature_min", 5))
     stats.elf_other_minimum = elf_min
@@ -167,6 +182,13 @@ def dependency_pick_score(
 ) -> float:
     """Additive score adjustment for a pool candidate (higher = more desirable)."""
     score = 0.0
+    if stats.aura_package_requested and "Aura" in (candidate.type_line or ""):
+        if stats.aura_spells < stats.aura_spell_floor:
+            score += 6.0 * weight
+    if stats.artifact_package_requested and "Artifact" in (candidate.type_line or ""):
+        if stats.artifact_count < stats.artifact_spell_floor:
+            score += 5.0 * weight
+
     for effect in candidate_effects or []:
         if effect.effect_kind == "energy_produce" and stats.energy_package_requested:
             if stats.energy_producers < stats.energy_producer_floor:

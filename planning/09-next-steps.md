@@ -29,7 +29,8 @@ Status as of 2026-05-31. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | `--strict-dependencies` | Done — D4 pick-time filter |
 | `--repair-dependencies` | Done — D5 post-build swap pass |
 | Wizard dependency controls (UX2) | **Not started** — CLI flags only today |
-| Dependency dogfood calibration | **In progress** — automated `analyze run`; full-matrix pass after `import` |
+| Dependency dogfood calibration | **Done** — `analyze run` matrix; mechanic packages for energy, auras, artifacts, subtype lords |
+| Mechanic packages (non-energy) | **Done** — voltron auras, equip/vehicles artifacts, elf lords (card-driven) |
 
 ## Dogfooding snapshot (v1 closure)
 
@@ -173,6 +174,6 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 ## Suggested next task
 
-**Run `analyze run` on a fresh import** and confirm false-positive rate &lt; 5%, then **UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. Threshold review against `dependency-audit` evidence remains optional follow-up.
+**UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. Optional: **sacrifice/aristocrats** package when effect patterns exist; expand `analyze` matrix for elf tribal and artifact-heavy commanders.
 
 See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX2 → UX3 criteria linter → UX5 local web).

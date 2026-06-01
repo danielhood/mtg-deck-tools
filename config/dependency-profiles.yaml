@@ -49,6 +49,8 @@ profiles:
   # Audit 2026-05-30: 662 elf creatures, 9 other-elf payoffs (buff_subtype)
   elves:
     label: Elf tribal
+    activation:
+      include_mechanics: []
     roles: [subtype_payoff, subtype_creature]
     defaults:
       subtype: Elf
@@ -58,6 +60,8 @@ profiles:
   # Audit 2026-05-30: 23 whenever-cast-artifact payoffs (partial coverage)
   artifacts:
     label: Artifacts matter
+    activation:
+      include_mechanics: [equip, vehicles]
     roles: [artifact_spell, artifact_payoff]
     defaults:
       artifact_min: 8

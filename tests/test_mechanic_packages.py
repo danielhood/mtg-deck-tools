@@ -100,3 +100,53 @@ def test_ensure_energy_adds_producers_when_only_consumer(energy_pkg_db: sqlite3.
     )
     energy_issues = [i for i in report.issues if i.rule_id == "ENERGY_BALANCE"]
     assert not energy_issues
+
+
+def test_ensure_aura_package(energy_pkg_db: sqlite3.Connection, monkeypatch) -> None:
+    from mtg_deck_tools.builder.mechanic_packages import ensure_aura_package
+
+    monkeypatch.setattr(
+        "mtg_deck_tools.builder.mechanic_packages.aura_spell_min",
+        lambda profiles=None: 2,
+    )
+    conn = energy_pkg_db
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, oracle_text, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land, price_known
+        ) VALUES ('aura1', 'Ethereal Armor', 'Enchantment — Aura', '', '{W}', 1, '["G"]', '[]', 1, 0, 0, 1)
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, oracle_text, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land, price_known
+        ) VALUES ('aura2', 'Rancor', 'Enchantment — Aura', '', '{G}', 1, '["G"]', '[]', 1, 0, 0, 1)
+        """
+    )
+    for i in range(6, 12):
+        _insert_card(conn, oracle_id=f"aura{i}", name=f"Aura {i}", type_line="Enchantment — Aura")
+    conn.commit()
+
+    cards = [
+        _deck_card(
+            oracle_id="aura1",
+            name="Ethereal Armor",
+            type_line="Enchantment — Aura",
+            slot="synergy",
+        ),
+        _deck_card(oracle_id="f0", name="Filler 0", type_line="Instant", slot="flex"),
+    ]
+    criteria = DeckCriteria(themes=["voltron"])
+    result = ensure_aura_package(
+        conn,
+        cards,
+        criteria=criteria,
+        identity=["G"],
+        commander_oracle_ids=set(),
+        commander_theme_tags=set(),
+    )
+    assert result.swaps >= 1
+    assert sum(1 for c in result.cards if "Aura" in c.type_line) >= 2
