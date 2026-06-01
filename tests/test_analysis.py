@@ -49,6 +49,18 @@ def test_classify_energy_include_appropriate() -> None:
     assert classify_dependency_warning(issue, criteria) == "appropriate"
 
 
+def test_classify_aristocrats_sacrifice_appropriate() -> None:
+    criteria = DeckCriteria(themes=["aristocrats"])
+    issue = DependencyIssue(
+        rule_id="SACRIFICE_BALANCE",
+        status="warn",
+        message="test",
+        profile_id="sacrifice",
+        detail={"outlets": ["Altar"], "payoffs": []},
+    )
+    assert classify_dependency_warning(issue, criteria) == "appropriate"
+
+
 def test_expect_rules_must_not_warn() -> None:
     from mtg_deck_tools.analysis.matrix import (
         AnalysisScenario,

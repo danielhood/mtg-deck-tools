@@ -90,6 +90,8 @@ cases:
         source: whenever_cast_type
         payload:
           types: [artifact]
+      - effect_kind: sacrifice_fodder
+        source: sacrifice_fodder_token
 
   - name: lightning_bolt
     oracle_text: "Lightning Bolt deals 3 damage to any target."
@@ -142,6 +144,41 @@ cases:
     oracle_text: "Other creatures you control get +1/+1."
     type_line: "Legendary Creature — Human Noble"
     expected: []
+
+  - name: ashnods_altar
+    oracle_text: "Sacrifice a creature: Add {C}{C}."
+    type_line: "Artifact"
+    expected:
+      - effect_kind: sacrifice_outlet
+        source: sacrifice_outlet
+
+  - name: blood_artist
+    oracle_text: "Whenever a creature dies, Blood Artist deals 1 damage to that creature's controller and you gain 1 life."
+    type_line: "Creature — Vampire"
+    expected:
+      - effect_kind: sacrifice_payoff
+        source: sacrifice_creature_dies_payoff
+
+  - name: zulaport_cutthroat
+    oracle_text: "Whenever another creature you control dies, each opponent loses 1 life and you gain 1 life."
+    type_line: "Creature — Human Rogue Ally"
+    expected:
+      - effect_kind: sacrifice_payoff
+        source: sacrifice_creature_dies_payoff
+
+  - name: nest_invader
+    oracle_text: "When Nest Invader enters the battlefield, create a 0/1 colorless Eldrazi Spawn creature token with \"Sacrifice this creature: Add {C}.\""
+    type_line: "Creature — Eldrazi Drone"
+    expected:
+      - effect_kind: sacrifice_fodder
+        source: sacrifice_fodder_token
+
+  - name: vindictive_wrench
+    oracle_text: "Sacrifice an artifact. If you do, destroy target artifact."
+    type_line: "Instant"
+    expected:
+      - effect_kind: sacrifice_outlet
+        source: sacrifice_outlet
 
   - name: double_search_creature
     oracle_text: "Search your library for a creature card, then search your library for a land card."

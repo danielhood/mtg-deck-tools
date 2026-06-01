@@ -153,6 +153,58 @@ patterns:
     capture:
       types: 1
 
+  # --- sacrifice / aristocrats (payoff before outlet; outlet excludes payoffs) ---
+  - id: sacrifice_creature_dies_payoff
+    effect_kind: sacrifice_payoff
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever (?:a |another |each )?(?:[\\w'-]+ )*(?:creature|permanent)(?: you control)? dies"
+    payload:
+      trigger: dies
+
+  - id: sacrifice_any_creature_dies
+    effect_kind: sacrifice_payoff
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever a creature dies"
+    payload:
+      trigger: dies
+    exclude_if_matched:
+      - sacrifice_creature_dies_payoff
+
+  - id: sacrifice_on_sacrifice_payoff
+    effect_kind: sacrifice_payoff
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)when(ever)? you sacrifice"
+    payload:
+      trigger: sacrifice
+
+  - id: sacrifice_outlet
+    effect_kind: sacrifice_outlet
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(?:you may )?sacrifice (?:a |an |another |each |one or more |one of your )(?:[\\w'-]+ )*(creature|permanent|artifact)"
+    payload:
+      role: outlet
+    exclude_if_matched:
+      - sacrifice_creature_dies_payoff
+      - sacrifice_any_creature_dies
+      - sacrifice_on_sacrifice_payoff
+
+  - id: sacrifice_fodder_token
+    effect_kind: sacrifice_fodder
+    confidence: 0.85
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)create (?:a |an |two |three |four |five |\\d+/\\d+ |one or more |any number of )?(?:[\\w'/.-]+ )*token"
+    payload:
+      role: fodder
+
   # --- type line (not oracle) ---
   - id: type_line_aura
     effect_kind: type_line_aura

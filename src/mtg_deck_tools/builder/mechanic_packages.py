@@ -6,7 +6,12 @@ import sqlite3
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from mtg_deck_tools.builder.dependency_repair import MAX_REPAIR_SWAPS, swap_energy_card, swap_matching_card
+from mtg_deck_tools.builder.dependency_repair import (
+    MAX_REPAIR_SWAPS,
+    swap_effect_kind_card,
+    swap_energy_card,
+    swap_matching_card,
+)
 from mtg_deck_tools.builder.dependency_scoring import card_effects_enabled
 from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.models.criteria import DeckCriteria
@@ -17,6 +22,7 @@ from mtg_deck_tools.rules.dependency_profiles import (
     elf_creature_min,
     elf_subtype,
     energy_profile_floors,
+    sacrifice_profile_floors,
 )
 from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
 
@@ -75,6 +81,44 @@ def count_energy_cards(
             elif effect.effect_kind == "energy_consume":
                 consumers += 1
     return producers, consumers
+
+
+def _sacrifice_role_oracle_ids(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+) -> tuple[set[str], set[str], set[str]]:
+    effects = fetch_card_effects(conn, [c.oracle_id for c in cards])
+    outlets: set[str] = set()
+    payoffs: set[str] = set()
+    fodders: set[str] = set()
+    for card in cards:
+        for effect in effects.get(card.oracle_id, []):
+            if effect.effect_kind == "sacrifice_outlet":
+                outlets.add(card.oracle_id)
+            elif effect.effect_kind == "sacrifice_payoff":
+                payoffs.add(card.oracle_id)
+            elif effect.effect_kind == "sacrifice_fodder":
+                fodders.add(card.oracle_id)
+    return outlets, payoffs, fodders
+
+
+def count_sacrifice_cards(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+) -> tuple[int, int, int]:
+    effects = fetch_card_effects(conn, [c.oracle_id for c in cards])
+    outlets = 0
+    payoffs = 0
+    fodders = 0
+    for card in cards:
+        for effect in effects.get(card.oracle_id, []):
+            if effect.effect_kind == "sacrifice_outlet":
+                outlets += 1
+            elif effect.effect_kind == "sacrifice_payoff":
+                payoffs += 1
+            elif effect.effect_kind == "sacrifice_fodder":
+                fodders += 1
+    return outlets, payoffs, fodders
 
 
 def _lords_in_deck(
@@ -192,6 +236,80 @@ def ensure_energy_package(
             break
         working, msg = result
         messages.append(msg.replace("Dependency repair:", "Energy package:"))
+        swaps += 1
+
+    return MechanicPackageResult(working, messages, swaps)
+
+
+def ensure_sacrifice_package(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> MechanicPackageResult:
+    scope = build_dependency_scope(criteria)
+    if not scope.sacrifice_user_intent:
+        return MechanicPackageResult(list(cards), [])
+
+    outlet_min, payoff_min, fodder_min = sacrifice_profile_floors()
+    working = list(cards)
+    messages: list[str] = []
+    swaps = 0
+
+    for _ in range(MAX_REPAIR_SWAPS):
+        outlets, payoffs, fodders = count_sacrifice_cards(conn, working)
+        if outlets >= outlet_min and payoffs >= payoff_min and fodders >= fodder_min:
+            break
+
+        if outlets < outlet_min:
+            effect_kind = "sacrifice_outlet"
+        elif payoffs < payoff_min:
+            effect_kind = "sacrifice_payoff"
+        elif fodders < fodder_min:
+            effect_kind = "sacrifice_fodder"
+        elif outlets > 0 and payoffs == 0:
+            effect_kind = "sacrifice_payoff"
+        elif payoffs > 0 and outlets == 0:
+            effect_kind = "sacrifice_outlet"
+        else:
+            break
+
+        outlet_ids, payoff_ids, fodder_ids = _sacrifice_role_oracle_ids(conn, working)
+        protect: set[str] = set()
+        if effect_kind == "sacrifice_outlet" and len(payoff_ids) <= payoff_min:
+            protect = payoff_ids
+        elif effect_kind == "sacrifice_payoff" and len(outlet_ids) <= outlet_min:
+            protect = outlet_ids
+        elif effect_kind == "sacrifice_fodder":
+            if len(outlet_ids) <= outlet_min:
+                protect |= outlet_ids
+            if len(payoff_ids) <= payoff_min:
+                protect |= payoff_ids
+
+        role_label = effect_kind.replace("sacrifice_", "sacrifice ")
+        result = swap_effect_kind_card(
+            conn,
+            working,
+            effect_kind,
+            role_label=role_label,
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+            protect_oracle_ids=protect,
+        )
+        if result is None:
+            messages.append(
+                f"Sacrifice package: could not add {role_label} "
+                f"(have {outlets} outlet(s), {payoffs} payoff(s), {fodders} fodder; "
+                f"want ≥{outlet_min} / ≥{payoff_min} / ≥{fodder_min})."
+            )
+            break
+        working, msg = result
+        messages.append(msg.replace("Dependency repair:", "Sacrifice package:"))
         swaps += 1
 
     return MechanicPackageResult(working, messages, swaps)
@@ -384,6 +502,7 @@ def ensure_included_mechanic_packages(
 
     for ensure_fn in (
         ensure_energy_package,
+        ensure_sacrifice_package,
         ensure_aura_package,
         ensure_artifact_package,
         ensure_subtype_lord_packages,

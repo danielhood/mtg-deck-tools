@@ -67,9 +67,10 @@ profiles:
       artifact_min: 8
       share_max: 0.22
 
-  # Deferred — no effect patterns yet; aristocrats theme tag only
   sacrifice:
     label: Sacrifice / aristocrats
+    activation:
+      themes: [aristocrats]
     roles: [outlet, fodder, payoff]
     defaults:
       outlet_min: 2

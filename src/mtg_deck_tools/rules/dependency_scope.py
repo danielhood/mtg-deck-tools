@@ -22,6 +22,7 @@ class DependencyScope:
     energy_user_intent: bool = False
     artifacts_user_intent: bool = False
     elves_user_intent: bool = False
+    sacrifice_user_intent: bool = False
 
 
 def _load_profile_activation(path: Path | None = None) -> dict[str, dict[str, list[str]]]:
@@ -79,4 +80,5 @@ def build_dependency_scope(
         energy_user_intent=energy_user,
         artifacts_user_intent=_profile_active("artifacts"),
         elves_user_intent=_profile_active("elves"),
+        sacrifice_user_intent=_profile_active("sacrifice"),
     )
