@@ -13,6 +13,7 @@ from mtg_deck_tools.rules.dependency_profiles import (
     artifact_spell_min,
     aura_spell_min,
     energy_profile_floors,
+    sacrifice_profile_floors,
 )
 from mtg_deck_tools.rules.dependencies import (
     CardEffectRow,
@@ -44,6 +45,15 @@ class DeckBuildStats:
     artifact_package_requested: bool = False
     needs_elf_support: bool = False
     elf_other_minimum: int = 5
+    sacrifice_outlets: int = 0
+    sacrifice_payoffs: int = 0
+    sacrifice_fodder: int = 0
+    sacrifice_outlet_floor: int = 0
+    sacrifice_payoff_floor: int = 0
+    sacrifice_fodder_floor: int = 0
+    sacrifice_package_requested: bool = False
+    needs_sacrifice_payoff: bool = False
+    needs_sacrifice_outlet: bool = False
 
 
 def card_effects_enabled(conn: sqlite3.Connection) -> bool:
@@ -112,6 +122,12 @@ def build_deck_build_stats(
                 stats.energy_producers += 1
             elif effect.effect_kind == "energy_consume":
                 stats.energy_consumers += 1
+            elif effect.effect_kind == "sacrifice_outlet":
+                stats.sacrifice_outlets += 1
+            elif effect.effect_kind == "sacrifice_payoff":
+                stats.sacrifice_payoffs += 1
+            elif effect.effect_kind == "sacrifice_fodder":
+                stats.sacrifice_fodder += 1
 
     for subtype in ("Elf", "Goblin", "Zombie", "Vampire", "Dragon"):
         count = _count_subtype_on_cards(partial, subtype)
@@ -120,6 +136,8 @@ def build_deck_build_stats(
 
     stats.needs_energy_consumer = stats.energy_producers > 0 and stats.energy_consumers == 0
     stats.needs_energy_producer = stats.energy_consumers > 0 and stats.energy_producers == 0
+    stats.needs_sacrifice_payoff = stats.sacrifice_outlets > 0 and stats.sacrifice_payoffs == 0
+    stats.needs_sacrifice_outlet = stats.sacrifice_payoffs > 0 and stats.sacrifice_outlets == 0
 
     if criteria is not None:
         from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
@@ -140,6 +158,16 @@ def build_deck_build_stats(
         if scope.artifacts_user_intent:
             stats.artifact_package_requested = True
             stats.artifact_spell_floor = artifact_spell_min(profile_cfg)
+        if scope.sacrifice_user_intent:
+            o_min, p_min, f_min = sacrifice_profile_floors(profile_cfg)
+            stats.sacrifice_package_requested = True
+            stats.sacrifice_outlet_floor = o_min
+            stats.sacrifice_payoff_floor = p_min
+            stats.sacrifice_fodder_floor = f_min
+            if stats.sacrifice_outlets < o_min:
+                stats.needs_sacrifice_outlet = True
+            if stats.sacrifice_payoffs < p_min:
+                stats.needs_sacrifice_payoff = True
 
     elf_min = int(profile_cfg.get("elves", {}).get("payoff_creature_min", 5))
     stats.elf_other_minimum = elf_min
@@ -199,6 +227,19 @@ def dependency_pick_score(
         if effect.effect_kind == "energy_consume" and stats.needs_energy_consumer:
             score += 5.0 * weight
         elif effect.effect_kind == "energy_produce" and stats.needs_energy_producer:
+            score += 3.5 * weight
+        elif effect.effect_kind == "sacrifice_outlet" and stats.sacrifice_package_requested:
+            if stats.sacrifice_outlets < stats.sacrifice_outlet_floor:
+                score += 7.0 * weight
+        elif effect.effect_kind == "sacrifice_payoff" and stats.sacrifice_package_requested:
+            if stats.sacrifice_payoffs < stats.sacrifice_payoff_floor:
+                score += 7.0 * weight
+        elif effect.effect_kind == "sacrifice_fodder" and stats.sacrifice_package_requested:
+            if stats.sacrifice_fodder < stats.sacrifice_fodder_floor:
+                score += 4.0 * weight
+        elif effect.effect_kind == "sacrifice_payoff" and stats.needs_sacrifice_payoff:
+            score += 5.0 * weight
+        elif effect.effect_kind == "sacrifice_outlet" and stats.needs_sacrifice_outlet:
             score += 3.5 * weight
         elif effect.effect_kind == "energy_consume" and stats.energy_producers >= 2:
             if stats.energy_consumers < stats.energy_producers:

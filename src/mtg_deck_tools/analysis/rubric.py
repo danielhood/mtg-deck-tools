@@ -42,6 +42,15 @@ def classify_dependency_warning(
             return "appropriate"
         return "inappropriate"
 
+    if rule_id == "SACRIFICE_BALANCE":
+        if scope.sacrifice_user_intent:
+            return "appropriate"
+        outlets = detail.get("outlets") or []
+        payoffs = detail.get("payoffs") or []
+        if max(len(outlets), len(payoffs)) >= 2:
+            return "appropriate"
+        return "inappropriate"
+
     if rule_id == "TUTOR_TARGET_EXISTS":
         return "appropriate"
 

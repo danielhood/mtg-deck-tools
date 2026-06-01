@@ -38,3 +38,14 @@ def elf_creature_min(profiles: dict[str, dict[str, Any]] | None = None) -> int:
 
 def elf_subtype(profiles: dict[str, dict[str, Any]] | None = None) -> str:
     return str(_profile_defaults("elves", profiles).get("subtype", "Elf"))
+
+
+def sacrifice_profile_floors(
+    profiles: dict[str, dict[str, Any]] | None = None,
+) -> tuple[int, int, int]:
+    cfg = _profile_defaults("sacrifice", profiles)
+    return (
+        int(cfg.get("outlet_min", 2)),
+        int(cfg.get("payoff_min", 3)),
+        int(cfg.get("fodder_min", 8)),
+    )

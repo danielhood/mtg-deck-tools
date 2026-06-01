@@ -36,6 +36,7 @@ MAX_REPAIR_SWAPS = 10
 ISSUE_PRIORITY = (
     "TUTOR_TARGET_EXISTS",
     "ENERGY_BALANCE",
+    "SACRIFICE_BALANCE",
     "TYPE_SYNERGY_MIN",
     "AURA_SUPPORT_MIN",
 )
@@ -339,18 +340,19 @@ def swap_matching_card(
     )
 
 
-def swap_energy_card(
+def swap_effect_kind_card(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
     effect_kind: str,
     *,
+    role_label: str,
     criteria: DeckCriteria,
     identity: list[str],
     commander_oracle_ids: set[str],
     commander_theme_tags: set[str],
     protect_oracle_ids: set[str] | None = None,
 ) -> tuple[list[DeckCard], str] | None:
-    """Replace a flex/synergy card with an energy producer or consumer."""
+    """Replace a flex/synergy card with another card that has the given effect kind."""
     victim = _pick_victim(cards, protect_oracle_ids=protect_oracle_ids or set())
     if victim is None:
         return None
@@ -385,10 +387,34 @@ def swap_energy_card(
         return None
     tags = fetch_card_tags(conn, [pick.oracle_id]).get(pick.oracle_id, [])
     updated = _apply_swap(cards, victim, pick, tags)
-    role = "payoff" if effect_kind == "energy_consume" else "producer"
     return (
         updated,
-        f"Dependency repair: replaced {victim.name} with {pick.name} (energy {role}).",
+        f"Dependency repair: replaced {victim.name} with {pick.name} ({role_label}).",
+    )
+
+
+def swap_energy_card(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    effect_kind: str,
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+    protect_oracle_ids: set[str] | None = None,
+) -> tuple[list[DeckCard], str] | None:
+    role = "payoff" if effect_kind == "energy_consume" else "producer"
+    return swap_effect_kind_card(
+        conn,
+        cards,
+        effect_kind,
+        role_label=f"energy {role}",
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=commander_oracle_ids,
+        commander_theme_tags=commander_theme_tags,
+        protect_oracle_ids=protect_oracle_ids,
     )
 
 
@@ -410,6 +436,37 @@ def _fix_energy_balance(
         conn,
         cards,
         effect_kind,
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=commander_oracle_ids,
+        commander_theme_tags=commander_theme_tags,
+    )
+
+
+def _fix_sacrifice_balance(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    issue: DependencyIssue,
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> tuple[list[DeckCard], str] | None:
+    detail = issue.detail or {}
+    outlets = detail.get("outlets") or []
+    payoffs = detail.get("payoffs") or []
+    if outlets and not payoffs:
+        effect_kind = "sacrifice_payoff"
+        role_label = "sacrifice payoff"
+    else:
+        effect_kind = "sacrifice_outlet"
+        role_label = "sacrifice outlet"
+    return swap_effect_kind_card(
+        conn,
+        cards,
+        effect_kind,
+        role_label=role_label,
         criteria=criteria,
         identity=identity,
         commander_oracle_ids=commander_oracle_ids,
@@ -536,6 +593,16 @@ def _attempt_repair(
         )
     if issue.rule_id == "ENERGY_BALANCE":
         return _fix_energy_balance(
+            conn,
+            cards,
+            issue,
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+        )
+    if issue.rule_id == "SACRIFICE_BALANCE":
+        return _fix_sacrifice_balance(
             conn,
             cards,
             issue,

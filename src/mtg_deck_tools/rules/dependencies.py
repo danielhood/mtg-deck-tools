@@ -232,6 +232,22 @@ def _should_warn_energy_imbalance(
     return dominant >= 2
 
 
+def _should_warn_sacrifice_imbalance(
+    *,
+    scope: DependencyScope,
+    outlet_count: int,
+    payoff_count: int,
+) -> bool:
+    if outlet_count == 0 and payoff_count == 0:
+        return False
+    if outlet_count > 0 and payoff_count > 0:
+        return False
+    if scope.sacrifice_user_intent:
+        return True
+    dominant = max(outlet_count, payoff_count)
+    return dominant >= 2
+
+
 def validate_dependencies(
     conn: sqlite3.Connection,
     *,
@@ -272,6 +288,9 @@ def validate_dependencies(
 
     energy_producers: list[str] = []
     energy_consumers: list[str] = []
+    sacrifice_outlets: list[str] = []
+    sacrifice_payoffs: list[str] = []
+    sacrifice_fodder: list[str] = []
     aura_spells = _count_type(maindeck, "enchantment")  # refined below for Aura subtype
 
     for card in maindeck:
@@ -280,6 +299,12 @@ def validate_dependencies(
                 energy_producers.append(card.name)
             elif effect.effect_kind == "energy_consume":
                 energy_consumers.append(card.name)
+            elif effect.effect_kind == "sacrifice_outlet":
+                sacrifice_outlets.append(card.name)
+            elif effect.effect_kind == "sacrifice_payoff":
+                sacrifice_payoffs.append(card.name)
+            elif effect.effect_kind == "sacrifice_fodder":
+                sacrifice_fodder.append(card.name)
             elif effect.effect_kind == "type_line_aura":
                 pass
 
@@ -349,6 +374,55 @@ def validate_dependencies(
             profile_id="energy",
             counts={"producer": len(energy_producers), "consumer": len(energy_consumers)},
             status=severity if strict and energy_warn else ("warn" if energy_warn else "pass"),
+            messages=[],
+        )
+    )
+
+    sacrifice_imbalanced = (sacrifice_outlets and not sacrifice_payoffs) or (
+        sacrifice_payoffs and not sacrifice_outlets
+    )
+    sacrifice_warn = sacrifice_imbalanced and _should_warn_sacrifice_imbalance(
+        scope=dep_scope,
+        outlet_count=len(sacrifice_outlets),
+        payoff_count=len(sacrifice_payoffs),
+    )
+    if sacrifice_warn and sacrifice_outlets and not sacrifice_payoffs:
+        report.issues.append(
+            DependencyIssue(
+                rule_id="SACRIFICE_BALANCE",
+                status=severity,
+                message=(
+                    f"Deck has {len(sacrifice_outlets)} sacrifice outlet(s) "
+                    f"({', '.join(sacrifice_outlets[:5])}"
+                    f"{', …' if len(sacrifice_outlets) > 5 else ''}) but no sacrifice payoffs "
+                    f"(e.g. \"whenever a creature dies\")."
+                ),
+                profile_id="sacrifice",
+                detail={"outlets": sacrifice_outlets, "payoffs": []},
+            )
+        )
+    elif sacrifice_warn and sacrifice_payoffs and not sacrifice_outlets:
+        report.issues.append(
+            DependencyIssue(
+                rule_id="SACRIFICE_BALANCE",
+                status=severity,
+                message=(
+                    f"Deck has {len(sacrifice_payoffs)} sacrifice payoff(s) but no cards that "
+                    f"let you sacrifice creatures or permanents."
+                ),
+                profile_id="sacrifice",
+                detail={"outlets": [], "payoffs": sacrifice_payoffs},
+            )
+        )
+    report.profiles.append(
+        ProfileSummary(
+            profile_id="sacrifice",
+            counts={
+                "outlet": len(sacrifice_outlets),
+                "payoff": len(sacrifice_payoffs),
+                "fodder": len(sacrifice_fodder),
+            },
+            status=severity if strict and sacrifice_warn else ("warn" if sacrifice_warn else "pass"),
             messages=[],
         )
     )

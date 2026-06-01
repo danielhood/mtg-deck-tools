@@ -88,7 +88,8 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN]
+        rules_must_not_warn: [SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
 
   # --- Budget / availability (v1 closure parity) ---
   - id: budget-pantlaza-strict

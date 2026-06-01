@@ -8,7 +8,7 @@ import sqlite3
 import pytest
 
 from mtg_deck_tools.builder.deck import DeckCard
-from mtg_deck_tools.builder.mechanic_packages import ensure_energy_package
+from mtg_deck_tools.builder.mechanic_packages import ensure_energy_package, ensure_sacrifice_package
 from mtg_deck_tools.db.schema import apply_schema
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.dependencies import validate_dependencies
@@ -150,3 +150,78 @@ def test_ensure_aura_package(energy_pkg_db: sqlite3.Connection, monkeypatch) -> 
     )
     assert result.swaps >= 1
     assert sum(1 for c in result.cards if "Aura" in c.type_line) >= 2
+
+
+def _insert_card_b(
+    conn: sqlite3.Connection, *, oracle_id: str, name: str, type_line: str
+) -> None:
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, oracle_text, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land, price_known
+        ) VALUES (?, ?, ?, '', '{2}', 2, '["B"]', '[]', 1, 0, 0, 1)
+        """,
+        (oracle_id, name, type_line),
+    )
+
+
+@pytest.fixture
+def sacrifice_pkg_db() -> sqlite3.Connection:
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    apply_schema(conn)
+    for i in range(6):
+        _insert_card_b(conn, oracle_id=f"f{i}", name=f"Filler {i}", type_line="Instant")
+    _insert_card_b(conn, oracle_id="altar", name="Ashnod's Altar", type_line="Artifact")
+    _insert_effect(conn, "altar", "sacrifice_outlet", "sacrifice_outlet")
+    _insert_card_b(conn, oracle_id="artist", name="Blood Artist", type_line="Creature")
+    _insert_effect(conn, "artist", "sacrifice_payoff", "sacrifice_creature_dies_payoff")
+    _insert_card_b(conn, oracle_id="nest", name="Nest Invader", type_line="Creature")
+    _insert_effect(conn, "nest", "sacrifice_fodder", "sacrifice_fodder_token")
+    for i in range(3):
+        oid = f"out{i}"
+        _insert_card_b(conn, oracle_id=oid, name=f"Outlet {i}", type_line="Artifact")
+        _insert_effect(conn, oid, "sacrifice_outlet", "sacrifice_outlet")
+    for i in range(4):
+        oid = f"pay{i}"
+        _insert_card_b(conn, oracle_id=oid, name=f"Payoff {i}", type_line="Creature")
+        _insert_effect(conn, oid, "sacrifice_payoff", "sacrifice_creature_dies_payoff")
+    for i in range(10):
+        oid = f"tok{i}"
+        _insert_card_b(conn, oracle_id=oid, name=f"Token {i}", type_line="Creature")
+        _insert_effect(conn, oid, "sacrifice_fodder", "sacrifice_fodder_token")
+    conn.commit()
+    return conn
+
+
+def test_ensure_sacrifice_adds_payoff_when_only_outlet(
+    sacrifice_pkg_db: sqlite3.Connection,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        "mtg_deck_tools.builder.mechanic_packages.sacrifice_profile_floors",
+        lambda profiles=None: (1, 1, 1),
+    )
+    cards = [
+        _deck_card(oracle_id="altar", name="Ashnod's Altar", type_line="Artifact"),
+        _deck_card(oracle_id="f0", name="Filler 0", type_line="Instant"),
+    ]
+    criteria = DeckCriteria(themes=["aristocrats"])
+    result = ensure_sacrifice_package(
+        sacrifice_pkg_db,
+        cards,
+        criteria=criteria,
+        identity=["B"],
+        commander_oracle_ids=set(),
+        commander_theme_tags=set(),
+    )
+    assert result.swaps >= 1
+    report = validate_dependencies(
+        sacrifice_pkg_db,
+        maindeck=result.cards,
+        commanders=[],
+        criteria=criteria,
+    )
+    sacrifice_issues = [i for i in report.issues if i.rule_id == "SACRIFICE_BALANCE"]
+    assert not sacrifice_issues

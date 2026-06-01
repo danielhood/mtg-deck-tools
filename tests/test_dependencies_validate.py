@@ -141,6 +141,34 @@ def test_energy_one_sided_warns_with_energy_intent(dep_db: sqlite3.Connection) -
     assert any(i.rule_id == "ENERGY_BALANCE" for i in report.warnings)
 
 
+def test_sacrifice_one_sided_warns_with_aristocrats_intent(dep_db: sqlite3.Connection) -> None:
+    conn = dep_db
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, oracle_text, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land, price_known
+        ) VALUES ('altar', 'Ashnod''s Altar', 'Artifact', '', '{3}', 3, '[]', '[]', 1, 0, 0, 1)
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO card_effects (
+            oracle_id, face_index, effect_kind, payload, confidence, source
+        ) VALUES ('altar', 0, 'sacrifice_outlet', '{}', 1.0, 'sacrifice_outlet')
+        """
+    )
+    conn.commit()
+    maindeck = [_deck_card(oracle_id="altar", name="Ashnod's Altar", type_line="Artifact")]
+    report = validate_dependencies(
+        conn,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["aristocrats"]),
+    )
+    assert any(i.rule_id == "SACRIFICE_BALANCE" for i in report.warnings)
+
+
 def test_energy_one_sided_silent_without_intent(dep_db: sqlite3.Connection) -> None:
     maindeck = [_deck_card(oracle_id="hub", name="Aether Hub", type_line="Land", cmc=0.0)]
     report = validate_dependencies(
