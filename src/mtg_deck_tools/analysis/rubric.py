@@ -29,9 +29,8 @@ def classify_dependency_warning(
     detail = issue.detail or {}
 
     if rule_id == "AURA_SUPPORT_MIN":
-        if scope.aura_support_min:
-            return "appropriate"
-        return "inappropriate"
+        # Fires only for voltron theme or card-driven aura tutors / Aura cast payoffs.
+        return "appropriate"
 
     if rule_id == "ENERGY_BALANCE":
         if scope.energy_user_intent:
