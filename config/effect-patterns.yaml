@@ -143,6 +143,16 @@ patterns:
     capture:
       subtypes_plural: 1
 
+  - id: whenever_cast_aura
+    effect_kind: whenever_cast_aura
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever you cast an Aura"
+    payload:
+      types: [enchantment]
+      subtypes: [Aura]
+
   - id: whenever_cast_type
     effect_kind: whenever_cast_type
     confidence: 0.9
@@ -152,6 +162,8 @@ patterns:
     payload: {}
     capture:
       types: 1
+    exclude_if_matched:
+      - whenever_cast_aura
 
   # --- sacrifice / aristocrats (payoff before outlet; outlet excludes payoffs) ---
   - id: sacrifice_creature_dies_payoff

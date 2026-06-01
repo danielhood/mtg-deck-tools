@@ -15,7 +15,11 @@ from mtg_deck_tools.builder.dependency_repair import (
 from mtg_deck_tools.builder.dependency_scoring import card_effects_enabled
 from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.rules.dependencies import fetch_card_effects
+from mtg_deck_tools.rules.dependencies import (
+    _payload_searches_auras,
+    _should_check_aura_support_min,
+    fetch_card_effects,
+)
 from mtg_deck_tools.rules.dependency_profiles import (
     artifact_spell_min,
     aura_spell_min,
@@ -325,10 +329,29 @@ def ensure_aura_package(
     commander_theme_tags: set[str],
 ) -> MechanicPackageResult:
     scope = build_dependency_scope(criteria)
-    if not scope.aura_support_min:
+    effects_map = fetch_card_effects(conn, [c.oracle_id for c in cards])
+    if not _should_check_aura_support_min(
+        scope=scope,
+        aura_spells=count_aura_spells(cards),
+        effects_map=effects_map,
+        maindeck=cards,
+    ):
         return MechanicPackageResult(list(cards), [])
 
     minimum = aura_spell_min()
+
+    def _aura_protect_ids(deck: list[DeckCard]) -> set[str]:
+        protect = {c.oracle_id for c in deck if "Aura" in (c.type_line or "")}
+        deck_effects = fetch_card_effects(conn, [c.oracle_id for c in deck])
+        for card in deck:
+            for effect in deck_effects.get(card.oracle_id, []):
+                if effect.effect_kind == "whenever_cast_aura":
+                    protect.add(card.oracle_id)
+                elif effect.effect_kind == "search_library" and _payload_searches_auras(
+                    effect.payload
+                ):
+                    protect.add(card.oracle_id)
+        return protect
 
     def need_more(deck: list[DeckCard]) -> bool:
         return count_aura_spells(deck) < minimum
@@ -343,6 +366,7 @@ def ensure_aura_package(
             identity=identity,
             commander_oracle_ids=commander_oracle_ids,
             commander_theme_tags=commander_theme_tags,
+            protect_oracle_ids=_aura_protect_ids(deck),
         )
 
     def fail_msg(deck: list[DeckCard]) -> str:

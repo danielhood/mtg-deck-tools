@@ -174,6 +174,6 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 ## Suggested next task
 
-**UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. Optional: **sacrifice/aristocrats** package when effect patterns exist; expand `analyze` matrix for elf tribal and artifact-heavy commanders.
+**UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. **Dogfood matrix** expanded (elf tribal, Breya/Urza artifacts, Korvold/Chatterfang aristocrats, landfall, goblins, Edgar, Sythis) — see [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml).
 
 See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX2 → UX3 criteria linter → UX5 local web).

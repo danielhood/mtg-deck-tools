@@ -21,7 +21,7 @@ from mtg_deck_tools.rules.dependencies import DependencyIssue, DependencyReport
 def test_load_dogfood_matrix_has_scenarios() -> None:
     matrix = load_analysis_matrix()
     assert matrix.schema_version >= 1
-    assert len(matrix.scenarios) >= 8
+    assert len(matrix.scenarios) >= 18
     assert all(s.commander_names for s in matrix.scenarios)
 
 

@@ -82,6 +82,25 @@ cases:
       - effect_kind: type_line_aura
         source: type_line_aura
 
+  - name: ethereal_armor_aura_cast
+    oracle_text: "Whenever you cast an Aura spell, draw a card."
+    type_line: "Creature"
+    expected:
+      - effect_kind: whenever_cast_aura
+        source: whenever_cast_aura
+        payload:
+          types: [enchantment]
+          subtypes: [Aura]
+
+  - name: enchantress_presence
+    oracle_text: "Whenever you cast an enchantment spell, draw a card."
+    type_line: "Enchantment"
+    expected:
+      - effect_kind: whenever_cast_type
+        source: whenever_cast_type
+        payload:
+          types: [enchantment]
+
   - name: sai_master_thopterist
     oracle_text: "Whenever you cast an artifact spell, create a 1/1 colorless Thopter artifact creature token with flying."
     type_line: "Legendary Creature — Human Artificer"

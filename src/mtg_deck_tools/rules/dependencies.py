@@ -179,10 +179,7 @@ def _payload_searches_auras(payload: dict[str, Any]) -> bool:
 def _deck_has_aura_payoff(effects_map: dict[str, list[CardEffectRow]]) -> bool:
     for effects in effects_map.values():
         for effect in effects:
-            if effect.effect_kind != "whenever_cast_type":
-                continue
-            types = effect.payload.get("types") or []
-            if types == ["enchantment"]:
+            if effect.effect_kind == "whenever_cast_aura":
                 return True
     return False
 

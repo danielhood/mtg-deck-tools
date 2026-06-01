@@ -77,6 +77,74 @@ scenarios:
         rules_must_not_warn: [ENERGY_BALANCE]
         max_inappropriate_warnings: 0
 
+  # --- Elf tribal (subtype lord package + card-driven TYPE_SYNERGY_MIN) ---
+  - id: elves-lathril
+    label: Elf tribal (Lathril) — tokens + lord support
+    commander_names: ["Lathril, Blade of the Elves"]
+    criteria:
+      themes: [tokens]
+      colors: [B, G]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: elves-marwyn
+    label: Elf tribal (Marwyn) — ramp/draw mono-green
+    commander_names: ["Marwyn, the Nurturer"]
+    criteria:
+      themes: [ramp, draw]
+      colors: [G]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: elves-ezuri
+    label: Elf tribal (Ezuri) — combat-focused
+    commander_names: ["Ezuri, Renegade Leader"]
+    criteria:
+      themes: [ramp]
+      colors: [G]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  # --- Artifact-heavy (equip/vehicles package) ---
+  - id: artifacts-breya
+    label: Artifacts (Breya) — equip/vehicles density
+    commander_names: ["Breya, Etherium Shaper"]
+    criteria:
+      themes: [ramp, draw]
+      colors: [U, R, W]
+      include_mechanics: [equip, vehicles]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: artifacts-urza-chief
+    label: Artifacts (Urza, Chief Artificer) — pirate lord synergy
+    commander_names: ["Urza, Chief Artificer"]
+    criteria:
+      themes: [ramp]
+      colors: [W, U, B]
+      include_mechanics: [equip, vehicles]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        max_inappropriate_warnings: 0
+
   # --- Tribal / aristocrats (card-driven rules) ---
   - id: aristocrats-yawgmoth
     label: Aristocrats (Yawgmoth)
@@ -89,6 +157,87 @@ scenarios:
         passed: true
       dependency:
         rules_must_not_warn: [SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: aristocrats-korvold
+    label: Aristocrats (Korvold) — sacrifice + draw
+    commander_names: ["Korvold, Fae-Cursed King"]
+    criteria:
+      themes: [aristocrats, draw]
+      colors: [B, G, R]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: aristocrats-chatterfang
+    label: Squirrels + aristocrats (Chatterfang)
+    commander_names: ["Chatterfang, Squirrel General"]
+    criteria:
+      themes: [tokens, aristocrats]
+      colors: [B, G]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [SACRIFICE_BALANCE, AURA_SUPPORT_MIN, ENERGY_BALANCE]
+        max_inappropriate_warnings: 0
+
+  # --- Other archetypes ---
+  - id: landfall-omnath
+    label: Landfall (Omnath, Locus of Rage)
+    commander_names: ["Omnath, Locus of Rage"]
+    criteria:
+      themes: [landfall]
+      colors: [G, R]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: goblins-krenko
+    label: Goblins (Krenko) — tokens
+    commander_names: ["Krenko, Mob Boss"]
+    criteria:
+      themes: [tokens]
+      colors: [R]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: vampires-edgar
+    label: Vampires (Edgar Markov) — budget tokens
+    commander_names: ["Edgar Markov"]
+    criteria:
+      themes: [tokens]
+      colors: [B, R, W]
+      budget_usd: 150
+      card_price_max_usd: 5
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: enchantress-sythis
+    label: Enchantress (Sythis) — no voltron aura floor noise
+    commander_names: ["Sythis, Harvest's Hand"]
+    criteria:
+      themes: [draw, removal]
+      colors: [G, W]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
         max_inappropriate_warnings: 0
 
   # --- Budget / availability (v1 closure parity) ---

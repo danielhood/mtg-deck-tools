@@ -135,10 +135,35 @@ def test_incidental_aura_does_not_trigger_support_min(scope_db: sqlite3.Connecti
     assert not any(i.rule_id == "AURA_SUPPORT_MIN" for i in report.issues)
 
 
-def test_enchantress_payoff_triggers_aura_support_min(scope_db: sqlite3.Connection) -> None:
+def test_enchantment_cast_payoff_does_not_trigger_aura_support_min(
+    scope_db: sqlite3.Connection,
+) -> None:
+    """Generic enchantment payoffs are not voltron aura support (see whenever_cast_aura)."""
     maindeck = [
         _deck_card(oracle_id="aura1", name="Ethereal Armor", type_line="Enchantment — Aura"),
         _deck_card(oracle_id="payoff", name="Enchantress", type_line="Creature"),
+    ]
+    report = validate_dependencies(
+        scope_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["tokens"]),
+    )
+    assert not any(i.rule_id == "AURA_SUPPORT_MIN" for i in report.issues)
+
+
+def test_aura_cast_payoff_triggers_aura_support_min(scope_db: sqlite3.Connection) -> None:
+    _insert_effect(
+        scope_db,
+        "payoff",
+        "whenever_cast_aura",
+        {"types": ["enchantment"], "subtypes": ["Aura"]},
+        "whenever_cast_aura",
+    )
+    scope_db.commit()
+    maindeck = [
+        _deck_card(oracle_id="aura1", name="Ethereal Armor", type_line="Enchantment — Aura"),
+        _deck_card(oracle_id="payoff", name="Aura Sage", type_line="Creature"),
     ]
     report = validate_dependencies(
         scope_db,
