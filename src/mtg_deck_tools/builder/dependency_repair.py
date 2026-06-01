@@ -279,6 +279,66 @@ def _fix_tutor_target(
     )
 
 
+def swap_matching_card(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    *,
+    match,
+    label: str,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+    protect_oracle_ids: set[str] | None = None,
+    limit: int = 400,
+) -> tuple[list[DeckCard], str] | None:
+    """Replace a flex/synergy card with a candidate matching ``match(candidate)``."""
+    victim = _pick_victim(cards, protect_oracle_ids=protect_oracle_ids or set())
+    if victim is None:
+        return None
+
+    exclude_ids = _used_ids(cards) | commander_oracle_ids
+    exclude_names = _used_names(cards)
+    pool = fetch_candidates(
+        conn,
+        identity=identity,
+        exclude_oracle_ids=exclude_ids,
+        exclude_names=exclude_names,
+        avoid_mechanics=criteria.avoid_mechanics,
+        require_theme_tags=None,
+        nonlands_only=True,
+        limit=limit,
+    )
+    pool = [c for c in pool if match(c)]
+    pool = filter_candidates_by_price(pool, criteria, criteria.budget_usd)
+    pool = filter_candidates_by_rarity(pool, criteria)
+    pool = filter_candidates_by_availability(conn, pool, criteria)
+    pool = _prepare_pool(
+        conn,
+        pool,
+        partial=cards,
+        commander_oracle_ids=commander_oracle_ids,
+        criteria=criteria,
+    )
+    pick = _score_repair_pick(
+        conn,
+        pool,
+        partial=cards,
+        commander_oracle_ids=commander_oracle_ids,
+        slot=victim.slot,
+        criteria=criteria,
+        commander_theme_tags=commander_theme_tags,
+    )
+    if pick is None:
+        return None
+    tags = fetch_card_tags(conn, [pick.oracle_id]).get(pick.oracle_id, [])
+    updated = _apply_swap(cards, victim, pick, tags)
+    return (
+        updated,
+        f"Dependency repair: replaced {victim.name} with {pick.name} ({label}).",
+    )
+
+
 def swap_energy_card(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
@@ -442,49 +502,15 @@ def _fix_aura_support(
     commander_oracle_ids: set[str],
     commander_theme_tags: set[str],
 ) -> tuple[list[DeckCard], str] | None:
-    victim = _pick_victim(cards, protect_oracle_ids=set())
-    if victim is None:
-        return None
-
-    exclude_ids = _used_ids(cards) | commander_oracle_ids
-    exclude_names = _used_names(cards)
-    pool = fetch_candidates(
+    return swap_matching_card(
         conn,
+        cards,
+        match=lambda c: "Aura" in c.type_line,
+        label="Aura support",
+        criteria=criteria,
         identity=identity,
-        exclude_oracle_ids=exclude_ids,
-        exclude_names=exclude_names,
-        avoid_mechanics=criteria.avoid_mechanics,
-        require_theme_tags=None,
-        nonlands_only=True,
-        limit=400,
-    )
-    pool = [c for c in pool if "Aura" in c.type_line]
-    pool = filter_candidates_by_price(pool, criteria, criteria.budget_usd)
-    pool = filter_candidates_by_rarity(pool, criteria)
-    pool = filter_candidates_by_availability(conn, pool, criteria)
-    pool = _prepare_pool(
-        conn,
-        pool,
-        partial=cards,
         commander_oracle_ids=commander_oracle_ids,
-        criteria=criteria,
-    )
-    pick = _score_repair_pick(
-        conn,
-        pool,
-        partial=cards,
-        commander_oracle_ids=commander_oracle_ids,
-        slot=victim.slot,
-        criteria=criteria,
         commander_theme_tags=commander_theme_tags,
-    )
-    if pick is None:
-        return None
-    tags = fetch_card_tags(conn, [pick.oracle_id]).get(pick.oracle_id, [])
-    updated = _apply_swap(cards, victim, pick, tags)
-    return (
-        updated,
-        f"Dependency repair: replaced {victim.name} with {pick.name} (Aura support).",
     )
 
 

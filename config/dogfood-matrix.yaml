@@ -37,7 +37,7 @@ scenarios:
 
   # --- Voltron / auras (deck-level aura floor may apply) ---
   - id: voltron-dromoka
-    label: Voltron theme (Dromoka) — aura support in scope
+    label: Voltron theme (Dromoka) — aura package filled
     commander_names: ["Dragonlord Dromoka"]
     criteria:
       themes: [voltron]
@@ -46,7 +46,21 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [ENERGY_BALANCE]
+        rules_must_not_warn: [ENERGY_BALANCE, AURA_SUPPORT_MIN]
+        max_inappropriate_warnings: 0
+
+  - id: artifacts-equip
+    label: Equip/vehicles include — artifact density
+    commander_names: ["Urza, Lord High Artificer"]
+    criteria:
+      themes: [ramp, draw]
+      colors: [U]
+      include_mechanics: [equip, vehicles]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE]
 
   # --- Energy intent ---
   - id: energy-simic
