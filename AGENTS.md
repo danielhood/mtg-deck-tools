@@ -1,5 +1,16 @@
 # AGENTS.md
 
+## Cursor-driven SDLC
+
+Documentation is **agent-enforced**, not CI-gated. On every task that changes code or ship status:
+
+1. Follow [planning/DOC-MAP.md](planning/DOC-MAP.md) for which files to update.
+2. Obey Cursor rules in `.cursor/rules/` (especially `sdlc-documentation`, always applied).
+3. Before commit/push/PR: run skill **`/sync-documentation`**.
+4. Dependency expansion: run **`/ship-dependency-feature`** (includes sync + doc 15 ship steps).
+
+PRs must include a **Documentation** section (docs touched, or explicit reason for none). Never leave shipped features listed as "next" in doc 15 or doc 09.
+
 ## Cursor Cloud specific instructions
 
 ### Product

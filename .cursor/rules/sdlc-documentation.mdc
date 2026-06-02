@@ -1,0 +1,25 @@
+---
+description: Agent SDLC — keep documentation in sync with code on every PR; no human doc review gate.
+alwaysApply: true
+---
+
+# Documentation SDLC (always)
+
+This repo prototypes a **Cursor-driven SDLC**. Agents own documentation quality; do not rely on CI doc gates or human PR checklists.
+
+## Before every commit / push / PR
+
+1. Read [planning/DOC-MAP.md](../../planning/DOC-MAP.md) and classify the change.
+2. Update every doc listed for that change type **in the same branch** as the code.
+3. Run skill **`/sync-documentation`** before opening or updating a PR.
+4. For dependency expansion (profiles, packages, effect patterns, dogfood): run **`/ship-dependency-feature`** instead of or in addition to sync-documentation.
+
+## Non-negotiables
+
+- **Ship status** changes (feature complete, backlog reorder) → update doc 15 strike-through grid, doc 09 priorities, and README when user-facing.
+- **Never** leave planning docs listing shipped work as "next" (see subtype lords / tokens / vehicles pattern in doc 15).
+- If no docs need updates, state why explicitly in the PR body.
+
+## PR body
+
+Include a **Documentation** section listing touched files or "none — [reason]". See DOC-MAP PR template.

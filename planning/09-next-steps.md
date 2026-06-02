@@ -143,7 +143,7 @@ Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-ro
 
 **Recently shipped (2026-06):** **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile, per-subtype minimums); **Tokens package** (`TOKEN_BALANCE`, `themes: [tokens]`); **Vehicles profile** (`VEHICLE_BALANCE`, `include_mechanics: [vehicles]`).
 
-Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15).
+Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15). **Doc updates:** [DOC-MAP.md](DOC-MAP.md); agents run `/ship-dependency-feature` before PR.
 
 ### 2. UX2 — wizard synergy controls
 

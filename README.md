@@ -2,7 +2,7 @@
 
 Local utility for building **Commander** (EDH) decks: a terminal wizard walks through themes, colors, mechanics, and budget, then generates a legal 100-card list with Markdown and machine-readable output.
 
-Planning docs: [`planning/README.md`](planning/README.md) · next steps: [`planning/09-next-steps.md`](planning/09-next-steps.md).
+Planning docs: [`planning/README.md`](planning/README.md) · agent doc map: [`planning/DOC-MAP.md`](planning/DOC-MAP.md) · next steps: [`planning/09-next-steps.md`](planning/09-next-steps.md).
 
 ## Prerequisites
 

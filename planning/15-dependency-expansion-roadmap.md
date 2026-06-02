@@ -2,7 +2,9 @@
 
 Status as of 2026-06-02. **D0–D5 is shipped** (validate, score, strict filter, repair, mechanic packages). This doc captures **what runs today**, **candidate effect atoms and rules**, and a **suggested build order** for the next dependency work.
 
-Related: [10-card-dependency-engine.md](10-card-dependency-engine.md) (architecture), [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) (UX knobs), [`config/effect-patterns.yaml`](../config/effect-patterns.yaml), [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml), [`resources/dependency/hard-cases.yaml`](../resources/dependency/hard-cases.yaml).
+**Agent merge gate:** Any PR that ships or changes dependency behavior must update this doc (shipped grid, inventory, sequence), [09-next-steps.md](09-next-steps.md), and user-facing [README.md](../README.md) in the **same PR**. Enforcement: [DOC-MAP.md](DOC-MAP.md), `.cursor/rules/`, skills `/sync-documentation` and `/ship-dependency-feature` — not CI.
+
+Related: [10-card-dependency-engine.md](10-card-dependency-engine.md) (architecture), [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) (UX knobs), [DOC-MAP.md](DOC-MAP.md) (doc maintenance map), [`config/effect-patterns.yaml`](../config/effect-patterns.yaml), [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml), [`resources/dependency/hard-cases.yaml`](../resources/dependency/hard-cases.yaml).
 
 ---
 
@@ -151,6 +153,8 @@ Beyond artifact count: equip cost, “whenever equipped”, bodies to carry equi
 ---
 
 ## Implementation checklist (per feature)
+
+Canonical doc-update map: **[DOC-MAP.md](DOC-MAP.md)**. Agents: invoke **`/ship-dependency-feature`** for this checklist plus ship-status edits.
 
 Use this for each expansion PR:
 

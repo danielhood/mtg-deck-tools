@@ -56,8 +56,12 @@ htmlcov/
 # pyenv / local version pins
 .python-version
 
-# Cursor IDE (local editor state; project rules may be committed explicitly)
-.cursor/
+# Cursor IDE (local editor state; commit shared rules and skills)
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
+!.cursor/skills/
+!.cursor/skills/**
 
 # IDE / OS
 .idea/
