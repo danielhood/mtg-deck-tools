@@ -50,6 +50,15 @@ def classify_dependency_warning(
             return "appropriate"
         return "inappropriate"
 
+    if rule_id == "TOKEN_BALANCE":
+        if scope.tokens_user_intent:
+            return "appropriate"
+        producers = detail.get("producers") or []
+        payoffs = detail.get("payoffs") or []
+        if max(len(producers), len(payoffs)) >= 2:
+            return "appropriate"
+        return "inappropriate"
+
     if rule_id == "TUTOR_TARGET_EXISTS":
         return "appropriate"
 

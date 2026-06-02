@@ -19,7 +19,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, TOKEN_BALANCE]
         max_inappropriate_warnings: 0
 
   - id: draw-removal-golgari
@@ -88,7 +88,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TOKEN_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: elves-marwyn
@@ -182,7 +182,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [SACRIFICE_BALANCE, AURA_SUPPORT_MIN, ENERGY_BALANCE]
+        rules_must_not_warn: [SACRIFICE_BALANCE, TOKEN_BALANCE, AURA_SUPPORT_MIN, ENERGY_BALANCE]
         max_inappropriate_warnings: 0
 
   # --- Other archetypes ---
@@ -209,7 +209,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TOKEN_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: vampires-edgar
@@ -224,7 +224,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TOKEN_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: enchantress-sythis
@@ -254,6 +254,9 @@ scenarios:
     expect:
       validation:
         passed: true
+      dependency:
+        rules_must_not_warn: [TOKEN_BALANCE]
+        max_inappropriate_warnings: 0
 
   - id: budget-dromoka-cap
     label: Dromoka $150 / $5 per card
@@ -279,7 +282,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, TOKEN_BALANCE]
         max_inappropriate_warnings: 0
 
   # --- Strict / repair (subset) ---
@@ -293,6 +296,9 @@ scenarios:
     expect:
       validation:
         passed: true
+      dependency:
+        rules_must_not_warn: [TOKEN_BALANCE]
+        max_inappropriate_warnings: 0
 
   - id: tokens-repair-deps
     label: Tokens with post-build repair
@@ -304,3 +310,6 @@ scenarios:
     expect:
       validation:
         passed: true
+      dependency:
+        rules_must_not_warn: [TOKEN_BALANCE]
+        max_inappropriate_warnings: 0

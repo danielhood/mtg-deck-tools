@@ -109,8 +109,29 @@ cases:
         source: whenever_cast_type
         payload:
           types: [artifact]
-      - effect_kind: sacrifice_fodder
-        source: sacrifice_fodder_token
+      - effect_kind: token_produce
+        source: token_produce
+
+  - name: token_payoff_create
+    oracle_text: "Whenever you create a token, draw a card."
+    type_line: "Creature"
+    expected:
+      - effect_kind: token_payoff
+        source: token_payoff_on_create
+
+  - name: token_payoff_enter
+    oracle_text: "Whenever a token enters the battlefield, each opponent loses 1 life."
+    type_line: "Creature"
+    expected:
+      - effect_kind: token_payoff
+        source: token_payoff_on_enter
+
+  - name: token_payoff_for_each
+    oracle_text: "For each token you control, each opponent loses 1 life."
+    type_line: "Enchantment"
+    expected:
+      - effect_kind: token_payoff
+        source: token_payoff_for_each
 
   - name: lightning_bolt
     oracle_text: "Lightning Bolt deals 3 damage to any target."
@@ -189,8 +210,8 @@ cases:
     oracle_text: "When Nest Invader enters the battlefield, create a 0/1 colorless Eldrazi Spawn creature token with \"Sacrifice this creature: Add {C}.\""
     type_line: "Creature — Eldrazi Drone"
     expected:
-      - effect_kind: sacrifice_fodder
-        source: sacrifice_fodder_token
+      - effect_kind: token_produce
+        source: token_produce
 
   - name: vindictive_wrench
     oracle_text: "Sacrifice an artifact. If you do, destroy target artifact."

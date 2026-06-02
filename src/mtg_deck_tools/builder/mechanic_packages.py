@@ -26,6 +26,7 @@ from mtg_deck_tools.rules.dependency_profiles import (
     energy_profile_floors,
     sacrifice_profile_floors,
     subtype_lord_minimum,
+    token_profile_floors,
 )
 from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
 
@@ -122,6 +123,38 @@ def count_sacrifice_cards(
             elif effect.effect_kind == "sacrifice_fodder":
                 fodders += 1
     return outlets, payoffs, fodders
+
+
+def _token_role_oracle_ids(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+) -> tuple[set[str], set[str]]:
+    effects = fetch_card_effects(conn, [c.oracle_id for c in cards])
+    producers: set[str] = set()
+    payoffs: set[str] = set()
+    for card in cards:
+        for effect in effects.get(card.oracle_id, []):
+            if effect.effect_kind == "token_produce":
+                producers.add(card.oracle_id)
+            elif effect.effect_kind == "token_payoff":
+                payoffs.add(card.oracle_id)
+    return producers, payoffs
+
+
+def count_token_cards(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+) -> tuple[int, int]:
+    effects = fetch_card_effects(conn, [c.oracle_id for c in cards])
+    producers = 0
+    payoffs = 0
+    for card in cards:
+        for effect in effects.get(card.oracle_id, []):
+            if effect.effect_kind == "token_produce":
+                producers += 1
+            elif effect.effect_kind == "token_payoff":
+                payoffs += 1
+    return producers, payoffs
 
 
 def _lords_in_deck(
@@ -318,6 +351,91 @@ def ensure_sacrifice_package(
     return MechanicPackageResult(working, messages, swaps)
 
 
+def ensure_token_package(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> MechanicPackageResult:
+    scope = build_dependency_scope(criteria)
+    if not scope.tokens_user_intent:
+        return MechanicPackageResult(list(cards), [])
+
+    producer_min, payoff_min = token_profile_floors()
+    working = list(cards)
+    messages: list[str] = []
+    swaps = 0
+
+    for _ in range(MAX_REPAIR_SWAPS):
+        producers, payoffs = count_token_cards(conn, working)
+        if producers >= producer_min and payoffs >= payoff_min:
+            break
+
+        if producers < producer_min:
+            effect_kind = "token_produce"
+        elif payoffs < payoff_min:
+            effect_kind = "token_payoff"
+        elif producers > 0 and payoffs == 0:
+            effect_kind = "token_payoff"
+        elif payoffs > 0 and producers == 0:
+            effect_kind = "token_produce"
+        else:
+            break
+
+        producer_ids, payoff_ids = _token_role_oracle_ids(conn, working)
+        protect: set[str] = set()
+        if effect_kind == "token_produce" and len(payoff_ids) <= payoff_min:
+            protect = payoff_ids
+        elif effect_kind == "token_payoff":
+            if len(producer_ids) <= producer_min:
+                protect |= producer_ids
+            protect |= payoff_ids
+            for lord_id, _, subtype in _lords_in_deck(conn, working):
+                minimum = subtype_lord_minimum(subtype)
+                others = sum(
+                    1
+                    for c in working
+                    if c.oracle_id != lord_id
+                    and subtype in (c.type_line or "")
+                    and "Creature" in (c.type_line or "")
+                )
+                if others < minimum:
+                    protect.add(lord_id)
+                    for card in working:
+                        if subtype in (card.type_line or "") and "Creature" in (
+                            card.type_line or ""
+                        ):
+                            protect.add(card.oracle_id)
+
+        role_label = effect_kind.replace("token_", "token ")
+        result = swap_effect_kind_card(
+            conn,
+            working,
+            effect_kind,
+            role_label=role_label,
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+            protect_oracle_ids=protect,
+        )
+        if result is None:
+            messages.append(
+                f"Token package: could not add {role_label} "
+                f"(have {producers} producer(s), {payoffs} payoff(s); "
+                f"want ≥{producer_min} / ≥{payoff_min})."
+            )
+            break
+        working, msg = result
+        messages.append(msg.replace("Dependency repair:", "Token package:"))
+        swaps += 1
+
+    return MechanicPackageResult(working, messages, swaps)
+
+
 def ensure_aura_package(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
@@ -457,6 +575,11 @@ def ensure_subtype_lord_packages(
         return MechanicPackageResult(list(cards), [])
 
     lord_ids = {lord_id for lord_id, _, _ in lords}
+    scope = build_dependency_scope(criteria)
+    token_protect: set[str] = set()
+    if scope.tokens_user_intent:
+        _, token_payoff_ids = _token_role_oracle_ids(conn, cards)
+        token_protect = token_payoff_ids
     working = list(cards)
     messages: list[str] = []
     swaps = 0
@@ -478,7 +601,7 @@ def ensure_subtype_lord_packages(
             def match_creature(c) -> bool:
                 return subtype in c.type_line and "Creature" in c.type_line
 
-            protect = set(lord_ids)
+            protect = set(lord_ids) | token_protect
             for card in working:
                 if card.oracle_id in protect:
                     continue
@@ -532,6 +655,7 @@ def ensure_included_mechanic_packages(
         ensure_aura_package,
         ensure_artifact_package,
         ensure_subtype_lord_packages,
+        ensure_token_package,
     ):
         result = ensure_fn(
             conn,

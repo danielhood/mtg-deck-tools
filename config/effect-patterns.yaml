@@ -165,6 +165,71 @@ patterns:
     exclude_if_matched:
       - whenever_cast_aura
 
+  # --- tokens (payoff before produce; sacrifice_fodder excludes token_produce) ---
+  - id: token_payoff_on_create
+    effect_kind: token_payoff
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever you create (?:a |an |one or more )?token"
+    payload:
+      trigger: create
+
+  - id: token_payoff_on_enter
+    effect_kind: token_payoff
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever (?:a |another |each |one or more )?(?:\\w+ )*tokens? (?:enters?|enter)(?: the battlefield)?"
+    payload:
+      trigger: enter
+    exclude_if_matched:
+      - token_payoff_on_create
+
+  - id: token_payoff_for_each
+    effect_kind: token_payoff
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)for each (?:token|tokens) you control"
+    payload:
+      trigger: count
+
+  - id: token_payoff_tokens_you_control
+    effect_kind: token_payoff
+    confidence: 0.85
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(?:number of|amount of) tokens you control|tokens you control (?:get|have|gain)"
+    payload:
+      trigger: control
+    exclude_if_matched:
+      - token_payoff_for_each
+
+  - id: token_doubler_or_replacement
+    effect_kind: token_replacement
+    confidence: 1.0
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(?:if an effect would create|creates twice that many)"
+    payload:
+      role: modifier
+
+  - id: token_produce
+    effect_kind: token_produce
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)create (?:a |an |two |three |four |five |\\d+/\\d+ |one or more |any number of )?(?:[\\w'/.-]+ )*token"
+    payload:
+      role: producer
+    exclude_if_matched:
+      - token_doubler_or_replacement
+      - token_payoff_on_create
+      - token_payoff_on_enter
+      - token_payoff_for_each
+      - token_payoff_tokens_you_control
+
   # --- sacrifice / aristocrats (payoff before outlet; outlet excludes payoffs) ---
   - id: sacrifice_creature_dies_payoff
     effect_kind: sacrifice_payoff
@@ -216,6 +281,13 @@ patterns:
         pattern: "(?i)create (?:a |an |two |three |four |five |\\d+/\\d+ |one or more |any number of )?(?:[\\w'/.-]+ )*token"
     payload:
       role: fodder
+    exclude_if_matched:
+      - token_produce
+      - token_doubler_or_replacement
+      - token_payoff_on_create
+      - token_payoff_on_enter
+      - token_payoff_for_each
+      - token_payoff_tokens_you_control
 
   # --- type line (not oracle) ---
   - id: type_line_aura
