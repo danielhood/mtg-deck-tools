@@ -389,8 +389,26 @@ def ensure_token_package(
         protect: set[str] = set()
         if effect_kind == "token_produce" and len(payoff_ids) <= payoff_min:
             protect = payoff_ids
-        elif effect_kind == "token_payoff" and len(producer_ids) <= producer_min:
-            protect = producer_ids
+        elif effect_kind == "token_payoff":
+            if len(producer_ids) <= producer_min:
+                protect |= producer_ids
+            protect |= payoff_ids
+            for lord_id, _, subtype in _lords_in_deck(conn, working):
+                minimum = subtype_lord_minimum(subtype)
+                others = sum(
+                    1
+                    for c in working
+                    if c.oracle_id != lord_id
+                    and subtype in (c.type_line or "")
+                    and "Creature" in (c.type_line or "")
+                )
+                if others < minimum:
+                    protect.add(lord_id)
+                    for card in working:
+                        if subtype in (card.type_line or "") and "Creature" in (
+                            card.type_line or ""
+                        ):
+                            protect.add(card.oracle_id)
 
         role_label = effect_kind.replace("token_", "token ")
         result = swap_effect_kind_card(
@@ -557,6 +575,11 @@ def ensure_subtype_lord_packages(
         return MechanicPackageResult(list(cards), [])
 
     lord_ids = {lord_id for lord_id, _, _ in lords}
+    scope = build_dependency_scope(criteria)
+    token_protect: set[str] = set()
+    if scope.tokens_user_intent:
+        _, token_payoff_ids = _token_role_oracle_ids(conn, cards)
+        token_protect = token_payoff_ids
     working = list(cards)
     messages: list[str] = []
     swaps = 0
@@ -578,7 +601,7 @@ def ensure_subtype_lord_packages(
             def match_creature(c) -> bool:
                 return subtype in c.type_line and "Creature" in c.type_line
 
-            protect = set(lord_ids)
+            protect = set(lord_ids) | token_protect
             for card in working:
                 if card.oracle_id in protect:
                     continue
@@ -628,11 +651,11 @@ def ensure_included_mechanic_packages(
 
     for ensure_fn in (
         ensure_energy_package,
-        ensure_token_package,
         ensure_sacrifice_package,
         ensure_aura_package,
         ensure_artifact_package,
         ensure_subtype_lord_packages,
+        ensure_token_package,
     ):
         result = ensure_fn(
             conn,

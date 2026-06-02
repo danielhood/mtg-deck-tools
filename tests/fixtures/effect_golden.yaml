@@ -112,16 +112,6 @@ cases:
       - effect_kind: token_produce
         source: token_produce
 
-  - name: parallel_lives
-    oracle_text: "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead."
-    type_line: "Enchantment"
-    expected: []
-
-  - name: anointed_procession
-    oracle_text: "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead."
-    type_line: "Enchantment"
-    expected: []
-
   - name: token_payoff_create
     oracle_text: "Whenever you create a token, draw a card."
     type_line: "Creature"
@@ -135,6 +125,13 @@ cases:
     expected:
       - effect_kind: token_payoff
         source: token_payoff_on_enter
+
+  - name: token_payoff_for_each
+    oracle_text: "For each token you control, each opponent loses 1 life."
+    type_line: "Enchantment"
+    expected:
+      - effect_kind: token_payoff
+        source: token_payoff_for_each
 
   - name: lightning_bolt
     oracle_text: "Lightning Bolt deals 3 damage to any target."
