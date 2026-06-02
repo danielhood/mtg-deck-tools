@@ -82,7 +82,7 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 
 | Work item | New / extended atoms | Rule / package | Activation | Notes |
 | --- | --- | --- | --- | --- |
-| **Generic subtype lords** | Extend `buff_subtype` capture (Goblin, Vampire, Dragon, Pirate, …) | Per-subtype floors in `subtype_lords` profile; lord package runs for any lord | Card-driven + optional tribal themes | Profile has per-subtype minimums; matrix covers Goblins/Vampires via card-driven rules |
+| ~~**Generic subtype lords**~~ | Extend `buff_subtype` capture (Goblin, Vampire, Dragon, Pirate, …) | Per-subtype floors in `subtype_lords` profile; lord package runs for any lord | Card-driven + optional tribal themes | **Shipped 2026-06** — per-subtype minimums (Elf, Goblin, Vampire, Pirate, Zombie, Dragon); Krenko/Edgar dogfood |
 | ~~**Tokens package**~~ | `token_produce`, `token_payoff` | `TOKEN_BALANCE` | `themes: [tokens]` | **Shipped 2026-06** |
 | ~~**Vehicles profile**~~ | `type_line_vehicle` + crew creature count | `VEHICLE_BALANCE` | `include_mechanics: [vehicles]` | **Shipped 2026-06** — `vehicle_min: 3`, `creature_min: 25` |
 | **Enchantment matters** | `whenever_cast_enchantment` (non-Aura) | Enchantment density floor separate from `AURA_SUPPORT_MIN` | Enchantress commanders / `themes` TBD | Sythis dogfood scenario guards against voltron aura noise; package could still add enchantments |
@@ -173,13 +173,12 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
-| 1 | **Subtype lord generalization** (Goblin, Vampire, Pirate) | Reuses `buff_subtype` + lord package; matrix already includes Krenko, Edgar, Urza |
-| 2 | **Enchantment matters profile** | Sythis / enchantress without conflating auras |
-| 3 | **Tutor payload upgrades** | Incremental `TUTOR_TARGET_EXISTS` accuracy |
-| 4 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
-| 5 | **Counter resources** | After audit evidence (proliferate, blood, …) |
+| 1 | **Enchantment matters profile** | Sythis / enchantress without conflating auras |
+| 2 | **Tutor payload upgrades** | Incremental `TUTOR_TARGET_EXISTS` accuracy |
+| 3 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
+| 4 | **Counter resources** | After audit evidence (proliferate, blood, …) |
 
-**Shipped (2026-06):** Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
+**Shipped (2026-06):** Subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
 
 **Parallel track:** **UX2** wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` ([11](11-dependency-engine-user-experience.md)) — does not block pattern work but improves user-facing control.
 
