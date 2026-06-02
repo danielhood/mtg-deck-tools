@@ -1,0 +1,15 @@
+---
+description: Dependency engine changes require planning doc and README updates per DOC-MAP.
+globs: config/dependency-profiles.yaml,config/effect-patterns.yaml,config/dogfood-matrix.yaml,src/mtg_deck_tools/builder/mechanic_packages.py,src/mtg_deck_tools/builder/dependency_scoring.py,src/mtg_deck_tools/builder/dependency_repair.py,src/mtg_deck_tools/rules/dependencies.py,src/mtg_deck_tools/rules/dependency_profiles.py,src/mtg_deck_tools/rules/dependency_scope.py,src/mtg_deck_tools/effects/**,src/mtg_deck_tools/analysis/rubric.py
+alwaysApply: false
+---
+
+# Dependency changes → documentation
+
+When editing matched dependency paths:
+
+1. Follow [planning/DOC-MAP.md](../../planning/DOC-MAP.md) **Dependency feature implementation checklist**.
+2. If shipping a roadmap item: strike through in [planning/15-dependency-expansion-roadmap.md](../../planning/15-dependency-expansion-roadmap.md), update [planning/09-next-steps.md](../../planning/09-next-steps.md), and [README.md](../../README.md) when users gain a new mechanic or flag.
+3. Invoke **`/ship-dependency-feature`** before finishing the task.
+
+Do not merge dependency code without the corresponding planning updates in the same PR.

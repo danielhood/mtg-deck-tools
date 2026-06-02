@@ -14,6 +14,7 @@ Planning documents for a local Windows utility that walks users through deck-bui
 | [06-open-questions.md](06-open-questions.md) | Resolved planning decisions |
 | [07-deck-output-format.md](07-deck-output-format.md) | Markdown + `.deck.json` schema |
 | [08-card-availability.md](08-card-availability.md) | Budget null prices; availability heuristic |
+| [DOC-MAP.md](DOC-MAP.md) | **Agent SDLC** — which docs to update per change type (canonical; not duplicated here) |
 | [09-next-steps.md](09-next-steps.md) | **Active roadmap** — post-v1 backlog and dependency UX |
 | [14-deck-analysis.md](14-deck-analysis.md) | **Automated dogfood** — `analyze run` matrix and reports |
 | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) | **Active** — shipped dependency inventory + high-value expansion backlog |
@@ -80,5 +81,7 @@ Planning documents for a local Windows utility that walks users through deck-bui
 ## What's next
 
 See **[09-next-steps.md](09-next-steps.md)** for the active backlog.
+
+**Agent documentation SDLC:** **[DOC-MAP.md](DOC-MAP.md)** — required updates per change type; enforced via `.cursor/rules/` and skills `/sync-documentation`, `/ship-dependency-feature` (no CI doc gates).
 
 **Recommended first tasks:** **dependency expansion** — enchantment matters, tutor payloads, graveyard heuristics ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)); **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
