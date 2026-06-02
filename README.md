@@ -137,7 +137,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 
 The builder fills a **99-card maindeck** (commander is separate) using **slots**: fixed-size buckets such as ramp, draw, removal, synergy, lands, and so on. Default counts live in [`config/slot-templates.yaml`](config/slot-templates.yaml) (e.g. 30 synergy, 31 lands); the wizard can change them within bounds, and the saved `.deck.json` stores the template under `criteria.slot_template`.
 
-Each slot is filled from `data/cards.db` using color identity, theme tags, mechanic tags, budget, and scoring. After nonland slots are filled, **lands** are chosen to match the mana base plan. A **dependency pass** (when `card_effects` is populated after `import`) scores picks during fill, validates cross-card synergy after the build, and can optionally filter or repair gaps (tutor targets, energy balance, type payoffs). Outputs include validation notes, a **Deck dependencies** section, budget totals, and per-card detail in Markdown.
+Each slot is filled from `data/cards.db` using color identity, theme tags, mechanic tags, budget, and scoring. After nonland slots are filled, **lands** are chosen to match the mana base plan. A **dependency pass** (when `card_effects` is populated after `import`) scores picks during fill, validates cross-card synergy after the build, and can optionally filter or repair gaps (tutor targets, energy balance, token/vehicle/artifact/type payoffs). Outputs include validation notes, a **Deck dependencies** section, budget totals, and per-card detail in Markdown.
 
 #### Fresh generate (no `--from`)
 
@@ -222,7 +222,9 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 
 **Phase 3 (v1):** build-time legality filters, slot pool quality, `.deck.json` reload, availability scoring (`--prefer-available`, unpriced classification in Notes), and v1 success criteria closure — **complete** as of 2026-05-30.
 
-**Dependency engine (D0–D5):** effect extraction at import (`card_effects`), post-build `dependency_report` in Markdown/JSON, pick-time scoring (D3), `--strict-dependencies` (D4), and `--repair-dependencies` (D5) — **complete** as of 2026-05-31. Next: dogfood calibration and wizard UX for dependency controls — see [`planning/09-next-steps.md`](planning/09-next-steps.md).
+**Dependency engine (D0–D5):** effect extraction at import (`card_effects`), post-build `dependency_report` in Markdown/JSON, pick-time scoring (D3), `--strict-dependencies` (D4), and `--repair-dependencies` (D5) — **complete** as of 2026-05-31.
+
+**Dependency expansion:** **tokens** profile (`TOKEN_BALANCE`, wizard `themes: [tokens]`) and **vehicles** profile (`VEHICLE_BALANCE`, wizard include mechanic `vehicles`) — **complete** as of 2026-06-02. Next: enchantment matters, tutor payloads, UX2 wizard dependency controls — see [`planning/09-next-steps.md`](planning/09-next-steps.md).
 
 ## License
 

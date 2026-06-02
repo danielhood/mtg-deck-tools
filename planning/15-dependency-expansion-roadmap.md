@@ -1,6 +1,6 @@
 # Dependency engine — expansion roadmap (post D0–D5)
 
-Status as of 2026-06-01. **D0–D5 is shipped** (validate, score, strict filter, repair, mechanic packages). This doc captures **what runs today**, **candidate effect atoms and rules**, and a **suggested build order** for the next dependency work.
+Status as of 2026-06-02. **D0–D5 is shipped** (validate, score, strict filter, repair, mechanic packages). This doc captures **what runs today**, **candidate effect atoms and rules**, and a **suggested build order** for the next dependency work.
 
 Related: [10-card-dependency-engine.md](10-card-dependency-engine.md) (architecture), [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) (UX knobs), [`config/effect-patterns.yaml`](../config/effect-patterns.yaml), [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml), [`resources/dependency/hard-cases.yaml`](../resources/dependency/hard-cases.yaml).
 
@@ -28,7 +28,7 @@ flowchart TD
 
 ---
 
-## Shipped inventory (2026-06-01)
+## Shipped inventory (2026-06-02)
 
 ### Effect kinds in `card_effects`
 
@@ -41,6 +41,8 @@ flowchart TD
 | `whenever_cast_type` | “Whenever you cast an Artifact spell …” |
 | `whenever_cast_aura` | “Whenever you cast an Aura spell …” (voltron / aura support trigger) |
 | `type_line_aura` | Aura on type line (extraction aid) |
+| `token_produce` / `token_payoff` | Token producers vs “whenever you create a token” payoffs |
+| `type_line_vehicle` | Vehicle on type line (crew density checks) |
 
 ### Validation rules (`rule_id`)
 
@@ -49,6 +51,8 @@ flowchart TD
 | `TUTOR_TARGET_EXISTS` | Tutor with zero matching targets in deck + commander pool | Always (card-driven) |
 | `ENERGY_BALANCE` | Producers without consumers or reverse | `include_mechanics: [energy]` or ≥2 imbalanced cards |
 | `SACRIFICE_BALANCE` | Outlets without payoffs or reverse | `themes: [aristocrats]` or ≥2 imbalanced cards |
+| `TOKEN_BALANCE` | Producers without payoffs or reverse | `themes: [tokens]` or ≥2 imbalanced cards |
+| `VEHICLE_BALANCE` | Vehicle count or crew creatures below floor | `include_mechanics: [vehicles]`, Vehicle lord in deck, or ≥2 vehicles |
 | `TYPE_SYNERGY_MIN` | Subtype lord or type-matters payoff below suggested minimum | Card-driven (lord / cast trigger in deck) |
 | `AURA_SUPPORT_MIN` | Aura count below floor | `themes: [voltron]`, aura tutors, or `whenever_cast_aura` payoffs |
 
@@ -60,7 +64,9 @@ flowchart TD
 | Sacrifice / aristocrats | `themes: [aristocrats]` | ≥2 outlets, ≥3 payoffs, ≥8 fodder |
 | Auras | Voltron theme or card-driven aura check | ≥6 Aura spells |
 | Artifacts | `include_mechanics: [equip, vehicles]` or artifact cast payoff in deck | ≥8 artifacts |
-| Subtype lords | Any `buff_subtype` lord detected | ≥5 other creatures of that subtype (Elf default in profile) |
+| Subtype lords | Any `buff_subtype` lord detected | Per-subtype minimums in profile (Elf default 5) |
+| Tokens | `themes: [tokens]` | ≥5 producers, ≥3 payoffs |
+| Vehicles | `include_mechanics: [vehicles]` or Vehicle lord in deck | ≥3 Vehicles, ≥25 crew creatures |
 
 ### Dogfood coverage
 
@@ -76,9 +82,9 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 
 | Work item | New / extended atoms | Rule / package | Activation | Notes |
 | --- | --- | --- | --- | --- |
-| **Generic subtype lords** | Extend `buff_subtype` capture (Goblin, Vampire, Dragon, Pirate, …) | Generalize `elves` profile or per-subtype floors; lord package already runs for any lord | Card-driven + optional tribal themes | Elf is the only named profile today; Goblins/Vampires in matrix rely on card-driven `TYPE_SYNERGY_MIN` only |
-| **Tokens package** | `token_produce`, `token_payoff` (“whenever you create a token”) | `TOKEN_BALANCE` or density floor | `themes: [tokens]` | Distinct from `sacrifice_fodder`; hard-cases mark many token cards `defer_tokens` |
-| **Vehicles profile** | Vehicle type line + crew patterns | `VEHICLE_BALANCE`: vehicles ≥ N, creatures ≥ M | `include_mechanics: [vehicles]` | `hard-cases.yaml`: `defer_vehicles`, Chief of the Foundry as `buff_subtype` |
+| **Generic subtype lords** | Extend `buff_subtype` capture (Goblin, Vampire, Dragon, Pirate, …) | Per-subtype floors in `subtype_lords` profile; lord package runs for any lord | Card-driven + optional tribal themes | Profile has per-subtype minimums; matrix covers Goblins/Vampires via card-driven rules |
+| ~~**Tokens package**~~ | `token_produce`, `token_payoff` | `TOKEN_BALANCE` | `themes: [tokens]` | **Shipped 2026-06** |
+| ~~**Vehicles profile**~~ | `type_line_vehicle` + crew creature count | `VEHICLE_BALANCE` | `include_mechanics: [vehicles]` | **Shipped 2026-06** — `vehicle_min: 3`, `creature_min: 25` |
 | **Enchantment matters** | `whenever_cast_enchantment` (non-Aura) | Enchantment density floor separate from `AURA_SUPPORT_MIN` | Enchantress commanders / `themes` TBD | Sythis dogfood scenario guards against voltron aura noise; package could still add enchantments |
 
 ### Priority 2 — Tutor payload upgrades
@@ -168,12 +174,12 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
 | 1 | **Subtype lord generalization** (Goblin, Vampire, Pirate) | Reuses `buff_subtype` + lord package; matrix already includes Krenko, Edgar, Urza |
-| 2 | **Tokens package** | Jetmir, Krenko, Chatterfang, Lathril in matrix; clear user intent via `themes: [tokens]` |
-| 3 | **Vehicles profile** | `include_mechanics: [vehicles]` exists; hard-cases documented |
-| 4 | **Enchantment matters profile** | Sythis / enchantress without conflating auras |
-| 5 | **Tutor payload upgrades** | Incremental `TUTOR_TARGET_EXISTS` accuracy |
-| 6 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
-| 7 | **Counter resources** | After audit evidence (proliferate, blood, …) |
+| 2 | **Enchantment matters profile** | Sythis / enchantress without conflating auras |
+| 3 | **Tutor payload upgrades** | Incremental `TUTOR_TARGET_EXISTS` accuracy |
+| 4 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
+| 5 | **Counter resources** | After audit evidence (proliferate, blood, …) |
+
+**Shipped (2026-06):** Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
 
 **Parallel track:** **UX2** wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` ([11](11-dependency-engine-user-experience.md)) — does not block pattern work but improves user-facing control.
 
