@@ -124,6 +124,13 @@ def test_build_dependency_scope_voltron_enables_aura() -> None:
     assert scope_v.aura_support_min
 
 
+def test_build_dependency_scope_vehicles_include() -> None:
+    scope = build_dependency_scope(DeckCriteria(include_mechanics=["vehicles"]))
+    assert scope.vehicles_user_intent
+    scope_off = build_dependency_scope(DeckCriteria(themes=["tokens"]))
+    assert not scope_off.vehicles_user_intent
+
+
 def test_incidental_aura_does_not_trigger_support_min(scope_db: sqlite3.Connection) -> None:
     maindeck = [_deck_card(oracle_id="aura1", name="Ethereal Armor", type_line="Enchantment — Aura")]
     report = validate_dependencies(

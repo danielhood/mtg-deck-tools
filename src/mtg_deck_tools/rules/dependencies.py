@@ -261,6 +261,44 @@ def _should_warn_token_imbalance(
     return dominant >= 2
 
 
+def _count_vehicles(pool: list[DeckCard]) -> int:
+    return sum(1 for c in pool if "Vehicle" in (c.type_line or ""))
+
+
+def _count_crew_creatures(pool: list[DeckCard]) -> int:
+    return sum(
+        1
+        for c in pool
+        if "Creature" in (c.type_line or "") and "Vehicle" not in (c.type_line or "")
+    )
+
+
+def _deck_has_vehicle_payoff(effects_map: dict[str, list[CardEffectRow]]) -> bool:
+    for effects in effects_map.values():
+        for effect in effects:
+            if effect.effect_kind != "buff_subtype":
+                continue
+            subtypes = effect.payload.get("subtypes") or []
+            if subtypes and subtypes[0] == "Vehicle":
+                return True
+    return False
+
+
+def _should_check_vehicle_balance(
+    *,
+    scope: DependencyScope,
+    vehicle_count: int,
+    effects_map: dict[str, list[CardEffectRow]],
+) -> bool:
+    if scope.vehicles_user_intent:
+        return True
+    if vehicle_count == 0:
+        return False
+    if _deck_has_vehicle_payoff(effects_map):
+        return True
+    return vehicle_count >= 2
+
+
 def validate_dependencies(
     conn: sqlite3.Connection,
     *,
@@ -490,7 +528,74 @@ def validate_dependencies(
         )
     )
 
-    from mtg_deck_tools.rules.dependency_profiles import subtype_lord_minimum
+    from mtg_deck_tools.rules.dependency_profiles import (
+        subtype_lord_minimum,
+        vehicle_profile_floors,
+    )
+
+    vehicle_count = _count_vehicles(maindeck)
+    creature_count = _count_crew_creatures(maindeck)
+    vehicle_min, creature_min = vehicle_profile_floors(profile_cfg)
+    check_vehicles = _should_check_vehicle_balance(
+        scope=dep_scope,
+        vehicle_count=vehicle_count,
+        effects_map=effects_map,
+    )
+    vehicle_status = "pass"
+    vehicle_messages: list[str] = []
+    if check_vehicles:
+        if vehicle_count < vehicle_min:
+            vehicle_status = severity
+            msg = (
+                f"Only {vehicle_count} Vehicle card(s) in the deck "
+                f"(suggested minimum {vehicle_min} for vehicle support)."
+            )
+            vehicle_messages.append(msg)
+            report.issues.append(
+                DependencyIssue(
+                    rule_id="VEHICLE_BALANCE",
+                    status=severity,
+                    message=msg,
+                    profile_id="vehicles",
+                    detail={
+                        "vehicles": vehicle_count,
+                        "creatures": creature_count,
+                        "vehicle_minimum": vehicle_min,
+                        "creature_minimum": creature_min,
+                        "deficit": "vehicles",
+                    },
+                )
+            )
+        elif creature_count < creature_min:
+            vehicle_status = severity
+            msg = (
+                f"Only {creature_count} creature(s) to crew Vehicles "
+                f"(suggested minimum {creature_min} when running vehicles)."
+            )
+            vehicle_messages.append(msg)
+            report.issues.append(
+                DependencyIssue(
+                    rule_id="VEHICLE_BALANCE",
+                    status=severity,
+                    message=msg,
+                    profile_id="vehicles",
+                    detail={
+                        "vehicles": vehicle_count,
+                        "creatures": creature_count,
+                        "vehicle_minimum": vehicle_min,
+                        "creature_minimum": creature_min,
+                        "deficit": "creatures",
+                    },
+                )
+            )
+    report.profiles.append(
+        ProfileSummary(
+            profile_id="vehicles",
+            counts={"vehicle": vehicle_count, "creature": creature_count},
+            status=vehicle_status,
+            messages=vehicle_messages,
+        )
+    )
 
     for card in maindeck:
         for effect in effects_map.get(card.oracle_id, []):

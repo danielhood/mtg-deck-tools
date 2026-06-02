@@ -13,6 +13,7 @@ from mtg_deck_tools.builder.mechanic_packages import (
     ensure_sacrifice_package,
     ensure_subtype_lord_packages,
     ensure_token_package,
+    ensure_vehicle_package,
 )
 from mtg_deck_tools.db.schema import apply_schema
 from mtg_deck_tools.models.criteria import DeckCriteria
@@ -351,3 +352,46 @@ def test_ensure_goblin_lord_adds_support(goblin_lord_db: sqlite3.Connection, mon
         if "Goblin" in c.type_line and "Creature" in c.type_line and c.oracle_id != "lord"
     )
     assert goblins >= 3
+
+
+@pytest.fixture
+def vehicle_pkg_db() -> sqlite3.Connection:
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    apply_schema(conn)
+    for i in range(6):
+        _insert_card(conn, oracle_id=f"f{i}", name=f"Filler {i}", type_line="Instant")
+    for i in range(4):
+        oid = f"v{i}"
+        _insert_card(conn, oracle_id=oid, name=f"Vehicle {i}", type_line="Artifact — Vehicle")
+    for i in range(30):
+        oid = f"c{i}"
+        _insert_card(conn, oracle_id=oid, name=f"Crew {i}", type_line="Creature — Human")
+    conn.commit()
+    return conn
+
+
+def test_ensure_vehicle_adds_vehicle_when_intent(
+    vehicle_pkg_db: sqlite3.Connection,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        "mtg_deck_tools.builder.mechanic_packages.vehicle_profile_floors",
+        lambda profiles=None: (2, 5),
+    )
+    cards = [
+        _deck_card(oracle_id="f0", name="Filler 0", type_line="Instant"),
+        _deck_card(oracle_id="c0", name="Crew 0", type_line="Creature — Human"),
+    ]
+    criteria = DeckCriteria(include_mechanics=["vehicles"])
+    result = ensure_vehicle_package(
+        vehicle_pkg_db,
+        cards,
+        criteria=criteria,
+        identity=["G"],
+        commander_oracle_ids=set(),
+        commander_theme_tags=set(),
+    )
+    assert result.swaps >= 1
+    vehicles = sum(1 for c in result.cards if "Vehicle" in c.type_line)
+    assert vehicles >= 1

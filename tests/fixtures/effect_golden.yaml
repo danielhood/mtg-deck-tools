@@ -220,6 +220,25 @@ cases:
       - effect_kind: sacrifice_outlet
         source: sacrifice_outlet
 
+  - name: smugglers_copter
+    oracle_text: "Flying\nWhenever Smuggler's Copter attacks or blocks, you may draw a card. If you do, discard a card.\nCrew 1"
+    type_line: "Artifact — Vehicle"
+    expected:
+      - effect_kind: type_line_vehicle
+        source: type_line_vehicle
+        payload:
+          types: [artifact]
+          subtypes: [Vehicle]
+
+  - name: chief_of_the_foundry
+    oracle_text: "Other Vehicles you control get +1/+1."
+    type_line: "Creature — Artificer"
+    expected:
+      - effect_kind: buff_subtype
+        source: buff_subtype_other
+        payload:
+          subtypes: [Vehicle]
+
   - name: double_search_creature
     oracle_text: "Search your library for a creature card, then search your library for a land card."
     type_line: "Sorcery"

@@ -105,3 +105,14 @@ profiles:
       producer_min: 5
       payoff_min: 3
       share_max: 0.2
+
+  # Audit 2026-05-30: Vehicle type line + crew; see planning/11 UX table
+  vehicles:
+    label: Vehicles
+    activation:
+      include_mechanics: [vehicles]
+    roles: [vehicle, crew_creature]
+    defaults:
+      vehicle_min: 3
+      creature_min: 25
+      share_max: 0.15

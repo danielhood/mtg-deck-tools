@@ -79,3 +79,13 @@ def token_profile_floors(
         int(cfg.get("producer_min", 5)),
         int(cfg.get("payoff_min", 3)),
     )
+
+
+def vehicle_profile_floors(
+    profiles: dict[str, dict[str, Any]] | None = None,
+) -> tuple[int, int]:
+    cfg = _profile_defaults("vehicles", profiles)
+    return (
+        int(cfg.get("vehicle_min", 3)),
+        int(cfg.get("creature_min", 25)),
+    )

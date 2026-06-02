@@ -59,6 +59,14 @@ def classify_dependency_warning(
             return "appropriate"
         return "inappropriate"
 
+    if rule_id == "VEHICLE_BALANCE":
+        if scope.vehicles_user_intent:
+            return "appropriate"
+        vehicles = detail.get("vehicles")
+        if vehicles is not None and vehicles >= 2:
+            return "appropriate"
+        return "inappropriate"
+
     if rule_id == "TUTOR_TARGET_EXISTS":
         return "appropriate"
 

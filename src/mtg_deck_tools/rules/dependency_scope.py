@@ -25,6 +25,7 @@ class DependencyScope:
     subtype_lords_user_intent: bool = False
     sacrifice_user_intent: bool = False
     tokens_user_intent: bool = False
+    vehicles_user_intent: bool = False
 
 
 def _load_profile_activation(path: Path | None = None) -> dict[str, dict[str, list[str]]]:
@@ -86,4 +87,5 @@ def build_dependency_scope(
         subtype_lords_user_intent=subtype_lords,
         sacrifice_user_intent=_profile_active("sacrifice"),
         tokens_user_intent=_profile_active("tokens"),
+        vehicles_user_intent=_profile_active("vehicles"),
     )

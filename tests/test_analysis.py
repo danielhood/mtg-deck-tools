@@ -73,6 +73,30 @@ def test_classify_tokens_balance_appropriate() -> None:
     assert classify_dependency_warning(issue, criteria) == "appropriate"
 
 
+def test_classify_vehicle_balance_appropriate() -> None:
+    criteria = DeckCriteria(include_mechanics=["vehicles"])
+    issue = DependencyIssue(
+        rule_id="VEHICLE_BALANCE",
+        status="warn",
+        message="test",
+        profile_id="vehicles",
+        detail={"vehicles": 1, "creatures": 10, "deficit": "vehicles"},
+    )
+    assert classify_dependency_warning(issue, criteria) == "appropriate"
+
+
+def test_classify_incidental_vehicle_inappropriate() -> None:
+    criteria = DeckCriteria(themes=["draw"])
+    issue = DependencyIssue(
+        rule_id="VEHICLE_BALANCE",
+        status="warn",
+        message="test",
+        profile_id="vehicles",
+        detail={"vehicles": 1, "creatures": 10, "deficit": "creatures"},
+    )
+    assert classify_dependency_warning(issue, criteria) == "inappropriate"
+
+
 def test_classify_incidental_token_inappropriate() -> None:
     criteria = DeckCriteria(themes=["draw"])
     issue = DependencyIssue(

@@ -1,6 +1,6 @@
 """Profile threshold helpers."""
 
-from mtg_deck_tools.rules.dependency_profiles import subtype_lord_minimum
+from mtg_deck_tools.rules.dependency_profiles import subtype_lord_minimum, vehicle_profile_floors
 
 
 def test_subtype_lord_minimum_uses_per_subtype_map() -> None:
