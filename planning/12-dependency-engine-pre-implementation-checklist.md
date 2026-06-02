@@ -14,7 +14,7 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 | ◐ | In progress |
 | ☑ | Done — link PR, commit, or artifact path in notes column |
 
-**Rule:** D0–D5 are **complete** (2026-05-31). Use this checklist for dogfood acceptance and UX2+ work; do not reopen D1 gate unless schema or pattern contracts change.
+**Rule:** D0–D5 are **complete** (2026-05-31). Use this checklist for dogfood acceptance and UX2+ work; do not reopen D1 gate unless schema or pattern contracts change. **Post–D5 expansion** (new effect kinds and profiles) — see [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
 
 **Suggested order:** § Snapshot → § D0 → § D0.5 → § Decisions → § Output contract → then D1 → D2.
 
@@ -164,5 +164,6 @@ Before UX2 / default strict mode, manually review generated decks:
 
 - [10-card-dependency-engine.md](10-card-dependency-engine.md) — D0–D5 technical phases
 - [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) — UX phases, progressive constraints
+- [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) — post–D5 expansion backlog
 - [09-next-steps.md](09-next-steps.md) — backlog
 - [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml) — thresholds (update after D0.5)

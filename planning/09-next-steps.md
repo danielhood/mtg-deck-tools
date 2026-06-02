@@ -1,6 +1,6 @@
 # Next steps — post-v1
 
-Status as of 2026-05-31. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phase 3 (§1–§5)**, and the **card dependency engine (D0–D5)** are **shipped**. Dogfood pass (`seed=42`, five commanders, varied budgets) confirms validation, budget, reload, and output polish — see [01-goals-and-scope.md](01-goals-and-scope.md#v1-closure-2026-05-30).
+Status as of 2026-06-01. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phase 3 (§1–§5)**, and the **card dependency engine (D0–D5)** are **shipped**. Dogfood matrix (**22 scenarios**) and mechanic packages (energy, sacrifice, auras, artifacts, subtype lords) — see [14-deck-analysis.md](14-deck-analysis.md) and [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
 
 ## Current state
 
@@ -29,8 +29,11 @@ Status as of 2026-05-31. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | `--strict-dependencies` | Done — D4 pick-time filter |
 | `--repair-dependencies` | Done — D5 post-build swap pass |
 | Wizard dependency controls (UX2) | **Not started** — CLI flags only today |
-| Dependency dogfood calibration | **Done** — `analyze run` matrix; mechanic packages for energy, auras, artifacts, subtype lords |
-| Mechanic packages (non-energy) | **Done** — voltron auras, equip/vehicles artifacts, elf lords (card-driven) |
+| Dependency dogfood calibration | **Done** — `analyze run` matrix (22 scenarios); 0% inappropriate warnings on full matrix |
+| Mechanic packages | **Done** — energy, sacrifice/aristocrats, voltron auras, equip/vehicles artifacts, subtype lords |
+| Sacrifice / aristocrats profile | **Done** — `SACRIFICE_BALANCE` + `ensure_sacrifice_package` |
+| Aura calibration | **Done** — `whenever_cast_aura` vs generic enchantment payoffs; card-driven aura package |
+| Dependency expansion (tokens, vehicles, …) | **Planned** — [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
 
 ## Dogfooding snapshot (v1 closure)
 
@@ -113,31 +116,33 @@ Shipped 2026-05-30 / 2026-05-31. Technical phases in [10-card-dependency-engine.
 | **D4** | Strict pick-time filter | `--strict-dependencies` |
 | **D5** | Post-build repair swaps | `--repair-dependencies` |
 
-**v1 rules:** `TUTOR_TARGET_EXISTS`, `ENERGY_BALANCE`, `TYPE_SYNERGY_MIN`, `AURA_SUPPORT_MIN` — thresholds in [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml).
+**v1 rules:** `TUTOR_TARGET_EXISTS`, `ENERGY_BALANCE`, `SACRIFICE_BALANCE`, `TYPE_SYNERGY_MIN`, `AURA_SUPPORT_MIN` — thresholds in [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml).
 
-**Maintainer workflow:** After bulk refresh, run `import` then `dependency-audit` to refresh `card_effects` and audit reports.
+**Mechanic packages:** energy, sacrifice/aristocrats, auras, artifacts, subtype lords — see [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) for shipped inventory.
+
+**Maintainer workflow:** After bulk refresh, run `import` then `dependency-audit` to refresh `card_effects` and audit reports. Run `analyze run --fail-on-expect` after dependency changes.
 
 ---
 
-## Active work — dependency UX and calibration
+## Active work — dependency expansion and UX
 
-Recommended order after D5:
+Recommended order:
 
-### 1. Dogfood acceptance (dependency rules)
+### 1. Dependency expansion (high-value additions)
 
-**Automated:** `mtg-deck-tools analyze run` (matrix: [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml), docs: [14-deck-analysis.md](14-deck-analysis.md)). Writes `output/analysis-*/summary.json` with false-positive rate and per-case JSON. Use `--fail-on-expect` in CI after import.
+Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**.
 
-Manual spot-check optional per [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md#dogfood-acceptance-after-d2):
+| Priority | Deliverable | Rationale |
+| --- | --- | --- |
+| 1 | Generic **subtype lords** (Goblin, Vampire, Pirate, …) | Reuses `buff_subtype`; dogfood already covers Krenko, Edgar, Urza |
+| 2 | **Tokens package** | `themes: [tokens]` — producers vs payoffs; distinct from sacrifice fodder |
+| 3 | **Vehicles profile** | Crew density; `include_mechanics: [vehicles]` already in profiles |
+| 4 | **Enchantment matters** | Enchantress density separate from voltron auras |
+| 5 | **Tutor payload upgrades** | CMC bands, colors, named cards — stronger `TUTOR_TARGET_EXISTS` |
+| 6 | **Graveyard / landfall heuristics** | Warn-only before packages |
+| 7 | **Counter resources** | Proliferate, blood, experience — after audit evidence |
 
-| Scenario | Pass? |
-| --- | --- |
-| Land tutor deck — no “no land” false warn | ☐ |
-| Energy producers, zero consumers — clear Energy note | ☐ |
-| Elf lord, &lt;5 elves — warning with suggested minimum | ☐ |
-| Enchantress / low aura count + aura tutor | ☐ |
-| Goodstuff deck — no spam warnings from arbitrary thresholds | ☐ |
-
-Set false-positive budget (e.g. &lt;5% warn rate on N hand-reviewed decks) before turning on strict mode by default.
+Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15).
 
 ### 2. UX2 — wizard synergy controls
 
@@ -147,12 +152,14 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 - **Focus presets** (`mechanic_focus`: energy, auras) wired to `dependency-profiles.yaml`
 - Surface dependency summary during wizard review (optional)
 
-### 3. Rule scoping and threshold tuning — **partial**
+### 3. Rule scoping and threshold tuning — **mostly done**
 
 - ☑ Scope deck-level profile rules to themes / `include_mechanics` / `mechanic_focus` (`rules/dependency_scope.py`, `activation` in `dependency-profiles.yaml`)
 - ☑ Suppress `ENERGY_BALANCE` for a lone incidental producer unless user includes `energy` or has 2+ imbalanced cards
-- ☐ Review `AURA_SUPPORT_MIN` / `TYPE_SYNERGY_MIN` thresholds against audit evidence
-- ☐ Optional: `SUBTYPE_SYNERGY_MIN` (e.g. Elf lords) — deferred in checklist
+- ☑ Sacrifice profile + `SACRIFICE_BALANCE` for aristocrats intent
+- ☑ `whenever_cast_aura` — enchantment payoffs no longer trigger voltron aura floor
+- ☑ Dogfood matrix — 22 scenarios; `analyze run --fail-on-expect` gate
+- ☐ Threshold review against latest audit evidence when adding new profiles (doc 15)
 
 ---
 
@@ -160,6 +167,7 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 | Topic | Notes | Doc |
 | --- | --- | --- |
+| **Dependency expansion** | Tokens, vehicles, subtype lords, tutors, graveyard heuristics | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
 | Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
 | Dependency swap packages | `generate --swap-profile energy` — needs UX5 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |
@@ -174,6 +182,8 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 ## Suggested next task
 
-**UX2 wizard controls** for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets. **Dogfood matrix** expanded (elf tribal, Breya/Urza artifacts, Korvold/Chatterfang aristocrats, landfall, goblins, Edgar, Sythis) — see [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml).
+**Dependency expansion** — start with **subtype lord generalization** and **tokens package** ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)). In parallel or after: **UX2** wizard controls for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets.
+
+Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 
 See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX2 → UX3 criteria linter → UX5 local web).
