@@ -393,10 +393,10 @@ Engine implementation should read profile thresholds from YAML rather than hard-
 
 ## Post–D5 expansion (active)
 
-D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras, artifacts, subtype lords, dogfood matrix). Further effect kinds, rules, and packages are tracked in **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**:
+D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras, artifacts, subtype lords, tokens, vehicles, dogfood matrix). Further effect kinds, rules, and packages are tracked in **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**:
 
 - Shipped inventory (`effect_kind`, `rule_id`, packages)
-- High-value additions (tokens, vehicles, tutor payloads, graveyard heuristics, counter resources)
+- High-value additions (enchantment matters, tutor payloads, graveyard heuristics, counter resources)
 - Explicit non-goals
 - Per-feature implementation checklist
 - Suggested build order

@@ -1,6 +1,6 @@
 # Next steps — post-v1
 
-Status as of 2026-06-01. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phase 3 (§1–§5)**, and the **card dependency engine (D0–D5)** are **shipped**. Dogfood matrix (**22 scenarios**) and mechanic packages (energy, sacrifice, auras, artifacts, subtype lords) — see [14-deck-analysis.md](14-deck-analysis.md) and [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
+Status as of 2026-06-02. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phase 3 (§1–§5)**, and the **card dependency engine (D0–D5)** are **shipped**. Dogfood matrix (**22 scenarios**) and mechanic packages (energy, sacrifice, auras, artifacts, subtype lords, tokens, vehicles) — see [14-deck-analysis.md](14-deck-analysis.md) and [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
 
 ## Current state
 
@@ -30,10 +30,12 @@ Status as of 2026-06-01. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | `--repair-dependencies` | Done — D5 post-build swap pass |
 | Wizard dependency controls (UX2) | **Not started** — CLI flags only today |
 | Dependency dogfood calibration | **Done** — `analyze run` matrix (22 scenarios); 0% inappropriate warnings on full matrix |
-| Mechanic packages | **Done** — energy, sacrifice/aristocrats, voltron auras, equip/vehicles artifacts, subtype lords |
+| Mechanic packages | **Done** — energy, sacrifice/aristocrats, voltron auras, equip/vehicles artifacts, subtype lords, tokens, vehicles |
 | Sacrifice / aristocrats profile | **Done** — `SACRIFICE_BALANCE` + `ensure_sacrifice_package` |
+| Tokens profile | **Done** — `TOKEN_BALANCE` + `ensure_token_package` (`themes: [tokens]`) |
+| Vehicles profile | **Done** — `VEHICLE_BALANCE` + `ensure_vehicle_package` (`include_mechanics: [vehicles]`) |
 | Aura calibration | **Done** — `whenever_cast_aura` vs generic enchantment payoffs; card-driven aura package |
-| Dependency expansion (tokens, vehicles, …) | **Planned** — [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
+| Dependency expansion (enchantment matters, tutors, …) | **Planned** — [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
 
 ## Dogfooding snapshot (v1 closure)
 
@@ -116,9 +118,9 @@ Shipped 2026-05-30 / 2026-05-31. Technical phases in [10-card-dependency-engine.
 | **D4** | Strict pick-time filter | `--strict-dependencies` |
 | **D5** | Post-build repair swaps | `--repair-dependencies` |
 
-**v1 rules:** `TUTOR_TARGET_EXISTS`, `ENERGY_BALANCE`, `SACRIFICE_BALANCE`, `TYPE_SYNERGY_MIN`, `AURA_SUPPORT_MIN` — thresholds in [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml).
+**v1 rules:** `TUTOR_TARGET_EXISTS`, `ENERGY_BALANCE`, `SACRIFICE_BALANCE`, `TOKEN_BALANCE`, `VEHICLE_BALANCE`, `TYPE_SYNERGY_MIN`, `AURA_SUPPORT_MIN` — thresholds in [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml).
 
-**Mechanic packages:** energy, sacrifice/aristocrats, auras, artifacts, subtype lords — see [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) for shipped inventory.
+**Mechanic packages:** energy, sacrifice/aristocrats, auras, artifacts, subtype lords, tokens, vehicles — see [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) for shipped inventory.
 
 **Maintainer workflow:** After bulk refresh, run `import` then `dependency-audit` to refresh `card_effects` and audit reports. Run `analyze run --fail-on-expect` after dependency changes.
 
@@ -135,12 +137,12 @@ Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-ro
 | Priority | Deliverable | Rationale |
 | --- | --- | --- |
 | 1 | Generic **subtype lords** (Goblin, Vampire, Pirate, …) | Reuses `buff_subtype`; dogfood already covers Krenko, Edgar, Urza |
-| 2 | **Tokens package** | `themes: [tokens]` — producers vs payoffs; distinct from sacrifice fodder |
-| 3 | **Vehicles profile** | Crew density; `include_mechanics: [vehicles]` already in profiles |
-| 4 | **Enchantment matters** | Enchantress density separate from voltron auras |
-| 5 | **Tutor payload upgrades** | CMC bands, colors, named cards — stronger `TUTOR_TARGET_EXISTS` |
-| 6 | **Graveyard / landfall heuristics** | Warn-only before packages |
-| 7 | **Counter resources** | Proliferate, blood, experience — after audit evidence |
+| 2 | **Enchantment matters** | Enchantress density separate from voltron auras |
+| 3 | **Tutor payload upgrades** | CMC bands, colors, named cards — stronger `TUTOR_TARGET_EXISTS` |
+| 4 | **Graveyard / landfall heuristics** | Warn-only before packages |
+| 5 | **Counter resources** | Proliferate, blood, experience — after audit evidence |
+
+**Recently shipped (2026-06):** **Tokens package** (`TOKEN_BALANCE`, `themes: [tokens]`); **Vehicles profile** (`VEHICLE_BALANCE`, `include_mechanics: [vehicles]`).
 
 Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15).
 
@@ -167,7 +169,7 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 | Topic | Notes | Doc |
 | --- | --- | --- |
-| **Dependency expansion** | Tokens, vehicles, subtype lords, tutors, graveyard heuristics | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
+| **Dependency expansion** | Enchantment matters, tutor payloads, graveyard heuristics, counter resources | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
 | Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
 | Dependency swap packages | `generate --swap-profile energy` — needs UX5 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |

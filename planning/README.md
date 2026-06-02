@@ -73,8 +73,12 @@ Planning documents for a local Windows utility that walks users through deck-bui
 - Pick-time dependency scoring during slot fill
 - `--strict-dependencies` and `--repair-dependencies` on `generate`
 
+### Dependency expansion (2026-06)
+- **Tokens profile** — `TOKEN_BALANCE`, `ensure_token_package` (`themes: [tokens]`)
+- **Vehicles profile** — `VEHICLE_BALANCE`, `ensure_vehicle_package` (`include_mechanics: [vehicles]`)
+
 ## What's next
 
 See **[09-next-steps.md](09-next-steps.md)** for the active backlog.
 
-**Recommended first tasks:** **dependency expansion** — subtype lords, tokens, vehicles ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)); **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
+**Recommended first tasks:** **dependency expansion** — enchantment matters, tutor payloads, graveyard heuristics ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)); **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
