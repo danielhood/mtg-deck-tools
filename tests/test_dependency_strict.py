@@ -118,7 +118,7 @@ def test_strict_rejects_energy_consumer_without_producers() -> None:
 
 
 def test_strict_rejects_elf_lord_without_support() -> None:
-    stats = DeckBuildStats(elf_other_minimum=5)
+    stats = DeckBuildStats(subtype_lord_minimums={"Elf": 5})
     assert not passes_strict_dependency_filter(
         _candidate(oracle_id="lord", name="Archdruid", type_line="Creature — Elf Druid"),
         [_effect("buff_subtype", {"subtypes": ["Elf"]})],

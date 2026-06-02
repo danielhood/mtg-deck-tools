@@ -22,6 +22,7 @@ class DependencyScope:
     energy_user_intent: bool = False
     artifacts_user_intent: bool = False
     elves_user_intent: bool = False
+    subtype_lords_user_intent: bool = False
     sacrifice_user_intent: bool = False
 
 
@@ -74,11 +75,13 @@ def build_dependency_scope(
         return False
 
     energy_user = _profile_active("energy")
+    subtype_lords = _profile_active("subtype_lords") or _profile_active("elves")
     return DependencyScope(
         energy_balance=True,
         aura_support_min=_profile_active("aura_support"),
         energy_user_intent=energy_user,
         artifacts_user_intent=_profile_active("artifacts"),
-        elves_user_intent=_profile_active("elves"),
+        elves_user_intent=subtype_lords,
+        subtype_lords_user_intent=subtype_lords,
         sacrifice_user_intent=_profile_active("sacrifice"),
     )

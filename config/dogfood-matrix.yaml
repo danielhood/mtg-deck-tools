@@ -88,7 +88,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: elves-marwyn
@@ -101,7 +101,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: elves-ezuri
@@ -114,7 +114,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   # --- Artifact-heavy (equip/vehicles package) ---
@@ -129,7 +129,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: artifacts-urza-chief
@@ -196,7 +196,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: goblins-krenko
@@ -209,7 +209,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: vampires-edgar
@@ -224,7 +224,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: enchantress-sythis
@@ -237,7 +237,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   # --- Budget / availability (v1 closure parity) ---
