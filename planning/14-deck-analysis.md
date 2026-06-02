@@ -79,6 +79,7 @@ Target: **&lt; 5%** on the full matrix ([planning/13](13-dependency-engine-decis
 
 - Add scenarios to the YAML (no code change).
 - For new check types, extend `expect` parsing in `analysis/matrix.py` and `analysis/expectations.py`.
+- For new dependency rules and mechanic packages, follow [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
 - Programmatic use: `build_generate_outcome()` → inspect `GenerateOutcome` without writing decks.
 
 ## CI

@@ -391,6 +391,18 @@ Engine implementation should read profile thresholds from YAML rather than hard-
 
 ---
 
+## Post–D5 expansion (active)
+
+D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras, artifacts, subtype lords, dogfood matrix). Further effect kinds, rules, and packages are tracked in **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**:
+
+- Shipped inventory (`effect_kind`, `rule_id`, packages)
+- High-value additions (tokens, vehicles, tutor payloads, graveyard heuristics, counter resources)
+- Explicit non-goals
+- Per-feature implementation checklist
+- Suggested build order
+
+---
+
 ## Open questions
 
 1. **Thresholds:** Global constants vs per-archetype in `slot-templates.yaml`? (See also per-profile defaults in `dependency-profiles.yaml` — [11](11-dependency-engine-user-experience.md).)
