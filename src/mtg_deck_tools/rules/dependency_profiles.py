@@ -69,3 +69,13 @@ def sacrifice_profile_floors(
         int(cfg.get("payoff_min", 3)),
         int(cfg.get("fodder_min", 8)),
     )
+
+
+def token_profile_floors(
+    profiles: dict[str, dict[str, Any]] | None = None,
+) -> tuple[int, int]:
+    cfg = _profile_defaults("tokens", profiles)
+    return (
+        int(cfg.get("producer_min", 5)),
+        int(cfg.get("payoff_min", 3)),
+    )

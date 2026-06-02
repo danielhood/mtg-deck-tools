@@ -12,6 +12,7 @@ from mtg_deck_tools.builder.mechanic_packages import (
     ensure_energy_package,
     ensure_sacrifice_package,
     ensure_subtype_lord_packages,
+    ensure_token_package,
 )
 from mtg_deck_tools.db.schema import apply_schema
 from mtg_deck_tools.models.criteria import DeckCriteria
@@ -229,6 +230,61 @@ def test_ensure_sacrifice_adds_payoff_when_only_outlet(
     )
     sacrifice_issues = [i for i in report.issues if i.rule_id == "SACRIFICE_BALANCE"]
     assert not sacrifice_issues
+
+
+@pytest.fixture
+def token_pkg_db() -> sqlite3.Connection:
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    apply_schema(conn)
+    for i in range(6):
+        _insert_card(conn, oracle_id=f"f{i}", name=f"Filler {i}", type_line="Instant")
+    _insert_card(conn, oracle_id="nest", name="Nest Invader", type_line="Creature")
+    _insert_effect(conn, "nest", "token_produce", "token_produce")
+    _insert_card(conn, oracle_id="payoff", name="Token Draw", type_line="Creature")
+    _insert_effect(conn, "payoff", "token_payoff", "token_payoff_on_create")
+    for i in range(5):
+        oid = f"prod{i}"
+        _insert_card(conn, oracle_id=oid, name=f"Producer {i}", type_line="Creature")
+        _insert_effect(conn, oid, "token_produce", "token_produce")
+    for i in range(3):
+        oid = f"pay{i}"
+        _insert_card(conn, oracle_id=oid, name=f"Payoff {i}", type_line="Creature")
+        _insert_effect(conn, oid, "token_payoff", "token_payoff_on_create")
+    conn.commit()
+    return conn
+
+
+def test_ensure_token_adds_payoff_when_only_producer(
+    token_pkg_db: sqlite3.Connection,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        "mtg_deck_tools.builder.mechanic_packages.token_profile_floors",
+        lambda profiles=None: (1, 1),
+    )
+    cards = [
+        _deck_card(oracle_id="nest", name="Nest Invader", type_line="Creature"),
+        _deck_card(oracle_id="f0", name="Filler 0", type_line="Instant"),
+    ]
+    criteria = DeckCriteria(themes=["tokens"])
+    result = ensure_token_package(
+        token_pkg_db,
+        cards,
+        criteria=criteria,
+        identity=["G"],
+        commander_oracle_ids=set(),
+        commander_theme_tags=set(),
+    )
+    assert result.swaps >= 1
+    report = validate_dependencies(
+        token_pkg_db,
+        maindeck=result.cards,
+        commanders=[],
+        criteria=criteria,
+    )
+    token_issues = [i for i in report.issues if i.rule_id == "TOKEN_BALANCE"]
+    assert not token_issues
 
 
 def _insert_card_r(

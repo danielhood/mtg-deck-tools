@@ -245,6 +245,22 @@ def _should_warn_sacrifice_imbalance(
     return dominant >= 2
 
 
+def _should_warn_token_imbalance(
+    *,
+    scope: DependencyScope,
+    producer_count: int,
+    payoff_count: int,
+) -> bool:
+    if producer_count == 0 and payoff_count == 0:
+        return False
+    if producer_count > 0 and payoff_count > 0:
+        return False
+    if scope.tokens_user_intent:
+        return True
+    dominant = max(producer_count, payoff_count)
+    return dominant >= 2
+
+
 def validate_dependencies(
     conn: sqlite3.Connection,
     *,
@@ -288,6 +304,8 @@ def validate_dependencies(
     sacrifice_outlets: list[str] = []
     sacrifice_payoffs: list[str] = []
     sacrifice_fodder: list[str] = []
+    token_producers: list[str] = []
+    token_payoffs: list[str] = []
     aura_spells = _count_type(maindeck, "enchantment")  # refined below for Aura subtype
 
     for card in maindeck:
@@ -302,6 +320,10 @@ def validate_dependencies(
                 sacrifice_payoffs.append(card.name)
             elif effect.effect_kind == "sacrifice_fodder":
                 sacrifice_fodder.append(card.name)
+            elif effect.effect_kind == "token_produce":
+                token_producers.append(card.name)
+            elif effect.effect_kind == "token_payoff":
+                token_payoffs.append(card.name)
             elif effect.effect_kind == "type_line_aura":
                 pass
 
@@ -420,6 +442,50 @@ def validate_dependencies(
                 "fodder": len(sacrifice_fodder),
             },
             status=severity if strict and sacrifice_warn else ("warn" if sacrifice_warn else "pass"),
+            messages=[],
+        )
+    )
+
+    token_imbalanced = (token_producers and not token_payoffs) or (
+        token_payoffs and not token_producers
+    )
+    token_warn = token_imbalanced and _should_warn_token_imbalance(
+        scope=dep_scope,
+        producer_count=len(token_producers),
+        payoff_count=len(token_payoffs),
+    )
+    if token_warn and token_producers and not token_payoffs:
+        report.issues.append(
+            DependencyIssue(
+                rule_id="TOKEN_BALANCE",
+                status=severity,
+                message=(
+                    f"Deck has {len(token_producers)} token producer(s) "
+                    f"({', '.join(token_producers[:5])}"
+                    f"{', …' if len(token_producers) > 5 else ''}) but no token payoffs "
+                    f"(e.g. \"whenever you create a token\")."
+                ),
+                profile_id="tokens",
+                detail={"producers": token_producers, "payoffs": []},
+            )
+        )
+    elif token_warn and token_payoffs and not token_producers:
+        report.issues.append(
+            DependencyIssue(
+                rule_id="TOKEN_BALANCE",
+                status=severity,
+                message=(
+                    f"Deck has {len(token_payoffs)} token payoff(s) but no cards that create tokens."
+                ),
+                profile_id="tokens",
+                detail={"producers": [], "payoffs": token_payoffs},
+            )
+        )
+    report.profiles.append(
+        ProfileSummary(
+            profile_id="tokens",
+            counts={"producer": len(token_producers), "payoff": len(token_payoffs)},
+            status=severity if strict and token_warn else ("warn" if token_warn else "pass"),
             messages=[],
         )
     )

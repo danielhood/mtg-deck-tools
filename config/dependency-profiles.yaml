@@ -95,3 +95,13 @@ profiles:
       outlet_min: 2
       payoff_min: 3
       fodder_min: 8
+
+  tokens:
+    label: Token synergies
+    activation:
+      themes: [tokens]
+    roles: [producer, payoff]
+    defaults:
+      producer_min: 5
+      payoff_min: 3
+      share_max: 0.2

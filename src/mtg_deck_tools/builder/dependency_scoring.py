@@ -15,6 +15,7 @@ from mtg_deck_tools.rules.dependency_profiles import (
     energy_profile_floors,
     sacrifice_profile_floors,
     subtype_lord_minimum,
+    token_profile_floors,
 )
 from mtg_deck_tools.rules.dependencies import (
     CardEffectRow,
@@ -57,6 +58,13 @@ class DeckBuildStats:
     sacrifice_package_requested: bool = False
     needs_sacrifice_payoff: bool = False
     needs_sacrifice_outlet: bool = False
+    token_producers: int = 0
+    token_payoffs: int = 0
+    token_producer_floor: int = 0
+    token_payoff_floor: int = 0
+    token_package_requested: bool = False
+    needs_token_payoff: bool = False
+    needs_token_producer: bool = False
 
 
 def card_effects_enabled(conn: sqlite3.Connection) -> bool:
@@ -131,11 +139,17 @@ def build_deck_build_stats(
                 stats.sacrifice_payoffs += 1
             elif effect.effect_kind == "sacrifice_fodder":
                 stats.sacrifice_fodder += 1
+            elif effect.effect_kind == "token_produce":
+                stats.token_producers += 1
+            elif effect.effect_kind == "token_payoff":
+                stats.token_payoffs += 1
 
     stats.needs_energy_consumer = stats.energy_producers > 0 and stats.energy_consumers == 0
     stats.needs_energy_producer = stats.energy_consumers > 0 and stats.energy_producers == 0
     stats.needs_sacrifice_payoff = stats.sacrifice_outlets > 0 and stats.sacrifice_payoffs == 0
     stats.needs_sacrifice_outlet = stats.sacrifice_payoffs > 0 and stats.sacrifice_outlets == 0
+    stats.needs_token_payoff = stats.token_producers > 0 and stats.token_payoffs == 0
+    stats.needs_token_producer = stats.token_payoffs > 0 and stats.token_producers == 0
 
     if criteria is not None:
         from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
@@ -166,6 +180,15 @@ def build_deck_build_stats(
                 stats.needs_sacrifice_outlet = True
             if stats.sacrifice_payoffs < p_min:
                 stats.needs_sacrifice_payoff = True
+        if scope.tokens_user_intent:
+            prod_min, pay_min = token_profile_floors(profile_cfg)
+            stats.token_package_requested = True
+            stats.token_producer_floor = prod_min
+            stats.token_payoff_floor = pay_min
+            if stats.token_producers < prod_min:
+                stats.needs_token_producer = True
+            if stats.token_payoffs < pay_min:
+                stats.needs_token_payoff = True
 
     lords_by_subtype: dict[str, int] = {}
     for card in partial:
@@ -246,6 +269,16 @@ def dependency_pick_score(
             score += 5.0 * weight
         elif effect.effect_kind == "sacrifice_outlet" and stats.needs_sacrifice_outlet:
             score += 3.5 * weight
+        elif effect.effect_kind == "token_produce" and stats.token_package_requested:
+            if stats.token_producers < stats.token_producer_floor:
+                score += 7.0 * weight
+        elif effect.effect_kind == "token_payoff" and stats.token_package_requested:
+            if stats.token_payoffs < stats.token_payoff_floor:
+                score += 7.0 * weight
+        elif effect.effect_kind == "token_payoff" and stats.needs_token_payoff:
+            score += 5.0 * weight
+        elif effect.effect_kind == "token_produce" and stats.needs_token_producer:
+            score += 3.5 * weight
         elif effect.effect_kind == "energy_consume" and stats.energy_producers >= 2:
             if stats.energy_consumers < stats.energy_producers:
                 score += 2.0 * weight
@@ -291,6 +324,9 @@ def passes_strict_dependency_filter(
                 return False
         elif effect.effect_kind == "energy_consume" and stats.energy_producers == 0:
             return False
+        elif effect.effect_kind == "token_payoff" and stats.token_producers == 0:
+            if not stats.token_package_requested:
+                return False
         elif effect.effect_kind == "buff_subtype":
             subtypes = effect.payload.get("subtypes") or []
             if subtypes:

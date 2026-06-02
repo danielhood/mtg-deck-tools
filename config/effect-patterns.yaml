@@ -165,6 +165,36 @@ patterns:
     exclude_if_matched:
       - whenever_cast_aura
 
+  # --- tokens (payoff before produce; sacrifice_fodder excludes token_produce) ---
+  - id: token_payoff_on_create
+    effect_kind: token_payoff
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever you create (?:a |an |one or more )?token"
+    payload:
+      trigger: create
+
+  - id: token_payoff_on_enter
+    effect_kind: token_payoff
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever (?:a |another |each |one or more )?token(?:s)? enters(?: the battlefield)?"
+    payload:
+      trigger: enter
+    exclude_if_matched:
+      - token_payoff_on_create
+
+  - id: token_produce
+    effect_kind: token_produce
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)create (?:a |an |two |three |four |five |\\d+/\\d+ |one or more |any number of )?(?:[\\w'/.-]+ )*token"
+    payload:
+      role: producer
+
   # --- sacrifice / aristocrats (payoff before outlet; outlet excludes payoffs) ---
   - id: sacrifice_creature_dies_payoff
     effect_kind: sacrifice_payoff
@@ -216,6 +246,8 @@ patterns:
         pattern: "(?i)create (?:a |an |two |three |four |five |\\d+/\\d+ |one or more |any number of )?(?:[\\w'/.-]+ )*token"
     payload:
       role: fodder
+    exclude_if_matched:
+      - token_produce
 
   # --- type line (not oracle) ---
   - id: type_line_aura

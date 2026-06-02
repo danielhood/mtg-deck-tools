@@ -178,3 +178,59 @@ def test_energy_one_sided_silent_without_intent(dep_db: sqlite3.Connection) -> N
         criteria=DeckCriteria(themes=["tokens"]),
     )
     assert not any(i.rule_id == "ENERGY_BALANCE" for i in report.warnings)
+
+
+def test_token_one_sided_warns_with_tokens_intent(dep_db: sqlite3.Connection) -> None:
+    conn = dep_db
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, oracle_text, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land, price_known
+        ) VALUES ('nest', 'Nest Invader', 'Creature', '', '{2}', 2, '[]', '[]', 1, 0, 0, 1)
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO card_effects (
+            oracle_id, face_index, effect_kind, payload, confidence, source
+        ) VALUES ('nest', 0, 'token_produce', '{}', 1.0, 'token_produce')
+        """
+    )
+    conn.commit()
+    maindeck = [_deck_card(oracle_id="nest", name="Nest Invader", type_line="Creature")]
+    report = validate_dependencies(
+        conn,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["tokens"]),
+    )
+    assert any(i.rule_id == "TOKEN_BALANCE" for i in report.warnings)
+
+
+def test_token_one_sided_silent_without_intent(dep_db: sqlite3.Connection) -> None:
+    conn = dep_db
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, oracle_text, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land, price_known
+        ) VALUES ('nest', 'Nest Invader', 'Creature', '', '{2}', 2, '[]', '[]', 1, 0, 0, 1)
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO card_effects (
+            oracle_id, face_index, effect_kind, payload, confidence, source
+        ) VALUES ('nest', 0, 'token_produce', '{}', 1.0, 'token_produce')
+        """
+    )
+    conn.commit()
+    maindeck = [_deck_card(oracle_id="nest", name="Nest Invader", type_line="Creature")]
+    report = validate_dependencies(
+        conn,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["aristocrats"]),
+    )
+    assert not any(i.rule_id == "TOKEN_BALANCE" for i in report.warnings)
