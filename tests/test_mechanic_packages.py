@@ -8,7 +8,11 @@ import sqlite3
 import pytest
 
 from mtg_deck_tools.builder.deck import DeckCard
-from mtg_deck_tools.builder.mechanic_packages import ensure_energy_package, ensure_sacrifice_package
+from mtg_deck_tools.builder.mechanic_packages import (
+    ensure_energy_package,
+    ensure_sacrifice_package,
+    ensure_subtype_lord_packages,
+)
 from mtg_deck_tools.db.schema import apply_schema
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.dependencies import validate_dependencies
@@ -225,3 +229,69 @@ def test_ensure_sacrifice_adds_payoff_when_only_outlet(
     )
     sacrifice_issues = [i for i in report.issues if i.rule_id == "SACRIFICE_BALANCE"]
     assert not sacrifice_issues
+
+
+def _insert_card_r(
+    conn: sqlite3.Connection, *, oracle_id: str, name: str, type_line: str
+) -> None:
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, oracle_text, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land, price_known
+        ) VALUES (?, ?, ?, '', '{2}', 2, '["R"]', '[]', 1, 0, 0, 1)
+        """,
+        (oracle_id, name, type_line),
+    )
+
+
+@pytest.fixture
+def goblin_lord_db() -> sqlite3.Connection:
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    apply_schema(conn)
+    for i in range(8):
+        _insert_card_r(conn, oracle_id=f"f{i}", name=f"Filler {i}", type_line="Instant")
+    _insert_card_r(conn, oracle_id="lord", name="Goblin Warchief", type_line="Creature — Goblin Warrior")
+    conn.execute(
+        """
+        INSERT INTO card_effects (
+            oracle_id, face_index, effect_kind, payload, confidence, source
+        ) VALUES (?, 0, 'buff_subtype', ?, 1.0, 'buff_subtype_other')
+        """,
+        ("lord", json.dumps({"subtypes": ["Goblin"]})),
+    )
+    for i in range(12):
+        oid = f"g{i}"
+        _insert_card_r(conn, oracle_id=oid, name=f"Goblin {i}", type_line="Creature — Goblin")
+    conn.commit()
+    return conn
+
+
+def test_ensure_goblin_lord_adds_support(goblin_lord_db: sqlite3.Connection, monkeypatch) -> None:
+    monkeypatch.setattr(
+        "mtg_deck_tools.builder.mechanic_packages.subtype_lord_minimum",
+        lambda subtype, profiles=None: 3 if subtype == "Goblin" else 5,
+    )
+    cards = [
+        _deck_card(oracle_id="lord", name="Goblin Warchief", type_line="Creature — Goblin Warrior"),
+        _deck_card(oracle_id="f0", name="Filler 0", type_line="Instant"),
+        _deck_card(oracle_id="f1", name="Filler 1", type_line="Instant"),
+        _deck_card(oracle_id="f2", name="Filler 2", type_line="Instant"),
+        _deck_card(oracle_id="f3", name="Filler 3", type_line="Instant"),
+    ]
+    result = ensure_subtype_lord_packages(
+        goblin_lord_db,
+        cards,
+        criteria=DeckCriteria(themes=["tokens"]),
+        identity=["R"],
+        commander_oracle_ids=set(),
+        commander_theme_tags=set(),
+    )
+    assert result.swaps >= 1
+    goblins = sum(
+        1
+        for c in result.cards
+        if "Goblin" in c.type_line and "Creature" in c.type_line and c.oracle_id != "lord"
+    )
+    assert goblins >= 3

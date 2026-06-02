@@ -23,10 +23,9 @@ from mtg_deck_tools.rules.dependencies import (
 from mtg_deck_tools.rules.dependency_profiles import (
     artifact_spell_min,
     aura_spell_min,
-    elf_creature_min,
-    elf_subtype,
     energy_profile_floors,
     sacrifice_profile_floors,
+    subtype_lord_minimum,
 )
 from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
 
@@ -457,17 +456,13 @@ def ensure_subtype_lord_packages(
     if not lords:
         return MechanicPackageResult(list(cards), [])
 
+    lord_ids = {lord_id for lord_id, _, _ in lords}
     working = list(cards)
     messages: list[str] = []
     swaps = 0
-    default_min = elf_creature_min()
-    default_subtype = elf_subtype()
 
     for lord_id, lord_name, subtype in lords:
-        if subtype == default_subtype:
-            minimum = default_min
-        else:
-            minimum = default_min
+        minimum = subtype_lord_minimum(subtype)
 
         for _ in range(MAX_REPAIR_SWAPS):
             others = sum(
@@ -483,6 +478,13 @@ def ensure_subtype_lord_packages(
             def match_creature(c) -> bool:
                 return subtype in c.type_line and "Creature" in c.type_line
 
+            protect = set(lord_ids)
+            for card in working:
+                if card.oracle_id in protect:
+                    continue
+                if subtype in (card.type_line or "") and "Creature" in (card.type_line or ""):
+                    protect.add(card.oracle_id)
+
             result = swap_matching_card(
                 conn,
                 working,
@@ -492,7 +494,7 @@ def ensure_subtype_lord_packages(
                 identity=identity,
                 commander_oracle_ids=commander_oracle_ids,
                 commander_theme_tags=commander_theme_tags,
-                protect_oracle_ids={lord_id},
+                protect_oracle_ids=protect,
             )
             if result is None:
                 messages.append(

@@ -115,7 +115,7 @@ def test_tutor_penalized_without_search_targets() -> None:
 
 
 def test_elf_candidate_boosted_when_lord_needs_support() -> None:
-    stats = DeckBuildStats(needs_elf_support=True)
+    stats = DeckBuildStats(needs_subtype_support={"Elf": True})
     score = dependency_pick_score(
         _candidate(oracle_id="e", name="Llanowar Elves", type_line="Creature — Elf"),
         [],

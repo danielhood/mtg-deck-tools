@@ -47,14 +47,33 @@ profiles:
       share_max: 0.18
 
   # Audit 2026-05-30: 662 elf creatures, 9 other-elf payoffs (buff_subtype)
-  elves:
-    label: Elf tribal
+  # Generalized for all "Other {Subtype}s you control" lords (card-driven package + TYPE_SYNERGY_MIN)
+  subtype_lords:
+    label: Subtype tribal lords
     activation:
       include_mechanics: []
     roles: [subtype_payoff, subtype_creature]
     defaults:
-      subtype: Elf
       payoff_creature_min: 5
+      subtype_minimums:
+        Elf: 5
+        Goblin: 8
+        Vampire: 6
+        Pirate: 5
+        Zombie: 5
+        Dragon: 4
+      share_max: 0.25
+
+  # Legacy profile id — same thresholds as subtype_lords (mechanic_focus alias)
+  elves:
+    label: Elf tribal (alias)
+    activation:
+      include_mechanics: []
+    roles: [subtype_payoff, subtype_creature]
+    defaults:
+      payoff_creature_min: 5
+      subtype_minimums:
+        Elf: 5
       share_max: 0.25
 
   # Audit 2026-05-30: 23 whenever-cast-artifact payoffs (partial coverage)

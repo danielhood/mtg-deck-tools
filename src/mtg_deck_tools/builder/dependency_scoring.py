@@ -14,6 +14,7 @@ from mtg_deck_tools.rules.dependency_profiles import (
     aura_spell_min,
     energy_profile_floors,
     sacrifice_profile_floors,
+    subtype_lord_minimum,
 )
 from mtg_deck_tools.rules.dependencies import (
     CardEffectRow,
@@ -45,6 +46,8 @@ class DeckBuildStats:
     artifact_package_requested: bool = False
     needs_elf_support: bool = False
     elf_other_minimum: int = 5
+    needs_subtype_support: dict[str, bool] = field(default_factory=dict)
+    subtype_lord_minimums: dict[str, int] = field(default_factory=dict)
     sacrifice_outlets: int = 0
     sacrifice_payoffs: int = 0
     sacrifice_fodder: int = 0
@@ -129,11 +132,6 @@ def build_deck_build_stats(
             elif effect.effect_kind == "sacrifice_fodder":
                 stats.sacrifice_fodder += 1
 
-    for subtype in ("Elf", "Goblin", "Zombie", "Vampire", "Dragon"):
-        count = _count_subtype_on_cards(partial, subtype)
-        if count:
-            stats.subtype_counts[subtype] = count
-
     stats.needs_energy_consumer = stats.energy_producers > 0 and stats.energy_consumers == 0
     stats.needs_energy_producer = stats.energy_consumers > 0 and stats.energy_producers == 0
     stats.needs_sacrifice_payoff = stats.sacrifice_outlets > 0 and stats.sacrifice_payoffs == 0
@@ -169,22 +167,29 @@ def build_deck_build_stats(
             if stats.sacrifice_payoffs < p_min:
                 stats.needs_sacrifice_payoff = True
 
-    elf_min = int(profile_cfg.get("elves", {}).get("payoff_creature_min", 5))
-    stats.elf_other_minimum = elf_min
-    has_elf_lord = False
+    lords_by_subtype: dict[str, int] = {}
     for card in partial:
         for effect in effects_map.get(card.oracle_id, []):
             if effect.effect_kind == "buff_subtype":
                 subtypes = effect.payload.get("subtypes") or []
-                if subtypes == ["Elf"]:
-                    has_elf_lord = True
-                    break
-        if has_elf_lord:
-            break
-    if has_elf_lord:
-        elves = stats.subtype_counts.get("Elf", 0)
-        others = elves - 1
-        stats.needs_elf_support = others < elf_min
+                if subtypes:
+                    subtype = subtypes[0]
+                    lords_by_subtype[subtype] = lords_by_subtype.get(subtype, 0) + 1
+
+    for subtype, lord_count in lords_by_subtype.items():
+        count = _count_subtype_on_cards(partial, subtype)
+        stats.subtype_counts[subtype] = count
+        minimum = subtype_lord_minimum(subtype, profile_cfg)
+        stats.subtype_lord_minimums[subtype] = minimum
+        others = count - lord_count
+        if others < minimum:
+            stats.needs_subtype_support[subtype] = True
+
+    if stats.needs_subtype_support.get("Elf"):
+        stats.needs_elf_support = True
+        stats.elf_other_minimum = stats.subtype_lord_minimums.get(
+            "Elf", subtype_lord_minimum("Elf", profile_cfg)
+        )
 
     return stats
 
@@ -254,15 +259,16 @@ def dependency_pick_score(
                 score += 0.5 * weight
         elif effect.effect_kind == "buff_subtype":
             subtypes = effect.payload.get("subtypes") or []
-            if subtypes == ["Elf"] and stats.needs_elf_support:
+            if subtypes and stats.needs_subtype_support.get(subtypes[0]):
                 score -= 1.0 * weight
         elif effect.effect_kind == "whenever_cast_type":
             types = effect.payload.get("types") or []
             if types == ["artifact"] and stats.artifact_count < 8:
                 score += 1.5 * weight
 
-    if stats.needs_elf_support and "Elf" in (candidate.type_line or ""):
-        score += 2.5 * weight
+    for subtype, needs in stats.needs_subtype_support.items():
+        if needs and subtype in (candidate.type_line or ""):
+            score += 2.5 * weight
 
     return score
 
@@ -287,9 +293,13 @@ def passes_strict_dependency_filter(
             return False
         elif effect.effect_kind == "buff_subtype":
             subtypes = effect.payload.get("subtypes") or []
-            if subtypes == ["Elf"]:
-                others = stats.subtype_counts.get("Elf", 0)
-                if others < stats.elf_other_minimum:
+            if subtypes:
+                subtype = subtypes[0]
+                minimum = stats.subtype_lord_minimums.get(
+                    subtype, subtype_lord_minimum(subtype)
+                )
+                count = stats.subtype_counts.get(subtype, 0)
+                if count < minimum:
                     return False
     return True
 

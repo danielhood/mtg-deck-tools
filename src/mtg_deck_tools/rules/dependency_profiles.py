@@ -32,12 +32,32 @@ def artifact_spell_min(profiles: dict[str, dict[str, Any]] | None = None) -> int
     return int(_profile_defaults("artifacts", profiles).get("artifact_min", 8))
 
 
+def _subtype_lords_cfg(profiles: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
+    cfg = _profile_defaults("subtype_lords", profiles)
+    if cfg:
+        return cfg
+    return _profile_defaults("elves", profiles)
+
+
+def subtype_lord_minimum(
+    subtype: str,
+    profiles: dict[str, dict[str, Any]] | None = None,
+) -> int:
+    """Minimum other creatures of ``subtype`` when a lord for that subtype is in the deck."""
+    cfg = _subtype_lords_cfg(profiles)
+    default = int(cfg.get("payoff_creature_min", 5))
+    mins = cfg.get("subtype_minimums") or {}
+    if isinstance(mins, dict) and subtype in mins:
+        return int(mins[subtype])
+    return default
+
+
 def elf_creature_min(profiles: dict[str, dict[str, Any]] | None = None) -> int:
-    return int(_profile_defaults("elves", profiles).get("payoff_creature_min", 5))
+    return subtype_lord_minimum("Elf", profiles)
 
 
 def elf_subtype(profiles: dict[str, dict[str, Any]] | None = None) -> str:
-    return str(_profile_defaults("elves", profiles).get("subtype", "Elf"))
+    return "Elf"
 
 
 def sacrifice_profile_floors(

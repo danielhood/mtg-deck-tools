@@ -424,8 +424,8 @@ def validate_dependencies(
         )
     )
 
-    elf_cfg = profile_cfg.get("elves", {})
-    elf_min = int(elf_cfg.get("payoff_creature_min", 5))
+    from mtg_deck_tools.rules.dependency_profiles import subtype_lord_minimum
+
     for card in maindeck:
         for effect in effects_map.get(card.oracle_id, []):
             if effect.effect_kind != "buff_subtype":
@@ -434,21 +434,22 @@ def validate_dependencies(
             if not subtypes:
                 continue
             subtype = subtypes[0]
+            minimum = subtype_lord_minimum(subtype, profile_cfg)
             total = _count_subtype(search_pool, subtype)
             others = total - (1 if subtype in (card.type_line or "") else 0)
-            if others < elf_min:
+            if others < minimum:
                 report.issues.append(
                     DependencyIssue(
                         rule_id="TYPE_SYNERGY_MIN",
                         status=severity,
                         message=(
                             f"{card.name} benefits from other {subtype}s, but the deck has "
-                            f"only {others} other {subtype}(s) (suggested minimum {elf_min})."
+                            f"only {others} other {subtype}(s) (suggested minimum {minimum})."
                         ),
                         card_name=card.name,
                         card_oracle_id=card.oracle_id,
-                        profile_id="elves",
-                        detail={"subtype": subtype, "count": others, "minimum": elf_min},
+                        profile_id="subtype_lords",
+                        detail={"subtype": subtype, "count": others, "minimum": minimum},
                     )
                 )
 
