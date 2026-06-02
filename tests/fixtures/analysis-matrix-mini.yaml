@@ -24,5 +24,5 @@ scenarios:
         lands: 2
     expect:
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE]
         max_inappropriate_warnings: 0

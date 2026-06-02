@@ -79,6 +79,9 @@ def _profile_counts(card: AuditCardRow) -> dict[str, dict[str, int]]:
                 and payload.get("subtypes") == ["Aura"]
             ):
                 counts["aura_support"]["aura_tutor"] += 1
+            elif "enchantment" in [t.lower() for t in (payload.get("types") or [])]:
+                if payload.get("subtypes") != ["Aura"]:
+                    counts["enchantments"]["enchantment_tutor"] += 1
         elif kind == "buff_subtype":
             subtypes = atom.payload.get("subtypes") or []
             if subtypes == ["Elf"]:
@@ -88,8 +91,12 @@ def _profile_counts(card: AuditCardRow) -> dict[str, dict[str, int]]:
             types = atom.payload.get("types") or []
             if types == ["artifact"]:
                 counts["artifacts"]["payoff"] += 1
+        elif kind == "whenever_cast_enchantment":
+            counts["enchantments"]["payoff"] += 1
     if "Elf" in card.type_line:
         counts["elves"]["creature"] += 1
+    if "Enchantment" in card.type_line:
+        counts["enchantments"]["enchantment_spell"] += 1
     return {k: dict(v) for k, v in counts.items()}
 
 

@@ -176,6 +176,16 @@ def _payload_searches_auras(payload: dict[str, Any]) -> bool:
     return "enchantment" in types and "aura" in subtypes
 
 
+def _payload_searches_enchantments(payload: dict[str, Any]) -> bool:
+    types = [t.lower() for t in (payload.get("types") or [])]
+    if "enchantment" not in types:
+        return False
+    subtypes = [s.lower() for s in (payload.get("subtypes") or [])]
+    if subtypes == ["aura"]:
+        return False
+    return True
+
+
 def _deck_has_aura_payoff(effects_map: dict[str, list[CardEffectRow]]) -> bool:
     for effects in effects_map.values():
         for effect in effects:
@@ -211,6 +221,47 @@ def _should_check_aura_support_min(
     if _deck_has_aura_tutor(maindeck, effects_map):
         return True
     return False
+
+
+def _deck_has_enchantment_payoff(effects_map: dict[str, list[CardEffectRow]]) -> bool:
+    for effects in effects_map.values():
+        for effect in effects:
+            if effect.effect_kind == "whenever_cast_enchantment":
+                return True
+    return False
+
+
+def _deck_has_enchantment_tutor(
+    maindeck: list[DeckCard],
+    effects_map: dict[str, list[CardEffectRow]],
+) -> bool:
+    for card in maindeck:
+        for effect in effects_map.get(card.oracle_id, []):
+            if effect.effect_kind == "search_library" and _payload_searches_enchantments(
+                effect.payload
+            ):
+                return True
+    return False
+
+
+def _should_check_enchantment_support_min(
+    *,
+    scope: DependencyScope,
+    enchantment_spells: int,
+    effects_map: dict[str, list[CardEffectRow]],
+    maindeck: list[DeckCard],
+) -> bool:
+    if scope.enchantments_user_intent:
+        return True
+    if _deck_has_enchantment_payoff(effects_map):
+        return True
+    if _deck_has_enchantment_tutor(maindeck, effects_map):
+        return True
+    return False
+
+
+def _count_enchantment_spells(pool: list[DeckCard]) -> int:
+    return sum(1 for c in pool if "Enchantment" in (c.type_line or ""))
 
 
 def _should_warn_energy_imbalance(
@@ -682,6 +733,45 @@ def validate_dependencies(
             counts={"aura_spell": aura_spells},
             status=aura_status,
             messages=aura_messages,
+        )
+    )
+
+    enchantment_cfg = profile_cfg.get("enchantments", {})
+    enchantment_min = int(enchantment_cfg.get("enchantment_min", 8))
+    enchantment_spells = _count_enchantment_spells(maindeck)
+    enchantment_status = "pass"
+    enchantment_messages: list[str] = []
+    check_enchantment_floor = _should_check_enchantment_support_min(
+        scope=dep_scope,
+        enchantment_spells=enchantment_spells,
+        effects_map=effects_map,
+        maindeck=maindeck,
+    )
+    if check_enchantment_floor and enchantment_spells < enchantment_min:
+        enchantment_status = severity
+        msg = (
+            f"Only {enchantment_spells} enchantment(s) in the deck "
+            f"(suggested minimum {enchantment_min} for enchantment support)."
+        )
+        enchantment_messages.append(msg)
+        report.issues.append(
+            DependencyIssue(
+                rule_id="ENCHANTMENT_SUPPORT_MIN",
+                status=severity,
+                message=msg,
+                profile_id="enchantments",
+                detail={
+                    "enchantment_count": enchantment_spells,
+                    "minimum": enchantment_min,
+                },
+            )
+        )
+    report.profiles.append(
+        ProfileSummary(
+            profile_id="enchantments",
+            counts={"enchantment_spell": enchantment_spells},
+            status=enchantment_status,
+            messages=enchantment_messages,
         )
     )
 

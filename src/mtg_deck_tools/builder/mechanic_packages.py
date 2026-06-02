@@ -17,12 +17,15 @@ from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.dependencies import (
     _payload_searches_auras,
+    _payload_searches_enchantments,
     _should_check_aura_support_min,
+    _should_check_enchantment_support_min,
     fetch_card_effects,
 )
 from mtg_deck_tools.rules.dependency_profiles import (
     artifact_spell_min,
     aura_spell_min,
+    enchantment_spell_min,
     energy_profile_floors,
     sacrifice_profile_floors,
     subtype_lord_minimum,
@@ -41,6 +44,10 @@ class MechanicPackageResult:
 
 def count_aura_spells(cards: list[DeckCard]) -> int:
     return sum(1 for c in cards if "Aura" in (c.type_line or ""))
+
+
+def count_enchantment_spells(cards: list[DeckCard]) -> int:
+    return sum(1 for c in cards if "Enchantment" in (c.type_line or ""))
 
 
 def count_type_on_maindeck(cards: list[DeckCard], card_type: str) -> int:
@@ -539,6 +546,72 @@ def ensure_aura_package(
     )
 
 
+def ensure_enchantment_package(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> MechanicPackageResult:
+    scope = build_dependency_scope(criteria)
+    effects_map = fetch_card_effects(conn, [c.oracle_id for c in cards])
+    if not _should_check_enchantment_support_min(
+        scope=scope,
+        enchantment_spells=count_enchantment_spells(cards),
+        effects_map=effects_map,
+        maindeck=cards,
+    ):
+        return MechanicPackageResult(list(cards), [])
+
+    minimum = enchantment_spell_min()
+
+    def _enchantment_protect_ids(deck: list[DeckCard]) -> set[str]:
+        protect = {c.oracle_id for c in deck if "Enchantment" in (c.type_line or "")}
+        deck_effects = fetch_card_effects(conn, [c.oracle_id for c in deck])
+        for card in deck:
+            for effect in deck_effects.get(card.oracle_id, []):
+                if effect.effect_kind == "whenever_cast_enchantment":
+                    protect.add(card.oracle_id)
+                elif effect.effect_kind == "search_library" and _payload_searches_enchantments(
+                    effect.payload
+                ):
+                    protect.add(card.oracle_id)
+        return protect
+
+    def need_more(deck: list[DeckCard]) -> bool:
+        return count_enchantment_spells(deck) < minimum
+
+    def swap_fn(deck: list[DeckCard]) -> tuple[list[DeckCard], str] | None:
+        return swap_matching_card(
+            conn,
+            deck,
+            match=lambda c: "Enchantment" in c.type_line,
+            label="enchantment",
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+            protect_oracle_ids=_enchantment_protect_ids(deck),
+        )
+
+    def fail_msg(deck: list[DeckCard]) -> str:
+        have = count_enchantment_spells(deck)
+        return (
+            f"Enchantment package: could not reach {minimum} enchantments (have {have})."
+        )
+
+    return _run_swap_loop(
+        conn,
+        cards,
+        package_name="Enchantment package",
+        need_more=need_more,
+        swap_fn=swap_fn,
+        failure_message=fail_msg,
+    )
+
+
 def ensure_artifact_package(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
@@ -761,6 +834,7 @@ def ensure_included_mechanic_packages(
         ensure_energy_package,
         ensure_sacrifice_package,
         ensure_aura_package,
+        ensure_enchantment_package,
         ensure_artifact_package,
         ensure_vehicle_package,
         ensure_subtype_lord_packages,

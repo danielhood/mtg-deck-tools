@@ -40,6 +40,7 @@ ISSUE_PRIORITY = (
     "TOKEN_BALANCE",
     "TYPE_SYNERGY_MIN",
     "AURA_SUPPORT_MIN",
+    "ENCHANTMENT_SUPPORT_MIN",
 )
 SWAP_SLOT_ORDER = ("flex", "synergy", "wincon", "draw", "removal", "board_wipe", "ramp")
 
@@ -637,6 +638,27 @@ def _fix_aura_support(
     )
 
 
+def _fix_enchantment_support(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> tuple[list[DeckCard], str] | None:
+    return swap_matching_card(
+        conn,
+        cards,
+        match=lambda c: "Enchantment" in c.type_line,
+        label="enchantment support",
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=commander_oracle_ids,
+        commander_theme_tags=commander_theme_tags,
+    )
+
+
 def _attempt_repair(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
@@ -699,6 +721,15 @@ def _attempt_repair(
         )
     if issue.rule_id == "AURA_SUPPORT_MIN":
         return _fix_aura_support(
+            conn,
+            cards,
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+        )
+    if issue.rule_id == "ENCHANTMENT_SUPPORT_MIN":
+        return _fix_enchantment_support(
             conn,
             cards,
             criteria=criteria,

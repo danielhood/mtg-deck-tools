@@ -75,6 +75,8 @@ Planning documents for a local Windows utility that walks users through deck-bui
 - `--strict-dependencies` and `--repair-dependencies` on `generate`
 
 ### Dependency expansion (2026-06)
+- **Enchantment matters** — `ENCHANTMENT_SUPPORT_MIN`, `ensure_enchantment_package` (`themes: [enchantress]`)
+- **Subtype lord generalization** — `TYPE_SYNERGY_MIN`, per-subtype floors in `subtype_lords` profile
 - **Tokens profile** — `TOKEN_BALANCE`, `ensure_token_package` (`themes: [tokens]`)
 - **Vehicles profile** — `VEHICLE_BALANCE`, `ensure_vehicle_package` (`include_mechanics: [vehicles]`)
 
@@ -84,4 +86,4 @@ See **[09-next-steps.md](09-next-steps.md)** for the active backlog.
 
 **Agent documentation SDLC:** **[DOC-MAP.md](DOC-MAP.md)** — required updates per change type; enforced via `.cursor/rules/` and skills `/sync-documentation`, `/ship-dependency-feature` (no CI doc gates).
 
-**Recommended first tasks:** **dependency expansion** — enchantment matters, tutor payloads, graveyard heuristics ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)); **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
+**Recommended first tasks:** **dependency expansion** — tutor payloads, graveyard heuristics ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)); **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).

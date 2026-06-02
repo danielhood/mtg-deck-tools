@@ -75,6 +75,13 @@ tags:
       - type: oracle_regex
         pattern: "(?i)(equipped creature|enchant creature|enchantment.?aura)"
 
+  - id: enchantress
+    layer: theme
+    description: Enchantment density and cast triggers
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever you cast an enchantment spell"
+
   # --- Keyword mechanics (include / avoid wizard) ---
   - id: flying
     layer: keyword

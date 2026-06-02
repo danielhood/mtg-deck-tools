@@ -77,7 +77,7 @@ def scope_db() -> sqlite3.Connection:
     _insert_effect(
         conn,
         "payoff",
-        "whenever_cast_type",
+        "whenever_cast_enchantment",
         {"types": ["enchantment"]},
         "whenever_cast_enchantment",
     )
@@ -157,6 +157,50 @@ def test_enchantment_cast_payoff_does_not_trigger_aura_support_min(
         criteria=DeckCriteria(themes=["tokens"]),
     )
     assert not any(i.rule_id == "AURA_SUPPORT_MIN" for i in report.issues)
+
+
+def test_enchantment_cast_payoff_triggers_enchantment_support_min(
+    scope_db: sqlite3.Connection,
+) -> None:
+    maindeck = [
+        _deck_card(oracle_id="payoff", name="Enchantress", type_line="Creature"),
+    ]
+    report = validate_dependencies(
+        scope_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["tokens"]),
+    )
+    assert any(i.rule_id == "ENCHANTMENT_SUPPORT_MIN" for i in report.issues)
+    assert not any(i.rule_id == "AURA_SUPPORT_MIN" for i in report.issues)
+
+
+def test_enchantress_theme_triggers_enchantment_support_min(
+    scope_db: sqlite3.Connection,
+) -> None:
+    maindeck = [
+        _deck_card(
+            oracle_id="enc1",
+            name="Sterling Grove",
+            type_line="Enchantment",
+        ),
+    ]
+    report = validate_dependencies(
+        scope_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["enchantress"]),
+    )
+    assert any(i.rule_id == "ENCHANTMENT_SUPPORT_MIN" for i in report.issues)
+    assert not any(i.rule_id == "AURA_SUPPORT_MIN" for i in report.issues)
+
+
+def test_build_dependency_scope_enchantress_enables_enchantments() -> None:
+    scope = build_dependency_scope(DeckCriteria(themes=["enchantress"]))
+    assert scope.enchantments_user_intent
+    assert scope.enchantment_support_min
+    scope_off = build_dependency_scope(DeckCriteria(themes=["tokens"]))
+    assert not scope_off.enchantments_user_intent
 
 
 def test_aura_cast_payoff_triggers_aura_support_min(scope_db: sqlite3.Connection) -> None:

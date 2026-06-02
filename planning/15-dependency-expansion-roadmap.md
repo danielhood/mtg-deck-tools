@@ -42,6 +42,7 @@ flowchart TD
 | `buff_subtype` | “Other Elves …” (and similar) subtype lords |
 | `whenever_cast_type` | “Whenever you cast an Artifact spell …” |
 | `whenever_cast_aura` | “Whenever you cast an Aura spell …” (voltron / aura support trigger) |
+| `whenever_cast_enchantment` | “Whenever you cast an enchantment spell …” (enchantress / non-voltron) |
 | `type_line_aura` | Aura on type line (extraction aid) |
 | `token_produce` / `token_payoff` | Token producers vs “whenever you create a token” payoffs |
 | `type_line_vehicle` | Vehicle on type line (crew density checks) |
@@ -57,6 +58,7 @@ flowchart TD
 | `VEHICLE_BALANCE` | Vehicle count or crew creatures below floor | `include_mechanics: [vehicles]`, Vehicle lord in deck, or ≥2 vehicles |
 | `TYPE_SYNERGY_MIN` | Subtype lord or type-matters payoff below suggested minimum | Card-driven (lord / cast trigger in deck) |
 | `AURA_SUPPORT_MIN` | Aura count below floor | `themes: [voltron]`, aura tutors, or `whenever_cast_aura` payoffs |
+| `ENCHANTMENT_SUPPORT_MIN` | Enchantment count below floor | `themes: [enchantress]`, enchantment tutors, or `whenever_cast_enchantment` payoffs |
 
 ### Mechanic packages (post-fill swaps)
 
@@ -65,6 +67,7 @@ flowchart TD
 | Energy | `include_mechanics: [energy]` | ≥2 producers, ≥2 consumers |
 | Sacrifice / aristocrats | `themes: [aristocrats]` | ≥2 outlets, ≥3 payoffs, ≥8 fodder |
 | Auras | Voltron theme or card-driven aura check | ≥6 Aura spells |
+| Enchantments | `themes: [enchantress]` or enchantment cast payoff / tutor in deck | ≥8 enchantments |
 | Artifacts | `include_mechanics: [equip, vehicles]` or artifact cast payoff in deck | ≥8 artifacts |
 | Subtype lords | Any `buff_subtype` lord detected | Per-subtype minimums in profile (Elf default 5) |
 | Tokens | `themes: [tokens]` | ≥5 producers, ≥3 payoffs |
@@ -87,7 +90,7 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | ~~**Generic subtype lords**~~ | Extend `buff_subtype` capture (Goblin, Vampire, Dragon, Pirate, …) | Per-subtype floors in `subtype_lords` profile; lord package runs for any lord | Card-driven + optional tribal themes | **Shipped 2026-06** — per-subtype minimums (Elf, Goblin, Vampire, Pirate, Zombie, Dragon); Krenko/Edgar dogfood |
 | ~~**Tokens package**~~ | `token_produce`, `token_payoff` | `TOKEN_BALANCE` | `themes: [tokens]` | **Shipped 2026-06** |
 | ~~**Vehicles profile**~~ | `type_line_vehicle` + crew creature count | `VEHICLE_BALANCE` | `include_mechanics: [vehicles]` | **Shipped 2026-06** — `vehicle_min: 3`, `creature_min: 25` |
-| **Enchantment matters** | `whenever_cast_enchantment` (non-Aura) | Enchantment density floor separate from `AURA_SUPPORT_MIN` | Enchantress commanders / `themes` TBD | Sythis dogfood scenario guards against voltron aura noise; package could still add enchantments |
+| ~~**Enchantment matters**~~ | `whenever_cast_enchantment` (non-Aura) | `ENCHANTMENT_SUPPORT_MIN` | `themes: [enchantress]` + card-driven | **Shipped 2026-06** — `enchantment_min: 8`; Sythis dogfood; separate from `AURA_SUPPORT_MIN` |
 
 ### Priority 2 — Tutor payload upgrades
 
@@ -177,12 +180,11 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
-| 1 | **Enchantment matters profile** | Sythis / enchantress without conflating auras |
-| 2 | **Tutor payload upgrades** | Incremental `TUTOR_TARGET_EXISTS` accuracy |
-| 3 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
-| 4 | **Counter resources** | After audit evidence (proliferate, blood, …) |
+| 1 | **Tutor payload upgrades** | Incremental `TUTOR_TARGET_EXISTS` accuracy |
+| 2 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
+| 3 | **Counter resources** | After audit evidence (proliferate, blood, …) |
 
-**Shipped (2026-06):** Subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
+**Shipped (2026-06):** Enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
 
 **Parallel track:** **UX2** wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` ([11](11-dependency-engine-user-experience.md)) — does not block pattern work but improves user-facing control.
 
