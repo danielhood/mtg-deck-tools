@@ -299,3 +299,13 @@ patterns:
     payload:
       types: [enchantment]
       subtypes: [Aura]
+
+  - id: type_line_vehicle
+    effect_kind: type_line_vehicle
+    confidence: 1.0
+    matchers:
+      - type: type_regex
+        pattern: "Vehicle"
+    payload:
+      types: [artifact]
+      subtypes: [Vehicle]

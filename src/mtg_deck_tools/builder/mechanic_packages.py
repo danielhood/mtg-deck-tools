@@ -27,6 +27,7 @@ from mtg_deck_tools.rules.dependency_profiles import (
     sacrifice_profile_floors,
     subtype_lord_minimum,
     token_profile_floors,
+    vehicle_profile_floors,
 )
 from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
 
@@ -45,6 +46,19 @@ def count_aura_spells(cards: list[DeckCard]) -> int:
 def count_type_on_maindeck(cards: list[DeckCard], card_type: str) -> int:
     needle = card_type.capitalize()
     return sum(1 for c in cards if needle in (c.type_line or ""))
+
+
+
+def count_vehicles_on_maindeck(cards: list[DeckCard]) -> int:
+    return sum(1 for c in cards if "Vehicle" in (c.type_line or ""))
+
+
+def count_crew_creatures_on_maindeck(cards: list[DeckCard]) -> int:
+    return sum(
+        1
+        for c in cards
+        if "Creature" in (c.type_line or "") and "Vehicle" not in (c.type_line or "")
+    )
 
 
 def count_subtype_creatures(cards: list[DeckCard], subtype: str) -> int:
@@ -184,6 +198,31 @@ def _deck_has_artifact_payoff(conn: sqlite3.Connection, cards: list[DeckCard]) -
                     return True
     return False
 
+
+
+
+def _deck_has_vehicle_payoff(conn: sqlite3.Connection, cards: list[DeckCard]) -> bool:
+    effects = fetch_card_effects(conn, [c.oracle_id for c in cards])
+    for card_effects in effects.values():
+        for effect in card_effects:
+            if effect.effect_kind != "buff_subtype":
+                continue
+            subtypes = effect.payload.get("subtypes") or []
+            if subtypes and subtypes[0] == "Vehicle":
+                return True
+    return False
+
+
+def _vehicle_payoff_oracle_ids(conn: sqlite3.Connection, cards: list[DeckCard]) -> set[str]:
+    effects = fetch_card_effects(conn, [c.oracle_id for c in cards])
+    ids: set[str] = set()
+    for card in cards:
+        for effect in effects.get(card.oracle_id, []):
+            if effect.effect_kind == "buff_subtype":
+                subtypes = effect.payload.get("subtypes") or []
+                if subtypes and subtypes[0] == "Vehicle":
+                    ids.add(card.oracle_id)
+    return ids
 
 def _run_swap_loop(
     conn: sqlite3.Connection,
@@ -555,6 +594,75 @@ def ensure_artifact_package(
     )
 
 
+
+def ensure_vehicle_package(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> MechanicPackageResult:
+    scope = build_dependency_scope(criteria)
+    has_payoff = _deck_has_vehicle_payoff(conn, cards)
+    if not scope.vehicles_user_intent and not has_payoff:
+        return MechanicPackageResult(list(cards), [])
+
+    vehicle_min, creature_min = vehicle_profile_floors()
+    protect_payoffs = _vehicle_payoff_oracle_ids(conn, cards)
+
+    def need_more(deck: list[DeckCard]) -> bool:
+        vehicles = count_vehicles_on_maindeck(deck)
+        creatures = count_crew_creatures_on_maindeck(deck)
+        if vehicles < vehicle_min:
+            return True
+        return vehicles > 0 and creatures < creature_min
+
+    def swap_fn(deck: list[DeckCard]) -> tuple[list[DeckCard], str] | None:
+        vehicles = count_vehicles_on_maindeck(deck)
+        if vehicles < vehicle_min:
+            return swap_matching_card(
+                conn,
+                deck,
+                match=lambda c: "Vehicle" in c.type_line,
+                label="Vehicle",
+                criteria=criteria,
+                identity=identity,
+                commander_oracle_ids=commander_oracle_ids,
+                commander_theme_tags=commander_theme_tags,
+                protect_oracle_ids=protect_payoffs,
+            )
+        return swap_matching_card(
+            conn,
+            deck,
+            match=lambda c: "Creature" in c.type_line and "Vehicle" not in c.type_line,
+            label="crew creature",
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+            protect_oracle_ids=protect_payoffs,
+        )
+
+    def fail_msg(deck: list[DeckCard]) -> str:
+        vehicles = count_vehicles_on_maindeck(deck)
+        creatures = count_crew_creatures_on_maindeck(deck)
+        return (
+            f"Vehicle package: could not reach {vehicle_min} Vehicle(s) and "
+            f"{creature_min} crew creatures (have {vehicles} / {creatures})."
+        )
+
+    return _run_swap_loop(
+        conn,
+        cards,
+        package_name="Vehicle package",
+        need_more=need_more,
+        swap_fn=swap_fn,
+        failure_message=fail_msg,
+    )
+
+
 def ensure_subtype_lord_packages(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
@@ -654,6 +762,7 @@ def ensure_included_mechanic_packages(
         ensure_sacrifice_package,
         ensure_aura_package,
         ensure_artifact_package,
+        ensure_vehicle_package,
         ensure_subtype_lord_packages,
         ensure_token_package,
     ):

@@ -234,3 +234,51 @@ def test_token_one_sided_silent_without_intent(dep_db: sqlite3.Connection) -> No
         criteria=DeckCriteria(themes=["aristocrats"]),
     )
     assert not any(i.rule_id == "TOKEN_BALANCE" for i in report.warnings)
+
+
+def test_vehicle_balance_warns_with_vehicles_intent(dep_db: sqlite3.Connection) -> None:
+    maindeck = [
+        _deck_card(oracle_id="copter", name="Smuggler's Copter", type_line="Artifact — Vehicle"),
+        _deck_card(oracle_id="bear", name="Grizzly Bears", type_line="Creature — Bear"),
+    ]
+    report = validate_dependencies(
+        dep_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(include_mechanics=["vehicles"]),
+    )
+    vehicle_issues = [i for i in report.issues if i.rule_id == "VEHICLE_BALANCE"]
+    assert vehicle_issues
+    assert vehicle_issues[0].detail.get("deficit") == "vehicles"
+
+
+def test_vehicle_crew_warns_when_many_vehicles_no_intent(dep_db: sqlite3.Connection) -> None:
+    maindeck = [
+        _deck_card(oracle_id=f"v{i}", name=f"Vehicle {i}", type_line="Artifact — Vehicle")
+        for i in range(3)
+    ] + [
+        _deck_card(oracle_id=f"c{i}", name=f"Creature {i}", type_line="Creature")
+        for i in range(5)
+    ]
+    report = validate_dependencies(
+        dep_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["ramp"]),
+    )
+    issues = [i for i in report.issues if i.rule_id == "VEHICLE_BALANCE"]
+    assert len(issues) == 1
+    assert issues[0].detail.get("deficit") == "creatures"
+
+
+def test_single_vehicle_silent_without_intent(dep_db: sqlite3.Connection) -> None:
+    maindeck = [
+        _deck_card(oracle_id="copter", name="Smuggler's Copter", type_line="Artifact — Vehicle"),
+    ]
+    report = validate_dependencies(
+        dep_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["ramp"]),
+    )
+    assert not any(i.rule_id == "VEHICLE_BALANCE" for i in report.issues)

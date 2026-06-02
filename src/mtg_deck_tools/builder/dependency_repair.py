@@ -475,6 +475,40 @@ def _fix_token_balance(
     )
 
 
+def _fix_vehicle_balance(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    issue: DependencyIssue,
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> tuple[list[DeckCard], str] | None:
+    detail = issue.detail or {}
+    if detail.get("deficit") == "creatures":
+        return swap_matching_card(
+            conn,
+            cards,
+            match=lambda c: "Creature" in c.type_line and "Vehicle" not in c.type_line,
+            label="crew creature",
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+        )
+    return swap_matching_card(
+        conn,
+        cards,
+        match=lambda c: "Vehicle" in c.type_line,
+        label="Vehicle",
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=commander_oracle_ids,
+        commander_theme_tags=commander_theme_tags,
+    )
+
+
 def _fix_sacrifice_balance(
     conn: sqlite3.Connection,
     cards: list[DeckCard],

@@ -129,7 +129,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN, VEHICLE_BALANCE]
         max_inappropriate_warnings: 0
 
   - id: artifacts-urza-chief

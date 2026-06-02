@@ -16,6 +16,7 @@ from mtg_deck_tools.rules.dependency_profiles import (
     sacrifice_profile_floors,
     subtype_lord_minimum,
     token_profile_floors,
+    vehicle_profile_floors,
 )
 from mtg_deck_tools.rules.dependencies import (
     CardEffectRow,
@@ -65,6 +66,13 @@ class DeckBuildStats:
     token_package_requested: bool = False
     needs_token_payoff: bool = False
     needs_token_producer: bool = False
+    vehicle_count: int = 0
+    crew_creature_count: int = 0
+    vehicle_floor: int = 0
+    crew_creature_floor: int = 0
+    vehicle_package_requested: bool = False
+    needs_vehicle: bool = False
+    needs_crew_creature: bool = False
 
 
 def card_effects_enabled(conn: sqlite3.Connection) -> bool:
@@ -125,6 +133,12 @@ def build_deck_build_stats(
     stats = DeckBuildStats(
         aura_spells=sum(1 for c in partial if "Aura" in (c.type_line or "")),
         artifact_count=_count_type_on_cards(partial, "artifact"),
+        vehicle_count=sum(1 for c in partial if "Vehicle" in (c.type_line or "")),
+        crew_creature_count=sum(
+            1
+            for c in partial
+            if "Creature" in (c.type_line or "") and "Vehicle" not in (c.type_line or "")
+        ),
     )
 
     for card in partial:
@@ -189,6 +203,15 @@ def build_deck_build_stats(
                 stats.needs_token_producer = True
             if stats.token_payoffs < pay_min:
                 stats.needs_token_payoff = True
+        if scope.vehicles_user_intent:
+            v_min, c_min = vehicle_profile_floors(profile_cfg)
+            stats.vehicle_package_requested = True
+            stats.vehicle_floor = v_min
+            stats.crew_creature_floor = c_min
+            if stats.vehicle_count < v_min:
+                stats.needs_vehicle = True
+            if stats.vehicle_count > 0 and stats.crew_creature_count < c_min:
+                stats.needs_crew_creature = True
 
     lords_by_subtype: dict[str, int] = {}
     for card in partial:
@@ -244,6 +267,16 @@ def dependency_pick_score(
     if stats.artifact_package_requested and "Artifact" in (candidate.type_line or ""):
         if stats.artifact_count < stats.artifact_spell_floor:
             score += 5.0 * weight
+    if stats.vehicle_package_requested and "Vehicle" in (candidate.type_line or ""):
+        if stats.vehicle_count < stats.vehicle_floor:
+            score += 6.0 * weight
+    if stats.vehicle_package_requested and "Creature" in (candidate.type_line or ""):
+        if (
+            "Vehicle" not in (candidate.type_line or "")
+            and stats.vehicle_count > 0
+            and stats.crew_creature_count < stats.crew_creature_floor
+        ):
+            score += 4.0 * weight
 
     for effect in candidate_effects or []:
         if effect.effect_kind == "energy_produce" and stats.energy_package_requested:
@@ -294,6 +327,12 @@ def dependency_pick_score(
             subtypes = effect.payload.get("subtypes") or []
             if subtypes and stats.needs_subtype_support.get(subtypes[0]):
                 score -= 1.0 * weight
+            if subtypes == ["Vehicle"] and stats.vehicle_package_requested:
+                if stats.vehicle_count < stats.vehicle_floor:
+                    score += 2.0 * weight
+        elif effect.effect_kind == "type_line_vehicle" and stats.vehicle_package_requested:
+            if stats.vehicle_count < stats.vehicle_floor:
+                score += 3.0 * weight
         elif effect.effect_kind == "whenever_cast_type":
             types = effect.payload.get("types") or []
             if types == ["artifact"] and stats.artifact_count < 8:
