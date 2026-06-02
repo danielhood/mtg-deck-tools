@@ -136,13 +136,12 @@ Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-ro
 
 | Priority | Deliverable | Rationale |
 | --- | --- | --- |
-| 1 | Generic **subtype lords** (Goblin, Vampire, Pirate, …) | Reuses `buff_subtype`; dogfood already covers Krenko, Edgar, Urza |
-| 2 | **Enchantment matters** | Enchantress density separate from voltron auras |
-| 3 | **Tutor payload upgrades** | CMC bands, colors, named cards — stronger `TUTOR_TARGET_EXISTS` |
-| 4 | **Graveyard / landfall heuristics** | Warn-only before packages |
-| 5 | **Counter resources** | Proliferate, blood, experience — after audit evidence |
+| 1 | **Enchantment matters** | Enchantress density separate from voltron auras |
+| 2 | **Tutor payload upgrades** | CMC bands, colors, named cards — stronger `TUTOR_TARGET_EXISTS` |
+| 3 | **Graveyard / landfall heuristics** | Warn-only before packages |
+| 4 | **Counter resources** | Proliferate, blood, experience — after audit evidence |
 
-**Recently shipped (2026-06):** **Tokens package** (`TOKEN_BALANCE`, `themes: [tokens]`); **Vehicles profile** (`VEHICLE_BALANCE`, `include_mechanics: [vehicles]`).
+**Recently shipped (2026-06):** **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile, per-subtype minimums); **Tokens package** (`TOKEN_BALANCE`, `themes: [tokens]`); **Vehicles profile** (`VEHICLE_BALANCE`, `include_mechanics: [vehicles]`).
 
 Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15).
 
@@ -184,7 +183,7 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 ## Suggested next task
 
-**Dependency expansion** — start with **subtype lord generalization** and **tokens package** ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)). In parallel or after: **UX2** wizard controls for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets.
+**Dependency expansion** — next up: **enchantment matters** profile ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)). In parallel or after: **UX2** wizard controls for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets.
 
 Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 
