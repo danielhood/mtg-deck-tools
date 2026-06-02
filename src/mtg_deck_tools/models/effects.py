@@ -67,6 +67,7 @@ EFFECT_KINDS = frozenset(
         "energy_consume",
         "buff_subtype",
         "whenever_cast_type",
+        "whenever_cast_enchantment",
         "type_line_aura",
     }
 )

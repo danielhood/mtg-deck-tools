@@ -32,6 +32,11 @@ def classify_dependency_warning(
         # Fires only for voltron theme or card-driven aura tutors / Aura cast payoffs.
         return "appropriate"
 
+    if rule_id == "ENCHANTMENT_SUPPORT_MIN":
+        if scope.enchantments_user_intent:
+            return "appropriate"
+        return "appropriate"
+
     if rule_id == "ENERGY_BALANCE":
         if scope.energy_user_intent:
             return "appropriate"

@@ -28,6 +28,10 @@ def aura_spell_min(profiles: dict[str, dict[str, Any]] | None = None) -> int:
     return int(_profile_defaults("aura_support", profiles).get("aura_spell_min", 6))
 
 
+def enchantment_spell_min(profiles: dict[str, dict[str, Any]] | None = None) -> int:
+    return int(_profile_defaults("enchantments", profiles).get("enchantment_min", 8))
+
+
 def artifact_spell_min(profiles: dict[str, dict[str, Any]] | None = None) -> int:
     return int(_profile_defaults("artifacts", profiles).get("artifact_min", 8))
 

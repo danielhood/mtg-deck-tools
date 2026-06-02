@@ -153,6 +153,17 @@ patterns:
       types: [enchantment]
       subtypes: [Aura]
 
+  - id: whenever_cast_enchantment
+    effect_kind: whenever_cast_enchantment
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever you cast an enchantment spell"
+    payload:
+      types: [enchantment]
+    exclude_if_matched:
+      - whenever_cast_aura
+
   - id: whenever_cast_type
     effect_kind: whenever_cast_type
     confidence: 0.9
@@ -164,6 +175,7 @@ patterns:
       types: 1
     exclude_if_matched:
       - whenever_cast_aura
+      - whenever_cast_enchantment
 
   # --- tokens (payoff before produce; sacrifice_fodder excludes token_produce) ---
   - id: token_payoff_on_create

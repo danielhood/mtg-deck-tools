@@ -19,6 +19,7 @@ class DependencyScope:
 
     energy_balance: bool = True
     aura_support_min: bool = False
+    enchantment_support_min: bool = False
     energy_user_intent: bool = False
     artifacts_user_intent: bool = False
     elves_user_intent: bool = False
@@ -26,6 +27,7 @@ class DependencyScope:
     sacrifice_user_intent: bool = False
     tokens_user_intent: bool = False
     vehicles_user_intent: bool = False
+    enchantments_user_intent: bool = False
 
 
 def _load_profile_activation(path: Path | None = None) -> dict[str, dict[str, list[str]]]:
@@ -81,6 +83,7 @@ def build_dependency_scope(
     return DependencyScope(
         energy_balance=True,
         aura_support_min=_profile_active("aura_support"),
+        enchantment_support_min=_profile_active("enchantments"),
         energy_user_intent=energy_user,
         artifacts_user_intent=_profile_active("artifacts"),
         elves_user_intent=subtype_lords,
@@ -88,4 +91,5 @@ def build_dependency_scope(
         sacrifice_user_intent=_profile_active("sacrifice"),
         tokens_user_intent=_profile_active("tokens"),
         vehicles_user_intent=_profile_active("vehicles"),
+        enchantments_user_intent=_profile_active("enchantments"),
     )

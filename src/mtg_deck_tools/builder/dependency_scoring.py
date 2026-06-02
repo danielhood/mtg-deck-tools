@@ -12,6 +12,7 @@ from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.dependency_profiles import (
     artifact_spell_min,
     aura_spell_min,
+    enchantment_spell_min,
     energy_profile_floors,
     sacrifice_profile_floors,
     subtype_lord_minimum,
@@ -35,6 +36,7 @@ class DeckBuildStats:
     energy_producers: int = 0
     energy_consumers: int = 0
     aura_spells: int = 0
+    enchantment_spells: int = 0
     artifact_count: int = 0
     subtype_counts: dict[str, int] = field(default_factory=dict)
     needs_energy_consumer: bool = False
@@ -43,8 +45,11 @@ class DeckBuildStats:
     energy_consumer_floor: int = 0
     energy_package_requested: bool = False
     aura_spell_floor: int = 0
+    enchantment_spell_floor: int = 0
     artifact_spell_floor: int = 0
     aura_package_requested: bool = False
+    enchantment_package_requested: bool = False
+    needs_enchantment_support: bool = False
     artifact_package_requested: bool = False
     needs_elf_support: bool = False
     elf_other_minimum: int = 5
@@ -132,6 +137,7 @@ def build_deck_build_stats(
 
     stats = DeckBuildStats(
         aura_spells=sum(1 for c in partial if "Aura" in (c.type_line or "")),
+        enchantment_spells=sum(1 for c in partial if "Enchantment" in (c.type_line or "")),
         artifact_count=_count_type_on_cards(partial, "artifact"),
         vehicle_count=sum(1 for c in partial if "Vehicle" in (c.type_line or "")),
         crew_creature_count=sum(
@@ -181,6 +187,11 @@ def build_deck_build_stats(
         if scope.aura_support_min:
             stats.aura_package_requested = True
             stats.aura_spell_floor = aura_spell_min(profile_cfg)
+        if scope.enchantments_user_intent:
+            stats.enchantment_package_requested = True
+            stats.enchantment_spell_floor = enchantment_spell_min(profile_cfg)
+            if stats.enchantment_spells < stats.enchantment_spell_floor:
+                stats.needs_enchantment_support = True
         if scope.artifacts_user_intent:
             stats.artifact_package_requested = True
             stats.artifact_spell_floor = artifact_spell_min(profile_cfg)
@@ -237,6 +248,20 @@ def build_deck_build_stats(
             "Elf", subtype_lord_minimum("Elf", profile_cfg)
         )
 
+    if stats.enchantment_package_requested:
+        if stats.enchantment_spells < stats.enchantment_spell_floor:
+            stats.needs_enchantment_support = True
+    else:
+        for card in partial:
+            for effect in effects_map.get(card.oracle_id, []):
+                if effect.effect_kind == "whenever_cast_enchantment":
+                    minimum = enchantment_spell_min(profile_cfg)
+                    if stats.enchantment_spells < minimum:
+                        stats.needs_enchantment_support = True
+                    break
+            if stats.needs_enchantment_support:
+                break
+
     return stats
 
 
@@ -264,6 +289,11 @@ def dependency_pick_score(
     if stats.aura_package_requested and "Aura" in (candidate.type_line or ""):
         if stats.aura_spells < stats.aura_spell_floor:
             score += 6.0 * weight
+    if stats.enchantment_package_requested and "Enchantment" in (candidate.type_line or ""):
+        if stats.enchantment_spells < stats.enchantment_spell_floor:
+            score += 6.0 * weight
+    if stats.needs_enchantment_support and "Enchantment" in (candidate.type_line or ""):
+        score += 3.0 * weight
     if stats.artifact_package_requested and "Artifact" in (candidate.type_line or ""):
         if stats.artifact_count < stats.artifact_spell_floor:
             score += 5.0 * weight
@@ -330,6 +360,8 @@ def dependency_pick_score(
             if subtypes == ["Vehicle"] and stats.vehicle_package_requested:
                 if stats.vehicle_count < stats.vehicle_floor:
                     score += 2.0 * weight
+        elif effect.effect_kind == "whenever_cast_enchantment" and stats.needs_enchantment_support:
+            score -= 1.0 * weight
         elif effect.effect_kind == "type_line_vehicle" and stats.vehicle_package_requested:
             if stats.vehicle_count < stats.vehicle_floor:
                 score += 3.0 * weight
@@ -376,6 +408,10 @@ def passes_strict_dependency_filter(
                 count = stats.subtype_counts.get(subtype, 0)
                 if count < minimum:
                     return False
+        elif effect.effect_kind == "whenever_cast_enchantment":
+            minimum = stats.enchantment_spell_floor or enchantment_spell_min()
+            if stats.enchantment_spells < minimum:
+                return False
     return True
 
 

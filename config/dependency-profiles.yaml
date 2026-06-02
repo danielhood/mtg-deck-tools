@@ -46,6 +46,16 @@ profiles:
       aura_spell_max: 15
       share_max: 0.18
 
+  # Enchantress density (non-voltron); card-driven via whenever_cast_enchantment / enchantment tutors
+  enchantments:
+    label: Enchantments matter
+    activation:
+      themes: [enchantress]
+    roles: [enchantment_spell, enchantment_payoff]
+    defaults:
+      enchantment_min: 8
+      share_max: 0.22
+
   # Audit 2026-05-30: 662 elf creatures, 9 other-elf payoffs (buff_subtype)
   # Generalized for all "Other {Subtype}s you control" lords (card-driven package + TYPE_SYNERGY_MIN)
   subtype_lords:

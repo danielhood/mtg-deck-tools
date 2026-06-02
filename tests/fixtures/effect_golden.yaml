@@ -96,8 +96,8 @@ cases:
     oracle_text: "Whenever you cast an enchantment spell, draw a card."
     type_line: "Enchantment"
     expected:
-      - effect_kind: whenever_cast_type
-        source: whenever_cast_type
+      - effect_kind: whenever_cast_enchantment
+        source: whenever_cast_enchantment
         payload:
           types: [enchantment]
 

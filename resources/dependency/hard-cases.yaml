@@ -29,7 +29,7 @@ cases:
   - { name: "Krenko, Mob Boss", layout: normal, oracle_excerpt: "Goblin tokens", v1_stance: defer_tokens, notes: "" }
   - { name: "Purphoros, God of the Forge", layout: normal, oracle_excerpt: "creature you control", v1_stance: no_atoms, notes: "Generic, not other subtype" }
   - { name: "Urza, Lord High Artificer", layout: normal, oracle_excerpt: "artifact spell", v1_stance: whenever_cast_type, notes: "" }
-  - { name: "Sythis, Harvest's Hand", layout: normal, oracle_excerpt: "enchantment spell", v1_stance: whenever_cast_type, notes: "" }
+  - { name: "Sythis, Harvest's Hand", layout: normal, oracle_excerpt: "enchantment spell", v1_stance: whenever_cast_enchantment, notes: "" }
   - { name: "Sram, Senior Edificer", layout: normal, oracle_excerpt: "Aura spell", v1_stance: warn_only, notes: "Cast trigger may need aura_cast kind" }
   - { name: "Kor Spiritdancer", layout: normal, oracle_excerpt: "Aura spell", v1_stance: whenever_cast_type, notes: "Enchantment — Aura on other cards" }
   - { name: "Ethereal Armor", layout: normal, oracle_excerpt: "Enchant creature", v1_stance: type_line_aura, notes: "" }
