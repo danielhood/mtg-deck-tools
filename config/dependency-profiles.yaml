@@ -162,6 +162,7 @@ profiles:
       consumer_min: 2
       consumer_max: 8
       share_max: 0.18
+      incidental_imbalance_min: 5
 
   graveyard:
     label: Graveyard heuristics

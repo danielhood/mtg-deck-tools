@@ -333,6 +333,24 @@ cases:
       - effect_kind: sacrifice_payoff
         source: sacrifice_creature_dies_payoff
 
+  - name: font_of_agonies
+    oracle_text: "Whenever you pay life, put that many blood counters on this enchantment.\n{1}{B}, Remove four blood counters from this enchantment: Destroy target creature."
+    type_line: "Enchantment"
+    expected:
+      - effect_kind: blood_produce
+        source: blood_produce
+      - effect_kind: blood_consume
+        source: blood_consume
+
+  - name: bloodletter_quill
+    oracle_text: "{2}, {T}, Put a blood counter on this artifact: Draw a card, then you lose 1 life for each blood counter on this artifact.\n{U}{B}: Remove a blood counter from this artifact."
+    type_line: "Artifact"
+    expected:
+      - effect_kind: blood_produce
+        source: blood_produce
+      - effect_kind: blood_consume
+        source: blood_consume
+
   - name: hardened_scales
     oracle_text: "If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on it instead."
     type_line: "Enchantment"
