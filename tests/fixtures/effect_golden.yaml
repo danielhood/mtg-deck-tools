@@ -161,6 +161,24 @@ cases:
       - effect_kind: energy_consume
         source: energy_consume
 
+  - name: aetherstorm_roc
+    oracle_text: "Flying\nWhenever this creature or another creature you control enters, you get {E} (an energy counter).\nWhenever this creature attacks, you may pay {E}{E}. If you do, put a +1/+1 counter on it and tap up to one target creature defending player controls."
+    type_line: "Creature — Bird"
+    expected_min:
+      - effect_kind: energy_produce
+        source: energy_produce
+      - effect_kind: energy_consume
+        source: energy_consume
+
+  - name: nissa_worldsoul_speaker
+    oracle_text: "Landfall — Whenever a land you control enters, you get {E}{E} (two energy counters).\nYou may pay eight {E} rather than pay the mana cost for permanent spells you cast."
+    type_line: "Legendary Creature — Elf Druid"
+    expected_min:
+      - effect_kind: energy_produce
+        source: energy_produce
+      - effect_kind: energy_consume
+        source: energy_consume
+
   - name: attune_with_aether
     oracle_text: "Search your library for a basic land card and a card named Aether Hub, reveal them, put them into your hand, then shuffle."
     type_line: "Sorcery"
