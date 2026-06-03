@@ -32,7 +32,7 @@ def run_step6(criteria: DeckCriteria) -> DeckCriteria:
 
     console.print(
         Panel(
-            "[bold]Step 6 of 6[/bold] — Card rarity\n"
+            "[bold]Step 7 of 7[/bold] — Card rarity\n"
             "Exclude maindeck cards below this rarity (commander is not filtered here).",
             title="MTG Deck Tools",
             border_style="cyan",

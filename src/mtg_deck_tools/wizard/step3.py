@@ -15,7 +15,7 @@ def run_step3(criteria: DeckCriteria) -> DeckCriteria:
 
     console.print(
         Panel(
-            "[bold]Step 3 of 6[/bold] — Colors\n"
+            "[bold]Step 4 of 7[/bold] — Colors\n"
             "Pick the colors your commander must use. Leave none for any (including colorless).",
             title="MTG Deck Tools",
             border_style="cyan",

@@ -139,7 +139,7 @@ mtg-deck-tools analyze run --write-decks --fail-on-expect
 # Full deck: slot-filled 99-card maindeck → output/
 mtg-deck-tools generate --seed 42 --colors G --themes tokens
 
-# Full wizard: themes, mechanics, colors, budget, commander, rarity
+# Full wizard: themes, mechanics, synergy controls, colors, budget, commander, rarity
 mtg-deck-tools wizard
 
 # Wizard then generate
@@ -164,7 +164,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 | `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms |
 | `stats` | Row counts, import metadata, top tags, effect counts |
 | `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
-| `wizard` | Interactive wizard: themes, mechanics, colors, budget & per-card prices, commander (color + price filters), rarity (criteria only; does not write a deck) |
+| `wizard` | Interactive wizard (7 steps): themes, mechanics, synergy/dependency controls, colors, budget & per-card prices, commander (color + price filters), rarity (criteria only; does not write a deck) |
 | `generate` | Build a 99-card maindeck plus commander metadata → `output/*.deck.json` and `output/*.md` |
 
 ### `generate` — how it works
@@ -258,7 +258,7 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 
 **Dependency engine (D0–D5):** effect extraction at import (`card_effects`), post-build `dependency_report` in Markdown/JSON, pick-time scoring (D3), `--strict-dependencies` (D4), and `--repair-dependencies` (D5) — **complete** as of 2026-05-31.
 
-**Dependency expansion:** **tutor payload matching** (CMC bands, colors, land subtypes, multi-type OR for `TUTOR_TARGET_EXISTS`), **enchantments** profile (`ENCHANTMENT_SUPPORT_MIN`, wizard `themes: [enchantress]`), **tokens** (`TOKEN_BALANCE`), **vehicles** (`VEHICLE_BALANCE`), **equipment depth** (`EQUIPMENT_BALANCE`, `include_mechanics: [equip]` or `themes: [voltron]`), **rad/oil/charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`), **subtype lords**, **sacrifice/token refinements** (aristocrats fodder includes token makers; Grave Pact-style `sacrifice_opponent`; persist/undying/escape `death_recursion`), and **graveyard/landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; wizard `themes: [recursion, landfall]`) — shipped as of 2026-06. Next: UX2 wizard dependency controls — see [`planning/09-next-steps.md`](planning/09-next-steps.md).
+**Dependency expansion:** **tutor payload matching** (CMC bands, colors, land subtypes, multi-type OR for `TUTOR_TARGET_EXISTS`), **enchantments** profile (`ENCHANTMENT_SUPPORT_MIN`, wizard `themes: [enchantress]`), **tokens** (`TOKEN_BALANCE`), **vehicles** (`VEHICLE_BALANCE`), **equipment depth** (`EQUIPMENT_BALANCE`, `include_mechanics: [equip]` or `themes: [voltron]`), **rad/oil/charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`), **subtype lords**, **sacrifice/token refinements** (aristocrats fodder includes token makers; Grave Pact-style `sacrifice_opponent`; persist/undying/escape `death_recursion`), and **graveyard/landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; wizard `themes: [recursion, landfall]`) — shipped as of 2026-06. **UX2** wizard step 3 sets `strict_dependencies`, `repair_dependencies`, and optional `mechanic_focus` presets for activated profiles. Next: UX3 criteria linter — see [`planning/09-next-steps.md`](planning/09-next-steps.md).
 
 ## License
 

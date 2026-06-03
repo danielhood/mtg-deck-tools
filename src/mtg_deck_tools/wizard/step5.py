@@ -133,7 +133,7 @@ def run_step5(
     try:
         console.print(
             Panel(
-                "[bold]Step 5 of 6[/bold] — Commander\n"
+                "[bold]Step 6 of 7[/bold] — Commander\n"
                 "Search and select your commander. Results respect your color filter and "
                 "per-card price range (and deck budget when set).\n"
                 "Partner commanders can add a second.",

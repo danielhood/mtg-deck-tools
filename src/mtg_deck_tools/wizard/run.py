@@ -8,6 +8,7 @@ from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.wizard.step1 import run_step1
 from mtg_deck_tools.wizard.step2 import run_step2
 from mtg_deck_tools.wizard.step3 import run_step3
+from mtg_deck_tools.wizard.step3_synergy import run_step3_synergy
 from mtg_deck_tools.wizard.step4 import run_step4
 from mtg_deck_tools.wizard.step5 import run_step5
 from mtg_deck_tools.wizard.step6 import run_step6
@@ -19,9 +20,10 @@ def run_wizard(
     seed: int | None = None,
     db_path: Path | None = None,
 ) -> DeckCriteria:
-    """Run all six wizard steps and return complete DeckCriteria."""
+    """Run all seven wizard steps and return complete DeckCriteria."""
     criteria = run_step1(seed=seed, show_summary=False)
     criteria = run_step2(criteria)
+    criteria = run_step3_synergy(criteria)
     criteria = run_step3(criteria)
     criteria = run_step4(criteria)
     criteria = run_step5(criteria, db_path=db_path)

@@ -7,13 +7,13 @@ Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | Milestone | Status |
 | --- | --- |
 | Oracle import + mechanic tags + SQLite | Done |
-| Wizard (steps 1–5) | Done |
+| Wizard (steps 1–7; UX2 synergy step 3) | Done |
 | Slot-filled 99-card generation | Done |
 | Dynamic mana base | Done |
 | Commander validation (CR 903 / 702.124) | Done |
 | Budget enforcement + trim pass | Done |
 | `--strict-budget` | Done (CLI flag; wizard references it at generate time) |
-| Per-card USD price min/max | Done — wizard step 4 (filters commander search in step 5) + `--card-price-min` / `--card-price-max` |
+| Per-card USD price min/max | Done — wizard step 5 (filters commander search in step 6) + `--card-price-min` / `--card-price-max` |
 | Build-time legality filters (903.5d, land/nonland slots) | Done |
 | Deck Markdown output polish | Done — grouped notes, card details, mana text, header metadata |
 | Commander price + release date (wizard + MD) | Done |
@@ -28,7 +28,7 @@ Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | Pick-time dependency scoring | Done — D3 during slot fill |
 | `--strict-dependencies` | Done — D4 pick-time filter |
 | `--repair-dependencies` | Done — D5 post-build swap pass |
-| Wizard dependency controls (UX2) | **Not started** — CLI flags only today; scope expanded 2026-06-03 to cover all 15 activated profiles |
+| Wizard dependency controls (UX2) | **Done** — wizard step 3: `strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` per activated profile |
 | Dependency dogfood calibration | **Done** — `analyze run --fail-on-expect`: **25/25** after 2026-06 bulk refresh (blood consume patterns, +1/+1 incidental threshold) |
 | Mechanic packages | **Done** — energy, experience, blood, +1/+1 counters, sacrifice/aristocrats, voltron auras, enchantments, equip/vehicles artifacts, subtype lords, tokens, vehicles, equipment |
 | Sacrifice / aristocrats profile | **Done** — `SACRIFICE_BALANCE` + `ensure_sacrifice_package` |
@@ -60,7 +60,7 @@ Early pass: `output/muldrotha-the-gravetide-20260530180919.md` (`seed=42`, token
 | --- | --- |
 | Validation | **PASSED** |
 | Dependency report | **WARNINGS** — `AURA_SUPPORT_MIN` (2 auras vs suggested min 6) on a tokens build |
-| Strict / repair flags | Available via CLI; not yet exposed in wizard |
+| Strict / repair / focus | Wizard step 3 and CLI flags (`--strict-dependencies`, `--repair-dependencies`) |
 
 **Calibration note:** Deck-level rules are now scoped to themes / `include_mechanics` / `mechanic_focus` (see `dependency_scope.py`). Incidental single-card energy no longer warns unless the user includes `energy`. Card-level rules (tutors, lords, enchantress payoffs) still fire when relevant cards are present.
 
@@ -97,7 +97,7 @@ mtg-deck-tools generate --from deck.deck.json --refill-slot synergy --seed 42
 
 ### 4. Unpriced / availability handling — **Done**
 
-Policy in [08-card-availability.md](08-card-availability.md). Wizard step 4 defaults to strict + prefer-available when a budget is set.
+Policy in [08-card-availability.md](08-card-availability.md). Wizard step 5 defaults to strict + prefer-available when a budget is set.
 
 ### 5. v1 success criteria closure — **Done**
 
@@ -148,21 +148,15 @@ Shipped `rad_*`, `oil_*`, `charge_*` effect atoms; `RAD_BALANCE`, `OIL_BALANCE`,
 
 Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**. Priority 1–6 expansion items are shipped.
 
-**Suggested next task:** **UX2** wizard dependency controls (`strict_dependencies`, `repair_dependencies`, `mechanic_focus`).
+**Suggested next task:** **UX3** criteria linter warnings in wizard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
 
-**Recently shipped (2026-06):** **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
+**Recently shipped (2026-06):** **UX2** wizard synergy step (`strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` for all activated profiles); **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
 
 Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15). **Doc updates:** [DOC-MAP.md](DOC-MAP.md); agents run `/ship-dependency-feature` before PR.
 
-### 2. UX2 — wizard synergy controls
+### ~~2. UX2 — wizard synergy controls~~ **Done**
 
-From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md):
-
-- Wizard step for **synergy strictness** (`strict_dependencies`, `repair_dependencies`) — expose as yes/no prompts in Step 5 or a new step; currently CLI-only flags
-- **Focus-level presets** (`mechanic_focus`: incidental/supported/focused/engine) for **every profile activated by the user's theme and `include_mechanics` selections** — not only energy and auras; the list is driven by what the user already selected in Steps 1–2, so casual users see nothing new while power users get per-mechanic control
-- No new engine or schema work needed: `DeckCriteria.mechanic_focus` is already a generic dict and `dependency_scope.py` already reads it for all profiles
-- All 15 profiles are now eligible (energy, aura\_support, rad, oil, charge, experience, blood, plus\_one, vehicles, equipment, tokens, sacrifice, enchantments, graveyard, landfall)
-- Surface dependency summary during wizard review (low-priority stretch goal; may slip to UX3)
+Shipped wizard **step 3** (synergy & dependencies): `strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` presets (incidental/supported/focused/engine) for every profile activated in steps 1–2. Criteria summary shows dependency settings. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md).
 
 ### 3. Rule scoping and threshold tuning — **mostly done**
 
@@ -193,10 +187,8 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 ## Suggested next task
 
-**UX2** wizard controls for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). Dependency expansion priorities 1–6 are shipped ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)).
-
-UX2 scope expanded (2026-06-03): focus-level presets now target all 15 active profiles, not only energy and auras. See §2 above and the expanded UX2 spec in doc 11.
+**UX3** criteria linter warnings in the wizard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). UX2 wizard synergy controls shipped 2026-06-03 (step 3: strict/repair flags + `mechanic_focus` for activated profiles).
 
 Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` — **28/28** ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 
-See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX2 → UX3 criteria linter → UX5 local web).
+See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX3 criteria linter → UX5 local web).

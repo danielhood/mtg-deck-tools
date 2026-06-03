@@ -46,7 +46,7 @@ def run_step2(criteria: DeckCriteria) -> DeckCriteria:
 
     console.print(
         Panel(
-            "[bold]Step 2 of 6[/bold] — Include / avoid mechanics\n"
+            "[bold]Step 2 of 7[/bold] — Include / avoid mechanics\n"
             "Prefer cards with certain keywords, or hard-exclude others from the pool.",
             title="MTG Deck Tools",
             border_style="cyan",

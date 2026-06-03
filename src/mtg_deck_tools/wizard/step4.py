@@ -87,7 +87,7 @@ def run_step4(criteria: DeckCriteria) -> DeckCriteria:
 
     console.print(
         Panel(
-            "[bold]Step 4 of 6[/bold] — Budget & card prices\n"
+            "[bold]Step 5 of 7[/bold] — Budget & card prices\n"
             "Set optional total deck cap and per-card min/max using Scryfall prices. "
             "The per-card range filters commander search in the next step. "
             "When a budget is set, you can exclude unpriced cards and prefer "

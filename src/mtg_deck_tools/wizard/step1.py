@@ -161,7 +161,7 @@ def run_step1(*, seed: int | None = None, show_summary: bool = True) -> DeckCrit
 
     console.print(
         Panel(
-            "[bold]Step 1 of 6[/bold] — Themes & slot template\n"
+            "[bold]Step 1 of 7[/bold] — Themes & slot template\n"
             "Pick archetype tags for synergy cards and how many cards per deck slot.",
             title="MTG Deck Tools",
             border_style="cyan",
