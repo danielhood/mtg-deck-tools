@@ -167,7 +167,7 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 | Topic | Notes | Doc |
 | --- | --- | --- |
-| **Dependency expansion** | Tutor payloads, graveyard heuristics, counter resources | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
+| **Dependency expansion** | Graveyard heuristics, counter resources | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
 | Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
 | Dependency swap packages | `generate --swap-profile energy` — needs UX5 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |

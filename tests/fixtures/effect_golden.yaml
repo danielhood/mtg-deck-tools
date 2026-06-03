@@ -247,3 +247,43 @@ cases:
         source: search_library_creature
       - effect_kind: search_library
         source: search_library_land
+
+  - name: green_suns_zenith
+    oracle_text: "Search your library for a green creature card, reveal it, put it into your hand, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_colored_creature
+        payload:
+          types: [creature]
+          colors: [G]
+
+  - name: natures_lore
+    oracle_text: "Search your library for a Forest card, put it onto the battlefield, then shuffle."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_land_subtype
+        payload:
+          types: [land]
+          subtypes: [Forest]
+
+  - name: fierce_empath
+    oracle_text: "When Fierce Empath enters the battlefield, you may search your library for a creature card with mana value 6 or greater, reveal it, put it into your hand, then shuffle."
+    type_line: "Creature — Elf"
+    expected:
+      - effect_kind: search_library
+        source: search_library_creature_cmc_min
+        payload:
+          types: [creature]
+          min_cmc: 6
+
+  - name: finale_of_devastation
+    oracle_text: "Search your library and/or graveyard for a creature or planeswalker card with mana value X or less and put it onto the battlefield."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: search_library
+        source: search_library_creature_or_planeswalker
+        payload:
+          types: [creature, planeswalker]
+          type_match: any

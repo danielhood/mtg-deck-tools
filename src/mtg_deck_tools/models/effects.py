@@ -14,6 +14,10 @@ class SearchLibraryPayload(BaseModel):
     subtypes: list[str] = Field(default_factory=list)
     supertypes: list[str] = Field(default_factory=list)
     max_cmc: int | None = None
+    min_cmc: int | None = None
+    colors: list[str] = Field(default_factory=list)
+    card_name: str | None = None
+    type_match: str | None = None
     zones: list[str] = Field(default_factory=lambda: ["library"])
     destination: str = "hand"
     any_card: bool = False

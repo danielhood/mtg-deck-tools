@@ -224,7 +224,7 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 
 **Dependency engine (D0–D5):** effect extraction at import (`card_effects`), post-build `dependency_report` in Markdown/JSON, pick-time scoring (D3), `--strict-dependencies` (D4), and `--repair-dependencies` (D5) — **complete** as of 2026-05-31.
 
-**Dependency expansion:** **enchantments** profile (`ENCHANTMENT_SUPPORT_MIN`, wizard `themes: [enchantress]`), **tokens** profile (`TOKEN_BALANCE`), **vehicles** profile (`VEHICLE_BALANCE`), and **subtype lords** — **complete** as of 2026-06. Next: tutor payloads, UX2 wizard dependency controls — see [`planning/09-next-steps.md`](planning/09-next-steps.md).
+**Dependency expansion:** **tutor payload matching** (CMC bands, colors, land subtypes, multi-type OR for `TUTOR_TARGET_EXISTS`), **enchantments** profile (`ENCHANTMENT_SUPPORT_MIN`, wizard `themes: [enchantress]`), **tokens** (`TOKEN_BALANCE`), **vehicles** (`VEHICLE_BALANCE`), and **subtype lords** — shipped as of 2026-06. Next: graveyard/landfall heuristics, UX2 wizard dependency controls — see [`planning/09-next-steps.md`](planning/09-next-steps.md).
 
 ## License
 

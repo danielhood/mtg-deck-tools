@@ -133,7 +133,7 @@ def test_strict_allows_tutor_when_creature_in_pool() -> None:
         _candidate(oracle_id="t", name="Worldly Tutor", type_line="Instant"),
         [_effect("search_library", {"types": ["creature"]})],
         stats,
-        [("Creature — Elf", 1.0)],
+        [("Creature — Elf", 1.0, ("G",), "Llanowar Elves")],
     )
 
 

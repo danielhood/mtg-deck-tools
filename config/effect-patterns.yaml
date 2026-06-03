@@ -41,6 +41,57 @@ patterns:
     capture:
       max_cmc: 1
 
+  - id: search_library_creature_cmc_min
+    effect_kind: search_library
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an )?creature card with mana value (\\d+) or greater"
+    payload:
+      types: [creature]
+    capture:
+      min_cmc: 1
+    exclude_if_matched:
+      - search_library_creature_cmc
+
+  - id: search_library_colored_creature
+    effect_kind: search_library
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an )?(white|blue|black|red|green) creature card"
+    payload:
+      types: [creature]
+    capture:
+      color_word: 1
+    exclude_if_matched:
+      - search_library_creature_cmc
+      - search_library_creature_cmc_min
+
+  - id: search_library_land_subtype
+    effect_kind: search_library
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library for (?:a |an )?(Forest|Island|Mountain|Plains|Swamp) card"
+    payload:
+      types: [land]
+    capture:
+      subtypes: 1
+    exclude_if_matched:
+      - search_library_basic_land
+      - search_library_land
+
+  - id: search_library_creature_or_planeswalker
+    effect_kind: search_library
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)search your library(?: and/or graveyard)? for (?:a |an )?creature or planeswalker card"
+    payload:
+      types: [creature, planeswalker]
+      type_match: any
+
   - id: search_library_creature
     effect_kind: search_library
     confidence: 0.9
@@ -51,6 +102,9 @@ patterns:
       types: [creature]
     exclude_if_matched:
       - search_library_creature_cmc
+      - search_library_creature_cmc_min
+      - search_library_colored_creature
+      - search_library_creature_or_planeswalker
 
   - id: search_library_aura
     effect_kind: search_library
@@ -70,6 +124,7 @@ patterns:
         pattern: "(?i)search your library for (?:a |an )?artifact or enchantment card"
     payload:
       types: [artifact, enchantment]
+      type_match: any
 
   - id: search_library_enchantment
     effect_kind: search_library

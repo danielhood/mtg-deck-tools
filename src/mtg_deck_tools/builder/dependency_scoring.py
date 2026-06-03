@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from dataclasses import dataclass, field
 from typing import Any
@@ -26,7 +27,7 @@ from mtg_deck_tools.rules.dependencies import (
     payload_matches_card,
 )
 
-SearchPoolEntry = tuple[str, float]  # type_line, cmc
+SearchPoolEntry = tuple[str, float, tuple[str, ...], str]  # type_line, cmc, colors, name
 
 
 @dataclass
@@ -104,19 +105,35 @@ def build_search_pool(
     partial: list[DeckCard],
     commander_oracle_ids: set[str],
 ) -> list[SearchPoolEntry]:
-    pool: list[SearchPoolEntry] = [(c.type_line or "", c.cmc) for c in partial]
-    if not commander_oracle_ids:
-        return pool
-    placeholders = ",".join("?" * len(commander_oracle_ids))
+    oracle_ids = {c.oracle_id for c in partial} | set(commander_oracle_ids)
+    if not oracle_ids:
+        return [(c.type_line or "", c.cmc, tuple(), c.name) for c in partial]
+    placeholders = ",".join("?" * len(oracle_ids))
     rows = conn.execute(
         f"""
-        SELECT type_line, cmc FROM cards
+        SELECT oracle_id, type_line, cmc, colors, name FROM cards
         WHERE oracle_id IN ({placeholders})
         """,
-        list(commander_oracle_ids),
+        list(oracle_ids),
     ).fetchall()
-    for row in rows:
-        pool.append((row["type_line"] or "", float(row["cmc"] or 0)))
+    by_id = {row["oracle_id"]: row for row in rows}
+    pool: list[SearchPoolEntry] = []
+    for card in partial:
+        row = by_id.get(card.oracle_id)
+        colors = tuple(json.loads(row["colors"] or "[]")) if row else tuple()
+        pool.append((card.type_line or "", card.cmc, colors, card.name))
+    for oid in commander_oracle_ids:
+        row = by_id.get(oid)
+        if row is None:
+            continue
+        pool.append(
+            (
+                row["type_line"] or "",
+                float(row["cmc"] or 0),
+                tuple(json.loads(row["colors"] or "[]")),
+                row["name"] or "",
+            )
+        )
     return pool
 
 
@@ -272,7 +289,9 @@ def count_search_targets(
     if payload.get("any_card"):
         return len(search_pool)
     return sum(
-        1 for type_line, cmc in search_pool if payload_matches_card(type_line, cmc, payload)
+        1
+        for type_line, cmc, colors, name in search_pool
+        if payload_matches_card(type_line, cmc, payload, colors=list(colors), name=name)
     )
 
 
