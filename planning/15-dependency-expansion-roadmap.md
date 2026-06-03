@@ -38,6 +38,9 @@ flowchart TD
 | --- | --- |
 | `search_library` | Tutor / search predicates (land, creature, artifact, enchantment, aura, CMC min/max, colored creature, land subtype, creature or planeswalker, any card) |
 | `energy_produce` / `energy_consume` | Energy counter balance |
+| `experience_produce` / `experience_consume` | Experience counter balance |
+| `blood_produce` / `blood_consume` | Blood counter balance (player counters) |
+| `plus_one_produce` / `plus_one_consume` | +1/+1 counter producers vs payoffs |
 | `sacrifice_outlet` / `sacrifice_payoff` / `sacrifice_fodder` | Aristocrats package roles |
 | `buff_subtype` | “Other Elves …” (and similar) subtype lords |
 | `whenever_cast_type` | “Whenever you cast an Artifact spell …” |
@@ -53,6 +56,9 @@ flowchart TD
 | --- | --- | --- |
 | `TUTOR_TARGET_EXISTS` | Tutor with zero matching targets in deck + commander pool | Always (card-driven) |
 | `ENERGY_BALANCE` | Producers without consumers or reverse | `include_mechanics: [energy]` or ≥2 imbalanced cards |
+| `EXPERIENCE_BALANCE` | Experience producers without consumers or reverse | `include_mechanics: [experience]` or ≥2 imbalanced cards |
+| `BLOOD_BALANCE` | Blood producers without consumers or reverse | `include_mechanics: [blood]` or ≥2 imbalanced cards |
+| `PLUS_ONE_BALANCE` | +1/+1 producers without consumers or reverse | `include_mechanics: [counters]` or ≥2 imbalanced cards |
 | `SACRIFICE_BALANCE` | Outlets without payoffs or reverse | `themes: [aristocrats]` or ≥2 imbalanced cards |
 | `TOKEN_BALANCE` | Producers without payoffs or reverse | `themes: [tokens]` or ≥2 imbalanced cards |
 | `VEHICLE_BALANCE` | Vehicle count or crew creatures below floor | `include_mechanics: [vehicles]`, Vehicle lord in deck, or ≥2 vehicles |
@@ -65,6 +71,9 @@ flowchart TD
 | Package | Activation | Floors (defaults) |
 | --- | --- | --- |
 | Energy | `include_mechanics: [energy]` | ≥2 producers, ≥2 consumers |
+| Experience | `include_mechanics: [experience]` | ≥1 producer, ≥2 consumers |
+| Blood | `include_mechanics: [blood]` | ≥2 producers, ≥2 consumers |
+| +1/+1 counters | `include_mechanics: [counters]` | ≥3 producers, ≥2 consumers |
 | Sacrifice / aristocrats | `themes: [aristocrats]` | ≥2 outlets, ≥3 payoffs, ≥8 fodder |
 | Auras | Voltron theme or card-driven aura check | ≥6 Aura spells |
 | Enchantments | `themes: [enchantress]` or enchantment cast payoff / tutor in deck | ≥8 enchantments |
@@ -75,7 +84,7 @@ flowchart TD
 
 ### Dogfood coverage
 
-[`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml) — **22 scenarios** (tokens, voltron, energy, elves, artifacts, aristocrats, landfall, goblins, vampires, enchantress, budget, strict/repair). Run: `mtg-deck-tools analyze run --fail-on-expect` after import.
+[`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml) — **25 scenarios** (tokens, voltron, energy, experience, blood, +1/+1 counters, elves, artifacts, aristocrats, landfall, goblins, vampires, enchantress, budget, strict/repair). Run: `mtg-deck-tools analyze run --fail-on-expect` after import.
 
 ---
 
@@ -105,16 +114,16 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | Named card search | Deferred (`REQUIRES_CARD` — rare) |
 | `any_card` tutors | Unchanged (low confidence soft warn) 
 
-### Priority 3 — Resource counters (energy-shaped profiles)
+### ~~Priority 3 — Resource counters (energy-shaped profiles)~~
 
-| Resource | Detection sketch | Profile idea | Audit stance |
-| --- | --- | --- | --- |
-| **+1/+1 / proliferate** | “proliferate”, “put a +1/+1 counter” | Producer vs payoff balance | `defer_counters` (Atraxa) |
-| **Experience** | “experience counter” | Consumers need producers | — |
-| **Blood** | Blood counter text | Yawgmoth-style | `defer_blood` |
-| **Rad, oil, charge** | Format-specific regex sets | Theme-selected only | Lower priority |
+**Shipped 2026-06** — [`rules/resource_counters.py`](../src/mtg_deck_tools/rules/resource_counters.py): experience, blood, and +1/+1 counter produce/consume atoms; `EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`; `ensure_resource_counter_packages`; wizard `include_mechanics: [experience]`, `[blood]`, `[counters]`. Rad/oil/charge remain deferred (lower pool / theme-only).
 
-Same implementation shape as energy: `*_produce` / `*_consume` kinds, `*_BALANCE` rule, `ensure_*_package`, `dependency-profiles.yaml` activation.
+| Resource | Status |
+| --- | --- |
+| **+1/+1 / proliferate** | Shipped — `plus_one_*` kinds, `PLUS_ONE_BALANCE` |
+| **Experience** | Shipped — `experience_*`, `EXPERIENCE_BALANCE` |
+| **Blood** | Shipped — `blood_*`, `BLOOD_BALANCE` |
+| **Rad, oil, charge** | Deferred — format-specific; add when theme selected |
 
 ### Priority 4 — Sacrifice / tokens refinements
 
@@ -181,9 +190,9 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
 | 1 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
-| 2 | **Counter resources** | After audit evidence (proliferate, blood, …) |
+| 2 | **Rad / oil / charge counters** | Format-specific resource counters; theme-selected |
 
-**Shipped (2026-06):** Tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
+**Shipped (2026-06):** **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
 
 **Parallel track:** **UX2** wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` ([11](11-dependency-engine-user-experience.md)) — does not block pattern work but improves user-facing control.
 

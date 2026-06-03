@@ -495,6 +495,26 @@ def validate_dependencies(
         )
     )
 
+    from mtg_deck_tools.rules.resource_counters import (
+        RESOURCE_COUNTER_SPECS,
+        append_resource_balance,
+        collect_resource_roles,
+    )
+
+    for spec in RESOURCE_COUNTER_SPECS:
+        res_producers, res_consumers = collect_resource_roles(
+            effects_map, maindeck, spec
+        )
+        append_resource_balance(
+            report,
+            spec=spec,
+            scope=dep_scope,
+            producers=res_producers,
+            consumers=res_consumers,
+            severity=severity,
+            strict=strict,
+        )
+
     sacrifice_imbalanced = (sacrifice_outlets and not sacrifice_payoffs) or (
         sacrifice_payoffs and not sacrifice_outlets
     )

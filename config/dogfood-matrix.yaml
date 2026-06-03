@@ -19,7 +19,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, TOKEN_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, TOKEN_BALANCE]
         max_inappropriate_warnings: 0
 
   - id: draw-removal-golgari
@@ -32,7 +32,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE]
         max_inappropriate_warnings: 0
 
   # --- Voltron / auras (deck-level aura floor may apply) ---
@@ -46,7 +46,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [ENERGY_BALANCE, AURA_SUPPORT_MIN]
+        rules_must_not_warn: [ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, AURA_SUPPORT_MIN]
         max_inappropriate_warnings: 0
 
   - id: artifacts-equip
@@ -60,7 +60,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, VEHICLE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, VEHICLE_BALANCE]
 
   # --- Energy intent ---
   - id: energy-simic
@@ -74,7 +74,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [ENERGY_BALANCE, ENCHANTMENT_SUPPORT_MIN]
+        rules_must_not_warn: [ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, ENCHANTMENT_SUPPORT_MIN]
         max_inappropriate_warnings: 0
 
   # --- Elf tribal (subtype lord package + card-driven TYPE_SYNERGY_MIN) ---
@@ -88,7 +88,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TOKEN_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, TOKEN_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: elves-marwyn
@@ -101,7 +101,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: elves-ezuri
@@ -114,7 +114,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   # --- Artifact-heavy (equip/vehicles package) ---
@@ -129,7 +129,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN, VEHICLE_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN, VEHICLE_BALANCE]
         max_inappropriate_warnings: 0
 
   - id: artifacts-urza-chief
@@ -143,7 +143,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [VEHICLE_BALANCE, ENCHANTMENT_SUPPORT_MIN]
+        rules_must_not_warn: [EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, VEHICLE_BALANCE, ENCHANTMENT_SUPPORT_MIN]
         max_inappropriate_warnings: 0
 
   # --- Tribal / aristocrats (card-driven rules) ---
@@ -157,7 +157,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [SACRIFICE_BALANCE, ENCHANTMENT_SUPPORT_MIN]
+        rules_must_not_warn: [EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, ENCHANTMENT_SUPPORT_MIN]
         max_inappropriate_warnings: 0
 
   - id: aristocrats-korvold
@@ -170,7 +170,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [SACRIFICE_BALANCE, ENCHANTMENT_SUPPORT_MIN]
+        rules_must_not_warn: [EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, ENCHANTMENT_SUPPORT_MIN]
         max_inappropriate_warnings: 0
 
   - id: aristocrats-chatterfang
@@ -183,7 +183,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [SACRIFICE_BALANCE, TOKEN_BALANCE, AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE]
+        rules_must_not_warn: [SACRIFICE_BALANCE, TOKEN_BALANCE, AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE]
         max_inappropriate_warnings: 0
 
   # --- Other archetypes ---
@@ -197,7 +197,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: goblins-krenko
@@ -210,7 +210,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TOKEN_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, TOKEN_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: vampires-edgar
@@ -225,7 +225,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TOKEN_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, TOKEN_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   - id: enchantress-sythis
@@ -238,7 +238,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, SACRIFICE_BALANCE, TYPE_SYNERGY_MIN]
         max_inappropriate_warnings: 0
 
   # --- Budget / availability (v1 closure parity) ---
@@ -256,7 +256,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [TOKEN_BALANCE, ENCHANTMENT_SUPPORT_MIN]
+        rules_must_not_warn: [EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, TOKEN_BALANCE, ENCHANTMENT_SUPPORT_MIN]
         max_inappropriate_warnings: 0
 
   - id: budget-dromoka-cap
@@ -283,7 +283,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, TOKEN_BALANCE]
+        rules_must_not_warn: [AURA_SUPPORT_MIN, ENCHANTMENT_SUPPORT_MIN, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, TOKEN_BALANCE]
         max_inappropriate_warnings: 0
 
   # --- Strict / repair (subset) ---
@@ -298,7 +298,7 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [TOKEN_BALANCE, ENCHANTMENT_SUPPORT_MIN]
+        rules_must_not_warn: [EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, TOKEN_BALANCE, ENCHANTMENT_SUPPORT_MIN]
         max_inappropriate_warnings: 0
 
   - id: tokens-repair-deps
@@ -312,5 +312,48 @@ scenarios:
       validation:
         passed: true
       dependency:
-        rules_must_not_warn: [TOKEN_BALANCE, ENCHANTMENT_SUPPORT_MIN]
+        rules_must_not_warn: [EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, TOKEN_BALANCE, ENCHANTMENT_SUPPORT_MIN]
+        max_inappropriate_warnings: 0
+
+  # --- Resource counters (experience, blood, +1/+1) ---
+  - id: experience-mizzix
+    label: Experience included — producer and consumer present
+    commander_names: ["Mizzix of the Izmagnus"]
+    criteria:
+      themes: [ramp, draw]
+      colors: [U, R]
+      include_mechanics: [experience]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [EXPERIENCE_BALANCE, ENERGY_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: blood-yawgmoth
+    label: Blood counters included — producer/consumer package
+    commander_names: ["Yawgmoth, Thran Physician"]
+    criteria:
+      themes: [aristocrats]
+      colors: [B]
+      include_mechanics: [blood]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [BLOOD_BALANCE, SACRIFICE_BALANCE, ENERGY_BALANCE, EXPERIENCE_BALANCE, PLUS_ONE_BALANCE]
+        max_inappropriate_warnings: 0
+
+  - id: plus-one-counters
+    label: "+1/+1 counters theme — balanced package"
+    commander_names: ["Atraxa, Praetors' Voice"]
+    criteria:
+      themes: [ramp]
+      colors: [G, W, U, B]
+      include_mechanics: [counters]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [PLUS_ONE_BALANCE, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE]
         max_inappropriate_warnings: 0

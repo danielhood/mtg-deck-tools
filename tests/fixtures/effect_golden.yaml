@@ -287,3 +287,40 @@ cases:
         payload:
           types: [creature, planeswalker]
           type_match: any
+
+  - name: mizzix_experience
+    oracle_text: "Whenever you cast an instant or sorcery spell with mana value greater than the number of experience counters you have, you get an experience counter.\nInstant and sorcery spells you cast cost {1} less to cast for each experience counter you have."
+    type_line: "Legendary Creature — Goblin Wizard"
+    expected:
+      - effect_kind: experience_produce
+        source: experience_produce
+      - effect_kind: experience_consume
+        source: experience_consume
+
+  - name: yawgmoth_blood
+    oracle_text: "Whenever a creature dies, you may pay 1 life. If you do, each opponent loses 1 life and you gain 1 life.\n{2}, Pay 1 life: Put a blood counter on target opponent."
+    type_line: "Legendary Creature — Human Cleric"
+    expected_min:
+      - effect_kind: blood_produce
+        source: blood_produce
+      - effect_kind: sacrifice_payoff
+        source: sacrifice_creature_dies_payoff
+
+  - name: hardened_scales
+    oracle_text: "If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on it instead."
+    type_line: "Enchantment"
+    expected:
+      - effect_kind: plus_one_produce
+        source: plus_one_produce
+
+  - name: ozolith
+    oracle_text: "Whenever a creature you control leaves the battlefield, if it had counters on it, put those counters on The Ozolith.\nAt the beginning of combat on your turn, if The Ozolith has counters on it, you may move all counters from The Ozolith onto target creature."
+    type_line: "Legendary Artifact"
+    expected: []
+
+  - name: walking_ballista
+    oracle_text: "Walking Ballista enters the battlefield with X +1/+1 counters on it.\n{4}: Put a +1/+1 counter on Walking Ballista."
+    type_line: "Artifact Creature — Construct"
+    expected:
+      - effect_kind: plus_one_produce
+        source: plus_one_produce

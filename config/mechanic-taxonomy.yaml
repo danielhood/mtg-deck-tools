@@ -169,6 +169,24 @@ tags:
       - type: oracle_regex
         pattern: "(?i)(\\{E\\}|energy counter)"
 
+  - id: experience
+    layer: keyword
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)experience counter"
+
+  - id: blood
+    layer: keyword
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)blood counter"
+
+  - id: counters
+    layer: keyword
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(\\+1/\\+1 counter|proliferate)"
+
   - id: vehicles
     layer: keyword
     matchers:

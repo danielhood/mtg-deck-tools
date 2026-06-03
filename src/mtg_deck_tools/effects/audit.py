@@ -70,6 +70,18 @@ def _profile_counts(card: AuditCardRow) -> dict[str, dict[str, int]]:
             counts["energy"]["producer"] += 1
         elif kind == "energy_consume":
             counts["energy"]["consumer"] += 1
+        elif kind == "experience_produce":
+            counts["experience"]["producer"] += 1
+        elif kind == "experience_consume":
+            counts["experience"]["consumer"] += 1
+        elif kind == "blood_produce":
+            counts["blood"]["producer"] += 1
+        elif kind == "blood_consume":
+            counts["blood"]["consumer"] += 1
+        elif kind == "plus_one_produce":
+            counts["plus_one"]["producer"] += 1
+        elif kind == "plus_one_consume":
+            counts["plus_one"]["consumer"] += 1
         elif kind == "type_line_aura":
             counts["aura_support"]["aura_spell"] += 1
         elif kind == "search_library":

@@ -36,6 +36,9 @@ MAX_REPAIR_SWAPS = 10
 ISSUE_PRIORITY = (
     "TUTOR_TARGET_EXISTS",
     "ENERGY_BALANCE",
+    "EXPERIENCE_BALANCE",
+    "BLOOD_BALANCE",
+    "PLUS_ONE_BALANCE",
     "SACRIFICE_BALANCE",
     "TOKEN_BALANCE",
     "TYPE_SYNERGY_MIN",
@@ -451,6 +454,40 @@ def _fix_energy_balance(
     )
 
 
+def _fix_resource_balance(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    issue: DependencyIssue,
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> tuple[list[DeckCard], str] | None:
+    from mtg_deck_tools.rules.resource_counters import spec_for_rule
+
+    spec = spec_for_rule(issue.rule_id)
+    if spec is None:
+        return None
+    detail = issue.detail or {}
+    producers = detail.get("producers") or []
+    consumers = detail.get("consumers") or []
+    effect_kind = (
+        spec.consume_kind if producers and not consumers else spec.produce_kind
+    )
+    role = "payoff" if effect_kind == spec.consume_kind else "producer"
+    return swap_effect_kind_card(
+        conn,
+        cards,
+        effect_kind,
+        role_label=f"{spec.display_name} {role}",
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=commander_oracle_ids,
+        commander_theme_tags=commander_theme_tags,
+    )
+
+
 def _fix_token_balance(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
@@ -687,6 +724,16 @@ def _attempt_repair(
         )
     if issue.rule_id == "ENERGY_BALANCE":
         return _fix_energy_balance(
+            conn,
+            cards,
+            issue,
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+        )
+    if issue.rule_id in ("EXPERIENCE_BALANCE", "BLOOD_BALANCE", "PLUS_ONE_BALANCE"):
+        return _fix_resource_balance(
             conn,
             cards,
             issue,

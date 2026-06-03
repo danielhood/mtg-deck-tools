@@ -33,6 +33,12 @@ from mtg_deck_tools.rules.dependency_profiles import (
     vehicle_profile_floors,
 )
 from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
+from mtg_deck_tools.rules.resource_counters import (
+    RESOURCE_COUNTER_SPECS,
+    count_resource_cards,
+    resource_profile_floors,
+    resource_role_oracle_ids,
+)
 
 
 @dataclass
@@ -321,6 +327,81 @@ def ensure_energy_package(
         swaps += 1
 
     return MechanicPackageResult(working, messages, swaps)
+
+
+def ensure_resource_counter_packages(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> MechanicPackageResult:
+    scope = build_dependency_scope(criteria)
+    working = list(cards)
+    all_messages: list[str] = []
+    total_swaps = 0
+
+    for spec in RESOURCE_COUNTER_SPECS:
+        if not scope.resource_user_intent(spec.profile_id):
+            continue
+
+        producer_min, consumer_min = resource_profile_floors(spec.profile_id)
+        messages: list[str] = []
+        swaps = 0
+        label = spec.display_name.title()
+
+        for _ in range(MAX_REPAIR_SWAPS):
+            producers, consumers = count_resource_cards(conn, working, spec)
+            if producers >= producer_min and consumers >= consumer_min:
+                break
+
+            if producers < producer_min:
+                effect_kind = spec.produce_kind
+            elif consumers < consumer_min:
+                effect_kind = spec.consume_kind
+            elif producers > 0 and consumers == 0:
+                effect_kind = spec.consume_kind
+            elif consumers > 0 and producers == 0:
+                effect_kind = spec.produce_kind
+            else:
+                break
+
+            producer_ids, consumer_ids = resource_role_oracle_ids(conn, working, spec)
+            protect: set[str] = set()
+            if effect_kind == spec.produce_kind and len(consumer_ids) < consumer_min:
+                protect = consumer_ids
+            elif effect_kind == spec.consume_kind and len(producer_ids) < producer_min:
+                protect = producer_ids
+
+            role = "payoff" if effect_kind == spec.consume_kind else "producer"
+            result = swap_effect_kind_card(
+                conn,
+                working,
+                effect_kind,
+                role_label=f"{spec.display_name} {role}",
+                criteria=criteria,
+                identity=identity,
+                commander_oracle_ids=commander_oracle_ids,
+                commander_theme_tags=commander_theme_tags,
+                protect_oracle_ids=protect,
+            )
+            if result is None:
+                messages.append(
+                    f"{label} package: could not add {effect_kind.replace('_', ' ')} "
+                    f"(have {producers} producer(s), {consumers} consumer(s); "
+                    f"want ≥{producer_min} / ≥{consumer_min})."
+                )
+                break
+            working, msg = result
+            messages.append(msg.replace("Dependency repair:", f"{label} package:"))
+            swaps += 1
+
+        all_messages.extend(messages)
+        total_swaps += swaps
+
+    return MechanicPackageResult(working, all_messages, total_swaps)
 
 
 def ensure_sacrifice_package(
@@ -832,6 +913,7 @@ def ensure_included_mechanic_packages(
 
     for ensure_fn in (
         ensure_energy_package,
+        ensure_resource_counter_packages,
         ensure_sacrifice_package,
         ensure_aura_package,
         ensure_enchantment_package,

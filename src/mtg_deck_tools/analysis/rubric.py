@@ -7,6 +7,7 @@ from typing import Literal
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.dependencies import DependencyIssue
 from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
+from mtg_deck_tools.rules.resource_counters import spec_for_rule
 
 WarningVerdict = Literal["appropriate", "inappropriate", "review"]
 
@@ -69,6 +70,16 @@ def classify_dependency_warning(
             return "appropriate"
         vehicles = detail.get("vehicles")
         if vehicles is not None and vehicles >= 2:
+            return "appropriate"
+        return "inappropriate"
+
+    resource_spec = spec_for_rule(rule_id)
+    if resource_spec is not None:
+        if scope.resource_user_intent(resource_spec.profile_id):
+            return "appropriate"
+        producers = detail.get("producers") or []
+        consumers = detail.get("consumers") or []
+        if max(len(producers), len(consumers)) >= 2:
             return "appropriate"
         return "inappropriate"
 
