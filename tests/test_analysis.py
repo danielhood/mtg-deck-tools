@@ -85,6 +85,30 @@ def test_classify_vehicle_balance_appropriate() -> None:
     assert classify_dependency_warning(issue, criteria) == "appropriate"
 
 
+def test_classify_equipment_balance_appropriate() -> None:
+    criteria = DeckCriteria(include_mechanics=["equip"])
+    issue = DependencyIssue(
+        rule_id="EQUIPMENT_BALANCE",
+        status="warn",
+        message="test",
+        profile_id="equipment",
+        detail={"equipment": 1, "carriers": 10, "deficit": "equipment"},
+    )
+    assert classify_dependency_warning(issue, criteria) == "appropriate"
+
+
+def test_classify_incidental_equipment_inappropriate() -> None:
+    criteria = DeckCriteria(themes=["draw"])
+    issue = DependencyIssue(
+        rule_id="EQUIPMENT_BALANCE",
+        status="warn",
+        message="test",
+        profile_id="equipment",
+        detail={"equipment": 1, "carriers": 10, "deficit": "carriers"},
+    )
+    assert classify_dependency_warning(issue, criteria) == "inappropriate"
+
+
 def test_classify_incidental_vehicle_inappropriate() -> None:
     criteria = DeckCriteria(themes=["draw"])
     issue = DependencyIssue(

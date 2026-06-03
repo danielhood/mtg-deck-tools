@@ -73,6 +73,17 @@ def classify_dependency_warning(
             return "appropriate"
         return "inappropriate"
 
+    if rule_id == "EQUIPMENT_BALANCE":
+        if scope.equipment_user_intent:
+            return "appropriate"
+        equipment = detail.get("equipment")
+        equip_payoffs = detail.get("equip_payoffs") or []
+        if equipment is not None and equipment >= 2:
+            return "appropriate"
+        if len(equip_payoffs) >= 2:
+            return "appropriate"
+        return "inappropriate"
+
     resource_spec = spec_for_rule(rule_id)
     if resource_spec is not None:
         if scope.resource_user_intent(resource_spec.profile_id):

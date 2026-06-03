@@ -27,6 +27,7 @@ class DependencyScope:
     sacrifice_user_intent: bool = False
     tokens_user_intent: bool = False
     vehicles_user_intent: bool = False
+    equipment_user_intent: bool = False
     enchantments_user_intent: bool = False
     graveyard_user_intent: bool = False
     landfall_user_intent: bool = False
@@ -102,6 +103,7 @@ def build_dependency_scope(
         sacrifice_user_intent=_profile_active("sacrifice"),
         tokens_user_intent=_profile_active("tokens"),
         vehicles_user_intent=_profile_active("vehicles"),
+        equipment_user_intent=_profile_active("equipment"),
         enchantments_user_intent=_profile_active("enchantments"),
         graveyard_user_intent=_profile_active("graveyard"),
         landfall_user_intent=_profile_active("landfall"),

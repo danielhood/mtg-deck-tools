@@ -95,6 +95,16 @@ def vehicle_profile_floors(
     )
 
 
+def equipment_profile_floors(
+    profiles: dict[str, dict[str, Any]] | None = None,
+) -> tuple[int, int]:
+    cfg = _profile_defaults("equipment", profiles)
+    return (
+        int(cfg.get("equipment_min", 4)),
+        int(cfg.get("carrier_creature_min", 22)),
+    )
+
+
 def resource_counter_profile_floors(
     profile_id: str,
     profiles: dict[str, dict[str, Any]] | None = None,
