@@ -73,7 +73,7 @@ def run_step3_synergy(criteria: DeckCriteria) -> DeckCriteria:
 
     console.print(
         Panel(
-            "[bold]Step 3 of 6[/bold] — Synergy & dependencies\n"
+            "[bold]Step 3 of 7[/bold] — Synergy & dependencies\n"
             "Control how strictly the builder enforces card synergies and optional "
             "focus levels for mechanics you selected in steps 1–2. "
             "Same options as [bold]--strict-dependencies[/bold] and "

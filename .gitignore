@@ -29,6 +29,9 @@ share/python-wheels/
 .venv/
 venv/
 
+# uv bootstrap (scripts/bootstrap-linux.sh)
+.tools/
+
 # Editable install artifacts
 *.egg-info/
 ENV/

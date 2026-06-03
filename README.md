@@ -1,13 +1,14 @@
 # MTG Deck Tools
 
-Local utility for building **Commander** (EDH) decks: a terminal wizard walks through themes, colors, mechanics, and budget, then generates a legal 100-card list with Markdown and machine-readable output.
+Local utility for building **Commander** (EDH) decks: a terminal wizard walks through themes, mechanics, colors, budget, commander, and rarity, then generates a legal 100-card list with Markdown and machine-readable output.
 
 Planning docs: [`planning/README.md`](planning/README.md) · agent doc map: [`planning/DOC-MAP.md`](planning/DOC-MAP.md) · next steps: [`planning/09-next-steps.md`](planning/09-next-steps.md).
 
 ## Prerequisites
 
-- Python 3.12+ (for Phase 1+)
+- Python 3.12+ on `PATH` as `python3` (interpreter only — see setup below for `pip` / `venv`)
 - Git
+- **Linux (optional):** [uv](https://docs.astral.sh/uv/) via `scripts/bootstrap-linux.sh` when the system Python lacks `pip`, `venv`, or `ensurepip` (no `sudo` required)
 
 ## External data (not in this repository)
 
@@ -58,6 +59,7 @@ Use the effective date in the filename so updates are obvious. Commander deck co
 ```
 mtg-deck-tools/
   planning/                 # Architecture and product decisions
+  scripts/                  # bootstrap-linux.sh (uv-based env on Linux)
   resources/
     scryfall/               # Oracle bulk JSON (local download) + field docs
     mtg/                    # Comprehensive Rules (local download)
@@ -66,6 +68,10 @@ mtg-deck-tools/
 ```
 
 ## Setup (development)
+
+Pick one path. All options install editable package `mtg-deck-tools` with dev dependencies into `.venv/`.
+
+### Standard (Python `venv` + `pip`)
 
 **Windows (PowerShell)**
 
@@ -85,7 +91,35 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-Ensure oracle cards JSON and Comprehensive Rules are in place (see above).
+On Debian/Ubuntu, if `python3 -m venv` fails, install the matching `python3.*-venv` package once (e.g. `python3.12-venv`).
+
+### Bootstrap with uv (Linux)
+
+Use this when you have **Python 3.12+** but not a working `pip` or `venv` module (minimal cloud images, fresh Ubuntu without `python3-venv`). The script downloads a project-local [uv](https://docs.astral.sh/uv/) binary to `.tools/uv` (gitignored), creates `.venv`, and runs `uv pip install -e ".[dev]"`. It does **not** install Python itself.
+
+```bash
+cd mtg-deck-tools
+chmod +x scripts/bootstrap-linux.sh   # first clone only
+./scripts/bootstrap-linux.sh
+source .venv/bin/activate
+```
+
+Recreate the virtual environment from scratch:
+
+```bash
+./scripts/bootstrap-linux.sh --clear
+```
+
+A PowerShell equivalent for Windows is not bundled yet; use the standard Windows steps above when `pip` and `venv` are available.
+
+### Data and database
+
+Ensure oracle cards JSON and Comprehensive Rules are in place (see [External data](#external-data-not-in-this-repository)), then:
+
+```bash
+mtg-deck-tools import
+mtg-deck-tools stats
+```
 
 ## Usage
 
@@ -105,7 +139,7 @@ mtg-deck-tools analyze run --write-decks --fail-on-expect
 # Full deck: slot-filled 99-card maindeck → output/
 mtg-deck-tools generate --seed 42 --colors G --themes tokens
 
-# Full wizard: themes, mechanics, synergy controls, colors, commander, budget
+# Full wizard: themes, mechanics, synergy controls, colors, budget, commander, rarity
 mtg-deck-tools wizard
 
 # Wizard then generate
@@ -130,7 +164,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 | `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms |
 | `stats` | Row counts, import metadata, top tags, effect counts |
 | `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
-| `wizard` | Interactive wizard (6 steps): themes, mechanics, synergy/dependency controls, colors, commander, budget (criteria only; does not write a deck) |
+| `wizard` | Interactive wizard (7 steps): themes, mechanics, synergy/dependency controls, colors, budget & per-card prices, commander (color + price filters), rarity (criteria only; does not write a deck) |
 | `generate` | Build a 99-card maindeck plus commander metadata → `output/*.deck.json` and `output/*.md` |
 
 ### `generate` — how it works

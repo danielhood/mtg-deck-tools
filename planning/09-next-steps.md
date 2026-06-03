@@ -7,13 +7,13 @@ Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | Milestone | Status |
 | --- | --- |
 | Oracle import + mechanic tags + SQLite | Done |
-| Wizard (steps 1–6; UX2 synergy step) | Done |
+| Wizard (steps 1–7; UX2 synergy step 3) | Done |
 | Slot-filled 99-card generation | Done |
 | Dynamic mana base | Done |
 | Commander validation (CR 903 / 702.124) | Done |
 | Budget enforcement + trim pass | Done |
 | `--strict-budget` | Done (CLI flag; wizard references it at generate time) |
-| Per-card USD price min/max | Done — wizard step 5 + `--card-price-min` / `--card-price-max` |
+| Per-card USD price min/max | Done — wizard step 5 (filters commander search in step 6) + `--card-price-min` / `--card-price-max` |
 | Build-time legality filters (903.5d, land/nonland slots) | Done |
 | Deck Markdown output polish | Done — grouped notes, card details, mana text, header metadata |
 | Commander price + release date (wizard + MD) | Done |

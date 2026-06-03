@@ -1,132 +1,137 @@
-"""Wizard step 4: commander selection."""
+"""Wizard step 4: budget and per-card price range."""
 
 from __future__ import annotations
-
-import sqlite3
-from pathlib import Path
 
 import questionary
 from rich.panel import Panel
 
-from mtg_deck_tools.formatting import format_card_name_with_type
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.paths import DEFAULT_DB_PATH
-from mtg_deck_tools.wizard.commanders import (
-    CommanderRow,
-    combined_color_identity,
-    fetch_commander,
-    format_commander_choice,
-    search_commanders,
-)
 from mtg_deck_tools.wizard.common import WIZARD_STYLE, console, require_tty
 
 
-def _require_db(db_path: Path) -> sqlite3.Connection:
-    if not db_path.exists():
-        raise FileNotFoundError(
-            f"Database not found at {db_path}. Run: mtg-deck-tools import"
-        )
-    from mtg_deck_tools.db.connection import connect
-
-    return connect(db_path)
-
-
-def _prompt_commander_pick(
-    conn: sqlite3.Connection,
-    *,
-    colors: list[str],
-    label: str,
-) -> CommanderRow:
-    while True:
-        query = questionary.text(
-            f"{label} — search name (blank shows popular matches)",
-            style=WIZARD_STYLE,
-        ).ask()
-        if query is None:
-            raise KeyboardInterrupt
-
-        results = search_commanders(conn, colors=colors, name_query=query or "")
-        if not results:
-            console.print("[yellow]No commanders found. Try a different search or colors.[/yellow]")
-            continue
-
-        options = [
-            questionary.Choice(title=format_commander_choice(cmd), value=cmd.oracle_id)
-            for cmd in results
-        ]
-        options.append(questionary.Choice(title="Search again", value="__search__"))
-
-        picked = questionary.select(
-            f"Select {label.lower()}",
-            choices=options,
-            style=WIZARD_STYLE,
-        ).ask()
-        if picked is None:
-            raise KeyboardInterrupt
-        if picked == "__search__":
-            continue
-
-        commander = fetch_commander(conn, picked)
-        if commander:
-            return commander
+def _validate_positive_money(text: str) -> bool | str:
+    text = text.strip()
+    if not text:
+        return "Enter a dollar amount"
+    try:
+        value = float(text)
+    except ValueError:
+        return "Enter a valid number (e.g. 150)"
+    if value <= 0:
+        return "Amount must be greater than 0"
+    return True
 
 
-def _prompt_add_partner(commander: CommanderRow) -> bool:
-    if not commander.partner_kind:
-        return False
-    choice = questionary.confirm(
-        f"{format_card_name_with_type(commander.name, commander.type_line)} supports partners. "
-        "Add a second commander?",
+def _validate_optional_money(text: str) -> bool | str:
+    text = text.strip()
+    if not text:
+        return True
+    try:
+        value = float(text)
+    except ValueError:
+        return "Enter a valid number or leave blank"
+    if value < 0:
+        return "Amount must be >= 0"
+    return True
+
+
+def _prompt_optional_money(label: str, *, default: str = "") -> float | None:
+    raw = questionary.text(
+        label,
+        default=default,
+        style=WIZARD_STYLE,
+        validate=_validate_optional_money,
+    ).ask()
+    if raw is None:
+        raise KeyboardInterrupt
+    text = raw.strip()
+    return float(text) if text else None
+
+
+def _prompt_card_price_range(criteria: DeckCriteria) -> DeckCriteria:
+    set_range = questionary.confirm(
+        "Set a per-card price range (USD min and/or max)?",
         default=False,
         style=WIZARD_STYLE,
     ).ask()
-    if choice is None:
+    if set_range is None:
         raise KeyboardInterrupt
-    return choice
+    if not set_range:
+        return criteria
+
+    min_usd = _prompt_optional_money(
+        "Minimum price per card (USD, blank for none)",
+        default="",
+    )
+    max_usd = _prompt_optional_money(
+        "Maximum price per card (USD, blank for none)",
+        default="",
+    )
+    if min_usd is None and max_usd is None:
+        console.print("[yellow]No range set — skipping per-card price limits.[/yellow]")
+        return criteria
+    if min_usd is not None and max_usd is not None and min_usd > max_usd:
+        raise RuntimeError("Minimum card price cannot exceed maximum card price.")
+
+    return criteria.model_copy(
+        update={
+            "card_price_min_usd": min_usd,
+            "card_price_max_usd": max_usd,
+        }
+    )
 
 
-def run_step4(
-    criteria: DeckCriteria,
-    *,
-    db_path: Path | None = None,
-) -> DeckCriteria:
-    """Interactive step 4: pick commander (and optional partner)."""
+def run_step4(criteria: DeckCriteria) -> DeckCriteria:
+    """Interactive step 4: optional deck budget and per-card price range."""
     require_tty()
-    path = db_path or DEFAULT_DB_PATH
-    conn = _require_db(path)
 
-    try:
-        console.print(
-            Panel(
-                "[bold]Step 5 of 6[/bold] — Commander\n"
-                "Search and select your commander. Partner commanders can add a second.",
-                title="MTG Deck Tools",
-                border_style="cyan",
-            )
+    console.print(
+        Panel(
+            "[bold]Step 5 of 7[/bold] — Budget & card prices\n"
+            "Set optional total deck cap and per-card min/max using Scryfall prices. "
+            "The per-card range filters commander search in the next step. "
+            "When a budget is set, you can exclude unpriced cards and prefer "
+            "readily available picks (same as [bold]--strict-budget[/bold] / "
+            "[bold]--prefer-available[/bold] at generate time).",
+            title="MTG Deck Tools",
+            border_style="cyan",
         )
+    )
 
-        primary = _prompt_commander_pick(
-            conn,
-            colors=criteria.colors,
-            label="Commander",
-        )
-        commanders = [primary]
+    set_budget = questionary.confirm(
+        "Set a total deck budget (USD)?",
+        default=False,
+        style=WIZARD_STYLE,
+    ).ask()
+    if set_budget is None:
+        raise KeyboardInterrupt
 
-        if _prompt_add_partner(primary):
-            partner = _prompt_commander_pick(
-                conn,
-                colors=combined_color_identity(commanders),
-                label="Partner commander",
-            )
-            if partner.oracle_id == primary.oracle_id:
-                raise RuntimeError("Partner must be a different card.")
-            commanders.append(partner)
+    if set_budget:
+        raw = questionary.text(
+            "Maximum deck budget (USD)",
+            default="150",
+            style=WIZARD_STYLE,
+            validate=_validate_positive_money,
+        ).ask()
+        if raw is None:
+            raise KeyboardInterrupt
+        criteria = criteria.model_copy(update={"budget_usd": float(raw.strip())})
+        exclude_unpriced = questionary.confirm(
+            "Exclude cards without USD prices from the build?",
+            default=True,
+            style=WIZARD_STYLE,
+        ).ask()
+        if exclude_unpriced is None:
+            raise KeyboardInterrupt
+        criteria = criteria.model_copy(update={"strict_budget": exclude_unpriced})
 
-        return criteria.model_copy(
-            update={
-                "commander_oracle_ids": [c.oracle_id for c in commanders],
-                "colors": combined_color_identity(commanders),
-            }
-        )
-    finally:
-        conn.close()
+        prefer_available = questionary.confirm(
+            "Prefer readily available cards (filter obscure / hard-to-find picks)?",
+            default=True,
+            style=WIZARD_STYLE,
+        ).ask()
+        if prefer_available is None:
+            raise KeyboardInterrupt
+        criteria = criteria.model_copy(update={"prefer_available": prefer_available})
+
+    return _prompt_card_price_range(criteria)
