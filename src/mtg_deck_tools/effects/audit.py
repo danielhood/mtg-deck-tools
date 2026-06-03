@@ -82,6 +82,18 @@ def _profile_counts(card: AuditCardRow) -> dict[str, dict[str, int]]:
             counts["plus_one"]["producer"] += 1
         elif kind == "plus_one_consume":
             counts["plus_one"]["consumer"] += 1
+        elif kind == "rad_produce":
+            counts["rad"]["producer"] += 1
+        elif kind == "rad_consume":
+            counts["rad"]["consumer"] += 1
+        elif kind == "oil_produce":
+            counts["oil"]["producer"] += 1
+        elif kind == "oil_consume":
+            counts["oil"]["consumer"] += 1
+        elif kind == "charge_produce":
+            counts["charge"]["producer"] += 1
+        elif kind == "charge_consume":
+            counts["charge"]["consumer"] += 1
         elif kind == "type_line_aura":
             counts["aura_support"]["aura_spell"] += 1
         elif kind == "search_library":

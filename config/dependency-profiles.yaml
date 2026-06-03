@@ -164,6 +164,44 @@ profiles:
       share_max: 0.18
       incidental_imbalance_min: 5
 
+  rad:
+    label: Rad counters
+    activation:
+      include_mechanics: [rad]
+    roles: [producer, consumer]
+    defaults:
+      producer_min: 2
+      producer_max: 8
+      consumer_min: 1
+      consumer_max: 6
+      share_max: 0.1
+
+  oil:
+    label: Oil counters
+    activation:
+      include_mechanics: [oil]
+    roles: [producer, consumer]
+    defaults:
+      producer_min: 2
+      producer_max: 8
+      consumer_min: 2
+      consumer_max: 8
+      share_max: 0.12
+      incidental_imbalance_min: 3
+
+  charge:
+    label: Charge counters
+    activation:
+      include_mechanics: [charge]
+    roles: [producer, consumer]
+    defaults:
+      producer_min: 2
+      producer_max: 10
+      consumer_min: 2
+      consumer_max: 8
+      share_max: 0.15
+      incidental_imbalance_min: 5
+
   graveyard:
     label: Graveyard heuristics
     activation:
