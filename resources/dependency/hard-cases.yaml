@@ -39,7 +39,7 @@ cases:
   - { name: "Teferi's Protection", layout: normal, oracle_excerpt: "phase out", v1_stance: no_atoms, notes: "" }
   - { name: "Smothering Tithe", layout: normal, oracle_excerpt: "Treasure token", v1_stance: defer_tokens, notes: "" }
   - { name: "Ashnod's Altar", layout: normal, oracle_excerpt: "sacrifice a creature", v1_stance: defer_sacrifice, notes: "Sacrifice profile D1.5" }
-  - { name: "Grave Pact", layout: normal, oracle_excerpt: "sacrifice a creature", v1_stance: defer_sacrifice, notes: "" }
+  - { name: "Grave Pact", layout: normal, oracle_excerpt: "each other player sacrifices", v1_stance: shipped, notes: "sacrifice_opponent + payoff; not sacrifice_outlet" }
   - { name: "Blood Artist", layout: normal, oracle_excerpt: "creature dies", v1_stance: defer_sacrifice, notes: "" }
   - { name: "Yawgmoth, Thran Physician", layout: normal, oracle_excerpt: "blood counter", v1_stance: defer_blood, notes: "Audit hit count" }
   - { name: "K'rrik, Son of Yawgmoth", layout: normal, oracle_excerpt: "pay life rather than {B}", v1_stance: no_atoms, notes: "" }

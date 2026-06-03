@@ -291,7 +291,7 @@ patterns:
       - whenever_cast_aura
       - whenever_cast_enchantment
 
-  # --- tokens (payoff before produce; sacrifice_fodder excludes token_produce) ---
+  # --- tokens (payoff before produce; aristocrats fodder also counts token_produce in code) ---
   - id: token_payoff_on_create
     effect_kind: token_payoff
     confidence: 0.95
@@ -357,6 +357,53 @@ patterns:
       - token_payoff_tokens_you_control
 
   # --- sacrifice / aristocrats (payoff before outlet; outlet excludes payoffs) ---
+  - id: sacrifice_opponent_forced
+    effect_kind: sacrifice_opponent
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(?:each (?:other )?player|opponents?) sacrifices"
+    payload:
+      role: opponent
+
+  - id: sacrifice_opponent_that_player
+    effect_kind: sacrifice_opponent
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)that player sacrifices"
+    payload:
+      role: opponent
+    exclude_if_matched:
+      - sacrifice_opponent_forced
+
+  - id: death_recursion_persist
+    effect_kind: death_recursion
+    confidence: 1.0
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)\\bpersist\\b"
+    payload:
+      mechanic: persist
+
+  - id: death_recursion_undying
+    effect_kind: death_recursion
+    confidence: 1.0
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)\\bundying\\b"
+    payload:
+      mechanic: undying
+
+  - id: death_recursion_escape
+    effect_kind: death_recursion
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(?:may cast|cast).{0,120}from (?:your )?graveyard|escape—"
+    payload:
+      mechanic: escape
+
   - id: sacrifice_creature_dies_payoff
     effect_kind: sacrifice_payoff
     confidence: 0.95
@@ -398,6 +445,8 @@ patterns:
       - sacrifice_creature_dies_payoff
       - sacrifice_any_creature_dies
       - sacrifice_on_sacrifice_payoff
+      - sacrifice_opponent_forced
+      - sacrifice_opponent_that_player
 
   - id: sacrifice_fodder_token
     effect_kind: sacrifice_fodder

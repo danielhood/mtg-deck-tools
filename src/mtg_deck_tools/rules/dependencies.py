@@ -289,10 +289,17 @@ def _should_warn_sacrifice_imbalance(
     scope: DependencyScope,
     outlet_count: int,
     payoff_count: int,
+    opponent_sacrifice_count: int = 0,
+    death_recursion_count: int = 0,
 ) -> bool:
-    if outlet_count == 0 and payoff_count == 0:
-        return False
-    if outlet_count > 0 and payoff_count > 0:
+    from mtg_deck_tools.rules.sacrifice_roles import sacrifice_roles_balanced
+
+    if sacrifice_roles_balanced(
+        outlet_count=outlet_count,
+        payoff_count=payoff_count,
+        opponent_sacrifice_count=opponent_sacrifice_count,
+        death_recursion_count=death_recursion_count,
+    ):
         return False
     if scope.sacrifice_user_intent:
         return True
@@ -395,9 +402,6 @@ def validate_dependencies(
 
     energy_producers: list[str] = []
     energy_consumers: list[str] = []
-    sacrifice_outlets: list[str] = []
-    sacrifice_payoffs: list[str] = []
-    sacrifice_fodder: list[str] = []
     token_producers: list[str] = []
     token_payoffs: list[str] = []
     aura_spells = _count_type(maindeck, "enchantment")  # refined below for Aura subtype
@@ -408,12 +412,6 @@ def validate_dependencies(
                 energy_producers.append(card.name)
             elif effect.effect_kind == "energy_consume":
                 energy_consumers.append(card.name)
-            elif effect.effect_kind == "sacrifice_outlet":
-                sacrifice_outlets.append(card.name)
-            elif effect.effect_kind == "sacrifice_payoff":
-                sacrifice_payoffs.append(card.name)
-            elif effect.effect_kind == "sacrifice_fodder":
-                sacrifice_fodder.append(card.name)
             elif effect.effect_kind == "token_produce":
                 token_producers.append(card.name)
             elif effect.effect_kind == "token_payoff":
@@ -515,15 +513,39 @@ def validate_dependencies(
             strict=strict,
         )
 
-    sacrifice_imbalanced = (sacrifice_outlets and not sacrifice_payoffs) or (
-        sacrifice_payoffs and not sacrifice_outlets
+    from mtg_deck_tools.rules.sacrifice_roles import (
+        collect_sacrifice_roles,
+        sacrifice_outlet_support,
+        sacrifice_roles_balanced,
+    )
+
+    (
+        sacrifice_outlets,
+        sacrifice_payoffs,
+        sacrifice_fodder,
+        sacrifice_opponent,
+        death_recursion,
+    ) = collect_sacrifice_roles(effects_map, maindeck)
+
+    sacrifice_imbalanced = not sacrifice_roles_balanced(
+        outlet_count=len(sacrifice_outlets),
+        payoff_count=len(sacrifice_payoffs),
+        opponent_sacrifice_count=len(sacrifice_opponent),
+        death_recursion_count=len(death_recursion),
+    )
+    effective_outlets = sacrifice_outlet_support(
+        outlet_count=len(sacrifice_outlets),
+        opponent_sacrifice_count=len(sacrifice_opponent),
+        death_recursion_count=len(death_recursion),
     )
     sacrifice_warn = sacrifice_imbalanced and _should_warn_sacrifice_imbalance(
         scope=dep_scope,
         outlet_count=len(sacrifice_outlets),
         payoff_count=len(sacrifice_payoffs),
+        opponent_sacrifice_count=len(sacrifice_opponent),
+        death_recursion_count=len(death_recursion),
     )
-    if sacrifice_warn and sacrifice_outlets and not sacrifice_payoffs:
+    if sacrifice_warn and effective_outlets > 0 and not sacrifice_payoffs:
         report.issues.append(
             DependencyIssue(
                 rule_id="SACRIFICE_BALANCE",
@@ -538,7 +560,7 @@ def validate_dependencies(
                 detail={"outlets": sacrifice_outlets, "payoffs": []},
             )
         )
-    elif sacrifice_warn and sacrifice_payoffs and not sacrifice_outlets:
+    elif sacrifice_warn and sacrifice_payoffs and effective_outlets == 0:
         report.issues.append(
             DependencyIssue(
                 rule_id="SACRIFICE_BALANCE",
@@ -558,6 +580,8 @@ def validate_dependencies(
                 "outlet": len(sacrifice_outlets),
                 "payoff": len(sacrifice_payoffs),
                 "fodder": len(sacrifice_fodder),
+                "opponent_sacrifice": len(sacrifice_opponent),
+                "death_recursion": len(death_recursion),
             },
             status=severity if strict and sacrifice_warn else ("warn" if sacrifice_warn else "pass"),
             messages=[],

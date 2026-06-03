@@ -41,7 +41,9 @@ flowchart TD
 | `experience_produce` / `experience_consume` | Experience counter balance |
 | `blood_produce` / `blood_consume` | Blood counter balance (player counters) |
 | `plus_one_produce` / `plus_one_consume` | +1/+1 counter producers vs payoffs |
-| `sacrifice_outlet` / `sacrifice_payoff` / `sacrifice_fodder` | Aristocrats package roles |
+| `sacrifice_outlet` / `sacrifice_payoff` / `sacrifice_fodder` | Aristocrats package roles (`token_produce` counts as fodder) |
+| `sacrifice_opponent` | Grave Pact-style forced sacrifice (not an outlet) |
+| `death_recursion` | Persist, undying, escape-from-graveyard (supports payoffs without outlets) |
 | `buff_subtype` | “Other Elves …” (and similar) subtype lords |
 | `whenever_cast_type` | “Whenever you cast an Artifact spell …” |
 | `whenever_cast_aura` | “Whenever you cast an Aura spell …” (voltron / aura support trigger) |
@@ -125,13 +127,15 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | **Blood** | Shipped — `blood_*`, `BLOOD_BALANCE` |
 | **Rad, oil, charge** | Deferred — format-specific; add when theme selected |
 
-### Priority 4 — Sacrifice / tokens refinements
+### ~~Priority 4 — Sacrifice / tokens refinements~~
 
-| Work item | Purpose |
+**Shipped 2026-06** — [`rules/sacrifice_roles.py`](../src/mtg_deck_tools/rules/sacrifice_roles.py): `token_produce` counts toward aristocrats fodder; `sacrifice_opponent` and `death_recursion` atoms; opponent/ recursion enablers satisfy `SACRIFICE_BALANCE` without player sacrifice outlets.
+
+| Work item | Status |
 | --- | --- |
-| Token producers vs aristocrats fodder | `sacrifice_fodder` uses “create … token”; token *payoffs* are a separate axis |
-| Opponent-sacrifice effects | Grave Pact-style — optional tag or pattern, not outlet |
-| Persist / undying / escape | Death triggers without full aristocrats package |
+| ~~Token producers vs aristocrats fodder~~ | Shipped — shared fodder axis; token payoffs stay on `TOKEN_BALANCE` |
+| ~~Opponent-sacrifice effects~~ | Shipped — `sacrifice_opponent`; excluded from `sacrifice_outlet` |
+| ~~Persist / undying / escape~~ | Shipped — `death_recursion`; ≥2 pieces support payoffs without outlets |
 
 ### Priority 5 — Graveyard / landfall (warn-only first)
 
@@ -192,7 +196,7 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 | 1 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
 | 2 | **Rad / oil / charge counters** | Format-specific resource counters; theme-selected |
 
-**Shipped (2026-06):** **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
+**Shipped (2026-06):** **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`).
 
 **Parallel track:** **UX2** wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` ([11](11-dependency-engine-user-experience.md)) — does not block pattern work but improves user-facing control.
 

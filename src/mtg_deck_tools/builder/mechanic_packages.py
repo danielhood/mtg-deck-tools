@@ -118,18 +118,21 @@ def _sacrifice_role_oracle_ids(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
 ) -> tuple[set[str], set[str], set[str]]:
+    from mtg_deck_tools.rules.sacrifice_roles import card_is_sacrifice_fodder
+
     effects = fetch_card_effects(conn, [c.oracle_id for c in cards])
     outlets: set[str] = set()
     payoffs: set[str] = set()
     fodders: set[str] = set()
     for card in cards:
-        for effect in effects.get(card.oracle_id, []):
+        card_effects = effects.get(card.oracle_id, [])
+        for effect in card_effects:
             if effect.effect_kind == "sacrifice_outlet":
                 outlets.add(card.oracle_id)
             elif effect.effect_kind == "sacrifice_payoff":
                 payoffs.add(card.oracle_id)
-            elif effect.effect_kind == "sacrifice_fodder":
-                fodders.add(card.oracle_id)
+        if card_is_sacrifice_fodder(card_effects):
+            fodders.add(card.oracle_id)
     return outlets, payoffs, fodders
 
 
@@ -137,18 +140,10 @@ def count_sacrifice_cards(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
 ) -> tuple[int, int, int]:
+    from mtg_deck_tools.rules.sacrifice_roles import count_sacrifice_roles
+
     effects = fetch_card_effects(conn, [c.oracle_id for c in cards])
-    outlets = 0
-    payoffs = 0
-    fodders = 0
-    for card in cards:
-        for effect in effects.get(card.oracle_id, []):
-            if effect.effect_kind == "sacrifice_outlet":
-                outlets += 1
-            elif effect.effect_kind == "sacrifice_payoff":
-                payoffs += 1
-            elif effect.effect_kind == "sacrifice_fodder":
-                fodders += 1
+    outlets, payoffs, fodders, _, _ = count_sacrifice_roles(effects, cards)
     return outlets, payoffs, fodders
 
 
@@ -432,7 +427,7 @@ def ensure_sacrifice_package(
         elif payoffs < payoff_min:
             effect_kind = "sacrifice_payoff"
         elif fodders < fodder_min:
-            effect_kind = "sacrifice_fodder"
+            effect_kind = "__fodder__"
         elif outlets > 0 and payoffs == 0:
             effect_kind = "sacrifice_payoff"
         elif payoffs > 0 and outlets == 0:
@@ -446,24 +441,43 @@ def ensure_sacrifice_package(
             protect = payoff_ids
         elif effect_kind == "sacrifice_payoff" and len(outlet_ids) <= outlet_min:
             protect = outlet_ids
-        elif effect_kind == "sacrifice_fodder":
+        elif effect_kind in ("sacrifice_fodder", "__fodder__"):
             if len(outlet_ids) <= outlet_min:
                 protect |= outlet_ids
             if len(payoff_ids) <= payoff_min:
                 protect |= payoff_ids
 
-        role_label = effect_kind.replace("sacrifice_", "sacrifice ")
-        result = swap_effect_kind_card(
-            conn,
-            working,
-            effect_kind,
-            role_label=role_label,
-            criteria=criteria,
-            identity=identity,
-            commander_oracle_ids=commander_oracle_ids,
-            commander_theme_tags=commander_theme_tags,
-            protect_oracle_ids=protect,
-        )
+        if effect_kind == "__fodder__":
+            from mtg_deck_tools.rules.sacrifice_roles import fodder_effect_kinds_for_swap
+
+            result = None
+            for fodder_kind in fodder_effect_kinds_for_swap():
+                result = swap_effect_kind_card(
+                    conn,
+                    working,
+                    fodder_kind,
+                    role_label="sacrifice fodder",
+                    criteria=criteria,
+                    identity=identity,
+                    commander_oracle_ids=commander_oracle_ids,
+                    commander_theme_tags=commander_theme_tags,
+                    protect_oracle_ids=protect,
+                )
+                if result is not None:
+                    break
+        else:
+            role_label = effect_kind.replace("sacrifice_", "sacrifice ")
+            result = swap_effect_kind_card(
+                conn,
+                working,
+                effect_kind,
+                role_label=role_label,
+                criteria=criteria,
+                identity=identity,
+                commander_oracle_ids=commander_oracle_ids,
+                commander_theme_tags=commander_theme_tags,
+                protect_oracle_ids=protect,
+            )
         if result is None:
             messages.append(
                 f"Sacrifice package: could not add {role_label} "

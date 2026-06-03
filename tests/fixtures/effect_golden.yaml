@@ -213,6 +213,29 @@ cases:
       - effect_kind: token_produce
         source: token_produce
 
+  - name: grave_pact
+    oracle_text: "Whenever a creature you control dies, each other player sacrifices a creature of their choice."
+    type_line: "Enchantment"
+    expected:
+      - effect_kind: sacrifice_payoff
+        source: sacrifice_creature_dies_payoff
+      - effect_kind: sacrifice_opponent
+        source: sacrifice_opponent_forced
+
+  - name: butcher_gnarl
+    oracle_text: "Persist (When this creature dies, if it had no -1/-1 counters on it, return it to the battlefield under its owner's control with a -1/-1 counter on it.)"
+    type_line: "Creature — Beast"
+    expected:
+      - effect_kind: death_recursion
+        source: death_recursion_persist
+
+  - name: gravecrawler
+    oracle_text: "You may cast Gravecrawler from your graveyard as long as you control a Zombie."
+    type_line: "Creature — Zombie"
+    expected:
+      - effect_kind: death_recursion
+        source: death_recursion_escape
+
   - name: vindictive_wrench
     oracle_text: "Sacrifice an artifact. If you do, destroy target artifact."
     type_line: "Instant"

@@ -61,6 +61,8 @@ class DeckBuildStats:
     sacrifice_outlets: int = 0
     sacrifice_payoffs: int = 0
     sacrifice_fodder: int = 0
+    sacrifice_opponent_sacrifice: int = 0
+    sacrifice_death_recursion: int = 0
     sacrifice_outlet_floor: int = 0
     sacrifice_payoff_floor: int = 0
     sacrifice_fodder_floor: int = 0
@@ -179,12 +181,6 @@ def build_deck_build_stats(
                 stats.energy_producers += 1
             elif effect.effect_kind == "energy_consume":
                 stats.energy_consumers += 1
-            elif effect.effect_kind == "sacrifice_outlet":
-                stats.sacrifice_outlets += 1
-            elif effect.effect_kind == "sacrifice_payoff":
-                stats.sacrifice_payoffs += 1
-            elif effect.effect_kind == "sacrifice_fodder":
-                stats.sacrifice_fodder += 1
             elif effect.effect_kind == "token_produce":
                 stats.token_producers += 1
             elif effect.effect_kind == "token_payoff":
@@ -202,8 +198,27 @@ def build_deck_build_stats(
 
     stats.needs_energy_consumer = stats.energy_producers > 0 and stats.energy_consumers == 0
     stats.needs_energy_producer = stats.energy_consumers > 0 and stats.energy_producers == 0
-    stats.needs_sacrifice_payoff = stats.sacrifice_outlets > 0 and stats.sacrifice_payoffs == 0
-    stats.needs_sacrifice_outlet = stats.sacrifice_payoffs > 0 and stats.sacrifice_outlets == 0
+    from mtg_deck_tools.rules.sacrifice_roles import (
+        count_sacrifice_roles,
+        sacrifice_outlet_support,
+    )
+
+    (
+        stats.sacrifice_outlets,
+        stats.sacrifice_payoffs,
+        stats.sacrifice_fodder,
+        stats.sacrifice_opponent_sacrifice,
+        stats.sacrifice_death_recursion,
+    ) = count_sacrifice_roles(effects_map, partial)
+    effective_sac_outlets = sacrifice_outlet_support(
+        outlet_count=stats.sacrifice_outlets,
+        opponent_sacrifice_count=stats.sacrifice_opponent_sacrifice,
+        death_recursion_count=stats.sacrifice_death_recursion,
+    )
+    stats.needs_sacrifice_payoff = effective_sac_outlets > 0 and stats.sacrifice_payoffs == 0
+    stats.needs_sacrifice_outlet = (
+        stats.sacrifice_payoffs > 0 and effective_sac_outlets == 0
+    )
     stats.needs_token_payoff = stats.token_producers > 0 and stats.token_payoffs == 0
     stats.needs_token_producer = stats.token_payoffs > 0 and stats.token_producers == 0
 
@@ -246,7 +261,7 @@ def build_deck_build_stats(
             stats.sacrifice_outlet_floor = o_min
             stats.sacrifice_payoff_floor = p_min
             stats.sacrifice_fodder_floor = f_min
-            if stats.sacrifice_outlets < o_min:
+            if effective_sac_outlets < o_min:
                 stats.needs_sacrifice_outlet = True
             if stats.sacrifice_payoffs < p_min:
                 stats.needs_sacrifice_payoff = True
@@ -385,7 +400,7 @@ def dependency_pick_score(
         elif effect.effect_kind == "sacrifice_payoff" and stats.sacrifice_package_requested:
             if stats.sacrifice_payoffs < stats.sacrifice_payoff_floor:
                 score += 7.0 * weight
-        elif effect.effect_kind == "sacrifice_fodder" and stats.sacrifice_package_requested:
+        elif effect.effect_kind in ("sacrifice_fodder", "token_produce") and stats.sacrifice_package_requested:
             if stats.sacrifice_fodder < stats.sacrifice_fodder_floor:
                 score += 4.0 * weight
         elif effect.effect_kind == "sacrifice_payoff" and stats.needs_sacrifice_payoff:
