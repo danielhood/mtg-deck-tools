@@ -64,6 +64,50 @@ def commander_db() -> sqlite3.Connection:
     return conn
 
 
+@pytest.fixture
+def color_match_db() -> sqlite3.Connection:
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    apply_schema(conn)
+    rows = [
+        ("mono-b", "Mono B", json.dumps(["B"])),
+        ("golgari", "Golgari", json.dumps(["B", "G"])),
+        ("naya", "Naya", json.dumps(["R", "G", "W"])),
+        ("colorless", "Colorless", json.dumps([])),
+    ]
+    for oracle_id, name, color_identity in rows:
+        conn.execute(
+            """
+            INSERT INTO cards (
+                oracle_id, name, type_line, color_identity, commander_legal,
+                commander_eligible
+            ) VALUES (?, ?, 'Legendary Creature', ?, 1, 1)
+            """,
+            (oracle_id, name, color_identity),
+        )
+    conn.commit()
+    return conn
+
+
+def test_search_commanders_exact_color_identity(color_match_db: sqlite3.Connection) -> None:
+    exact = search_commanders(color_match_db, colors=["B"], color_match="exact")
+    assert {c.oracle_id for c in exact} == {"mono-b"}
+
+    exact_bg = search_commanders(color_match_db, colors=["B", "G"], color_match="exact")
+    assert {c.oracle_id for c in exact_bg} == {"golgari"}
+
+    exact_empty = search_commanders(color_match_db, colors=[], color_match="exact")
+    assert {c.oracle_id for c in exact_empty} == {"colorless"}
+
+
+def test_search_commanders_includes_extra_colors(color_match_db: sqlite3.Connection) -> None:
+    includes = search_commanders(color_match_db, colors=["B"], color_match="includes")
+    assert {c.oracle_id for c in includes} == {"mono-b", "golgari"}
+
+    includes_bg = search_commanders(color_match_db, colors=["B", "G"], color_match="includes")
+    assert {c.oracle_id for c in includes_bg} == {"golgari"}
+
+
 def test_search_commanders_loads_price_and_date(commander_db: sqlite3.Connection) -> None:
     results = search_commanders(commander_db, colors=["B"], name_query="Test")
     assert len(results) == 1

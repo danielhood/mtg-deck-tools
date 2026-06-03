@@ -5,6 +5,9 @@ from __future__ import annotations
 import json
 import sqlite3
 from dataclasses import dataclass
+from typing import Literal
+
+ColorMatchMode = Literal["exact", "includes"]
 
 from mtg_deck_tools.formatting import (
     format_card_name_with_type,
@@ -57,8 +60,13 @@ def search_commanders(
     colors: list[str],
     name_query: str = "",
     limit: int = 15,
+    color_match: ColorMatchMode = "exact",
 ) -> list[CommanderRow]:
-    """Find commander-eligible cards matching color filter and optional name substring."""
+    """Find commander-eligible cards matching color filter and optional name substring.
+
+    ``exact``: commander color identity equals the selected colors (no extra colors).
+    ``includes``: commander identity contains every selected color (may include more).
+    """
     sql = """
         SELECT oracle_id, name, type_line, color_identity, partner_kind, edhrec_rank,
                price_usd, price_known, released_at
@@ -66,9 +74,16 @@ def search_commanders(
         WHERE commander_eligible = 1
     """
     params: list = []
-    for color in colors:
-        sql += " AND color_identity LIKE ?"
-        params.append(f'%"{color}"%')
+    if color_match == "exact":
+        sql += " AND json_array_length(color_identity) = ?"
+        params.append(len(colors))
+        for color in colors:
+            sql += " AND color_identity LIKE ?"
+            params.append(f'%"{color}"%')
+    else:
+        for color in colors:
+            sql += " AND color_identity LIKE ?"
+            params.append(f'%"{color}"%')
     if name_query.strip():
         sql += " AND name LIKE ? ESCAPE '\\'"
         params.append(f"%{name_query.strip()}%")

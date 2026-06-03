@@ -164,7 +164,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 | `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms |
 | `stats` | Row counts, import metadata, top tags, effect counts |
 | `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
-| `wizard` | Interactive wizard: themes, mechanics, colors, commander, budget (criteria only; does not write a deck) |
+| `wizard` | Interactive wizard: themes, mechanics, colors, commander (exact or includes color filter), budget (criteria only; does not write a deck) |
 | `generate` | Build a 99-card maindeck plus commander metadata → `output/*.deck.json` and `output/*.md` |
 
 ### `generate` — how it works

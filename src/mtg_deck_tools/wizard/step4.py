@@ -12,6 +12,7 @@ from mtg_deck_tools.formatting import format_card_name_with_type
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import DEFAULT_DB_PATH
 from mtg_deck_tools.wizard.commanders import (
+    ColorMatchMode,
     CommanderRow,
     combined_color_identity,
     fetch_commander,
@@ -31,11 +32,33 @@ def _require_db(db_path: Path) -> sqlite3.Connection:
     return connect(db_path)
 
 
+def _prompt_color_match_mode() -> ColorMatchMode:
+    picked = questionary.select(
+        "Commander color filter",
+        choices=[
+            questionary.Choice(
+                title="Exact — identity is only the colors you selected",
+                value="exact",
+            ),
+            questionary.Choice(
+                title="Includes — identity has your colors (may include more)",
+                value="includes",
+            ),
+        ],
+        style=WIZARD_STYLE,
+        default="exact",
+    ).ask()
+    if picked is None:
+        raise KeyboardInterrupt
+    return picked
+
+
 def _prompt_commander_pick(
     conn: sqlite3.Connection,
     *,
     colors: list[str],
     label: str,
+    color_match: ColorMatchMode,
 ) -> CommanderRow:
     while True:
         query = questionary.text(
@@ -45,7 +68,12 @@ def _prompt_commander_pick(
         if query is None:
             raise KeyboardInterrupt
 
-        results = search_commanders(conn, colors=colors, name_query=query or "")
+        results = search_commanders(
+            conn,
+            colors=colors,
+            name_query=query or "",
+            color_match=color_match,
+        )
         if not results:
             console.print("[yellow]No commanders found. Try a different search or colors.[/yellow]")
             continue
@@ -99,16 +127,20 @@ def run_step4(
         console.print(
             Panel(
                 "[bold]Step 4 of 5[/bold] — Commander\n"
-                "Search and select your commander. Partner commanders can add a second.",
+                "Search and select your commander. Filter by exact or broader color match.\n"
+                "Partner commanders can add a second.",
                 title="MTG Deck Tools",
                 border_style="cyan",
             )
         )
 
+        color_match = _prompt_color_match_mode()
+
         primary = _prompt_commander_pick(
             conn,
             colors=criteria.colors,
             label="Commander",
+            color_match=color_match,
         )
         commanders = [primary]
 
@@ -117,6 +149,7 @@ def run_step4(
                 conn,
                 colors=combined_color_identity(commanders),
                 label="Partner commander",
+                color_match=color_match,
             )
             if partner.oracle_id == primary.oracle_id:
                 raise RuntimeError("Partner must be a different card.")
