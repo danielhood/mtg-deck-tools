@@ -165,13 +165,13 @@ patterns:
       - search_library_enchantment
       - search_library_artifact
 
-  # --- energy (consume before produce in file order; produce excludes consume) ---
+  # --- energy (dual-role cards may produce and consume) ---
   - id: energy_consume
     effect_kind: energy_consume
     confidence: 0.95
     matchers:
       - type: oracle_regex
-        pattern: "(?i)pay (?:\\d+ )?\\{E\\}"
+        pattern: "(?i)(?:pay (?:\\d+|\\w+ )*\\{E\\}(?:\\{E\\})*|you may pay (?:\\d+|\\w+ )*\\{E\\})"
     payload:
       resource: energy
       min_cost: 1
@@ -184,8 +184,6 @@ patterns:
         pattern: "(?i)(you get \\{E\\}|you get [^.\\n]*energy counters?|get [^.\\n]*energy counters?)"
     payload:
       resource: energy
-    exclude_if_matched:
-      - energy_consume
 
   # --- experience counters ---
   - id: experience_produce

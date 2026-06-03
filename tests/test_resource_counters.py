@@ -193,3 +193,28 @@ def test_blood_produce_and_consume_on_same_card(resource_db: sqlite3.Connection)
         criteria=DeckCriteria(include_mechanics=["blood"]),
     )
     assert not any(i.rule_id == "BLOOD_BALANCE" for i in report.issues)
+
+
+def test_energy_produce_and_consume_on_same_card(resource_db: sqlite3.Connection) -> None:
+    _insert_effect(
+        resource_db,
+        "solo",
+        "energy_produce",
+        {"resource": "energy"},
+        "energy_produce",
+    )
+    _insert_effect(
+        resource_db,
+        "solo",
+        "energy_consume",
+        {"resource": "energy"},
+        "energy_consume",
+    )
+    resource_db.commit()
+    report = validate_dependencies(
+        resource_db,
+        maindeck=[_deck_card(oracle_id="solo", name="Aetherstorm Roc", type_line="Creature")],
+        commanders=[],
+        criteria=DeckCriteria(include_mechanics=["energy"]),
+    )
+    assert not any(i.rule_id == "ENERGY_BALANCE" for i in report.issues)
