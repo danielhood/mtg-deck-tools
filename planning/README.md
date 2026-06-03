@@ -86,4 +86,4 @@ See **[09-next-steps.md](09-next-steps.md)** for the active backlog.
 
 **Agent documentation SDLC:** **[DOC-MAP.md](DOC-MAP.md)** — required updates per change type; enforced via `.cursor/rules/` and skills `/sync-documentation`, `/ship-dependency-feature` (no CI doc gates).
 
-**Recommended first tasks:** **dependency expansion** — Rad/oil/charge counters ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)); **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
+**Recommended first tasks:** **Dogfood matrix** — fix `blood-yawgmoth` and `elves-lathril` scenario failures after 2026-06 bulk refresh ([09-next-steps.md](09-next-steps.md) §0, [14-deck-analysis.md](14-deck-analysis.md)); then **dependency expansion** — Rad/oil/charge counters ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)); **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).

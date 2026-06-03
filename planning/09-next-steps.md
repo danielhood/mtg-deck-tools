@@ -29,7 +29,7 @@ Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | `--strict-dependencies` | Done — D4 pick-time filter |
 | `--repair-dependencies` | Done — D5 post-build swap pass |
 | Wizard dependency controls (UX2) | **Not started** — CLI flags only today |
-| Dependency dogfood calibration | **Done** — `analyze run` matrix (25 scenarios); 0% inappropriate warnings on full matrix |
+| Dependency dogfood calibration | **In progress** — `analyze run --fail-on-expect`: **23/25** pass after 2026-06 bulk refresh + graveyard/landfall ship; **2 scenario failures** remain (see [Suggested next task](#suggested-next-task)) |
 | Mechanic packages | **Done** — energy, experience, blood, +1/+1 counters, sacrifice/aristocrats, voltron auras, enchantments, equip/vehicles artifacts, subtype lords, tokens, vehicles |
 | Sacrifice / aristocrats profile | **Done** — `SACRIFICE_BALANCE` + `ensure_sacrifice_package` |
 | Tokens profile | **Done** — `TOKEN_BALANCE` + `ensure_token_package` (`themes: [tokens]`) |
@@ -130,6 +130,17 @@ Shipped 2026-05-30 / 2026-05-31. Technical phases in [10-card-dependency-engine.
 
 Recommended order:
 
+### 0. Dogfood matrix — fix scenario failures (immediate)
+
+After **2026-06-03** import against Scryfall oracle bulk `oracle-cards-20260603015351.json` (12,581 effect atoms), `mtg-deck-tools analyze run --fail-on-expect` reports **23/25** scenarios passing with **0% inappropriate warnings**. Restore **25/25** before new dependency expansion:
+
+| Scenario | Failing rule | Likely fix |
+| --- | --- | --- |
+| `blood-yawgmoth` | `BLOOD_BALANCE` | Blood mechanic package / repair not filling consumers when `include_mechanics: [blood]` |
+| `elves-lathril` | `PLUS_ONE_BALANCE` | Incidental +1/+1 producers from new pool on tokens elf deck — threshold, pattern, or rubric |
+
+Workflow: re-run `import` → `analyze run --fail-on-expect` after each fix. See [14-deck-analysis.md](14-deck-analysis.md).
+
 ### 1. Dependency expansion (high-value additions)
 
 Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**.
@@ -158,6 +169,7 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 - ☑ Sacrifice profile + `SACRIFICE_BALANCE` for aristocrats intent
 - ☑ `whenever_cast_aura` — enchantment payoffs no longer trigger voltron aura floor
 - ☑ Dogfood matrix — 25 scenarios; `analyze run --fail-on-expect` gate
+- ☐ **Dogfood matrix 25/25** after bulk refresh — fix `blood-yawgmoth`, `elves-lathril` (2026-06-03: 23/25 pass)
 - ☐ Threshold review against latest audit evidence when adding new profiles (doc 15)
 
 ---
@@ -181,7 +193,9 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 ## Suggested next task
 
-**Dependency expansion** — next up: **Rad / oil / charge counters** ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)). In parallel or after: **UX2** wizard controls for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets.
+**Fix dogfood scenario failures** — restore `analyze run --fail-on-expect` to **25/25** after the 2026-06 Scryfall bulk refresh. Failing cases: `blood-yawgmoth` (`BLOOD_BALANCE`), `elves-lathril` (`PLUS_ONE_BALANCE`). Details in §0 above and [14-deck-analysis.md](14-deck-analysis.md).
+
+Then: **Rad / oil / charge counters** ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)). In parallel or after: **UX2** wizard controls for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets.
 
 Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 
