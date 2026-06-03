@@ -18,7 +18,7 @@ mtg-deck-tools analyze run --fail-on-expect
 
 ## Matrix format
 
-Default: [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml) (22 scenarios as of 2026-06-01: tribal, artifacts, aristocrats, landfall, enchantress, plus budget/strict/repair cases).
+Default: [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml) (25 scenarios as of 2026-06-03: tribal, artifacts, aristocrats, landfall, enchantress, experience/blood/+1/+1 counters, plus budget/strict/repair cases).
 
 Each scenario defines:
 

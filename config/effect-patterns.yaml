@@ -187,6 +187,65 @@ patterns:
     exclude_if_matched:
       - energy_consume
 
+  # --- experience counters ---
+  - id: experience_produce
+    effect_kind: experience_produce
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(you get (?:an )?experience counter|get (?:an )?experience counter)"
+    payload:
+      resource: experience
+
+  - id: experience_consume
+    effect_kind: experience_consume
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)((?:for each|equal to the number of|per) experience counter|experience counters? you have)"
+    payload:
+      resource: experience
+
+  # --- blood counters (on players) ---
+  - id: blood_produce
+    effect_kind: blood_produce
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)((?:put|place)s? .{0,50}blood counters? on)"
+    payload:
+      resource: blood
+
+  - id: blood_consume
+    effect_kind: blood_consume
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(for each blood counter|blood counters? (?:an )?opponent has|blood counters? on (?:each )?opponent)"
+    payload:
+      resource: blood
+    exclude_if_matched:
+      - blood_produce
+
+  # --- +1/+1 counters ---
+  - id: plus_one_produce
+    effect_kind: plus_one_produce
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(put (?:a |one |\\d+ )?\\+1/\\+1 counters?|\\+1/\\+1 counters? (?:are |would be )put|proliferate)"
+    payload:
+      resource: plus_one
+
+  - id: plus_one_consume
+    effect_kind: plus_one_consume
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(with (?:a |one |\\d+ )?\\+1/\\+1 counters?|remove .{0,40}\\+1/\\+1 counters?)"
+    payload:
+      resource: plus_one
+
   # --- type / subtype payoffs ---
   - id: buff_subtype_other
     effect_kind: buff_subtype

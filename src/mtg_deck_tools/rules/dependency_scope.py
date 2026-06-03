@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
@@ -28,6 +28,10 @@ class DependencyScope:
     tokens_user_intent: bool = False
     vehicles_user_intent: bool = False
     enchantments_user_intent: bool = False
+    _resource_intent: dict[str, bool] = field(default_factory=dict)
+
+    def resource_user_intent(self, profile_id: str) -> bool:
+        return bool(self._resource_intent.get(profile_id))
 
 
 def _load_profile_activation(path: Path | None = None) -> dict[str, dict[str, list[str]]]:
@@ -78,8 +82,13 @@ def build_dependency_scope(
             return True
         return False
 
+    from mtg_deck_tools.rules.resource_counters import RESOURCE_COUNTER_SPECS
+
     energy_user = _profile_active("energy")
     subtype_lords = _profile_active("subtype_lords") or _profile_active("elves")
+    resource_intent = {
+        spec.profile_id: _profile_active(spec.profile_id) for spec in RESOURCE_COUNTER_SPECS
+    }
     return DependencyScope(
         energy_balance=True,
         aura_support_min=_profile_active("aura_support"),
@@ -92,4 +101,5 @@ def build_dependency_scope(
         tokens_user_intent=_profile_active("tokens"),
         vehicles_user_intent=_profile_active("vehicles"),
         enchantments_user_intent=_profile_active("enchantments"),
+        _resource_intent=resource_intent,
     )

@@ -93,3 +93,12 @@ def vehicle_profile_floors(
         int(cfg.get("vehicle_min", 3)),
         int(cfg.get("creature_min", 25)),
     )
+
+
+def resource_counter_profile_floors(
+    profile_id: str,
+    profiles: dict[str, dict[str, Any]] | None = None,
+) -> tuple[int, int]:
+    from mtg_deck_tools.rules.resource_counters import resource_profile_floors
+
+    return resource_profile_floors(profile_id, profiles)

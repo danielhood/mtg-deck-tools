@@ -126,3 +126,39 @@ profiles:
       vehicle_min: 3
       creature_min: 25
       share_max: 0.15
+
+  experience:
+    label: Experience counters
+    activation:
+      include_mechanics: [experience]
+    roles: [producer, consumer]
+    defaults:
+      producer_min: 1
+      producer_max: 4
+      consumer_min: 2
+      consumer_max: 6
+      share_max: 0.1
+
+  blood:
+    label: Blood counters
+    activation:
+      include_mechanics: [blood]
+    roles: [producer, consumer]
+    defaults:
+      producer_min: 2
+      producer_max: 6
+      consumer_min: 2
+      consumer_max: 8
+      share_max: 0.12
+
+  plus_one:
+    label: "+1/+1 counters"
+    activation:
+      include_mechanics: [counters]
+    roles: [producer, consumer]
+    defaults:
+      producer_min: 3
+      producer_max: 10
+      consumer_min: 2
+      consumer_max: 8
+      share_max: 0.18

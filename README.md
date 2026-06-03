@@ -137,7 +137,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 
 The builder fills a **99-card maindeck** (commander is separate) using **slots**: fixed-size buckets such as ramp, draw, removal, synergy, lands, and so on. Default counts live in [`config/slot-templates.yaml`](config/slot-templates.yaml) (e.g. 30 synergy, 31 lands); the wizard can change them within bounds, and the saved `.deck.json` stores the template under `criteria.slot_template`.
 
-Each slot is filled from `data/cards.db` using color identity, theme tags, mechanic tags, budget, and scoring. After nonland slots are filled, **lands** are chosen to match the mana base plan. A **dependency pass** (when `card_effects` is populated after `import`) scores picks during fill, validates cross-card synergy after the build, and can optionally filter or repair gaps (tutor targets, energy balance, token/vehicle/artifact/type payoffs). Outputs include validation notes, a **Deck dependencies** section, budget totals, and per-card detail in Markdown.
+Each slot is filled from `data/cards.db` using color identity, theme tags, mechanic tags, budget, and scoring. After nonland slots are filled, **lands** are chosen to match the mana base plan. A **dependency pass** (when `card_effects` is populated after `import`) scores picks during fill, validates cross-card synergy after the build, and can optionally filter or repair gaps (tutor targets, energy/experience/blood/+1/+1 counter balance, token/vehicle/artifact/type payoffs). Enable counter profiles with `include_mechanics` such as `energy`, `experience`, `blood`, or `counters` (+1/+1). Outputs include validation notes, a **Deck dependencies** section, budget totals, and per-card detail in Markdown.
 
 #### Fresh generate (no `--from`)
 
@@ -149,7 +149,7 @@ Each slot is filled from `data/cards.db` using color identity, theme tags, mecha
 | `--seed` | RNG seed for reproducible picks (also stored in criteria). |
 | `--strict-budget` | Exclude cards with no Scryfall price and enforce the budget cap during fill. |
 | `--strict-dependencies` | Exclude cards at pick time that would create unfulfillable tutors or one-sided resource loops (requires `card_effects` from `import`). |
-| `--repair-dependencies` | After fill, swap cards to fix dependency warnings (tutor targets, energy consumers, type support). |
+| `--repair-dependencies` | After fill, swap cards to fix dependency warnings (tutor targets, resource counter balance, type support). |
 | `--prefer-available` | Exclude cards below the import-time availability score (25th percentile). Uses scores from the current `cards.db` snapshot. |
 | `--card-price-min` / `--card-price-max` | Per-card USD floor/ceiling when picking cards. |
 | `--min-rarity` | Minimum rarity (`common`, `uncommon`, `rare`, `mythic`; default `common`). |

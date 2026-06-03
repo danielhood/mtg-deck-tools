@@ -15,11 +15,13 @@ from mtg_deck_tools.rules.dependency_profiles import (
     aura_spell_min,
     enchantment_spell_min,
     energy_profile_floors,
+    resource_counter_profile_floors,
     sacrifice_profile_floors,
     subtype_lord_minimum,
     token_profile_floors,
     vehicle_profile_floors,
 )
+from mtg_deck_tools.rules.resource_counters import RESOURCE_COUNTER_SPECS
 from mtg_deck_tools.rules.dependencies import (
     CardEffectRow,
     fetch_card_effects,
@@ -79,6 +81,13 @@ class DeckBuildStats:
     vehicle_package_requested: bool = False
     needs_vehicle: bool = False
     needs_crew_creature: bool = False
+    resource_producers: dict[str, int] = field(default_factory=dict)
+    resource_consumers: dict[str, int] = field(default_factory=dict)
+    resource_needs_consumer: dict[str, bool] = field(default_factory=dict)
+    resource_needs_producer: dict[str, bool] = field(default_factory=dict)
+    resource_package_requested: dict[str, bool] = field(default_factory=dict)
+    resource_producer_floor: dict[str, int] = field(default_factory=dict)
+    resource_consumer_floor: dict[str, int] = field(default_factory=dict)
 
 
 def card_effects_enabled(conn: sqlite3.Connection) -> bool:
@@ -180,6 +189,16 @@ def build_deck_build_stats(
                 stats.token_producers += 1
             elif effect.effect_kind == "token_payoff":
                 stats.token_payoffs += 1
+            else:
+                for spec in RESOURCE_COUNTER_SPECS:
+                    if effect.effect_kind == spec.produce_kind:
+                        stats.resource_producers[spec.profile_id] = (
+                            stats.resource_producers.get(spec.profile_id, 0) + 1
+                        )
+                    elif effect.effect_kind == spec.consume_kind:
+                        stats.resource_consumers[spec.profile_id] = (
+                            stats.resource_consumers.get(spec.profile_id, 0) + 1
+                        )
 
     stats.needs_energy_consumer = stats.energy_producers > 0 and stats.energy_consumers == 0
     stats.needs_energy_producer = stats.energy_consumers > 0 and stats.energy_producers == 0
@@ -187,6 +206,15 @@ def build_deck_build_stats(
     stats.needs_sacrifice_outlet = stats.sacrifice_payoffs > 0 and stats.sacrifice_outlets == 0
     stats.needs_token_payoff = stats.token_producers > 0 and stats.token_payoffs == 0
     stats.needs_token_producer = stats.token_payoffs > 0 and stats.token_producers == 0
+
+    for spec in RESOURCE_COUNTER_SPECS:
+        pid = spec.profile_id
+        prod = stats.resource_producers.get(pid, 0)
+        cons = stats.resource_consumers.get(pid, 0)
+        if prod > 0 and cons == 0:
+            stats.resource_needs_consumer[pid] = True
+        if cons > 0 and prod == 0:
+            stats.resource_needs_producer[pid] = True
 
     if criteria is not None:
         from mtg_deck_tools.rules.dependency_scope import build_dependency_scope
@@ -240,6 +268,19 @@ def build_deck_build_stats(
                 stats.needs_vehicle = True
             if stats.vehicle_count > 0 and stats.crew_creature_count < c_min:
                 stats.needs_crew_creature = True
+        for spec in RESOURCE_COUNTER_SPECS:
+            if scope.resource_user_intent(spec.profile_id):
+                p_min, c_min = resource_counter_profile_floors(
+                    spec.profile_id, profile_cfg
+                )
+                pid = spec.profile_id
+                stats.resource_package_requested[pid] = True
+                stats.resource_producer_floor[pid] = p_min
+                stats.resource_consumer_floor[pid] = c_min
+                if stats.resource_producers.get(pid, 0) < p_min:
+                    stats.resource_needs_producer[pid] = True
+                if stats.resource_consumers.get(pid, 0) < c_min:
+                    stats.resource_needs_consumer[pid] = True
 
     lords_by_subtype: dict[str, int] = {}
     for card in partial:
@@ -364,7 +405,31 @@ def dependency_pick_score(
         elif effect.effect_kind == "energy_consume" and stats.energy_producers >= 2:
             if stats.energy_consumers < stats.energy_producers:
                 score += 2.0 * weight
-        elif effect.effect_kind == "search_library":
+        else:
+            for spec in RESOURCE_COUNTER_SPECS:
+                pid = spec.profile_id
+                if effect.effect_kind == spec.produce_kind:
+                    if stats.resource_package_requested.get(pid):
+                        if stats.resource_producers.get(pid, 0) < stats.resource_producer_floor.get(
+                            pid, 0
+                        ):
+                            score += 7.0 * weight
+                    if stats.resource_needs_producer.get(pid):
+                        score += 3.5 * weight
+                elif effect.effect_kind == spec.consume_kind:
+                    if stats.resource_package_requested.get(pid):
+                        if stats.resource_consumers.get(pid, 0) < stats.resource_consumer_floor.get(
+                            pid, 0
+                        ):
+                            score += 7.0 * weight
+                    if stats.resource_needs_consumer.get(pid):
+                        score += 5.0 * weight
+                    elif stats.resource_producers.get(pid, 0) >= 2:
+                        if stats.resource_consumers.get(pid, 0) < stats.resource_producers.get(
+                            pid, 0
+                        ):
+                            score += 2.0 * weight
+        if effect.effect_kind == "search_library":
             if effect.confidence < 0.6 and effect.payload.get("any_card"):
                 continue
             targets = count_search_targets(search_pool, effect.payload)
@@ -414,7 +479,14 @@ def passes_strict_dependency_filter(
                 return False
         elif effect.effect_kind == "energy_consume" and stats.energy_producers == 0:
             return False
-        elif effect.effect_kind == "token_payoff" and stats.token_producers == 0:
+        else:
+            for spec in RESOURCE_COUNTER_SPECS:
+                if effect.effect_kind == spec.consume_kind:
+                    if stats.resource_producers.get(spec.profile_id, 0) == 0:
+                        if not stats.resource_package_requested.get(spec.profile_id):
+                            return False
+                    break
+        if effect.effect_kind == "token_payoff" and stats.token_producers == 0:
             if not stats.token_package_requested:
                 return False
         elif effect.effect_kind == "buff_subtype":
