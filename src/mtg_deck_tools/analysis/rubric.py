@@ -105,16 +105,20 @@ def classify_dependency_warning(
             return "appropriate"
         detail = issue.detail or {}
         if rule_id == "REANIMATION_SUPPORT":
-            return "appropriate"
+            if scope.graveyard_user_intent:
+                return "appropriate"
+            cards = detail.get("reanimate") or []
+            return "appropriate" if len(cards) >= 3 else "inappropriate"
         if rule_id == "GRAVEYARD_COST_SUPPORT":
             cards = detail.get("graveyard_cost") or []
             return "appropriate" if len(cards) >= 2 else "inappropriate"
         if rule_id == "SELF_MILL_BALANCE":
-            mill = detail.get("mill_enabler") or []
-            payoffs = detail.get("graveyard_payoff") or []
-            return "appropriate" if max(len(mill), len(payoffs)) >= 2 else "inappropriate"
+            if scope.graveyard_user_intent:
+                return "appropriate"
+            return "inappropriate"
         if rule_id == "LANDFALL_BALANCE":
-            payoffs = detail.get("landfall_payoff") or []
-            return "appropriate" if len(payoffs) >= 2 else "inappropriate"
+            if scope.landfall_user_intent:
+                return "appropriate"
+            return "inappropriate"
 
     return "review"

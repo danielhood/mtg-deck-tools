@@ -94,15 +94,34 @@ def test_self_mill_balanced_helpers() -> None:
     assert not self_mill_balanced(0, 2)
 
 
-def test_reanimation_low_creature_count_warns(gy_db: sqlite3.Connection) -> None:
+def test_reanimation_low_creature_count_warns_with_recursion_intent(gy_db: sqlite3.Connection) -> None:
     maindeck = [
         _deck_card(oracle_id="reanimate", name="Reanimate", type_line="Sorcery"),
         _deck_card(oracle_id="c1", name="Bear", type_line="Creature — Bear"),
     ]
-    report = validate_dependencies(gy_db, maindeck=maindeck, commanders=[])
+    report = validate_dependencies(
+        gy_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["recursion"]),
+    )
     issues = [i for i in report.issues if i.rule_id == RULE_REANIMATION_SUPPORT]
     assert len(issues) == 1
     assert issues[0].detail.get("deficit") == "creatures"
+
+
+def test_reanimation_single_card_silent_without_intent(gy_db: sqlite3.Connection) -> None:
+    maindeck = [
+        _deck_card(oracle_id="reanimate", name="Reanimate", type_line="Sorcery"),
+        _deck_card(oracle_id="c1", name="Bear", type_line="Creature — Bear"),
+    ]
+    report = validate_dependencies(
+        gy_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["tokens"]),
+    )
+    assert not any(i.rule_id == RULE_REANIMATION_SUPPORT for i in report.issues)
 
 
 def test_reanimation_enough_creatures_passes(gy_db: sqlite3.Connection) -> None:
@@ -115,9 +134,14 @@ def test_reanimation_enough_creatures_passes(gy_db: sqlite3.Connection) -> None:
             type_line="Creature",
             cmc=2.0,
         )
-        for i in range(20)
+        for i in range(15)
     ]
-    report = validate_dependencies(gy_db, maindeck=maindeck, commanders=[])
+    report = validate_dependencies(
+        gy_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["recursion"]),
+    )
     assert not any(i.rule_id == RULE_REANIMATION_SUPPORT for i in report.issues)
 
 
@@ -181,6 +205,26 @@ def test_self_mill_single_enabler_silent_without_intent(gy_db: sqlite3.Connectio
         criteria=DeckCriteria(themes=["tokens"]),
     )
     assert not any(i.rule_id == RULE_SELF_MILL_BALANCE for i in report.issues)
+
+
+def test_landfall_balance_silent_without_theme(gy_db: sqlite3.Connection) -> None:
+    conn = gy_db
+    for i in range(2):
+        oid = f"lf{i}"
+        _insert_card(conn, oid, f"Landfall {i}", "Creature")
+        _insert_effect(conn, oid, "landfall_payoff", "landfall_payoff")
+    conn.commit()
+    maindeck = [
+        _deck_card(oracle_id="lf0", name="Landfall 0", type_line="Creature"),
+        _deck_card(oracle_id="lf1", name="Landfall 1", type_line="Creature"),
+    ]
+    report = validate_dependencies(
+        conn,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["tokens"]),
+    )
+    assert not any(i.rule_id == RULE_LANDFALL_BALANCE for i in report.issues)
 
 
 def test_landfall_balance_warns_with_landfall_theme(gy_db: sqlite3.Connection) -> None:

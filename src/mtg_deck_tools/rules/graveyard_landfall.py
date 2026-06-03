@@ -121,9 +121,7 @@ def _should_warn_self_mill_imbalance(
 ) -> bool:
     if self_mill_balanced(mill_count, payoff_count):
         return False
-    if scope.graveyard_user_intent:
-        return True
-    return max(mill_count, payoff_count) >= dominant_min
+    return scope.graveyard_user_intent
 
 
 def _should_check_landfall_balance(
@@ -132,10 +130,20 @@ def _should_check_landfall_balance(
     landfall_payoff_count: int,
     cfg: dict[str, Any],
 ) -> bool:
-    if scope.landfall_user_intent:
+    return scope.landfall_user_intent
+
+
+def _should_warn_reanimation_support(
+    *,
+    scope: DependencyScope,
+    reanimate_count: int,
+    reanimation_card_min: int,
+) -> bool:
+    if reanimate_count == 0:
+        return False
+    if scope.graveyard_user_intent:
         return True
-    trigger_min = int(cfg.get("landfall_payoff_trigger_min", 2))
-    return landfall_payoff_count >= trigger_min
+    return reanimate_count >= reanimation_card_min
 
 
 def append_graveyard_landfall_balance(
@@ -161,16 +169,21 @@ def append_graveyard_landfall_balance(
     avg_creature_cmc = _avg_creature_cmc(maindeck)
     nonland_count = _count_nonlands(maindeck)
 
-    reanimation_creature_min = int(gy_cfg.get("reanimation_creature_min", 20))
+    reanimation_creature_min = int(gy_cfg.get("reanimation_creature_min", 15))
     reanimation_creature_cmc_max = float(gy_cfg.get("reanimation_creature_cmc_max", 5.0))
     graveyard_cost_nonland_min = int(gy_cfg.get("graveyard_cost_nonland_min", 35))
     graveyard_cost_card_min = int(gy_cfg.get("graveyard_cost_card_min", 2))
-    self_mill_dominant_min = int(gy_cfg.get("self_mill_dominant_min", 2))
-    land_ramp_min = int(lf_cfg.get("land_ramp_min", 8))
+    self_mill_dominant_min = int(gy_cfg.get("self_mill_dominant_min", 3))
+    reanimation_card_min = int(gy_cfg.get("reanimation_card_min", 3))
+    land_ramp_min = int(lf_cfg.get("land_ramp_min", 1))
 
     reanimation_status = "pass"
     reanimation_messages: list[str] = []
-    if reanimate:
+    if _should_warn_reanimation_support(
+        scope=scope,
+        reanimate_count=len(reanimate),
+        reanimation_card_min=reanimation_card_min,
+    ):
         low_creatures = creature_count < reanimation_creature_min
         high_cmc = avg_creature_cmc > reanimation_creature_cmc_max
         if low_creatures or high_cmc:
