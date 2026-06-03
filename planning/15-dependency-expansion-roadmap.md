@@ -51,6 +51,8 @@ flowchart TD
 | `type_line_aura` | Aura on type line (extraction aid) |
 | `token_produce` / `token_payoff` | Token producers vs “whenever you create a token” payoffs |
 | `type_line_vehicle` | Vehicle on type line (crew density checks) |
+| `type_line_equipment` | Equipment on type line (equip depth checks) |
+| `whenever_equipped` | “Whenever equipped” / equip payoff triggers |
 | `reanimate` | Return target from graveyard to battlefield/hand |
 | `graveyard_cost` | Delve / flashback (needs graveyard fodder over time) |
 | `mill_enabler` | Self-mill and library-to-graveyard enablers |
@@ -70,6 +72,7 @@ flowchart TD
 | `SACRIFICE_BALANCE` | Outlets without payoffs or reverse | `themes: [aristocrats]` or ≥2 imbalanced cards |
 | `TOKEN_BALANCE` | Producers without payoffs or reverse | `themes: [tokens]` or ≥2 imbalanced cards |
 | `VEHICLE_BALANCE` | Vehicle count or crew creatures below floor | `include_mechanics: [vehicles]`, Vehicle lord in deck, or ≥2 vehicles |
+| `EQUIPMENT_BALANCE` | Equipment count, carrier creatures, or equip payoffs without pieces | `include_mechanics: [equip]`, `themes: [voltron]`, whenever-equipped payoffs, or ≥2 Equipment |
 | `TYPE_SYNERGY_MIN` | Subtype lord or type-matters payoff below suggested minimum | Card-driven (lord / cast trigger in deck) |
 | `AURA_SUPPORT_MIN` | Aura count below floor | `themes: [voltron]`, aura tutors, or `whenever_cast_aura` payoffs |
 | `ENCHANTMENT_SUPPORT_MIN` | Enchantment count below floor | `themes: [enchantress]`, enchantment tutors, or `whenever_cast_enchantment` payoffs |
@@ -93,6 +96,7 @@ flowchart TD
 | Subtype lords | Any `buff_subtype` lord detected | Per-subtype minimums in profile (Elf default 5) |
 | Tokens | `themes: [tokens]` | ≥5 producers, ≥3 payoffs |
 | Vehicles | `include_mechanics: [vehicles]` or Vehicle lord in deck | ≥3 Vehicles, ≥25 crew creatures |
+| Equipment | `include_mechanics: [equip]` or `themes: [voltron]` or equip payoffs in deck | ≥4 Equipment, ≥22 carrier creatures |
 
 ### Dogfood coverage
 
@@ -158,9 +162,15 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | ~~**Self-mill**~~ | Mill enablers vs graveyard payoffs | Shipped — `SELF_MILL_BALANCE` |
 | ~~**Landfall**~~ | Land ramp count vs landfall payoffs | Shipped — `LANDFALL_BALANCE` when `themes: [landfall]` or ≥2 payoffs |
 
-### Priority 6 — Equipment depth
+### ~~Priority 6 — Equipment depth~~
 
-Beyond artifact count: equip cost, “whenever equipped”, bodies to carry equipment — overlaps vehicles/ voltron; profile under `equip` / `voltron`.
+**Shipped 2026-06** — [`rules/equipment_depth.py`](../src/mtg_deck_tools/rules/equipment_depth.py): `type_line_equipment`, `whenever_equipped`; `EQUIPMENT_BALANCE`; `ensure_equipment_package`; profile `equipment` (`equipment_min: 4`, `carrier_creature_min: 22`; activation `include_mechanics: [equip]`, `themes: [voltron]`).
+
+| Work item | Status |
+| --- | --- |
+| ~~Equip pieces beyond artifact count~~ | Shipped — `type_line_equipment` + `EQUIPMENT_BALANCE` floor |
+| ~~“Whenever equipped” payoffs~~ | Shipped — `whenever_equipped`; warns when payoffs lack Equipment |
+| ~~Bodies to carry equipment~~ | Shipped — carrier creature minimum when Equipment present |
 
 ---
 
@@ -206,7 +216,7 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 | ~~0~~ | ~~**Dogfood matrix 25/25**~~ | **Done 2026-06-03** — blood consume patterns; +1/+1 incidental threshold |
 | 1 | **Rad / oil / charge counters** | Format-specific resource counters; theme-selected |
 
-**Shipped (2026-06):** **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; profiles `graveyard`, `landfall`).
+**Shipped (2026-06):** **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; profiles `graveyard`, `landfall`).
 
 **Parallel track:** **UX2** wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` ([11](11-dependency-engine-user-experience.md)) — does not block pattern work but improves user-facing control.
 

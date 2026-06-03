@@ -273,6 +273,25 @@ cases:
           types: [artifact]
           subtypes: [Vehicle]
 
+  - name: sword_of_fire_and_ice
+    oracle_text: "Equipped creature gets +2/+2 and has protection from red and from blue.\nWhenever equipped creature deals combat damage to a player, Sword of Fire and Ice deals 2 damage to any target and you draw a card.\nEquip {2}"
+    type_line: "Artifact — Equipment"
+    expected:
+      - effect_kind: whenever_equipped
+        source: whenever_equipped_payoff
+      - effect_kind: type_line_equipment
+        source: type_line_equipment
+        payload:
+          types: [artifact]
+          subtypes: [Equipment]
+
+  - name: kor_duelist
+    oracle_text: "First strike\nWhenever equipped creature deals damage to a blocked creature, destroy that creature. You may attach an Equipment you control to this creature."
+    type_line: "Creature — Kor Soldier"
+    expected:
+      - effect_kind: whenever_equipped
+        source: whenever_equipped_payoff
+
   - name: chief_of_the_foundry
     oracle_text: "Other Vehicles you control get +1/+1."
     type_line: "Creature — Artificer"

@@ -30,10 +30,11 @@ Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | `--repair-dependencies` | Done — D5 post-build swap pass |
 | Wizard dependency controls (UX2) | **Not started** — CLI flags only today |
 | Dependency dogfood calibration | **Done** — `analyze run --fail-on-expect`: **25/25** after 2026-06 bulk refresh (blood consume patterns, +1/+1 incidental threshold) |
-| Mechanic packages | **Done** — energy, experience, blood, +1/+1 counters, sacrifice/aristocrats, voltron auras, enchantments, equip/vehicles artifacts, subtype lords, tokens, vehicles |
+| Mechanic packages | **Done** — energy, experience, blood, +1/+1 counters, sacrifice/aristocrats, voltron auras, enchantments, equip/vehicles artifacts, subtype lords, tokens, vehicles, equipment |
 | Sacrifice / aristocrats profile | **Done** — `SACRIFICE_BALANCE` + `ensure_sacrifice_package` |
 | Tokens profile | **Done** — `TOKEN_BALANCE` + `ensure_token_package` (`themes: [tokens]`) |
 | Vehicles profile | **Done** — `VEHICLE_BALANCE` + `ensure_vehicle_package` (`include_mechanics: [vehicles]`) |
+| Equipment depth | **Done** — `EQUIPMENT_BALANCE` + `ensure_equipment_package` (`include_mechanics: [equip]`, `themes: [voltron]`) |
 | Aura calibration | **Done** — `whenever_cast_aura` vs generic enchantment payoffs; card-driven aura package |
 | Dependency expansion (enchantment matters, tutors, …) | **Planned** — [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
 
@@ -118,9 +119,9 @@ Shipped 2026-05-30 / 2026-05-31. Technical phases in [10-card-dependency-engine.
 | **D4** | Strict pick-time filter | `--strict-dependencies` |
 | **D5** | Post-build repair swaps | `--repair-dependencies` |
 
-**v1 rules:** `TUTOR_TARGET_EXISTS`, `ENERGY_BALANCE`, `EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `SACRIFICE_BALANCE`, `TOKEN_BALANCE`, `VEHICLE_BALANCE`, `TYPE_SYNERGY_MIN`, `AURA_SUPPORT_MIN`, `ENCHANTMENT_SUPPORT_MIN`, `REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE` — thresholds in [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml).
+**v1 rules:** `TUTOR_TARGET_EXISTS`, `ENERGY_BALANCE`, `EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `SACRIFICE_BALANCE`, `TOKEN_BALANCE`, `VEHICLE_BALANCE`, `EQUIPMENT_BALANCE`, `TYPE_SYNERGY_MIN`, `AURA_SUPPORT_MIN`, `ENCHANTMENT_SUPPORT_MIN`, `REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE` — thresholds in [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml).
 
-**Mechanic packages:** energy, experience, blood, +1/+1 counters, sacrifice/aristocrats, auras, artifacts, subtype lords, tokens, vehicles — see [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) for shipped inventory.
+**Mechanic packages:** energy, experience, blood, +1/+1 counters, sacrifice/aristocrats, auras, artifacts, subtype lords, tokens, vehicles, equipment — see [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) for shipped inventory.
 
 **Maintainer workflow:** After bulk refresh, run `import` then `dependency-audit` to refresh `card_effects` and audit reports. Run `analyze run --fail-on-expect` after dependency changes.
 
@@ -146,9 +147,10 @@ Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-ro
 | Priority | Deliverable | Rationale |
 | --- | --- | --- |
 | 1 | **Rad / oil / charge counters** | Format-specific; theme-selected only |
-| 2 | **Equipment depth** | Equip cost / “whenever equipped” beyond artifact count |
 
-**Recently shipped (2026-06):** **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
+**Suggested next task:** Rad / oil / charge counters (format-specific resource counters).
+
+**Recently shipped (2026-06):** **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
 
 Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15). **Doc updates:** [DOC-MAP.md](DOC-MAP.md); agents run `/ship-dependency-feature` before PR.
 
@@ -175,7 +177,7 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 | Topic | Notes | Doc |
 | --- | --- | --- |
-| **Dependency expansion** | Rad/oil/charge counters, equipment depth | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
+| **Dependency expansion** | Rad/oil/charge counters | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
 | Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
 | Dependency swap packages | `generate --swap-profile energy` — needs UX5 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |

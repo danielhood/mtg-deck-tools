@@ -19,6 +19,7 @@ from mtg_deck_tools.rules.dependency_profiles import (
     sacrifice_profile_floors,
     subtype_lord_minimum,
     token_profile_floors,
+    equipment_profile_floors,
     vehicle_profile_floors,
 )
 from mtg_deck_tools.rules.resource_counters import RESOURCE_COUNTER_SPECS
@@ -83,6 +84,13 @@ class DeckBuildStats:
     vehicle_package_requested: bool = False
     needs_vehicle: bool = False
     needs_crew_creature: bool = False
+    equipment_count: int = 0
+    carrier_creature_count: int = 0
+    equipment_floor: int = 0
+    carrier_creature_floor: int = 0
+    equipment_package_requested: bool = False
+    needs_equipment: bool = False
+    needs_carrier_creature: bool = False
     resource_producers: dict[str, int] = field(default_factory=dict)
     resource_consumers: dict[str, int] = field(default_factory=dict)
     resource_needs_consumer: dict[str, bool] = field(default_factory=dict)
@@ -169,6 +177,12 @@ def build_deck_build_stats(
         artifact_count=_count_type_on_cards(partial, "artifact"),
         vehicle_count=sum(1 for c in partial if "Vehicle" in (c.type_line or "")),
         crew_creature_count=sum(
+            1
+            for c in partial
+            if "Creature" in (c.type_line or "") and "Vehicle" not in (c.type_line or "")
+        ),
+        equipment_count=sum(1 for c in partial if "Equipment" in (c.type_line or "")),
+        carrier_creature_count=sum(
             1
             for c in partial
             if "Creature" in (c.type_line or "") and "Vehicle" not in (c.type_line or "")
@@ -283,6 +297,15 @@ def build_deck_build_stats(
                 stats.needs_vehicle = True
             if stats.vehicle_count > 0 and stats.crew_creature_count < c_min:
                 stats.needs_crew_creature = True
+        if scope.equipment_user_intent:
+            e_min, car_min = equipment_profile_floors(profile_cfg)
+            stats.equipment_package_requested = True
+            stats.equipment_floor = e_min
+            stats.carrier_creature_floor = car_min
+            if stats.equipment_count < e_min:
+                stats.needs_equipment = True
+            if stats.equipment_count > 0 and stats.carrier_creature_count < car_min:
+                stats.needs_carrier_creature = True
         for spec in RESOURCE_COUNTER_SPECS:
             if scope.resource_user_intent(spec.profile_id):
                 p_min, c_min = resource_counter_profile_floors(
@@ -382,6 +405,16 @@ def dependency_pick_score(
             and stats.crew_creature_count < stats.crew_creature_floor
         ):
             score += 4.0 * weight
+    if stats.equipment_package_requested and "Equipment" in (candidate.type_line or ""):
+        if stats.equipment_count < stats.equipment_floor:
+            score += 6.0 * weight
+    if stats.equipment_package_requested and "Creature" in (candidate.type_line or ""):
+        if (
+            "Vehicle" not in (candidate.type_line or "")
+            and stats.equipment_count > 0
+            and stats.carrier_creature_count < stats.carrier_creature_floor
+        ):
+            score += 4.0 * weight
 
     for effect in candidate_effects or []:
         if effect.effect_kind == "energy_produce" and stats.energy_package_requested:
@@ -464,6 +497,12 @@ def dependency_pick_score(
         elif effect.effect_kind == "type_line_vehicle" and stats.vehicle_package_requested:
             if stats.vehicle_count < stats.vehicle_floor:
                 score += 3.0 * weight
+        elif effect.effect_kind == "type_line_equipment" and stats.equipment_package_requested:
+            if stats.equipment_count < stats.equipment_floor:
+                score += 3.0 * weight
+        elif effect.effect_kind == "whenever_equipped" and stats.equipment_package_requested:
+            if stats.equipment_count < stats.equipment_floor:
+                score += 2.0 * weight
         elif effect.effect_kind == "whenever_cast_type":
             types = effect.payload.get("types") or []
             if types == ["artifact"] and stats.artifact_count < 8:

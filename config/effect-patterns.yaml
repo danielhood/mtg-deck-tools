@@ -481,6 +481,26 @@ patterns:
       types: [artifact]
       subtypes: [Vehicle]
 
+  # --- equipment (Priority 6 — equip depth beyond artifact count) ---
+  - id: whenever_equipped_payoff
+    effect_kind: whenever_equipped
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)whenever (?:equipped|this (?:creature )?becomes equipped|an Equipment (?:you control )?enters)"
+    payload:
+      trigger: equipped
+
+  - id: type_line_equipment
+    effect_kind: type_line_equipment
+    confidence: 1.0
+    matchers:
+      - type: type_regex
+        pattern: "(?i)Artifact — Equipment"
+    payload:
+      types: [artifact]
+      subtypes: [Equipment]
+
   # --- graveyard / landfall (Priority 5 — warn-only heuristics) ---
   - id: reanimate_return
     effect_kind: reanimate

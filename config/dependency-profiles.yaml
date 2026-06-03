@@ -127,6 +127,18 @@ profiles:
       creature_min: 25
       share_max: 0.15
 
+  # Equipment depth: pieces, carriers, whenever-equipped payoffs (voltron / equip include)
+  equipment:
+    label: Equipment synergies
+    activation:
+      include_mechanics: [equip]
+      themes: [voltron]
+    roles: [equipment, equip_payoff, carrier_creature]
+    defaults:
+      equipment_min: 4
+      carrier_creature_min: 22
+      share_max: 0.15
+
   experience:
     label: Experience counters
     activation:

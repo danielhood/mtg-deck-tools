@@ -41,6 +41,8 @@ ISSUE_PRIORITY = (
     "PLUS_ONE_BALANCE",
     "SACRIFICE_BALANCE",
     "TOKEN_BALANCE",
+    "VEHICLE_BALANCE",
+    "EQUIPMENT_BALANCE",
     "TYPE_SYNERGY_MIN",
     "AURA_SUPPORT_MIN",
     "ENCHANTMENT_SUPPORT_MIN",
@@ -553,6 +555,51 @@ def _fix_vehicle_balance(
     )
 
 
+def _fix_equipment_balance(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    issue: DependencyIssue,
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> tuple[list[DeckCard], str] | None:
+    detail = issue.detail or {}
+    if detail.get("deficit") == "carriers":
+        return swap_matching_card(
+            conn,
+            cards,
+            match=lambda c: "Creature" in c.type_line and "Vehicle" not in c.type_line,
+            label="carrier creature",
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+        )
+    if detail.get("deficit") == "equipment":
+        return swap_matching_card(
+            conn,
+            cards,
+            match=lambda c: "Equipment" in c.type_line,
+            label="Equipment",
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+        )
+    return swap_effect_kind_card(
+        conn,
+        cards,
+        "type_line_equipment",
+        role_label="Equipment",
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=commander_oracle_ids,
+        commander_theme_tags=commander_theme_tags,
+    )
+
+
 def _fix_sacrifice_balance(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
@@ -754,6 +801,26 @@ def _attempt_repair(
         )
     if issue.rule_id == "TOKEN_BALANCE":
         return _fix_token_balance(
+            conn,
+            cards,
+            issue,
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+        )
+    if issue.rule_id == "VEHICLE_BALANCE":
+        return _fix_vehicle_balance(
+            conn,
+            cards,
+            issue,
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+        )
+    if issue.rule_id == "EQUIPMENT_BALANCE":
+        return _fix_equipment_balance(
             conn,
             cards,
             issue,
