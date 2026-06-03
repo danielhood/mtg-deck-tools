@@ -166,7 +166,7 @@ def wizard_cmd(
         typer.Option("--seed", help="RNG seed stored in criteria for later generate steps"),
     ] = None,
 ) -> None:
-    """Run the full deck-building wizard (steps 1–5)."""
+    """Run the full deck-building wizard (steps 1–6)."""
     try:
         run_wizard(seed=seed)
     except KeyboardInterrupt:

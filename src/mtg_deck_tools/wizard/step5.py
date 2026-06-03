@@ -104,7 +104,7 @@ def run_step5(criteria: DeckCriteria) -> DeckCriteria:
 
     console.print(
         Panel(
-            "[bold]Step 5 of 5[/bold] — Budget\n"
+            "[bold]Step 6 of 6[/bold] — Budget\n"
             "Optional total deck cap and per-card min/max using Scryfall prices. "
             "When a budget is set, you can exclude unpriced cards and prefer "
             "readily available picks (same as [bold]--strict-budget[/bold] / "

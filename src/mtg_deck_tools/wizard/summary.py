@@ -8,6 +8,7 @@ from mtg_deck_tools.formatting import format_card_price_range_display
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.rarity import format_min_rarity_display
 from mtg_deck_tools.wizard.common import console
+from mtg_deck_tools.wizard.dependencies import format_mechanic_focus_summary
 from mtg_deck_tools.wizard.slots import (
     COMMANDER_DECK_SIZE,
     load_slot_template_config,
@@ -60,6 +61,19 @@ def print_wizard_summary(criteria: DeckCriteria) -> None:
     )
     table.add_row("Card price range", price_range or "(none)")
     table.add_row("Minimum rarity", format_min_rarity_display(criteria.min_rarity))
+
+    table.add_row(
+        "Strict dependencies",
+        "yes" if criteria.strict_dependencies else "no",
+    )
+    table.add_row(
+        "Repair dependencies",
+        "yes" if criteria.repair_dependencies else "no",
+    )
+    table.add_row(
+        "Mechanic focus",
+        format_mechanic_focus_summary(criteria.mechanic_focus),
+    )
 
     if criteria.seed is not None:
         table.add_row("Seed", str(criteria.seed))

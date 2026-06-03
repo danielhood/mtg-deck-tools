@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [10-card-dependency-engine.md](10-card-dependency-engine.md).
 
-**Status (2026-06-03):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2** (wizard synergy strictness + `mechanic_focus` presets for all profiles activated by user selections) is the next milestone — see [09-next-steps.md](09-next-steps.md).
+**Status (2026-06-03):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). Next: **UX3** criteria linter — see [09-next-steps.md](09-next-steps.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -358,7 +358,7 @@ Engine requirements for swaps:
 | --- | --- | --- |
 | **UX0** | Document + `dependency-profiles.yaml` skeleton | None |
 | **UX1** | Notes + `dependency_report`; `--strict-dependencies` | D2 |
-| **UX2** | Wizard: “Synergy strictness” prompts (`strict_dependencies`, `repair_dependencies`) + focus-level presets (incidental/supported/focused/engine) for every profile activated by the user’s theme/mechanic selections | D2–D3 |
+| ~~**UX2**~~ | ~~Wizard: “Synergy strictness” prompts (`strict_dependencies`, `repair_dependencies`) + focus-level presets (incidental/supported/focused/engine) for every profile activated by the user’s theme/mechanic selections~~ — **Shipped 2026-06-03** (`wizard` step 3) | D2–D3 |
 | **UX3** | `criteria` linter warnings in wizard | D2 + profiles |
 | **UX4** | `.deck.json` per-card `dependency_roles` | D2 |
 | **UX5** | Local web: dependency dashboard + swap | D5 + API wrapper |
@@ -368,7 +368,7 @@ Engine requirements for swaps:
 
 The original UX2 spec named only energy and auras as focus-preset candidates. Dependency expansion Priorities 1–6 shipped 13 additional profiles; the table below shows every profile a user can now activate and the wizard selection that triggers it.
 
-**Wizard deliverables (UX2):**
+**Wizard deliverables (UX2)** — shipped in `wizard` step 3 (`step3_synergy.py`):
 
 1. **Synergy strictness step** — expose `strict_dependencies` ("Block picks with no valid target?") and `repair_dependencies` ("Run a post-build repair pass?") as yes/no prompts in Step 5 or a dedicated step after Step 2. These are currently CLI-only flags.
 

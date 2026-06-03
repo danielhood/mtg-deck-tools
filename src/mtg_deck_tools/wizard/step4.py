@@ -98,7 +98,7 @@ def run_step4(
     try:
         console.print(
             Panel(
-                "[bold]Step 4 of 5[/bold] — Commander\n"
+                "[bold]Step 5 of 6[/bold] — Commander\n"
                 "Search and select your commander. Partner commanders can add a second.",
                 title="MTG Deck Tools",
                 border_style="cyan",

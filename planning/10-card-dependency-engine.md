@@ -384,7 +384,7 @@ Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-de
 User-facing mechanics (energy focus, aura density, dominance caps, strict vs warn-only, future swap workflows) are specified in **[11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)**. That doc defines:
 
 - `config/dependency-profiles.yaml` — default min/max and share targets per mechanic profile
-- `DeckCriteria` extensions (`strict_dependencies`, `repair_dependencies`; `mechanic_focus` planned for UX2)
+- `DeckCriteria` extensions (`strict_dependencies`, `repair_dependencies`, `mechanic_focus` — wizard step 3 / CLI)
 - `dependency_report` shape for Markdown Notes and future UI
 
 Engine implementation should read profile thresholds from YAML rather than hard-coding counts, so CLI and future web UI share one source of truth.
