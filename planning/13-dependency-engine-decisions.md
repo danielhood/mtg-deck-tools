@@ -5,7 +5,7 @@ Resolved before D1 implementation (2026-05-30). Revisit only with evidence from 
 | Decision | Answer | Notes |
 | --- | --- | --- |
 | Threshold source | `config/dependency-profiles.yaml` | Theme multipliers optional later |
-| Tutor matching depth (v1) | Type, subtype, supertypes, `max_cmc` | No “nonbasic land” / named Plains in v1 |
+| Tutor matching depth (v1) | Type (OR when multi-type), subtype, supertypes, `min_cmc` / `max_cmc`, `colors` | Named card search (`REQUIRES_CARD`) still deferred |
 | Commander as tutor target | **Yes** for creature / legendary creature in CI | Document in validator (D2) |
 | `strict_dependencies` default | **Off** | Until D2 false-positive review |
 | Storage | `card_effects` table + JSON `payload` | No `effect_predicates` table in v1 |

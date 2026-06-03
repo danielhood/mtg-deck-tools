@@ -126,7 +126,10 @@ def test_elf_candidate_boosted_when_lord_needs_support() -> None:
 
 
 def test_count_search_targets_creature() -> None:
-    pool = [("Creature — Elf", 1.0), ("Instant", 2.0)]
+    pool = [
+        ("Creature — Elf", 1.0, ("G",), "Llanowar Elves"),
+        ("Instant", 2.0, (), "Lightning Bolt"),
+    ]
     assert count_search_targets(pool, {"types": ["creature"]}) == 1
 
 

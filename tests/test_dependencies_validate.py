@@ -121,6 +121,41 @@ def test_tutor_with_creature_target_passes(dep_db: sqlite3.Connection) -> None:
     assert not tutor_issues
 
 
+def test_artifact_or_enchantment_tutor_matches_either(dep_db: sqlite3.Connection) -> None:
+    conn = dep_db
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, oracle_text, mana_cost, cmc, colors, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land, price_known
+        ) VALUES ('et', 'Enlightened Tutor', 'Instant', '', '{W}', 1, '[]', '["W"]', '[]', 1, 0, 0, 1)
+        """
+    )
+    _insert_effect(
+        conn,
+        "et",
+        "search_library",
+        {"types": ["artifact", "enchantment"], "type_match": "any"},
+        "search_library_artifact_or_enchantment",
+    )
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, oracle_text, mana_cost, cmc, colors, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land, price_known
+        ) VALUES ('sol', 'Sol Ring', 'Artifact', '', '{1}', 1, '[]', '[]', '[]', 1, 0, 0, 1)
+        """
+    )
+    conn.commit()
+    maindeck = [
+        _deck_card(oracle_id="et", name="Enlightened Tutor", type_line="Instant"),
+        _deck_card(oracle_id="sol", name="Sol Ring", type_line="Artifact"),
+    ]
+    report = validate_dependencies(conn, maindeck=maindeck, commanders=[])
+    tutor_issues = [i for i in report.issues if i.rule_id == "TUTOR_TARGET_EXISTS"]
+    assert not tutor_issues
+
+
 def test_elf_lord_low_count_warns(dep_db: sqlite3.Connection) -> None:
     maindeck = [
         _deck_card(oracle_id="lord", name="Elvish Archdruid", type_line="Creature — Elf Druid"),

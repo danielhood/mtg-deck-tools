@@ -56,11 +56,11 @@ cases:
   - { name: "Rhystic Study", layout: normal, oracle_excerpt: "draw a card", v1_stance: no_atoms, notes: "" }
   - { name: "Smuggler's Copter", layout: normal, oracle_excerpt: "Vehicle", v1_stance: defer_vehicles, notes: "Vehicle profile" }
   - { name: "Chief of the Foundry", layout: normal, oracle_excerpt: "Vehicles you control", v1_stance: buff_subtype, notes: "Vehicle as subtype" }
-  - { name: "Finale of Devastation", layout: normal, oracle_excerpt: "creature or planeswalker card", v1_stance: warn_only, notes: "Multi-type tutor partial" }
-  - { name: "Green Sun's Zenith", layout: normal, oracle_excerpt: "green creature card", v1_stance: warn_only, notes: "Color in search deferred" }
-  - { name: "Three Visits", layout: normal, oracle_excerpt: "Forest card", v1_stance: warn_only, notes: "Subtype land search deferred" }
-  - { name: "Nature's Lore", layout: normal, oracle_excerpt: "Forest card", v1_stance: warn_only, notes: "" }
-  - { name: "Fierce Empath", layout: normal, oracle_excerpt: "creature card with mana value 6 or greater", v1_stance: warn_only, notes: "CMC greater not in v1" }
+  - { name: "Finale of Devastation", layout: normal, oracle_excerpt: "creature or planeswalker card", v1_stance: search_creature_or_planeswalker, notes: "Library and/or graveyard search" }
+  - { name: "Green Sun's Zenith", layout: normal, oracle_excerpt: "green creature card", v1_stance: search_colored_creature, notes: "" }
+  - { name: "Three Visits", layout: normal, oracle_excerpt: "Forest card", v1_stance: search_land_subtype, notes: "" }
+  - { name: "Nature's Lore", layout: normal, oracle_excerpt: "Forest card", v1_stance: search_land_subtype, notes: "" }
+  - { name: "Fierce Empath", layout: normal, oracle_excerpt: "creature card with mana value 6 or greater", v1_stance: search_creature_cmc_min, notes: "" }
   - { name: "Recruiter of the Guard", layout: normal, oracle_excerpt: "creature card with mana value 3 or less", v1_stance: search_creature_cmc, notes: "" }
   - { name: "Imperial Seal", layout: normal, oracle_excerpt: "Search your library for a card", v1_stance: search_any, notes: "" }
   - { name: "Gamble", layout: normal, oracle_excerpt: "Search your library for a card", v1_stance: search_any, notes: "" }

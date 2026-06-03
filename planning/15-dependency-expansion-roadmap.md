@@ -180,11 +180,10 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
-| 1 | **Tutor payload upgrades** | Incremental `TUTOR_TARGET_EXISTS` accuracy |
-| 2 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
-| 3 | **Counter resources** | After audit evidence (proliferate, blood, …) |
+| 1 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
+| 2 | **Counter resources** | After audit evidence (proliferate, blood, …) |
 
-**Shipped (2026-06):** Enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
+**Shipped (2026-06):** Tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density).
 
 **Parallel track:** **UX2** wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` ([11](11-dependency-engine-user-experience.md)) — does not block pattern work but improves user-facing control.
 

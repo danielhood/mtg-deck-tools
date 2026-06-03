@@ -10,6 +10,7 @@ from typing import Any
 from mtg_deck_tools.effects.patterns import EffectPattern, EffectPatternRegistry, load_effect_patterns
 from mtg_deck_tools.models.effects import EffectAtom
 from mtg_deck_tools.paths import EFFECT_PATTERNS_PATH
+from mtg_deck_tools.rules.tutor_payload import COLOR_WORD_TO_SYMBOL
 
 
 def _matches(
@@ -53,8 +54,12 @@ def _apply_captures(payload: dict[str, Any], capture_map: dict[str, int], match:
                 payload[key] = [value]
             else:
                 payload[key] = [value]
-        elif key == "max_cmc":
+        elif key in ("max_cmc", "min_cmc"):
             payload[key] = int(value)
+        elif key == "color_word":
+            symbol = COLOR_WORD_TO_SYMBOL.get(value.lower())
+            if symbol:
+                payload["colors"] = [symbol]
         else:
             payload[key] = value
 

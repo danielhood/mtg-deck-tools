@@ -17,6 +17,7 @@ from mtg_deck_tools.rules.dependency_scope import (
     DependencyScope,
     build_dependency_scope,
 )
+from mtg_deck_tools.rules.tutor_payload import describe_payload, payload_matches_card
 
 DependencyStatus = Literal["pass", "warn", "fail"]
 
@@ -111,48 +112,51 @@ def fetch_card_effects(
     return grouped
 
 
-def payload_matches_card(
-    type_line: str,
-    cmc: float,
+def _fetch_search_card_fields(
+    conn: sqlite3.Connection,
+    oracle_ids: list[str],
+) -> dict[str, tuple[list[str], str]]:
+    if not oracle_ids:
+        return {}
+    placeholders = ",".join("?" * len(oracle_ids))
+    rows = conn.execute(
+        f"""
+        SELECT oracle_id, colors, name FROM cards
+        WHERE oracle_id IN ({placeholders})
+        """,
+        oracle_ids,
+    ).fetchall()
+    return {
+        row["oracle_id"]: (json.loads(row["colors"] or "[]"), row["name"] or "")
+        for row in rows
+    }
+
+
+def _type_line_matches(
+    card: DeckCard,
     payload: dict[str, Any],
+    *,
+    card_fields: dict[str, tuple[list[str], str]],
 ) -> bool:
-    """Whether a card's type line / CMC satisfies a search_library payload (D2/D3)."""
-    tl = type_line or ""
-    for supertype in payload.get("supertypes") or []:
-        if supertype.lower() == "basic" and "Basic" in tl and "Land" in tl:
-            continue
-        if supertype not in tl:
-            return False
-    for card_type in payload.get("types") or []:
-        if card_type.lower() == "land" and "Land" not in tl:
-            return False
-        if card_type.lower() == "creature" and "Creature" not in tl:
-            return False
-        if card_type.lower() == "artifact" and "Artifact" not in tl:
-            return False
-        if card_type.lower() == "enchantment" and "Enchantment" not in tl:
-            return False
-    for subtype in payload.get("subtypes") or []:
-        if subtype not in tl:
-            return False
-    max_cmc = payload.get("max_cmc")
-    if max_cmc is not None and "Creature" in tl:
-        if cmc > float(max_cmc):
-            return False
-    return True
-
-
-def _type_line_matches(card: DeckCard, payload: dict[str, Any]) -> bool:
-    return payload_matches_card(card.type_line or "", card.cmc, payload)
+    colors, name = card_fields.get(card.oracle_id, ([], card.name))
+    return payload_matches_card(
+        card.type_line or "",
+        card.cmc,
+        payload,
+        colors=colors,
+        name=name,
+    )
 
 
 def _search_targets(
     pool: list[DeckCard],
     payload: dict[str, Any],
+    *,
+    card_fields: dict[str, tuple[list[str], str]],
 ) -> list[DeckCard]:
     if payload.get("any_card"):
         return list(pool)
-    return [c for c in pool if _type_line_matches(c, payload)]
+    return [c for c in pool if _type_line_matches(c, payload, card_fields=card_fields)]
 
 
 def _count_subtype(pool: list[DeckCard], subtype: str) -> int:
@@ -387,6 +391,7 @@ def validate_dependencies(
     search_pool = list(maindeck) + commander_cards
     all_oracle_ids = list({c.oracle_id for c in search_pool})
     effects_map = fetch_card_effects(conn, all_oracle_ids)
+    search_card_fields = _fetch_search_card_fields(conn, all_oracle_ids)
 
     energy_producers: list[str] = []
     energy_consumers: list[str] = []
@@ -424,7 +429,11 @@ def validate_dependencies(
                 continue
             if effect.confidence < 0.6 and effect.payload.get("any_card"):
                 continue
-            targets = _search_targets(search_pool, effect.payload)
+            targets = _search_targets(
+                search_pool,
+                effect.payload,
+                card_fields=search_card_fields,
+            )
             if targets:
                 continue
             detail = {"payload": effect.payload, "tutor": card.name}
@@ -779,18 +788,7 @@ def validate_dependencies(
 
 
 def _describe_payload(payload: dict[str, Any]) -> str:
-    if payload.get("any_card"):
-        return "any card"
-    parts: list[str] = []
-    for supertype in payload.get("supertypes") or []:
-        parts.append(supertype)
-    for card_type in payload.get("types") or []:
-        parts.append(card_type)
-    for subtype in payload.get("subtypes") or []:
-        parts.append(subtype)
-    if payload.get("max_cmc") is not None:
-        parts.append(f"mana value {payload['max_cmc']} or less")
-    return " / ".join(parts) if parts else "the search criteria"
+    return describe_payload(payload)
 
 
 def dependency_report_to_dict(report: DependencyReport) -> dict[str, Any]:

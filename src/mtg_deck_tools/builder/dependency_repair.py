@@ -251,7 +251,13 @@ def _fix_tutor_target(
     pool = [
         c
         for c in pool
-        if payload_matches_card(c.type_line, c.cmc, payload)
+        if payload_matches_card(
+            c.type_line,
+            c.cmc,
+            payload,
+            colors=c.color_identity,
+            name=c.name,
+        )
     ]
     pool = filter_candidates_by_price(pool, criteria, criteria.budget_usd)
     pool = filter_candidates_by_rarity(pool, criteria)
