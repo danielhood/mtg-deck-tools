@@ -28,7 +28,7 @@ Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | Pick-time dependency scoring | Done — D3 during slot fill |
 | `--strict-dependencies` | Done — D4 pick-time filter |
 | `--repair-dependencies` | Done — D5 post-build swap pass |
-| Wizard dependency controls (UX2) | **Not started** — CLI flags only today |
+| Wizard dependency controls (UX2) | **Not started** — CLI flags only today; scope expanded 2026-06-03 to cover all 15 activated profiles |
 | Dependency dogfood calibration | **Done** — `analyze run --fail-on-expect`: **25/25** after 2026-06 bulk refresh (blood consume patterns, +1/+1 incidental threshold) |
 | Mechanic packages | **Done** — energy, experience, blood, +1/+1 counters, sacrifice/aristocrats, voltron auras, enchantments, equip/vehicles artifacts, subtype lords, tokens, vehicles, equipment |
 | Sacrifice / aristocrats profile | **Done** — `SACRIFICE_BALANCE` + `ensure_sacrifice_package` |
@@ -158,9 +158,11 @@ Each feature: patterns → import → rule → optional package → dogfood scen
 
 From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md):
 
-- Wizard step or generate prompt for **synergy strictness** (`strict_dependencies`, `repair_dependencies`)
-- **Focus presets** (`mechanic_focus`: energy, auras) wired to `dependency-profiles.yaml`
-- Surface dependency summary during wizard review (optional)
+- Wizard step for **synergy strictness** (`strict_dependencies`, `repair_dependencies`) — expose as yes/no prompts in Step 5 or a new step; currently CLI-only flags
+- **Focus-level presets** (`mechanic_focus`: incidental/supported/focused/engine) for **every profile activated by the user's theme and `include_mechanics` selections** — not only energy and auras; the list is driven by what the user already selected in Steps 1–2, so casual users see nothing new while power users get per-mechanic control
+- No new engine or schema work needed: `DeckCriteria.mechanic_focus` is already a generic dict and `dependency_scope.py` already reads it for all profiles
+- All 15 profiles are now eligible (energy, aura\_support, rad, oil, charge, experience, blood, plus\_one, vehicles, equipment, tokens, sacrifice, enchantments, graveyard, landfall)
+- Surface dependency summary during wizard review (low-priority stretch goal; may slip to UX3)
 
 ### 3. Rule scoping and threshold tuning — **mostly done**
 
@@ -192,6 +194,8 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 ## Suggested next task
 
 **UX2** wizard controls for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). Dependency expansion priorities 1–6 are shipped ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)).
+
+UX2 scope expanded (2026-06-03): focus-level presets now target all 15 active profiles, not only energy and auras. See §2 above and the expanded UX2 spec in doc 11.
 
 Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` — **28/28** ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 

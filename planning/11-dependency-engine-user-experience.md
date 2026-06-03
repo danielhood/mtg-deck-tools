@@ -2,7 +2,9 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [10-card-dependency-engine.md](10-card-dependency-engine.md).
 
-**Status (2026-05-31):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2** (wizard synergy strictness + `mechanic_focus` presets) is the next milestone — see [09-next-steps.md](09-next-steps.md).
+**Status (2026-06-03):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2** (wizard synergy strictness + `mechanic_focus` presets for all profiles activated by user selections) is the next milestone — see [09-next-steps.md](09-next-steps.md).
+
+**UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
 This document is intentionally **UI-agnostic at the core** (criteria + reports in `.deck.json`) but evaluates **terminal CLI vs richer UI** per interaction type, and defines schema hooks the engine must support so any future shell can reuse the same logic.
 
@@ -356,11 +358,49 @@ Engine requirements for swaps:
 | --- | --- | --- |
 | **UX0** | Document + `dependency-profiles.yaml` skeleton | None |
 | **UX1** | Notes + `dependency_report`; `--strict-dependencies` | D2 |
-| **UX2** | Wizard: “Synergy strictness” + 1–2 focus presets (energy, auras) | D2–D3 |
+| **UX2** | Wizard: “Synergy strictness” prompts (`strict_dependencies`, `repair_dependencies`) + focus-level presets (incidental/supported/focused/engine) for every profile activated by the user’s theme/mechanic selections | D2–D3 |
 | **UX3** | `criteria` linter warnings in wizard | D2 + profiles |
 | **UX4** | `.deck.json` per-card `dependency_roles` | D2 |
 | **UX5** | Local web: dependency dashboard + swap | D5 + API wrapper |
 | **UX6** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
+
+### UX2 — expanded scope (2026-06-03)
+
+The original UX2 spec named only energy and auras as focus-preset candidates. Dependency expansion Priorities 1–6 shipped 13 additional profiles; the table below shows every profile a user can now activate and the wizard selection that triggers it.
+
+**Wizard deliverables (UX2):**
+
+1. **Synergy strictness step** — expose `strict_dependencies` ("Block picks with no valid target?") and `repair_dependencies` ("Run a post-build repair pass?") as yes/no prompts in Step 5 or a dedicated step after Step 2. These are currently CLI-only flags.
+
+2. **Focus-level prompts — selection-driven, not hard-coded** — after Step 2 collects themes and `include_mechanics`, offer an optional `incidental / supported / focused / engine` prompt for each profile that was activated. Users who make no specific mechanic selections see nothing new; users who select `[energy, rad]` + theme `tokens` see three prompts. Maps directly to `DeckCriteria.mechanic_focus`.
+
+   | Profile | Activated by | Focus prompt label |
+   | --- | --- | --- |
+   | `energy` | `include_mechanics: [energy]` | "Energy focus" |
+   | `aura_support` | `themes: [voltron]` or aura tutor in deck | "Aura support" |
+   | `rad` | `include_mechanics: [rad]` | "Rad counter focus" |
+   | `oil` | `include_mechanics: [oil]` | "Oil counter focus" |
+   | `charge` | `include_mechanics: [charge]` | "Charge counter focus" |
+   | `experience` | `include_mechanics: [experience]` | "Experience focus" |
+   | `blood` | `include_mechanics: [blood]` | "Blood counter focus" |
+   | `plus_one` | `include_mechanics: [counters]` | "+1/+1 counter focus" |
+   | `vehicles` | `include_mechanics: [vehicles]` | "Vehicle focus" |
+   | `equipment` | `include_mechanics: [equip]` | "Equipment focus" |
+   | `tokens` | `themes: [tokens]` | "Token focus" |
+   | `sacrifice` | `themes: [aristocrats]` | "Sacrifice package focus" |
+   | `enchantments` | `themes: [enchantress]` | "Enchantment focus" |
+   | `graveyard` | `themes: [recursion]` | "Graveyard focus" |
+   | `landfall` | `themes: [landfall]` | "Landfall focus" |
+
+3. **Optional dependency summary in wizard review** — low-priority stretch goal; may slip to UX3.
+
+**No new engine or schema work required.** `DeckCriteria.mechanic_focus` is already a generic `dict[str, str]`; `dependency_scope.py` already evaluates `_focus_requests_profile()` for every profile ID. The wizard just needs to populate it.
+
+**What stays out of UX2:**
+- Per-profile min/max overrides (CLI/JSON edit only; poor terminal fit — defer to UX5 web)
+- Criteria linter warnings (UX3)
+- Progressive constraint narrowing in the wizard (UX6)
+- `disabled_rule_ids` expert mode (stays CLI/JSON for now)
 
 ---
 
@@ -454,7 +494,7 @@ These apply to **CLI wizard**, future **local web**, and **interactive refill** 
 | **hidden** | Option not shown | Strict + high-confidence rule only |
 | **disabled** | Visible, cannot select; short reason | Layer 1 feasibility (later UX6) |
 | **warn** | Selectable; confirmation prompt | UX3 linter, early UX6 |
-| **info** | Selectable; badge “needs payoffs” | UX2 focus presets |
+| **info** | Selectable; badge “needs payoffs” | UX2 focus presets (all profiles activated by user selections) |
 | **off** | No restriction | Until dependency engine enabled |
 
 **Escape hatch (required):** “Show incompatible options” / `--no-progressive-constraints` so experts are not blocked by false positives.
