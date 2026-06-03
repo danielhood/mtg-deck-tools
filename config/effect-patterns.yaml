@@ -242,6 +242,63 @@ patterns:
     payload:
       resource: plus_one
 
+  # --- rad counters (player radiation) ---
+  - id: rad_produce
+    effect_kind: rad_produce
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)((?:you may )?(?:get|gets) .{0,25}rad counters?|(?:each|target|defending|that|they|opponents?) (?:\\w+ )?(?:player )?(?:gets?|get) .{0,35}rad counters?|give .{0,40}rad counters?)"
+    payload:
+      resource: rad
+
+  - id: rad_consume
+    effect_kind: rad_consume
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)((?:for each|total number of) .{0,30}rad counters?|rad counters? you have|(?:defending )?player (?:has|have) (?:a |any )?rad counters?|remove .{0,40}rad counters?|lose (?:all )?rad counters?|from radiation)"
+    payload:
+      resource: rad
+
+  # --- oil counters (Phyrexia / permanent) ---
+  - id: oil_produce
+    effect_kind: oil_produce
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(put .{0,50}oil counters? on|enters with .{0,30}oil counters?)"
+    payload:
+      resource: oil
+
+  - id: oil_consume
+    effect_kind: oil_consume
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(remove .{0,40}oil counters?|(?:for each|number of|equal to the number of) .{0,35}oil counters?|(?:has|have) .{0,25}oil counters?|with an oil counter|oil counter was removed|oil counters? on (?:them|each|permanents?))"
+    payload:
+      resource: oil
+
+  # --- charge counters (artifacts / generic) ---
+  - id: charge_produce
+    effect_kind: charge_produce
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(put .{0,60}charge counters?|enters(?: tapped)? with .{0,40}charge counters?)"
+    payload:
+      resource: charge
+
+  - id: charge_consume
+    effect_kind: charge_consume
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(remove .{0,40}charge counters?|for each charge counter|charge counters? on this)"
+    payload:
+      resource: charge
+
   # --- type / subtype payoffs ---
   - id: buff_subtype_other
     effect_kind: buff_subtype
