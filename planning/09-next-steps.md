@@ -136,11 +136,10 @@ Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-ro
 
 | Priority | Deliverable | Rationale |
 | --- | --- | --- |
-| 1 | **Tutor payload upgrades** | CMC bands, colors, named cards — stronger `TUTOR_TARGET_EXISTS` |
-| 2 | **Graveyard / landfall heuristics** | Warn-only before packages |
-| 3 | **Counter resources** | Proliferate, blood, experience — after audit evidence |
+| 1 | **Graveyard / landfall heuristics** | Warn-only before packages |
+| 2 | **Counter resources** | Proliferate, blood, experience — after audit evidence |
 
-**Recently shipped (2026-06):** **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
+**Recently shipped (2026-06):** **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
 
 Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15). **Doc updates:** [DOC-MAP.md](DOC-MAP.md); agents run `/ship-dependency-feature` before PR.
 
@@ -167,7 +166,7 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 | Topic | Notes | Doc |
 | --- | --- | --- |
-| **Dependency expansion** | Graveyard heuristics, counter resources | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
+| **Dependency expansion** | Tutor payloads, graveyard heuristics, counter resources | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
 | Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
 | Dependency swap packages | `generate --swap-profile energy` — needs UX5 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |

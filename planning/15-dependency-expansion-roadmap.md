@@ -36,7 +36,7 @@ flowchart TD
 
 | `effect_kind` | Role |
 | --- | --- |
-| `search_library` | Tutor / search predicates (land, creature, artifact, enchantment, aura, CMC cap, any card) |
+| `search_library` | Tutor / search predicates (land, creature, artifact, enchantment, aura, CMC min/max, colored creature, land subtype, creature or planeswalker, any card) |
 | `energy_produce` / `energy_consume` | Energy counter balance |
 | `sacrifice_outlet` / `sacrifice_payoff` / `sacrifice_fodder` | Aristocrats package roles |
 | `buff_subtype` | “Other Elves …” (and similar) subtype lords |
@@ -92,18 +92,18 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | ~~**Vehicles profile**~~ | `type_line_vehicle` + crew creature count | `VEHICLE_BALANCE` | `include_mechanics: [vehicles]` | **Shipped 2026-06** — `vehicle_min: 3`, `creature_min: 25` |
 | ~~**Enchantment matters**~~ | `whenever_cast_enchantment` (non-Aura) | `ENCHANTMENT_SUPPORT_MIN` | `themes: [enchantress]` + card-driven | **Shipped 2026-06** — `enchantment_min: 8`; Sythis dogfood; separate from `AURA_SUPPORT_MIN` |
 
-### Priority 2 — Tutor payload upgrades
+### ~~Priority 2 — Tutor payload upgrades~~
 
-Extend `search_library` payload matching (see gaps in [`hard-cases.yaml`](../resources/dependency/hard-cases.yaml)):
+**Shipped 2026-06** — [`rules/tutor_payload.py`](../src/mtg_deck_tools/rules/tutor_payload.py): OR type matching (`type_match: any`), `min_cmc` / `max_cmc`, `colors`, land subtypes (Forest, …), creature-or-planeswalker patterns; validator loads card `colors` from DB. Patterns: `search_library_creature_cmc_min`, `search_library_colored_creature`, `search_library_land_subtype`, `search_library_creature_or_planeswalker`.
 
-| Gap | Example cards | Build impact |
-| --- | --- | --- |
-| **CMC bands** | “MV 6 or greater”, “X or less” beyond current capture | Stronger `TUTOR_TARGET_EXISTS` |
-| **Color in search** | Green Sun’s Zenith | Identity-aware target pool |
-| **Named basic / subtype land** | Nature’s Lore, Three Visits (“Forest”) | Land subtype in payload |
-| **Multi-type tutors** | Finale of Devastation (creature or planeswalker) | Union target matching |
-| **Named card search** | “Search for a card named …” | New `REQUIRES_CARD` rule (high severity, rare) |
-| **`any_card` tutors** | Demonic Tutor, Gamble | Keep soft warn / low confidence (already `search_any`) |
+| Gap | Status |
+| --- | --- |
+| CMC bands (min / max) | Shipped |
+| Color in search | Shipped |
+| Named subtype land | Shipped |
+| Multi-type tutors | Shipped |
+| Named card search | Deferred (`REQUIRES_CARD` — rare) |
+| `any_card` tutors | Unchanged (low confidence soft warn) 
 
 ### Priority 3 — Resource counters (energy-shaped profiles)
 
