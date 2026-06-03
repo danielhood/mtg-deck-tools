@@ -40,6 +40,9 @@ flowchart TD
 | `energy_produce` / `energy_consume` | Energy counter balance |
 | `experience_produce` / `experience_consume` | Experience counter balance |
 | `blood_produce` / `blood_consume` | Blood counter balance (player counters) |
+| `rad_produce` / `rad_consume` | Rad counter balance (player radiation) |
+| `oil_produce` / `oil_consume` | Oil counter balance (Phyrexia / permanent) |
+| `charge_produce` / `charge_consume` | Charge counter balance (artifacts / generic) |
 | `plus_one_produce` / `plus_one_consume` | +1/+1 counter producers vs payoffs |
 | `sacrifice_outlet` / `sacrifice_payoff` / `sacrifice_fodder` | Aristocrats package roles (`token_produce` counts as fodder) |
 | `sacrifice_opponent` | Grave Pact-style forced sacrifice (not an outlet) |
@@ -66,6 +69,9 @@ flowchart TD
 | `ENERGY_BALANCE` | Producers without consumers or reverse | `include_mechanics: [energy]` or ≥2 imbalanced cards |
 | `EXPERIENCE_BALANCE` | Experience producers without consumers or reverse | `include_mechanics: [experience]` or ≥2 imbalanced cards |
 | `BLOOD_BALANCE` | Blood producers without consumers or reverse | `include_mechanics: [blood]` or ≥2 imbalanced cards |
+| `RAD_BALANCE` | Rad producers without consumers or reverse | `include_mechanics: [rad]` or ≥2 imbalanced cards |
+| `OIL_BALANCE` | Oil producers without consumers or reverse | `include_mechanics: [oil]` or ≥3 imbalanced cards |
+| `CHARGE_BALANCE` | Charge producers without consumers or reverse | `include_mechanics: [charge]` or ≥5 imbalanced cards |
 | `PLUS_ONE_BALANCE` | +1/+1 producers without consumers or reverse | `include_mechanics: [counters]` or ≥2 imbalanced cards |
 | `SACRIFICE_BALANCE` | Outlets without payoffs or reverse | `themes: [aristocrats]` or ≥2 imbalanced cards |
 | `TOKEN_BALANCE` | Producers without payoffs or reverse | `themes: [tokens]` or ≥2 imbalanced cards |
@@ -85,6 +91,9 @@ flowchart TD
 | Energy | `include_mechanics: [energy]` | ≥2 producers, ≥2 consumers |
 | Experience | `include_mechanics: [experience]` | ≥1 producer, ≥2 consumers |
 | Blood | `include_mechanics: [blood]` | ≥2 producers, ≥2 consumers |
+| Rad | `include_mechanics: [rad]` | ≥2 producers, ≥1 consumer |
+| Oil | `include_mechanics: [oil]` | ≥2 producers, ≥2 consumers |
+| Charge | `include_mechanics: [charge]` | ≥2 producers, ≥2 consumers |
 | +1/+1 counters | `include_mechanics: [counters]` | ≥3 producers, ≥2 consumers |
 | Sacrifice / aristocrats | `themes: [aristocrats]` | ≥2 outlets, ≥3 payoffs, ≥8 fodder |
 | Auras | Voltron theme or card-driven aura check | ≥6 Aura spells |
@@ -96,7 +105,7 @@ flowchart TD
 
 ### Dogfood coverage
 
-[`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml) — **25 scenarios** (tokens, voltron, energy, experience, blood, +1/+1 counters, elves, artifacts, aristocrats, landfall, goblins, vampires, enchantress, budget, strict/repair). Run: `mtg-deck-tools analyze run --fail-on-expect` after import.
+[`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml) — **28 scenarios** (tokens, voltron, energy, experience, blood, +1/+1, rad, oil, charge, elves, artifacts, aristocrats, landfall, goblins, vampires, enchantress, budget, strict/repair). Run: `mtg-deck-tools analyze run --fail-on-expect` after import.
 
 ---
 
@@ -128,14 +137,14 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 
 ### ~~Priority 3 — Resource counters (energy-shaped profiles)~~
 
-**Shipped 2026-06** — [`rules/resource_counters.py`](../src/mtg_deck_tools/rules/resource_counters.py): experience, blood, and +1/+1 counter produce/consume atoms; `EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`; `ensure_resource_counter_packages`; wizard `include_mechanics: [experience]`, `[blood]`, `[counters]`. Rad/oil/charge remain deferred (lower pool / theme-only).
+**Shipped 2026-06** — [`rules/resource_counters.py`](../src/mtg_deck_tools/rules/resource_counters.py): experience, blood, +1/+1, rad, oil, and charge counter produce/consume atoms; `EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `ensure_resource_counter_packages`; wizard `include_mechanics: [experience]`, `[blood]`, `[counters]`, `[rad]`, `[oil]`, `[charge]`.
 
 | Resource | Status |
 | --- | --- |
 | **+1/+1 / proliferate** | Shipped — `plus_one_*` kinds, `PLUS_ONE_BALANCE` |
 | **Experience** | Shipped — `experience_*`, `EXPERIENCE_BALANCE` |
 | **Blood** | Shipped — `blood_*`, `BLOOD_BALANCE` |
-| **Rad, oil, charge** | Deferred — format-specific; add when theme selected |
+| ~~**Rad, oil, charge**~~ | **Shipped 2026-06** — `rad_*`, `oil_*`, `charge_*`; theme-selected via `include_mechanics`; charge/oil use higher `incidental_imbalance_min` (5 / 3) |
 
 ### ~~Priority 4 — Sacrifice / tokens refinements~~
 
@@ -204,9 +213,10 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
 | ~~0~~ | ~~**Dogfood matrix 25/25**~~ | **Done 2026-06-03** — blood consume patterns; +1/+1 incidental threshold |
-| 1 | **Rad / oil / charge counters** | Format-specific resource counters; theme-selected |
+| ~~1~~ | ~~**Rad / oil / charge counters**~~ | **Done 2026-06-03** — `rad_*`, `oil_*`, `charge_*`; dogfood `rad-mothman`, `oil-migloz`, `charge-immard` |
+| 1 | **Equipment depth** | Equip cost / “whenever equipped” beyond artifact count |
 
-**Shipped (2026-06):** **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; profiles `graveyard`, `landfall`).
+**Shipped (2026-06):** **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; profiles `rad`, `oil`, `charge`; wizard `include_mechanics`); **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; profiles `graveyard`, `landfall`).
 
 **Parallel track:** **UX2** wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` ([11](11-dependency-engine-user-experience.md)) — does not block pattern work but improves user-facing control.
 

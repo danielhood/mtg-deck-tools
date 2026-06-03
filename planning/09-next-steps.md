@@ -1,6 +1,6 @@
 # Next steps — post-v1
 
-Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phase 3 (§1–§5)**, and the **card dependency engine (D0–D5)** are **shipped**. Dogfood matrix (**25 scenarios**) and mechanic packages (energy, experience, blood, +1/+1 counters, sacrifice, auras, artifacts, subtype lords, tokens, vehicles) — see [14-deck-analysis.md](14-deck-analysis.md) and [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
+Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phase 3 (§1–§5)**, and the **card dependency engine (D0–D5)** are **shipped**. Dogfood matrix (**28 scenarios**) and mechanic packages (energy, experience, blood, +1/+1, rad, oil, charge counters, sacrifice, auras, artifacts, subtype lords, tokens, vehicles) — see [14-deck-analysis.md](14-deck-analysis.md) and [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
 
 ## Current state
 
@@ -139,16 +139,19 @@ Restored **25/25** on `analyze run --fail-on-expect` after 2026-06 Scryfall bulk
 | `blood-yawgmoth` | Extended `blood_consume` extraction (remove/spend/for-each on permanent); cards like Font of Agonies now produce **and** consume |
 | `elves-lathril` | Raised `plus_one` `incidental_imbalance_min` to 5 so token elf shells ignore ≤4 incidental +1/+1 producers |
 
+### ~~1. Rad / oil / charge counters~~ **Done (2026-06-03)**
+
+Shipped `rad_*`, `oil_*`, `charge_*` effect atoms; `RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; profiles in `dependency-profiles.yaml`; wizard `include_mechanics: [rad, oil, charge]`. Dogfood: `rad-mothman`, `oil-migloz`, `charge-immard`. Post-import: **13,070** effect atoms (+486 vs prior import).
+
 ### 1. Dependency expansion (high-value additions)
 
 Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**.
 
 | Priority | Deliverable | Rationale |
 | --- | --- | --- |
-| 1 | **Rad / oil / charge counters** | Format-specific; theme-selected only |
-| 2 | **Equipment depth** | Equip cost / “whenever equipped” beyond artifact count |
+| 1 | **Equipment depth** | Equip cost / “whenever equipped” beyond artifact count |
 
-**Recently shipped (2026-06):** **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
+**Recently shipped (2026-06):** **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
 
 Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15). **Doc updates:** [DOC-MAP.md](DOC-MAP.md); agents run `/ship-dependency-feature` before PR.
 
@@ -166,7 +169,7 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 - ☑ Suppress `ENERGY_BALANCE` for a lone incidental producer unless user includes `energy` or has 2+ imbalanced cards
 - ☑ Sacrifice profile + `SACRIFICE_BALANCE` for aristocrats intent
 - ☑ `whenever_cast_aura` — enchantment payoffs no longer trigger voltron aura floor
-- ☑ Dogfood matrix — 25 scenarios; `analyze run --fail-on-expect` gate (**25/25** as of 2026-06-03 bulk refresh)
+- ☑ Dogfood matrix — 28 scenarios; `analyze run --fail-on-expect` gate (**28/28** as of 2026-06-03 rad/oil/charge ship)
 - ☐ Threshold review against latest audit evidence when adding new profiles (doc 15)
 
 ---
@@ -175,7 +178,7 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 | Topic | Notes | Doc |
 | --- | --- | --- |
-| **Dependency expansion** | Rad/oil/charge counters, equipment depth | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
+| **Dependency expansion** | Equipment depth | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) |
 | Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
 | Dependency swap packages | `generate --swap-profile energy` — needs UX5 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |
@@ -190,8 +193,8 @@ From [11-dependency-engine-user-experience.md](11-dependency-engine-user-experie
 
 ## Suggested next task
 
-**Dependency expansion** — next up: **Rad / oil / charge counters** ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)). In parallel or after: **UX2** wizard controls for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets.
+**Dependency expansion** — next up: **Equipment depth** ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)). In parallel or after: **UX2** wizard controls for `--strict-dependencies`, `--repair-dependencies`, and `mechanic_focus` presets.
 
-Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` — **25/25** ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
+Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` — **28/28** ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 
 See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX2 → UX3 criteria linter → UX5 local web).

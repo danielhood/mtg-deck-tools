@@ -1,4 +1,4 @@
-"""Shared produce/consume balance for player resource counters (experience, blood, +1/+1)."""
+"""Shared produce/consume balance for resource counters (experience, blood, +1/+1, rad, oil, charge)."""
 
 from __future__ import annotations
 
@@ -59,6 +59,33 @@ RESOURCE_COUNTER_SPECS: tuple[ResourceCounterSpec, ...] = (
         display_name="+1/+1",
         producer_label="+1/+1 counter producer(s)",
         consumer_label="cards that care about +1/+1 counters",
+    ),
+    ResourceCounterSpec(
+        profile_id="rad",
+        rule_id="RAD_BALANCE",
+        produce_kind="rad_produce",
+        consume_kind="rad_consume",
+        display_name="rad",
+        producer_label="rad counter producer(s)",
+        consumer_label="cards that care about rad counters",
+    ),
+    ResourceCounterSpec(
+        profile_id="oil",
+        rule_id="OIL_BALANCE",
+        produce_kind="oil_produce",
+        consume_kind="oil_consume",
+        display_name="oil",
+        producer_label="oil counter producer(s)",
+        consumer_label="cards that care about oil counters",
+    ),
+    ResourceCounterSpec(
+        profile_id="charge",
+        rule_id="CHARGE_BALANCE",
+        produce_kind="charge_produce",
+        consume_kind="charge_consume",
+        display_name="charge",
+        producer_label="charge counter producer(s)",
+        consumer_label="cards that care about charge counters",
     ),
 )
 

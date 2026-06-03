@@ -181,6 +181,24 @@ tags:
       - type: oracle_regex
         pattern: "(?i)blood counter"
 
+  - id: rad
+    layer: keyword
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)rad counter"
+
+  - id: oil
+    layer: keyword
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)oil counter"
+
+  - id: charge
+    layer: keyword
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)charge counter"
+
   - id: counters
     layer: keyword
     matchers:

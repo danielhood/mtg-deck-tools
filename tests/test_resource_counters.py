@@ -218,3 +218,94 @@ def test_energy_produce_and_consume_on_same_card(resource_db: sqlite3.Connection
         criteria=DeckCriteria(include_mechanics=["energy"]),
     )
     assert not any(i.rule_id == "ENERGY_BALANCE" for i in report.issues)
+
+
+def test_rad_scope_intent() -> None:
+    scope = build_dependency_scope(DeckCriteria(include_mechanics=["rad"]))
+    assert scope.resource_user_intent("rad")
+    assert not scope.resource_user_intent("oil")
+
+
+def test_rad_produce_and_consume_on_same_card(resource_db: sqlite3.Connection) -> None:
+    _insert_effect(
+        resource_db,
+        "solo",
+        "rad_produce",
+        {"resource": "rad"},
+        "rad_produce",
+    )
+    _insert_effect(
+        resource_db,
+        "solo",
+        "rad_consume",
+        {"resource": "rad"},
+        "rad_consume",
+    )
+    resource_db.commit()
+    report = validate_dependencies(
+        resource_db,
+        maindeck=[_deck_card(oracle_id="solo", name="Mariposa Military Base", type_line="Land")],
+        commanders=[],
+        criteria=DeckCriteria(include_mechanics=["rad"]),
+    )
+    assert not any(i.rule_id == "RAD_BALANCE" for i in report.issues)
+
+
+def test_oil_produce_and_consume_on_same_card(resource_db: sqlite3.Connection) -> None:
+    _insert_effect(
+        resource_db,
+        "solo",
+        "oil_produce",
+        {"resource": "oil"},
+        "oil_produce",
+    )
+    _insert_effect(
+        resource_db,
+        "solo",
+        "oil_consume",
+        {"resource": "oil"},
+        "oil_consume",
+    )
+    resource_db.commit()
+    report = validate_dependencies(
+        resource_db,
+        maindeck=[_deck_card(oracle_id="solo", name="Migloz, Maze Crusher", type_line="Creature")],
+        commanders=[],
+        criteria=DeckCriteria(include_mechanics=["oil"]),
+    )
+    assert not any(i.rule_id == "OIL_BALANCE" for i in report.issues)
+
+
+def test_charge_four_producers_silent_without_charge_intent(
+    resource_db: sqlite3.Connection,
+) -> None:
+    for i in range(4):
+        oid = f"c{i}"
+        resource_db.execute(
+            """
+            INSERT INTO cards (
+                oracle_id, name, type_line, oracle_text, mana_cost, cmc, color_identity,
+                keywords, commander_legal, commander_eligible, is_basic_land, price_known
+            ) VALUES (?, ?, 'Artifact', '', '{2}', 2, '[]', '[]', 1, 0, 0, 1)
+            """,
+            (oid, f"Charge Producer {i}"),
+        )
+        _insert_effect(
+            resource_db,
+            oid,
+            "charge_produce",
+            {"resource": "charge"},
+            "charge_produce",
+        )
+    resource_db.commit()
+    maindeck = [
+        _deck_card(oracle_id=f"c{i}", name=f"Charge Producer {i}", type_line="Artifact")
+        for i in range(4)
+    ]
+    report = validate_dependencies(
+        resource_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["artifacts"]),
+    )
+    assert not any(i.rule_id == "CHARGE_BALANCE" for i in report.issues)
