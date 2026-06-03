@@ -12,6 +12,27 @@ def has_card_price_range(criteria: DeckCriteria) -> bool:
     )
 
 
+def passes_card_price_usd(
+    *,
+    price_usd: float | None,
+    price_known: bool,
+    min_usd: float | None,
+    max_usd: float | None,
+    strict: bool,
+) -> bool:
+    """True when USD price satisfies optional per-card min/max (shared with commander search)."""
+    if not price_known or price_usd is None:
+        if min_usd is not None:
+            return False
+        return not strict
+    price = price_usd
+    if min_usd is not None and price < min_usd:
+        return False
+    if max_usd is not None and price > max_usd:
+        return False
+    return True
+
+
 def _passes_card_price_range(
     candidate: CardCandidate,
     *,
@@ -19,16 +40,13 @@ def _passes_card_price_range(
     max_usd: float | None,
     strict: bool,
 ) -> bool:
-    if not candidate.price_known or candidate.price_usd is None:
-        if min_usd is not None:
-            return False
-        return not strict
-    price = candidate.price_usd
-    if min_usd is not None and price < min_usd:
-        return False
-    if max_usd is not None and price > max_usd:
-        return False
-    return True
+    return passes_card_price_usd(
+        price_usd=candidate.price_usd,
+        price_known=candidate.price_known,
+        min_usd=min_usd,
+        max_usd=max_usd,
+        strict=strict,
+    )
 
 
 def filter_card_price_range(

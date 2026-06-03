@@ -1,6 +1,6 @@
 # MTG Deck Tools
 
-Local utility for building **Commander** (EDH) decks: a terminal wizard walks through themes, colors, mechanics, and budget, then generates a legal 100-card list with Markdown and machine-readable output.
+Local utility for building **Commander** (EDH) decks: a terminal wizard walks through themes, mechanics, colors, budget, commander, and rarity, then generates a legal 100-card list with Markdown and machine-readable output.
 
 Planning docs: [`planning/README.md`](planning/README.md) · agent doc map: [`planning/DOC-MAP.md`](planning/DOC-MAP.md) · next steps: [`planning/09-next-steps.md`](planning/09-next-steps.md).
 
@@ -139,7 +139,7 @@ mtg-deck-tools analyze run --write-decks --fail-on-expect
 # Full deck: slot-filled 99-card maindeck → output/
 mtg-deck-tools generate --seed 42 --colors G --themes tokens
 
-# Full wizard: themes, mechanics, colors, commander, budget
+# Full wizard: themes, mechanics, colors, budget, commander, rarity
 mtg-deck-tools wizard
 
 # Wizard then generate
@@ -164,7 +164,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 | `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms |
 | `stats` | Row counts, import metadata, top tags, effect counts |
 | `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
-| `wizard` | Interactive wizard: themes, mechanics, colors, commander (exact or includes color filter), budget (criteria only; does not write a deck) |
+| `wizard` | Interactive wizard: themes, mechanics, colors, budget & per-card prices, commander (color + price filters), rarity (criteria only; does not write a deck) |
 | `generate` | Build a 99-card maindeck plus commander metadata → `output/*.deck.json` and `output/*.md` |
 
 ### `generate` — how it works

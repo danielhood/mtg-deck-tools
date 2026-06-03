@@ -108,6 +108,38 @@ def test_search_commanders_includes_extra_colors(color_match_db: sqlite3.Connect
     assert {c.oracle_id for c in includes_bg} == {"golgari"}
 
 
+def test_search_commanders_filters_per_card_price_range(
+    commander_db: sqlite3.Connection,
+) -> None:
+    conn = commander_db
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, color_identity, commander_legal,
+            commander_eligible, price_usd, price_known
+        ) VALUES ('expensive', 'Expensive', 'Legendary Creature', '[]', 1, 1, 50.0, 1)
+        """
+    )
+    conn.commit()
+
+    in_range = search_commanders(
+        conn,
+        colors=["B"],
+        card_price_max_usd=10.0,
+        strict_budget=True,
+    )
+    assert {c.oracle_id for c in in_range} == {"cmd-1"}
+
+    out_of_range = search_commanders(
+        conn,
+        colors=[],
+        card_price_max_usd=10.0,
+        strict_budget=True,
+        name_query="Expensive",
+    )
+    assert out_of_range == []
+
+
 def test_search_commanders_loads_price_and_date(commander_db: sqlite3.Connection) -> None:
     results = search_commanders(commander_db, colors=["B"], name_query="Test")
     assert len(results) == 1

@@ -16,6 +16,41 @@ from mtg_deck_tools.formatting import (
 )
 
 
+def _append_commander_price_sql(
+    sql: str,
+    params: list,
+    *,
+    card_price_min_usd: float | None,
+    card_price_max_usd: float | None,
+    budget_usd: float | None,
+    strict_budget: bool,
+) -> str:
+    """Add WHERE clauses for per-card range and deck budget (commander must fit)."""
+    require_priced = strict_budget or card_price_min_usd is not None
+
+    if card_price_min_usd is not None:
+        sql += " AND price_known = 1 AND price_usd >= ?"
+        params.append(card_price_min_usd)
+
+    if card_price_max_usd is not None:
+        if require_priced:
+            sql += " AND price_known = 1 AND price_usd <= ?"
+            params.append(card_price_max_usd)
+        else:
+            sql += " AND (price_known = 0 OR price_usd IS NULL OR price_usd <= ?)"
+            params.append(card_price_max_usd)
+
+    if budget_usd is not None:
+        if strict_budget:
+            sql += " AND price_known = 1 AND price_usd <= ?"
+            params.append(budget_usd)
+        else:
+            sql += " AND (price_known = 0 OR price_usd IS NULL OR price_usd <= ?)"
+            params.append(budget_usd)
+
+    return sql
+
+
 @dataclass(frozen=True)
 class CommanderRow:
     oracle_id: str
@@ -61,11 +96,17 @@ def search_commanders(
     name_query: str = "",
     limit: int = 15,
     color_match: ColorMatchMode = "exact",
+    card_price_min_usd: float | None = None,
+    card_price_max_usd: float | None = None,
+    budget_usd: float | None = None,
+    strict_budget: bool = False,
 ) -> list[CommanderRow]:
     """Find commander-eligible cards matching color filter and optional name substring.
 
     ``exact``: commander color identity equals the selected colors (no extra colors).
     ``includes``: commander identity contains every selected color (may include more).
+
+    Per-card min/max and deck budget use the same rules as maindeck price filtering.
     """
     sql = """
         SELECT oracle_id, name, type_line, color_identity, partner_kind, edhrec_rank,
@@ -84,6 +125,14 @@ def search_commanders(
         for color in colors:
             sql += " AND color_identity LIKE ?"
             params.append(f'%"{color}"%')
+    sql = _append_commander_price_sql(
+        sql,
+        params,
+        card_price_min_usd=card_price_min_usd,
+        card_price_max_usd=card_price_max_usd,
+        budget_usd=budget_usd,
+        strict_budget=strict_budget,
+    )
     if name_query.strip():
         sql += " AND name LIKE ? ESCAPE '\\'"
         params.append(f"%{name_query.strip()}%")
