@@ -23,7 +23,7 @@ Resolved before D1 implementation (2026-05-30). Revisit only with evidence from 
 | `TYPE_SYNERGY_MIN` | `buff_subtype`, `whenever_cast_type` |
 | `AURA_SUPPORT_MIN` | `type_line_aura`, aura `search_library` |
 
-**Deferred:** graveyard / delve / escape, `SUBTYPE_SYNERGY_MIN` automation until audit justifies.
+**Deferred:** ~~graveyard / delve / escape~~ (shipped 2026-06 as warn-only heuristics), `SUBTYPE_SYNERGY_MIN` automation until audit justifies.
 
 ## False-positive budget (D2 gate)
 

@@ -51,6 +51,12 @@ flowchart TD
 | `type_line_aura` | Aura on type line (extraction aid) |
 | `token_produce` / `token_payoff` | Token producers vs “whenever you create a token” payoffs |
 | `type_line_vehicle` | Vehicle on type line (crew density checks) |
+| `reanimate` | Return target from graveyard to battlefield/hand |
+| `graveyard_cost` | Delve / flashback (needs graveyard fodder over time) |
+| `mill_enabler` | Self-mill and library-to-graveyard enablers |
+| `graveyard_payoff` | “For each … in your graveyard” and similar payoffs |
+| `landfall_payoff` | Landfall keyword triggers |
+| `land_ramp` | Spells that put lands onto the battlefield |
 
 ### Validation rules (`rule_id`)
 
@@ -67,6 +73,10 @@ flowchart TD
 | `TYPE_SYNERGY_MIN` | Subtype lord or type-matters payoff below suggested minimum | Card-driven (lord / cast trigger in deck) |
 | `AURA_SUPPORT_MIN` | Aura count below floor | `themes: [voltron]`, aura tutors, or `whenever_cast_aura` payoffs |
 | `ENCHANTMENT_SUPPORT_MIN` | Enchantment count below floor | `themes: [enchantress]`, enchantment tutors, or `whenever_cast_enchantment` payoffs |
+| `REANIMATION_SUPPORT` | Reanimation without creature density / curve | Card-driven when `reanimate` in deck |
+| `GRAVEYARD_COST_SUPPORT` | Delve/flashback with thin nonland count | Card-driven when ≥2 `graveyard_cost` cards |
+| `SELF_MILL_BALANCE` | Mill enablers vs graveyard payoffs | `themes: [recursion]` or ≥2 imbalanced cards |
+| `LANDFALL_BALANCE` | Landfall payoffs without land ramp | `themes: [landfall]` or ≥2 landfall payoffs |
 
 ### Mechanic packages (post-fill swaps)
 
@@ -137,16 +147,16 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | ~~Opponent-sacrifice effects~~ | Shipped — `sacrifice_opponent`; excluded from `sacrifice_outlet` |
 | ~~Persist / undying / escape~~ | Shipped — `death_recursion`; ≥2 pieces support payoffs without outlets |
 
-### Priority 5 — Graveyard / landfall (warn-only first)
+### ~~Priority 5 — Graveyard / landfall (warn-only first)~~
 
-Planning doc [10](10-card-dependency-engine.md) §5: **soft dependencies** — deck composition + curve, not pure regex.
+**Shipped 2026-06** — [`rules/graveyard_landfall.py`](../src/mtg_deck_tools/rules/graveyard_landfall.py): `reanimate`, `graveyard_cost`, `mill_enabler`, `graveyard_payoff`, `landfall_payoff`, `land_ramp` atoms; `REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE` (warn-only; no packages yet). Profiles: `graveyard` (`themes: [recursion]`), `landfall` (`themes: [landfall]`).
 
-| Archetype | Heuristic | Strict package? |
+| Archetype | Heuristic | Status |
 | --- | --- | --- |
-| **Reanimation** | “Return … from graveyard” + creature density / CMC | Warn first |
-| **Delve / escape / flashback** | Nonland count in graveyard over time | Warn first |
-| **Self-mill** | Mill enablers vs graveyard payoffs | Warn first |
-| **Landfall** | Land ramp count vs landfall payoffs | Warn when `themes: [landfall]`; matrix today only checks “no unrelated noise” |
+| ~~**Reanimation**~~ | “Return … from graveyard” + creature density / CMC | Shipped — `REANIMATION_SUPPORT` |
+| ~~**Delve / flashback**~~ | Nonland count proxy for graveyard fodder | Shipped — `GRAVEYARD_COST_SUPPORT` |
+| ~~**Self-mill**~~ | Mill enablers vs graveyard payoffs | Shipped — `SELF_MILL_BALANCE` |
+| ~~**Landfall**~~ | Land ramp count vs landfall payoffs | Shipped — `LANDFALL_BALANCE` when `themes: [landfall]` or ≥2 payoffs |
 
 ### Priority 6 — Equipment depth
 
@@ -193,10 +203,10 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
-| 1 | **Graveyard / landfall heuristics** | Warn-only rules before packages |
-| 2 | **Rad / oil / charge counters** | Format-specific resource counters; theme-selected |
+| 0 | **Dogfood matrix 25/25** | Fix `blood-yawgmoth`, `elves-lathril` after 2026-06 bulk refresh (23/25 today) |
+| 1 | **Rad / oil / charge counters** | Format-specific resource counters; theme-selected |
 
-**Shipped (2026-06):** **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`).
+**Shipped (2026-06):** **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; profiles `graveyard`, `landfall`).
 
 **Parallel track:** **UX2** wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` ([11](11-dependency-engine-user-experience.md)) — does not block pattern work but improves user-facing control.
 

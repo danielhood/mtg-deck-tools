@@ -89,4 +89,36 @@ def classify_dependency_warning(
     if rule_id == "TYPE_SYNERGY_MIN":
         return "appropriate"
 
+    if rule_id in (
+        "REANIMATION_SUPPORT",
+        "GRAVEYARD_COST_SUPPORT",
+        "SELF_MILL_BALANCE",
+        "LANDFALL_BALANCE",
+    ):
+        if rule_id == "LANDFALL_BALANCE" and scope.landfall_user_intent:
+            return "appropriate"
+        if rule_id in (
+            "REANIMATION_SUPPORT",
+            "GRAVEYARD_COST_SUPPORT",
+            "SELF_MILL_BALANCE",
+        ) and scope.graveyard_user_intent:
+            return "appropriate"
+        detail = issue.detail or {}
+        if rule_id == "REANIMATION_SUPPORT":
+            if scope.graveyard_user_intent:
+                return "appropriate"
+            cards = detail.get("reanimate") or []
+            return "appropriate" if len(cards) >= 3 else "inappropriate"
+        if rule_id == "GRAVEYARD_COST_SUPPORT":
+            cards = detail.get("graveyard_cost") or []
+            return "appropriate" if len(cards) >= 2 else "inappropriate"
+        if rule_id == "SELF_MILL_BALANCE":
+            if scope.graveyard_user_intent:
+                return "appropriate"
+            return "inappropriate"
+        if rule_id == "LANDFALL_BALANCE":
+            if scope.landfall_user_intent:
+                return "appropriate"
+            return "inappropriate"
+
     return "review"

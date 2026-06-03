@@ -828,6 +828,18 @@ def validate_dependencies(
         )
     )
 
+    from mtg_deck_tools.rules.graveyard_landfall import append_graveyard_landfall_balance
+
+    append_graveyard_landfall_balance(
+        report,
+        scope=dep_scope,
+        maindeck=maindeck,
+        effects_map=effects_map,
+        severity=severity,
+        strict=strict,
+        profiles=profile_cfg,
+    )
+
     return report
 
 

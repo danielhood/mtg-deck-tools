@@ -131,6 +131,16 @@ def test_build_dependency_scope_vehicles_include() -> None:
     assert not scope_off.vehicles_user_intent
 
 
+def test_build_dependency_scope_graveyard_and_landfall() -> None:
+    scope_gy = build_dependency_scope(DeckCriteria(themes=["recursion"]))
+    assert scope_gy.graveyard_user_intent
+    scope_lf = build_dependency_scope(DeckCriteria(themes=["landfall"]))
+    assert scope_lf.landfall_user_intent
+    scope_off = build_dependency_scope(DeckCriteria(themes=["tokens"]))
+    assert not scope_off.graveyard_user_intent
+    assert not scope_off.landfall_user_intent
+
+
 def test_incidental_aura_does_not_trigger_support_min(scope_db: sqlite3.Connection) -> None:
     maindeck = [_deck_card(oracle_id="aura1", name="Ethereal Armor", type_line="Enchantment — Aura")]
     report = validate_dependencies(

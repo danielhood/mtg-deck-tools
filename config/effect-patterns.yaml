@@ -484,3 +484,67 @@ patterns:
     payload:
       types: [artifact]
       subtypes: [Vehicle]
+
+  # --- graveyard / landfall (Priority 5 — warn-only heuristics) ---
+  - id: reanimate_return
+    effect_kind: reanimate
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)return (?:target )?(?:.{0,80} )?from (?:your |a )?graveyard to (?:the battlefield|your hand)"
+    payload:
+      role: reanimate
+    exclude_if_matched:
+      - death_recursion_escape
+
+  - id: graveyard_cost_delve_flashback
+    effect_kind: graveyard_cost
+    confidence: 1.0
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)\\b(?:delve|flashback)\\b"
+    payload:
+      mechanic: graveyard_cost
+
+  - id: mill_enabler
+    effect_kind: mill_enabler
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(?:mill (?:a |an |one |two |three |four |five |\\d+ )?cards?|put (?:the )?top (?:\\d+|one|two|three|four|five|ten) (?:cards )?of (?:your )?library into (?:your )?graveyard)"
+    payload:
+      role: mill
+
+  - id: graveyard_payoff
+    effect_kind: graveyard_payoff
+    confidence: 0.85
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(?:for each (?:card|creature|permanent).{0,80}in your graveyard|based on .{0,60}graveyard|with .{0,60} in your graveyard)"
+    payload:
+      role: payoff
+    exclude_if_matched:
+      - reanimate_return
+      - mill_enabler
+      - death_recursion_escape
+      - death_recursion_persist
+      - death_recursion_undying
+      - graveyard_cost_delve_flashback
+
+  - id: landfall_payoff
+    effect_kind: landfall_payoff
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)\\blandfall\\b"
+    payload:
+      role: payoff
+
+  - id: land_ramp
+    effect_kind: land_ramp
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(?:put (?:a |an |up to \\w+ )?(?:[\\w'-]+\\s+)*land(?: card)?(?:s)?(?: from your hand)? onto the battlefield|search your library for .{0,100}(?:basic land|(?:[\\w'-]+\\s+)*land(?: card)?|Forest|Island|Plains|Mountain|Swamp).{0,60}put .{0,60}onto the battlefield)"
+    payload:
+      role: ramp

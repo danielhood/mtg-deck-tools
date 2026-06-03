@@ -14,9 +14,11 @@ cases:
   - name: cultivate
     oracle_text: "Search your library for up to two basic land cards, put them onto the battlefield tapped, then shuffle."
     type_line: "Sorcery"
-    expected:
+    expected_min:
       - effect_kind: search_library
         source: search_library_basic_land
+      - effect_kind: land_ramp
+        source: land_ramp
 
   - name: elvish_vanguard
     oracle_text: "Other Elves you control get +1/+1."
@@ -284,12 +286,14 @@ cases:
   - name: natures_lore
     oracle_text: "Search your library for a Forest card, put it onto the battlefield, then shuffle."
     type_line: "Sorcery"
-    expected:
+    expected_min:
       - effect_kind: search_library
         source: search_library_land_subtype
         payload:
           types: [land]
           subtypes: [Forest]
+      - effect_kind: land_ramp
+        source: land_ramp
 
   - name: fierce_empath
     oracle_text: "When Fierce Empath enters the battlefield, you may search your library for a creature card with mana value 6 or greater, reveal it, put it into your hand, then shuffle."
@@ -347,3 +351,60 @@ cases:
     expected:
       - effect_kind: plus_one_produce
         source: plus_one_produce
+
+  - name: animate_dead
+    oracle_text: "Return target creature card from your graveyard to the battlefield."
+    type_line: "Enchantment — Aura"
+    expected_min:
+      - effect_kind: reanimate
+        source: reanimate_return
+      - effect_kind: type_line_aura
+        source: type_line_aura
+
+  - name: snapcaster_mage
+    oracle_text: "Flash\nWhen Snapcaster Mage enters the battlefield, target instant or sorcery card in your graveyard gains flashback until end of turn."
+    type_line: "Creature — Human Wizard"
+    expected:
+      - effect_kind: graveyard_cost
+        source: graveyard_cost_delve_flashback
+
+  - name: treasure_cruise
+    oracle_text: "Delve\nDraw three cards."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: graveyard_cost
+        source: graveyard_cost_delve_flashback
+
+  - name: stitchers_supplier
+    oracle_text: "When Stitcher's Supplier enters the battlefield or dies, mill three cards."
+    type_line: "Creature — Zombie"
+    expected:
+      - effect_kind: mill_enabler
+        source: mill_enabler
+
+  - name: saproling_symbiosis
+    oracle_text: "For each creature card in your graveyard, create a 1/1 green Saproling creature token."
+    type_line: "Sorcery"
+    expected_min:
+      - effect_kind: graveyard_payoff
+        source: graveyard_payoff
+      - effect_kind: token_produce
+        source: token_produce
+
+  - name: omnath_locus_of_rage
+    oracle_text: "Landfall — Whenever a land enters the battlefield under your control, create a 5/5 red Elemental creature token."
+    type_line: "Legendary Creature — Elemental"
+    expected_min:
+      - effect_kind: landfall_payoff
+        source: landfall_payoff
+      - effect_kind: token_produce
+        source: token_produce
+
+  - name: rampant_growth
+    oracle_text: "Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle."
+    type_line: "Sorcery"
+    expected_min:
+      - effect_kind: search_library
+        source: search_library_basic_land
+      - effect_kind: land_ramp
+        source: land_ramp
