@@ -140,6 +140,7 @@ def should_warn_resource_imbalance(
     profile_id: str,
     producer_count: int,
     consumer_count: int,
+    profiles: dict[str, dict[str, Any]] | None = None,
 ) -> bool:
     if producer_count == 0 and consumer_count == 0:
         return False
@@ -147,7 +148,9 @@ def should_warn_resource_imbalance(
         return False
     if scope.resource_user_intent(profile_id):
         return True
-    return max(producer_count, consumer_count) >= 2
+    cfg = (profiles or load_profile_defaults()).get(profile_id, {})
+    dominant_min = int(cfg.get("incidental_imbalance_min", 2))
+    return max(producer_count, consumer_count) >= dominant_min
 
 
 def append_resource_balance(

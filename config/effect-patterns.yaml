@@ -221,11 +221,9 @@ patterns:
     confidence: 0.9
     matchers:
       - type: oracle_regex
-        pattern: "(?i)(for each blood counter|blood counters? (?:an )?opponent has|blood counters? on (?:each )?opponent)"
+        pattern: "(?i)(?:remove .{0,40}blood counters? from|for each blood counter|blood counters? (?:an )?opponent has|blood counters? on (?:each )?opponent|lose 1 life for each blood counter)"
     payload:
       resource: blood
-    exclude_if_matched:
-      - blood_produce
 
   # --- +1/+1 counters ---
   - id: plus_one_produce

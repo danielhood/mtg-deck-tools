@@ -203,7 +203,7 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
-| 0 | **Dogfood matrix 25/25** | Fix `blood-yawgmoth`, `elves-lathril` after 2026-06 bulk refresh (23/25 today) |
+| ~~0~~ | ~~**Dogfood matrix 25/25**~~ | **Done 2026-06-03** — blood consume patterns; +1/+1 incidental threshold |
 | 1 | **Rad / oil / charge counters** | Format-specific resource counters; theme-selected |
 
 **Shipped (2026-06):** **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; profiles `graveyard`, `landfall`).

@@ -133,3 +133,63 @@ def test_balanced_experience_passes(resource_db: sqlite3.Connection) -> None:
         criteria=DeckCriteria(include_mechanics=["experience"]),
     )
     assert not any(i.rule_id == "EXPERIENCE_BALANCE" for i in report.issues)
+
+
+def test_plus_one_four_producers_silent_without_counters_intent(
+    resource_db: sqlite3.Connection,
+) -> None:
+    for i in range(4):
+        oid = f"p{i}"
+        resource_db.execute(
+            """
+            INSERT INTO cards (
+                oracle_id, name, type_line, oracle_text, mana_cost, cmc, color_identity,
+                keywords, commander_legal, commander_eligible, is_basic_land, price_known
+            ) VALUES (?, ?, 'Creature', '', '{2}', 2, '[]', '[]', 1, 0, 0, 1)
+            """,
+            (oid, f"Producer {i}"),
+        )
+        _insert_effect(
+            resource_db,
+            oid,
+            "plus_one_produce",
+            {"resource": "plus_one"},
+            "plus_one_produce",
+        )
+    resource_db.commit()
+    maindeck = [
+        _deck_card(oracle_id=f"p{i}", name=f"Producer {i}", type_line="Creature")
+        for i in range(4)
+    ]
+    report = validate_dependencies(
+        resource_db,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["tokens"]),
+    )
+    assert not any(i.rule_id == "PLUS_ONE_BALANCE" for i in report.issues)
+
+
+def test_blood_produce_and_consume_on_same_card(resource_db: sqlite3.Connection) -> None:
+    _insert_effect(
+        resource_db,
+        "solo",
+        "blood_produce",
+        {"resource": "blood"},
+        "blood_produce",
+    )
+    _insert_effect(
+        resource_db,
+        "solo",
+        "blood_consume",
+        {"resource": "blood"},
+        "blood_consume",
+    )
+    resource_db.commit()
+    report = validate_dependencies(
+        resource_db,
+        maindeck=[_deck_card(oracle_id="solo", name="Font of Agonies", type_line="Enchantment")],
+        commanders=[],
+        criteria=DeckCriteria(include_mechanics=["blood"]),
+    )
+    assert not any(i.rule_id == "BLOOD_BALANCE" for i in report.issues)
