@@ -162,3 +162,24 @@ profiles:
       consumer_min: 2
       consumer_max: 8
       share_max: 0.18
+
+  graveyard:
+    label: Graveyard heuristics
+    activation:
+      themes: [recursion]
+    roles: [reanimate, mill_enabler, graveyard_payoff, graveyard_cost]
+    defaults:
+      reanimation_creature_min: 20
+      reanimation_creature_cmc_max: 5.0
+      graveyard_cost_nonland_min: 35
+      graveyard_cost_card_min: 2
+      self_mill_dominant_min: 2
+
+  landfall:
+    label: Landfall
+    activation:
+      themes: [landfall]
+    roles: [landfall_payoff, land_ramp]
+    defaults:
+      land_ramp_min: 8
+      landfall_payoff_trigger_min: 2

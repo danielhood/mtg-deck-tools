@@ -86,4 +86,4 @@ See **[09-next-steps.md](09-next-steps.md)** for the active backlog.
 
 **Agent documentation SDLC:** **[DOC-MAP.md](DOC-MAP.md)** — required updates per change type; enforced via `.cursor/rules/` and skills `/sync-documentation`, `/ship-dependency-feature` (no CI doc gates).
 
-**Recommended first tasks:** **dependency expansion** — tutor payloads, graveyard heuristics ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)); **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
+**Recommended first tasks:** **dependency expansion** — Rad/oil/charge counters ([15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)); **UX2** wizard controls for strict/repair flags and `mechanic_focus` presets ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).

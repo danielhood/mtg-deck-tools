@@ -28,6 +28,8 @@ class DependencyScope:
     tokens_user_intent: bool = False
     vehicles_user_intent: bool = False
     enchantments_user_intent: bool = False
+    graveyard_user_intent: bool = False
+    landfall_user_intent: bool = False
     _resource_intent: dict[str, bool] = field(default_factory=dict)
 
     def resource_user_intent(self, profile_id: str) -> bool:
@@ -101,5 +103,7 @@ def build_dependency_scope(
         tokens_user_intent=_profile_active("tokens"),
         vehicles_user_intent=_profile_active("vehicles"),
         enchantments_user_intent=_profile_active("enchantments"),
+        graveyard_user_intent=_profile_active("graveyard"),
+        landfall_user_intent=_profile_active("landfall"),
         _resource_intent=resource_intent,
     )
