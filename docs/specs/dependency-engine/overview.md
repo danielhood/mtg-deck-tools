@@ -393,7 +393,7 @@ Engine implementation should read profile thresholds from YAML rather than hard-
 
 ## Post–D5 expansion (active)
 
-D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras, artifacts, subtype lords, tokens, vehicles, dogfood matrix). Shipped effect kinds, rules, and packages: **[shipped-inventory.md](shipped-inventory.md)**. Future work: **[dependency/backlog.md](../../roadmap/dependency/backlog.md)**:
+D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras, artifacts, subtype lords, tokens, vehicles, dogfood matrix). Shipped effect kinds, rules, and packages: **[shipped-inventory.md](shipped-inventory.md)**. Future work: **[backlog/cli-engine.md](../../roadmap/backlog/cli-engine.md)**:
 
 - Shipped inventory (`effect_kind`, `rule_id`, packages)
 - High-value additions (enchantment matters, tutor payloads, graveyard heuristics, counter resources)

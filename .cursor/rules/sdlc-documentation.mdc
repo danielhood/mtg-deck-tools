@@ -16,7 +16,7 @@ This repo prototypes a **Cursor-driven SDLC**. Agents own documentation quality;
 
 ## Non-negotiables
 
-- **Ship status** changes → update [shipped-inventory.md](../../docs/specs/dependency-engine/shipped-inventory.md) for dependency code, [roadmap/active.md](../../docs/roadmap/active.md) / [dependency/active.md](../../docs/roadmap/dependency/active.md), [changelog.md](../../docs/history/changelog.md), and README when user-facing.
+- **Ship status** changes → update [roadmap/active.md](../../docs/roadmap/active.md), relevant [roadmap/backlog/](../../docs/roadmap/backlog/), [changelog.md](../../docs/history/changelog.md), [shipped-inventory.md](../../docs/specs/dependency-engine/shipped-inventory.md) for dependency code, README when user-facing.
 - **Never** leave shipped work listed under **active** when it belongs in history/changelog only.
 - If no docs need updates, state why explicitly in the PR body.
 

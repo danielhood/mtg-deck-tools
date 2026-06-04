@@ -1,6 +1,6 @@
 # Dependency expansion — priority delivery history
 
-Archived record of Priority 1–8 expansion work (2026-06). **Open dependency work:** [dependency/backlog.md](../roadmap/dependency/backlog.md). **Shipped capability spec:** [shipped-inventory.md](../specs/dependency-engine/shipped-inventory.md).
+Archived record of Priority 1–8 expansion work (2026-06). **Open dependency work:** [backlog/cli-engine.md](../roadmap/backlog/cli-engine.md). **Shipped capability spec:** [shipped-inventory.md](../specs/dependency-engine/shipped-inventory.md).
 
 ---
 
@@ -79,7 +79,7 @@ Priority 5 shipped narrow `mill_enabler` (explicit mill / library→GY). **Prior
 
 **Non-goals (unchanged):** Reanimation and delve/flashback stay on `REANIMATION_SUPPORT` and `GRAVEYARD_COST_SUPPORT`.
 
-**Priority 7 remainder** (golden cases, broader GY, post-fill package) was never part of the shipped grid — tracked in [dependency/backlog.md](../roadmap/dependency/backlog.md).
+**Priority 7 remainder** (golden cases, broader GY, post-fill package) was never part of the shipped grid — tracked in [backlog/cli-engine.md](../roadmap/backlog/cli-engine.md).
 
 ### ~~Priority 8 — Token subtype buffs (match payoffs to produced token types)~~
 

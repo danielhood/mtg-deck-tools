@@ -7,9 +7,9 @@ Documentation is **agent-enforced**, not CI-gated. On every task that changes co
 1. Follow [docs/DOC-MAP.md](docs/DOC-MAP.md) for which files to update.
 2. Obey Cursor rules in `.cursor/rules/` (especially `sdlc-documentation`, always applied).
 3. Before commit/push/PR: run skill **`/sync-documentation`**.
-4. Dependency expansion: run **`/ship-dependency-feature`** (includes sync + dependency-expansion ship steps).
+4. Dependency expansion: run **`/ship-dependency-feature`**.
 
-PRs must include a **Documentation** section (docs touched, or explicit reason for none). Never leave shipped features listed as "next" in [roadmap/active.md](docs/roadmap/active.md), [roadmap/dependency/active.md](docs/roadmap/dependency/active.md), or [roadmap/backlog.md](docs/roadmap/backlog.md).
+PRs must include a **Documentation** section. Never leave shipped work listed in [roadmap/active.md](docs/roadmap/active.md) or component backlogs under [roadmap/backlog/](docs/roadmap/backlog/).
 
 ## Cursor Cloud specific instructions
 

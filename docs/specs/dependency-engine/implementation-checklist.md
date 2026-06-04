@@ -14,7 +14,7 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 | ◐ | In progress |
 | ☑ | Done — link PR, commit, or artifact path in notes column |
 
-**Rule:** D0–D5 are **complete** (2026-05-31). Use this checklist for dogfood acceptance and UX2+ work; do not reopen D1 gate unless schema or pattern contracts change. **Post–D5 expansion** (new effect kinds and profiles) — see [dependency/backlog.md](../../roadmap/dependency/backlog.md) and [dependency-validation.md](../../sdlc/dependency-validation.md).
+**Rule:** D0–D5 are **complete** (2026-05-31). Use this checklist for dogfood acceptance and UX2+ work; do not reopen D1 gate unless schema or pattern contracts change. **Post–D5 expansion** (new effect kinds and profiles) — see [backlog/cli-engine.md](../../roadmap/backlog/cli-engine.md) and [dependency-validation.md](../../sdlc/dependency-validation.md).
 
 **Suggested order:** § Snapshot → § D0 → § D0.5 → § Decisions → § Output contract → then D1 → D2.
 
@@ -166,7 +166,7 @@ Before UX2 / default strict mode, manually review generated decks:
 
 - [overview.md](overview.md) — D0–D5 technical phases
 - [user-experience.md](user-experience.md) — UX phases, progressive constraints
-- [dependency/backlog.md](../../roadmap/dependency/backlog.md) — post–D5 expansion backlog
+- [backlog/cli-engine.md](../../roadmap/backlog/cli-engine.md) — post–D5 expansion backlog
 - [shipped-inventory.md](shipped-inventory.md) — shipped atoms and rules
-- [active.md](../../roadmap/active.md) — backlog
+- [active.md](../../roadmap/active.md) — unified active register
 - [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml) — thresholds (update after D0.5)
