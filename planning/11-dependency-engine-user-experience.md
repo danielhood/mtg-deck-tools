@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [10-card-dependency-engine.md](10-card-dependency-engine.md).
 
-**Status (2026-06-03):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). Next: **UX3** criteria linter — see [09-next-steps.md](09-next-steps.md).
+**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). Next: **UX5** local web — see [09-next-steps.md](09-next-steps.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -363,7 +363,7 @@ Engine requirements for swaps:
 | **UX0** | Document + `dependency-profiles.yaml` skeleton | None |
 | **UX1** | Notes + `dependency_report`; `--strict-dependencies` | D2 |
 | ~~**UX2**~~ | ~~Wizard: “Synergy strictness” prompts (`strict_dependencies`, `repair_dependencies`) + focus-level presets (incidental/supported/focused/engine) for every profile activated by the user’s theme/mechanic selections~~ — **Shipped 2026-06-03** (`wizard` step 3) | D2–D3 |
-| **UX3** | `criteria` linter warnings in wizard | D2 + profiles |
+| ~~**UX3**~~ | ~~`criteria` linter warnings in wizard~~ — **Shipped 2026-06-04** (`rules/criteria_linter.py`, wizard preflight after step 7) | D2 + profiles |
 | **UX4** | `.deck.json` per-card `dependency_roles` | D2 |
 | **UX5** | Local web: dependency dashboard + swap | D5 + API wrapper |
 | **UX6** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
@@ -461,9 +461,19 @@ The original UX2 spec named only energy and auras as focus-preset candidates. De
 
 **What stays out of UX2:**
 - Per-profile min/max overrides (CLI/JSON edit only; poor terminal fit — defer to UX5 web)
-- Criteria linter warnings (UX3)
+- ~~Criteria linter warnings (UX3)~~ — shipped 2026-06-04
 - Progressive constraint narrowing in the wizard (UX6)
 - `disabled_rule_ids` expert mode (stays CLI/JSON for now)
+
+### UX3 — criteria linter (shipped 2026-06-04)
+
+**Deliverables:**
+
+1. **`lint_criteria()`** in `rules/criteria_linter.py` — warn-only preflight without building a deck. Returns `CriteriaWarning` rows with `rule_id` + message.
+2. **Wizard preflight** — after step 7 (rarity), before the criteria summary: show warnings in a yellow panel; user confirms or cancels.
+3. **Checks (v1):** include/avoid overlap; avoid vs activated profile or `mechanic_focus`; voltron + avoid equip; tokens + aristocrats theme stack; >2 profiles at focused/engine; strict budget + rare minimum + ≥3 focused profiles.
+
+**Explicit non-goals (defer to UX6):** disabling wizard options; inventory-backed CI feasibility; fix loop / re-run wizard steps.
 
 ---
 

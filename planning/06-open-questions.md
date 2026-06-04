@@ -30,7 +30,7 @@ See [09-next-steps.md](09-next-steps.md) for the active backlog (dependency UX c
 
 | Topic | Notes |
 | --- | --- |
-| Dependency wizard UX (UX3+) | UX2 shipped (wizard step 3: strict/repair + `mechanic_focus`); criteria linter and web UI remain — [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
+| Dependency wizard UX (UX5+) | UX3 shipped (criteria linter preflight); local web UI remains — [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | Complicated, context-dependent; not a single dial |
 | Obscure vs new null-price classification | Shipped heuristic favors obscure detection — [08-card-availability.md](08-card-availability.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` |

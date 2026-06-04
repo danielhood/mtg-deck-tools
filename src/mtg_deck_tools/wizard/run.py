@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.wizard.preflight import run_preflight
 from mtg_deck_tools.wizard.step1 import run_step1
 from mtg_deck_tools.wizard.step2 import run_step2
 from mtg_deck_tools.wizard.step3 import run_step3
@@ -28,5 +29,6 @@ def run_wizard(
     criteria = run_step4(criteria)
     criteria = run_step5(criteria, db_path=db_path)
     criteria = run_step6(criteria)
+    criteria = run_preflight(criteria)
     print_wizard_summary(criteria)
     return criteria

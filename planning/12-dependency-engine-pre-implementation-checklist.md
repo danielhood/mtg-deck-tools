@@ -123,7 +123,7 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 | Topic | Defer until |
 | --- | --- |
 | Progressive wizard restrictions (UX6) | D2 calibrated + D0.5 `profile_counts_by_ci` |
-| `ConstraintState` / criteria linter (UX3) | D2 rules stable; can parallel D2 |
+| `ConstraintState` / criteria linter (UX3) | ☑ UX3 shipped 2026-06-04 (`criteria_linter.py`); full `ConstraintState` deferred to UX6 |
 | Pick-time strict pool filter (D4) | **Shipped** — `--strict-dependencies` |
 | Repair / swap pass (D5) | **Shipped** — `--repair-dependencies` |
 | Web constraint panel (UX7) | Separate milestone |

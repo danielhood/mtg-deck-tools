@@ -1,6 +1,6 @@
 # Next steps — post-v1
 
-Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phase 3 (§1–§5)**, and the **card dependency engine (D0–D5)** are **shipped**. Dogfood matrix (**28 scenarios**) and mechanic packages (energy, experience, blood, +1/+1, rad, oil, charge counters, sacrifice, auras, artifacts, subtype lords, tokens, vehicles) — see [14-deck-analysis.md](14-deck-analysis.md) and [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
+Status as of 2026-06-04. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phase 3 (§1–§5)**, and the **card dependency engine (D0–D5)** are **shipped**. Dogfood matrix (**28 scenarios**) and mechanic packages (energy, experience, blood, +1/+1, rad, oil, charge counters, sacrifice, auras, artifacts, subtype lords, tokens, vehicles) — see [14-deck-analysis.md](14-deck-analysis.md) and [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
 
 ## Current state
 
@@ -29,6 +29,7 @@ Status as of 2026-06-03. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | `--strict-dependencies` | Done — D4 pick-time filter |
 | `--repair-dependencies` | Done — D5 post-build swap pass |
 | Wizard dependency controls (UX2) | **Done** — wizard step 3: `strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` per activated profile |
+| Wizard criteria linter (UX3) | **Done** — end-of-wizard preflight (`rules/criteria_linter.py`); user confirms before summary |
 | Dependency dogfood calibration | **Done** — `analyze run --fail-on-expect`: **25/25** after 2026-06 bulk refresh (blood consume patterns, +1/+1 incidental threshold) |
 | Mechanic packages | **Done** — energy, experience, blood, +1/+1 counters, sacrifice/aristocrats, voltron auras, enchantments, equip/vehicles artifacts, subtype lords, tokens, vehicles, equipment |
 | Sacrifice / aristocrats profile | **Done** — `SACRIFICE_BALANCE` + `ensure_sacrifice_package` |
@@ -148,17 +149,21 @@ Shipped `rad_*`, `oil_*`, `charge_*` effect atoms; `RAD_BALANCE`, `OIL_BALANCE`,
 
 Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**. Priority 1–6 expansion items are shipped.
 
-**Suggested next task (UX):** **UX3** criteria linter warnings in wizard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
+**Suggested next task (UX):** **UX5** local web dependency dashboard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
 
 **Suggested next task (dependency):** None — dependency expansion sequence complete through Priority 8; next dependency work is backlog-driven (see doc 15 non-goals).
 
-**Recently shipped (2026-06):** **Token subtype buffs** (`TOKEN_SUBTYPE_BUFF_SUPPORT`, `token_buff_subtype`, subtype capture on `token_produce`; dogfood `treasure-prosper`); **Graveyard filler atoms** (`mill_enabler_surveil_discover`, `graveyard_filler_discard`; dogfood `surveil-mirko`); **UX2** wizard synergy step (`strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` for all activated profiles); **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
+**Recently shipped (2026-06):** **UX3** criteria linter (end-of-wizard preflight: include/avoid overlap, avoid vs activated profiles/focus, voltron+avoid equip, tokens+aristocrats theme stack, too many focused profiles, over-constrained budget); **Token subtype buffs** (`TOKEN_SUBTYPE_BUFF_SUPPORT`, `token_buff_subtype`, subtype capture on `token_produce`; dogfood `treasure-prosper`); **Graveyard filler atoms** (`mill_enabler_surveil_discover`, `graveyard_filler_discard`; dogfood `surveil-mirko`); **UX2** wizard synergy step (`strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` for all activated profiles); **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
 
 Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15). **Doc updates:** [DOC-MAP.md](DOC-MAP.md); agents run `/ship-dependency-feature` before PR.
 
 ### ~~2. UX2 — wizard synergy controls~~ **Done**
 
 Shipped wizard **step 3** (synergy & dependencies): `strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` presets (incidental/supported/focused/engine) for every profile activated in steps 1–2. Criteria summary shows dependency settings. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md).
+
+### ~~3. UX3 — criteria linter~~ **Done (2026-06-04)**
+
+Shipped end-of-wizard **criteria preflight** (`rules/criteria_linter.py`, `wizard/preflight.py`): warn-only checks for include/avoid overlap, avoid vs activated dependency profiles or `mechanic_focus`, voltron + avoid equip, tokens + aristocrats theme stack, more than two focused/engine profiles, and strict budget + rare minimum + three focused profiles. User confirms before the criteria summary. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md).
 
 ### 4. Graveyard filler dependency enhancement (Priority 7) — **planned**
 
@@ -204,10 +209,10 @@ Extend graveyard **enabler** extraction so dependency balancing sees cards that 
 
 ## Suggested next task
 
-**UX3** criteria linter warnings in the wizard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). UX2 wizard synergy controls shipped 2026-06-03 (step 3: strict/repair flags + `mechanic_focus` for activated profiles).
+**UX5** local web dependency dashboard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). UX3 criteria linter shipped 2026-06-04 (wizard preflight after step 7). UX2 wizard synergy controls shipped 2026-06-03 (step 3: strict/repair flags + `mechanic_focus` for activated profiles).
 
 **Dependency (next enhancement):** [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) **Priority 7** — surveil, discover, and other graveyard-filler patterns for `SELF_MILL_BALANCE` (engineering sequence item **3** in doc 15). **Priority 8** — token subtype buffs (sequence item **4**).
 
 Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` — **28/28** ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 
-See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX3 criteria linter → UX5 local web).
+See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX5 local web → UX6 progressive constraints).
