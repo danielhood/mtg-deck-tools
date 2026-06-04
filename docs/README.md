@@ -23,6 +23,7 @@ docs/
   specs/               # Technical specifications
     data/              # Import contracts (oracle bulk, …)
     dependency-engine/
+    web/               # Web UI spec (planned — UX7)
   roadmap/             # Active work and domain backlogs
   history/             # Shipped milestones and changelog
   packages/            # Per-package indexes (cli, web, …)
@@ -57,6 +58,7 @@ docs/
 | [dependency-engine/decisions.md](specs/dependency-engine/decisions.md) | Locked v1 dependency decisions |
 | [dependency-engine/implementation-checklist.md](specs/dependency-engine/implementation-checklist.md) | D0–D5 pre-ship gate |
 | [dependency-engine/effect-extraction-policy.md](specs/dependency-engine/effect-extraction-policy.md) | Merged-face extraction policy |
+| [web/README.md](specs/web/README.md) | Web UI spec placeholder (UX7; `packages/web/`) |
 
 ## Roadmap
 

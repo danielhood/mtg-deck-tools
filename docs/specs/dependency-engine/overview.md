@@ -295,7 +295,7 @@ For each card C in deck:
 
 ## Phase D — Repair (optional, post-v1)
 
-Mirrors “post-validation repair” in [09-next-steps.md](../../roadmap/active.md):
+Mirrors “post-validation repair” in [active.md](../../roadmap/active.md):
 
 1. Run dependency validator.
 2. For each **fail**, search pool for a card that satisfies the missing predicate without breaking legality/budget.
@@ -316,9 +316,9 @@ Before tightening **wizard restrictions** or default thresholds, run a read-only
 | `predicate_target_counts` | Tutor feasibility per search predicate × color identity |
 | False-positive review queue | Do not hard-disable UI until confidence is high |
 
-Feeds progressive constraints in [11-dependency-engine-user-experience.md](user-experience.md) (UX8). The audit can ship as `dependency-audit` CLI or import sidecar without enabling generate-time strict mode.
+Feeds progressive constraints in [user-experience.md](user-experience.md) (UX8). The audit can ship as `dependency-audit` CLI or import sidecar without enabling generate-time strict mode.
 
-**Static DB:** Audit results are valid for the **bundled oracle snapshot** only. Re-run audit when maintainers refresh bulk import ([02-data-sources.md](../../architecture/data-sources.md)); users are not expected to update for new sets.
+**Static DB:** Audit results are valid for the **bundled oracle snapshot** only. Re-run audit when maintainers refresh bulk import ([data-sources.md](../../architecture/data-sources.md)); users are not expected to update for new sets.
 
 ---
 
@@ -336,9 +336,9 @@ Feeds progressive constraints in [11-dependency-engine-user-experience.md](user-
 
 **Suggested order:** D0 → D0.5 → D1 → D2 → D3 → D4 → D5.
 
-**Pre-implementation gate:** [12-dependency-engine-pre-implementation-checklist.md](implementation-checklist.md) — complete before merging D1.
+**Pre-implementation gate:** [implementation-checklist.md](implementation-checklist.md) — complete before merging D1.
 
-**D0 shipped in repo:** `config/effect-patterns.yaml`, `src/mtg_deck_tools/effects/`, `models/effects.py`, golden tests — see [14-effect-extraction-face-policy.md](effect-extraction-policy.md), [13-dependency-engine-decisions.md](decisions.md).
+**D0 shipped in repo:** `config/effect-patterns.yaml`, `src/mtg_deck_tools/effects/`, `models/effects.py`, golden tests — see [effect-extraction-policy.md](effect-extraction-policy.md), [decisions.md](decisions.md).
 
 ---
 
@@ -381,7 +381,7 @@ Feeds progressive constraints in [11-dependency-engine-user-experience.md](user-
 
 ## User experience and control
 
-User-facing mechanics (energy focus, aura density, dominance caps, strict vs warn-only, future swap workflows) are specified in **[11-dependency-engine-user-experience.md](user-experience.md)**. That doc defines:
+User-facing mechanics (energy focus, aura density, dominance caps, strict vs warn-only, future swap workflows) are specified in **[user-experience.md](user-experience.md)**. That doc defines:
 
 - `config/dependency-profiles.yaml` — default min/max and share targets per mechanic profile
 - `DeckCriteria` extensions (`strict_dependencies`, `repair_dependencies`, `mechanic_focus` — wizard step 3 / CLI)
@@ -393,7 +393,7 @@ Engine implementation should read profile thresholds from YAML rather than hard-
 
 ## Post–D5 expansion (active)
 
-D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras, artifacts, subtype lords, tokens, vehicles, dogfood matrix). Further effect kinds, rules, and packages are tracked in **[15-dependency-expansion-roadmap.md](../../roadmap/dependency-expansion.md)**:
+D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras, artifacts, subtype lords, tokens, vehicles, dogfood matrix). Further effect kinds, rules, and packages are tracked in **[dependency-expansion.md](../../roadmap/dependency-expansion.md)**:
 
 - Shipped inventory (`effect_kind`, `rule_id`, packages)
 - High-value additions (enchantment matters, tutor payloads, graveyard heuristics, counter resources)
@@ -426,7 +426,7 @@ D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras,
 
 ## References
 
-- [03-problem-decomposition.md](../../architecture/problem-decomposition.md) — tagging vs filtering
-- [05-technology-options.md](../../architecture/technology-stack.md) — why not full rules engine
-- [08-card-availability.md](../../product/card-availability.md) — similar preprocess + score pattern
-- [09-next-steps.md](../../roadmap/active.md) — active backlog (dependency UX, export, UI)
+- [problem-decomposition.md](../../architecture/problem-decomposition.md) — tagging vs filtering
+- [technology-stack.md](../../architecture/technology-stack.md) — why not full rules engine
+- [card-availability.md](../../product/card-availability.md) — similar preprocess + score pattern
+- [active.md](../../roadmap/active.md) — active backlog (dependency UX, export, UI)

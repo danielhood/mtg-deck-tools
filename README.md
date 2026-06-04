@@ -60,7 +60,7 @@ Use the effective date in the filename so updates are obvious. Commander deck co
 mtg-deck-tools/
   docs/                     # Product, architecture, specs, roadmap, history (see docs/README.md)
   src/mtg_deck_tools/       # CLI package (today)
-  packages/web/             # Web UI (planned — UX7)
+  packages/web/             # Web UI (planned — UX7; .gitkeep)
   scripts/                  # bootstrap-linux.sh (uv-based env on Linux)
   resources/
     scryfall/               # Oracle bulk JSON (local download) + field docs

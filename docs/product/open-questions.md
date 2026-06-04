@@ -13,26 +13,26 @@ All v1 planning questions are resolved. Revisit only when scope changes.
 | Runtime | Local Windows, local DB OK |
 | Preprocessing | Acceptable and recommended |
 | UI (v1) | Terminal wizard (CLI) — Python + `typer` / `questionary` / `rich` |
-| Include / avoid mechanics | Keyword-level want / avoid lists — see [03-problem-decomposition.md](../architecture/problem-decomposition.md) |
+| Include / avoid mechanics | Keyword-level want / avoid lists — see [problem-decomposition.md](../architecture/problem-decomposition.md) |
 | Wizard flow | Theme → include/avoid mechanics → colors → commander |
 | Partner commanders | In v1 |
-| Export format | Markdown + `.deck.json` — [07-deck-output-format.md](deck-output-format.md) |
-| Budget null price | **Allow with warning**; optional `--strict-budget` — [08-card-availability.md](card-availability.md) |
+| Export format | Markdown + `.deck.json` — [deck-output-format.md](deck-output-format.md) |
+| Budget null price | **Allow with warning**; optional `--strict-budget` — [card-availability.md](card-availability.md) |
 | Field reference | Split: `bulk-data-metadata-fields.md` + `oracle-card-fields.md` |
 | Deck variety | **Seeded random** slot selection (`--seed` for reproducibility) |
 | Power level dial | **Deferred** — needs richer model than a simple dial |
-| Card availability | v1: EDHREC bias + `availability_score`; obscure > new-unpriced — [08-card-availability.md](card-availability.md) |
-| Card data freshness | **Static snapshot** — manual bulk refresh; used-card audience — [01-goals-and-scope.md](goals-and-scope.md), [02-data-sources.md](../architecture/data-sources.md) |
+| Card availability | v1: EDHREC bias + `availability_score`; obscure > new-unpriced — [card-availability.md](card-availability.md) |
+| Card data freshness | **Static snapshot** — manual bulk refresh; used-card audience — [goals-and-scope.md](goals-and-scope.md), [data-sources.md](../architecture/data-sources.md) |
 
 ## Deferred (post-v1)
 
-See [09-next-steps.md](../roadmap/active.md) for the active backlog (dependency UX calibration, export, UI).
+See [active.md](../roadmap/active.md) for the active backlog (dependency UX calibration, export, UI).
 
 | Topic | Notes |
 | --- | --- |
-| Dependency wizard UX (UX7+) | UX2–UX5 CLI wizard shipped; UX7+ local web next — [11-dependency-engine-user-experience.md](../specs/dependency-engine/user-experience.md) |
+| Dependency wizard UX (UX7+) | UX2–UX5 CLI wizard shipped; UX7+ local web next — [user-experience.md](../specs/dependency-engine/user-experience.md) |
 | Power level / salt | Complicated, context-dependent; not a single dial |
-| Obscure vs new null-price classification | Shipped heuristic favors obscure detection — [08-card-availability.md](card-availability.md) |
+| Obscure vs new null-price classification | Shipped heuristic favors obscure detection — [card-availability.md](card-availability.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` |
 | Local web / desktop UI | Reuse Python core |
 

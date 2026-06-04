@@ -15,4 +15,6 @@ docs/specs/web/        # routes, API surface, deployment (add when UX7 starts)
 - Reuse the Python core (`src/mtg_deck_tools/`) via API or subprocess — no duplicate rules in the frontend.
 - Shared product goals: `docs/product/` · shared roadmap: `docs/roadmap/`.
 
-When implementation begins, update this README with actual paths and link new specs under `docs/specs/web/`.
+Web technical spec placeholder: [specs/web/README.md](../../specs/web/README.md).
+
+When implementation begins, update both READMEs with framework choice, API routes, and deployment.

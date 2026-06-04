@@ -1,8 +1,8 @@
 # Dependency engine — user experience and control model
 
-Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [10-card-dependency-engine.md](overview.md).
+Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). **UX4 shipped** — wizard step back-navigation (`wizard/navigation.py`, orchestration in `wizard/run.py`). **UX5 shipped** — wizard prepopulate on regen. Next: **UX7** local web — see [09-next-steps.md](../../roadmap/active.md).
+**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). **UX4 shipped** — wizard step back-navigation (`wizard/navigation.py`, orchestration in `wizard/run.py`). **UX5 shipped** — wizard prepopulate on regen. Next: **UX7** local web — see [active.md](../../roadmap/active.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -14,9 +14,9 @@ This document is intentionally **UI-agnostic at the core** (criteria + reports i
 
 | Concern | Owner doc | Notes |
 | --- | --- | --- |
-| What atoms exist, how they are extracted, validation rules | [10-card-dependency-engine.md](overview.md) | D0–D5 implementation phases |
+| What atoms exist, how they are extracted, validation rules | [overview.md](overview.md) | D0–D5 implementation phases |
 | What users can **ask for**, **see**, and **change** | **This doc** | Drives `DeckCriteria` extensions and `dependency_report` shape |
-| Deck file contract | [07-deck-output-format.md](../../product/deck-output-format.md) | `criteria`, Notes groups, future swap metadata |
+| Deck file contract | [deck-output-format.md](../../product/deck-output-format.md) | `criteria`, Notes groups, future swap metadata |
 
 **Design principle:** The engine evaluates **facts** (producers, consumers, tutor predicates). The UX layer expresses **intent** (which mechanics matter, how “focused” the deck should be). Keep intent in `DeckCriteria` / YAML profiles; keep evaluation in `rules/dependencies.py` + `card_effects`.
 
@@ -354,7 +354,7 @@ Engine requirements for swaps:
 | Swap selected card(s) | **Poor** | **Swap** button — UX11 |
 | Per-card lock on refill | **Poor** | **Lock** flag — UX11; stretch `--keep-locked` on CLI |
 
-**Conclusion:** CLI remains the **right first shell** for D0–D3 (reporting, strict flag, simple presets). Plan a **local web or desktop UI** when swap workflows, dashboards, and side-by-side card previews become requirements — reuse Option B/C from [04-architecture-options.md](../../architecture/pipeline-and-components.md) without forking the engine.
+**Conclusion:** CLI remains the **right first shell** for D0–D3 (reporting, strict flag, simple presets). Plan a **local web or desktop UI** when swap workflows, dashboards, and side-by-side card previews become requirements — reuse Option B/C from [pipeline-and-components.md](../../architecture/pipeline-and-components.md) without forking the engine.
 
 ### Phased UX roadmap
 
@@ -408,7 +408,7 @@ Engine requirements for swaps:
 | Lock / unlock card | Poor (manual JSON edit) | **Primary** |
 | Refill slot respecting locks | **Stretch** — e.g. `--keep-locked` on `--refill-slot` | **Primary** |
 
-Contract sketch: [07-deck-output-format.md](../../product/deck-output-format.md) § GUI deck editor. Backlog: [09-next-steps.md](../../roadmap/active.md).
+Contract sketch: [deck-output-format.md](../../product/deck-output-format.md) § GUI deck editor. Backlog: [active.md](../../roadmap/active.md).
 
 ### UX10 — Deck composition metrics (planned)
 
@@ -422,13 +422,13 @@ Contract sketch: [07-deck-output-format.md](../../product/deck-output-format.md)
 | **UX10b** | UX7 local web / desktop | Interactive bar chart; filter by creature / noncreature; compare to archetype reference curves (stretch) |
 | **UX10c** | Optional warn-only rules | e.g. `CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY` — thresholds in YAML, scoped by theme; **not** pick-time block unless user enables strict curve mode (TBD) |
 
-**Data:** Computed from built `DeckCard` rows (`cmc`, `type_line`, `quantity`) — no Scryfall API. `analyze run` may aggregate the same metrics into `summary.json` for regression dashboards ([14-deck-analysis.md](../deck-analysis.md)).
+**Data:** Computed from built `DeckCard` rows (`cmc`, `type_line`, `quantity`) — no Scryfall API. `analyze run` may aggregate the same metrics into `summary.json` for regression dashboards ([deck-analysis.md](../deck-analysis.md)).
 
 **CLI fit:** **Good** for text histogram and summary table; **poor** for interactive charts (defer to UX10b). Flags TBD: `--deck-metrics` / `--no-deck-metrics`.
 
 **Explicit non-goals:** Replacing `mana_base` land math; mandatory curve validation on every deck; wizard step for target curve shape (could follow UX3/UX8).
 
-Contract: [07-deck-output-format.md](../../product/deck-output-format.md) § Deck composition metrics.
+Contract: [deck-output-format.md](../../product/deck-output-format.md) § Deck composition metrics.
 
 ### UX2 — expanded scope (2026-06-03)
 
@@ -578,9 +578,9 @@ Operate on the main inventory (`cards.db` after import) to build **feasibility i
 | `commander_implied_profiles` | Auto-suggest focus when commander extracts Elf lord, enchantress, etc. |
 | `confidence_by_pattern` | Only **hard-disable** wizard options when extraction confidence ≥ threshold |
 
-See **D0.5 inventory audit** in [10-card-dependency-engine.md](overview.md) — restriction quality is bounded by audit accuracy.
+See **D0.5 inventory audit** in [overview.md](overview.md) — restriction quality is bounded by audit accuracy.
 
-**Static card pool:** Feasibility indexes (`profile_counts_by_ci`, etc.) are built from the **same versioned** `cards.db` as deck generation. The product targets **older used cards** ([01-goals-and-scope.md](../../product/goals-and-scope.md)); refreshing companion data is a **maintainer** step alongside `import`, not an end-user concern.
+**Static card pool:** Feasibility indexes (`profile_counts_by_ci`, etc.) are built from the **same versioned** `cards.db` as deck generation. The product targets **older used cards** ([goals-and-scope.md](../../product/goals-and-scope.md)); refreshing companion data is a **maintainer** step alongside `import`, not an end-user concern.
 
 ### UI interaction patterns (parked — specify now)
 
@@ -704,10 +704,10 @@ Decisions here should **constrain** doc 10 implementation early:
 
 ## References
 
-- [12-dependency-engine-pre-implementation-checklist.md](implementation-checklist.md) — D0–D5 gate (complete); dogfood acceptance open
-- [10-card-dependency-engine.md](overview.md) — atoms, rules, D0–D5
-- [07-deck-output-format.md](../../product/deck-output-format.md) — `.deck.json` schema
-- [04-architecture-options.md](../../architecture/pipeline-and-components.md) — CLI vs web vs desktop
-- [06-open-questions.md](../../product/open-questions.md) — deferred power level; UI timing
-- [09-next-steps.md](../../roadmap/active.md) — backlog ordering
+- [implementation-checklist.md](implementation-checklist.md) — D0–D5 gate (complete); dogfood acceptance open
+- [overview.md](overview.md) — atoms, rules, D0–D5
+- [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json` schema
+- [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — CLI vs web vs desktop
+- [open-questions.md](../../product/open-questions.md) — deferred power level; UI timing
+- [active.md](../../roadmap/active.md) — backlog ordering
 - [`config/mechanic-taxonomy.yaml`](../config/mechanic-taxonomy.yaml) — current include/avoid tags

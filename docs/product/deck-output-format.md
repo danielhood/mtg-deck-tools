@@ -98,7 +98,7 @@ For reload, modification, image lookup, and future UI versions. Versioned schema
 }
 ```
 
-Unpriced cards use `price_known: false`. See [08-card-availability.md](../card-availability.md) for budget policy and future obscure-vs-new classification.
+Unpriced cards use `price_known: false`. See [card-availability.md](card-availability.md) for budget policy and future obscure-vs-new classification.
 
 ### `dependency_report` (schema 1.0, optional)
 
@@ -204,7 +204,7 @@ Companion list for acquisition — not counted in the 100-card Commander deck.
 
 **Non-goals for first ship:** Emblems, planes, scheme cards; meld back faces; choosing a specific printing art for tokens (any English token printing is enough for acquisition).
 
-Tracked in backlog: [09-next-steps.md](../roadmap/active.md).
+Tracked in backlog: [active.md](../roadmap/active.md).
 
 ### Deck composition metrics (planned — UX10)
 
@@ -230,7 +230,7 @@ Tracked in backlog: [09-next-steps.md](../roadmap/active.md).
 
 **Non-goals for first ship:** Enforcing a universal “correct” Commander curve; simulating goldfish turns; sideboard metrics.
 
-Spec and UX phasing: [11-dependency-engine-user-experience.md](../specs/dependency-engine/user-experience.md) § UX10. Backlog: [09-next-steps.md](../roadmap/active.md).
+Spec and UX phasing: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX10. Backlog: [active.md](../roadmap/active.md).
 
 ### GUI deck editor (parked — UX11)
 
@@ -253,7 +253,7 @@ Illustrative card entry:
 }
 ```
 
-CLI today: `--refill-slot` replaces **all** cards in that slot; no `locked` field. Stretch: `--keep-locked` on refill. Full spec: [11-dependency-engine-user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
+CLI today: `--refill-slot` replaces **all** cards in that slot; no `locked` field. Stretch: `--keep-locked` on refill. Full spec: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
 
 ### Future utility operations on `.deck.json`
 

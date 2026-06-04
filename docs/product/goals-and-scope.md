@@ -23,9 +23,9 @@ A **local Windows utility** that:
 | Card library | **Static** Scryfall oracle bulk snapshot bundled or imported once per release cycle |
 | Prices | Point-in-time USD from bulk import; stale prices are acceptable |
 | Updating `cards.db` and companion data | **Manual, explicit** maintainer step — not automatic background sync |
-| Availability heuristics | Favor **established, tradable** cards; deprioritize obscure — see [08-card-availability.md](card-availability.md) |
+| Availability heuristics | Favor **established, tradable** cards; deprioritize obscure — see [card-availability.md](card-availability.md) |
 
-The tool should not optimize for “newest cards” or frequent Scryfall polling. Version-stamp the bulk file and derived DB in metadata so users know which snapshot they are on. See [02-data-sources.md](../architecture/data-sources.md) for refresh workflow.
+The tool should not optimize for “newest cards” or frequent Scryfall polling. Version-stamp the bulk file and derived DB in metadata so users know which snapshot they are on. See [data-sources.md](../architecture/data-sources.md) for refresh workflow.
 
 **Engineering consequence:** Dependency inventory (`card_effects`, feasibility indexes, `dependency-profiles.yaml` calibration) is computed against the **same static snapshot** as the builder. Re-running audit + import together on upgrade is fine; incremental daily updates are out of scope.
 
@@ -50,9 +50,9 @@ From CR 903 ([`resources/mtg/MagicCompRules 20260417.txt`](../resources/mtg/Magi
 - Real-time Scryfall API sync (static bulk JSON per release is sufficient for offline)
 - Automatic or scheduled card-data updates (manual bulk refresh only)
 - Third-party site export (Moxfield/Archidekt) — v2; v1 uses Markdown + `.deck.json`
-- Related **token card** companion list in deck output (acquisition aid; not part of 100-card count) — planned; [07-deck-output-format.md](deck-output-format.md)
-- **Deck composition metrics** (CMC distribution report/visualization; optional curve advisories) — planned UX10; [07-deck-output-format.md](deck-output-format.md), [11-dependency-engine-user-experience.md](../specs/dependency-engine/user-experience.md)
-- **GUI deck editor** (per-card lock; swap selected cards under current build rules) — planned UX11; [11-dependency-engine-user-experience.md](../specs/dependency-engine/user-experience.md)
+- Related **token card** companion list in deck output (acquisition aid; not part of 100-card count) — planned; [deck-output-format.md](deck-output-format.md)
+- **Deck composition metrics** (CMC distribution report/visualization; optional curve advisories) — planned UX10; [deck-output-format.md](deck-output-format.md), [user-experience.md](../specs/dependency-engine/user-experience.md)
+- **GUI deck editor** (per-card lock; swap selected cards under current build rules) — planned UX11; [user-experience.md](../specs/dependency-engine/user-experience.md)
 
 ## Success criteria for v1
 

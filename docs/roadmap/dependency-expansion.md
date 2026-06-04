@@ -220,9 +220,9 @@ Priority 5 shipped narrow `mill_enabler` (explicit mill / library→GY). **Prior
 | --- | --- | --- |
 | Removal / wipe density | Slot template, not oracle atoms | `slot-templates.yaml`, themes |
 | Curve / land count | Mana base planner (avg CMC + ramp → land count) | `mana_base.py`, validation |
-| Deck-wide CMC distribution / “good curve” UX | Post-build metrics & optional advisories, not `card_effects` | Planned **UX10** — [07-deck-output-format.md](../product/deck-output-format.md), [11](../specs/dependency-engine/user-experience.md) |
+| Deck-wide CMC distribution / “good curve” UX | Post-build metrics & optional advisories, not `card_effects` | Planned **UX10** — [deck-output-format.md](../product/deck-output-format.md), [11](../specs/dependency-engine/user-experience.md) |
 | Named combo pairs | Needs external combo data | — |
-| Power level / salt | No simple dial | [06-open-questions.md](../product/open-questions.md) |
+| Power level / salt | No simple dial | [open-questions.md](../product/open-questions.md) |
 | Aura removal risk | Not statically provable | UX note in [11](../specs/dependency-engine/user-experience.md) |
 | Commander partners / companion | Construction layer | `validate.py`, commander pick |
 | In-game timing / stack | Non-goal per [10](../specs/dependency-engine/overview.md) | — |
@@ -250,7 +250,7 @@ Use this for each expansion PR:
 
 ## Suggested sequence (engineering)
 
-Aligned with [09-next-steps.md](active.md) and dogfood matrix coverage:
+Aligned with [active.md](active.md) and dogfood matrix coverage:
 
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
@@ -268,5 +268,5 @@ Aligned with [09-next-steps.md](active.md) and dogfood matrix coverage:
 
 - Deferred card stances: [`resources/dependency/hard-cases.yaml`](../resources/dependency/hard-cases.yaml) (`v1_stance`: `defer_tokens`, `defer_vehicles`, `defer_graveyard`, `defer_counters`, …)
 - Profile thresholds: [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml)
-- Automated regression: [14-deck-analysis.md](../specs/deck-analysis.md)
-- Locked v1 scope: [13-dependency-engine-decisions.md](../specs/dependency-engine/decisions.md)
+- Automated regression: [deck-analysis.md](../specs/deck-analysis.md)
+- Locked v1 scope: [decisions.md](../specs/dependency-engine/decisions.md)

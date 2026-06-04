@@ -1,6 +1,6 @@
 # Card availability and pricing
 
-**Audience context:** Users typically build from **used inventory** (cards that have been on the market for months or years). The tool should bias toward cards that are **findable and familiar**, not toward the newest releases. A **static** card DB is acceptable — see [01-goals-and-scope.md](goals-and-scope.md) and [02-data-sources.md](../architecture/data-sources.md).
+**Audience context:** Users typically build from **used inventory** (cards that have been on the market for months or years). The tool should bias toward cards that are **findable and familiar**, not toward the newest releases. A **static** card DB is acceptable — see [goals-and-scope.md](goals-and-scope.md) and [data-sources.md](../architecture/data-sources.md).
 
 ## Basic land pricing
 

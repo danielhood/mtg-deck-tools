@@ -79,13 +79,13 @@ Target: **&lt; 5%** on the full matrix ([docs/specs/dependency-engine/decisions.
 
 ## Future: deck composition metrics in analyze output
 
-Not implemented. Planned **UX10** ([07-deck-output-format.md](../product/deck-output-format.md), [11-dependency-engine-user-experience.md](dependency-engine/user-experience.md)): per-case and aggregate **CMC histograms** (and creature-specific curves) in `cases/<id>.json` and `summary.json` when `--write-decks` is used — useful for spotting regressions in curve shape without manual MD review. Distinct from dependency `expect` blocks (no mandatory curve gate in dogfood matrix until thresholds are calibrated).
+Not implemented. Planned **UX10** ([deck-output-format.md](../product/deck-output-format.md), [user-experience.md](dependency-engine/user-experience.md)): per-case and aggregate **CMC histograms** (and creature-specific curves) in `cases/<id>.json` and `summary.json` when `--write-decks` is used — useful for spotting regressions in curve shape without manual MD review. Distinct from dependency `expect` blocks (no mandatory curve gate in dogfood matrix until thresholds are calibrated).
 
 ## Extending
 
 - Add scenarios to the YAML (no code change).
 - For new check types, extend `expect` parsing in `analysis/matrix.py` and `analysis/expectations.py`.
-- For new dependency rules and mechanic packages, follow [15-dependency-expansion-roadmap.md](../roadmap/dependency-expansion.md).
+- For new dependency rules and mechanic packages, follow [dependency-expansion.md](../roadmap/dependency-expansion.md).
 - Programmatic use: `build_generate_outcome()` → inspect `GenerateOutcome` without writing decks.
 
 ## CI
