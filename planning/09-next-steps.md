@@ -160,16 +160,9 @@ Each feature: patterns → import → rule → optional package → dogfood scen
 
 Shipped wizard **step 3** (synergy & dependencies): `strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` presets (incidental/supported/focused/engine) for every profile activated in steps 1–2. Criteria summary shows dependency settings. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md).
 
-### 4. Graveyard filler dependency enhancement (Priority 7) — **planned**
+### ~~4. Graveyard filler dependency enhancement (Priority 7)~~ **Done**
 
-Extend graveyard **enabler** extraction so dependency balancing sees cards that fill the yard without explicit “mill” or “put top … of library” wording.
-
-| Item | Notes |
-| --- | --- |
-| **Surveil / discover** | Not referenced in repo; do not match current `mill_enabler` regex |
-| **`SELF_MILL_BALANCE`** | Only compares `mill_enabler` vs `graveyard_payoff` when `graveyard` profile active (`themes: [recursion]`) |
-| **Delivery** | Patterns → import → graveyard role collection / balance rules → dogfood scenario; optional post-fill package only if needed |
-| **Spec** | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) § Priority 7 |
+Shipped `mill_enabler_surveil_discover` and `graveyard_filler_discard` patterns (same `mill_enabler` kind for `SELF_MILL_BALANCE`); wizard `include_mechanics: [surveil]`; dogfood `surveil-mirko`. See [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) § Priority 7.
 
 ### 3. Rule scoping and threshold tuning — **mostly done**
 

@@ -399,3 +399,16 @@ scenarios:
       dependency:
         rules_must_not_warn: [CHARGE_BALANCE, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, RAD_BALANCE, OIL_BALANCE, REANIMATION_SUPPORT, GRAVEYARD_COST_SUPPORT, SELF_MILL_BALANCE, EQUIPMENT_BALANCE, LANDFALL_BALANCE]
         max_inappropriate_warnings: 0
+
+  - id: surveil-mirko
+    label: Surveil recursion — graveyard filler enablers balanced
+    commander_names: ["Mirko, Obsessive Auditor"]
+    criteria:
+      themes: [recursion]
+      colors: [U, B]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [REANIMATION_SUPPORT, GRAVEYARD_COST_SUPPORT, SELF_MILL_BALANCE, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, RAD_BALANCE, OIL_BALANCE, CHARGE_BALANCE, EQUIPMENT_BALANCE, LANDFALL_BALANCE]
+        max_inappropriate_warnings: 0

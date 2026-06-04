@@ -18,9 +18,9 @@ mtg-deck-tools analyze run --fail-on-expect
 
 ## Matrix format
 
-Default: [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml) (28 scenarios as of 2026-06-03: tribal, artifacts, aristocrats, landfall, enchantress, experience/blood/+1/+1/rad/oil/charge counters, plus budget/strict/repair cases).
+Default: [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml) (29 scenarios as of 2026-06: tribal, artifacts, aristocrats, landfall, enchantress, experience/blood/+1/+1/rad/oil/charge counters, surveil recursion, plus budget/strict/repair cases).
 
-**Matrix status (2026-06-03):** `analyze run --fail-on-expect` passes **25/25** scenarios (0% inappropriate warnings) after import against Scryfall oracle bulk and calibration fixes for `blood-yawgmoth` / `elves-lathril`.
+**Matrix status (2026-06):** `analyze run --fail-on-expect` passes **29/29** scenarios (0% inappropriate warnings) after import against Scryfall oracle bulk; includes `surveil-mirko` (Priority 7 graveyard filler atoms).
 
 Each scenario defines:
 
