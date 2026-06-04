@@ -86,4 +86,4 @@ See **[09-next-steps.md](09-next-steps.md)** for the active backlog.
 
 **Agent documentation SDLC:** **[DOC-MAP.md](DOC-MAP.md)** — required updates per change type; enforced via `.cursor/rules/` and skills `/sync-documentation`, `/ship-dependency-feature` (no CI doc gates).
 
-**Recommended first tasks:** **UX5** wizard prepopulate on regen ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)); threshold tuning per doc 15.
+**Recommended first tasks:** **UX7** local web ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)); optional **UX10** CMC metrics; Priority 7 remainder in doc 15 is backlog only.

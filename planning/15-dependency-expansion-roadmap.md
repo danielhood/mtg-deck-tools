@@ -58,7 +58,7 @@ flowchart TD
 | `whenever_equipped` | “Whenever equipped” / equip payoff triggers |
 | `reanimate` | Return target from graveyard to battlefield/hand |
 | `graveyard_cost` | Delve / flashback (needs graveyard fodder over time) |
-| `mill_enabler` | Self-mill and explicit “put top … of library into graveyard” only — **not** surveil/discover (see Priority 7) |
+| `mill_enabler` | Self-mill, library→GY, **surveil**, **discover**, and looting-style discard (`mill_enabler`, `mill_enabler_surveil_discover`, `graveyard_filler_discard`) |
 | `graveyard_payoff` | “For each … in your graveyard” and similar payoffs |
 | `landfall_payoff` | Landfall keyword triggers |
 | `land_ramp` | Spells that put lands onto the battlefield |
@@ -173,29 +173,30 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | ~~**Self-mill**~~ | Mill enablers vs graveyard payoffs | Shipped — `SELF_MILL_BALANCE` |
 | ~~**Landfall**~~ | Land ramp count vs landfall payoffs | Shipped — `LANDFALL_BALANCE` when `themes: [landfall]` or ≥2 payoffs |
 
-### Priority 7 — Graveyard filler atoms (surveil, discover, generic mill)
+### ~~Priority 7 — Graveyard filler atoms (surveil, discover, discard)~~ **Shipped 2026-06 (core)**
 
-**Not shipped.** Priority 5 shipped **warn-only** graveyard heuristics with a **narrow** `mill_enabler` extractor. Many cards that fill the graveyard for synergy are **not** counted today, so `SELF_MILL_BALANCE` and related reports under-count enablers.
+Priority 5 shipped narrow `mill_enabler` (explicit mill / library→GY). **Priority 7 core** extended `mill_enabler` extraction and `SELF_MILL_BALANCE` coverage:
 
-| Gap | Example oracle / mechanic | Today | Target |
-| --- | --- | --- | --- |
-| **Surveil** | “Surveil N” (look at top N, put any number into your graveyard) | Not in codebase; not `mill_enabler` | New pattern or extend `mill_enabler` |
-| **Discover** | “Discover N” (same structure as surveil) | Same | Same |
-| **Generic library → GY** | “Put the top N cards of your library into your graveyard” without “mill” keyword | Matched by `mill_enabler` | Keep |
-| **Other GY stuffing** | Discard, “put target … into your graveyard”, dies-to-GY enablers | Usually **no** atom | Case-by-case patterns; exclude reanimate / `graveyard_cost` overlaps |
-| **Keyword tag** | Wizard `include_mechanics` / avoid | No `surveil` in `mechanic-taxonomy.yaml` | Optional taxonomy id for UX2 focus |
+| Deliverable | Status |
+| --- | --- |
+| **Surveil / discover** | Shipped — [`mill_enabler_surveil_discover`](../config/effect-patterns.yaml) → `effect_kind: mill_enabler` |
+| **Looting-style discard** | Shipped — `graveyard_filler_discard` |
+| **Validate** | Shipped — [`collect_graveyard_roles`](../src/mtg_deck_tools/rules/graveyard_landfall.py) counts all `mill_enabler` atoms |
+| **Wizard keyword** | Shipped — `surveil` in [`mechanic-taxonomy.yaml`](../config/mechanic-taxonomy.yaml) |
+| **Dogfood** | Shipped — `surveil-mirko` in [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml) |
+| **Generic library → GY** | Shipped — original `mill_enabler` pattern (Priority 5) |
 
-**Proposed delivery** (same checklist as § Implementation checklist):
+**Activation:** `graveyard` profile (`themes: [recursion]`); surveil via `include_mechanics: [surveil]`.
 
-1. **Patterns** — Extend `mill_enabler` and/or add `graveyard_filler` in `config/effect-patterns.yaml` (regex for `\bsurveil\b`, `\bdiscover\b`, optional discard-to-GY); golden rows in `tests/fixtures/effect_golden.yaml`.
-2. **Import** — Re-run `import`; confirm atom counts in `dependency-audit` evidence.
-3. **Validate** — Ensure `collect_graveyard_roles` / `SELF_MILL_BALANCE` in [`rules/graveyard_landfall.py`](../src/mtg_deck_tools/rules/graveyard_landfall.py) counts new kinds (may alias to `mill_enabler` or separate role with combined balance).
-4. **Optional package** — Post-fill swaps for `themes: [recursion]` (Priority 5 explicitly deferred packages); only if warn-only proves insufficient in dogfood.
-5. **Dogfood** — New matrix scenario (e.g. Dimir surveil commander, `themes: [recursion]`); `rules_must_not_warn` / `rules_must_warn` as appropriate.
+**Non-goals (unchanged):** Reanimation and delve/flashback stay on `REANIMATION_SUPPORT` and `GRAVEYARD_COST_SUPPORT`.
 
-**Activation:** Existing `graveyard` profile (`themes: [recursion]`); optional future `include_mechanics: [surveil]` if taxonomy adds the keyword.
+### Priority 7 remainder (backlog — optional)
 
-**Non-goals for this row:** Reanimation density and delve/flashback fodder are already covered by `REANIMATION_SUPPORT` and `GRAVEYARD_COST_SUPPORT`; do not duplicate those atoms.
+| Item | Notes |
+| --- | --- |
+| **Golden cases** | Add surveil/discover/discard rows to `tests/fixtures/effect_golden.yaml` |
+| **Broader GY stuffing** | “Put target … into your graveyard”, dies-to-GY enablers — case-by-case patterns |
+| **Post-fill package** | `ensure_*` swaps for `themes: [recursion]` — deferred unless warn-only proves insufficient |
 
 ### ~~Priority 8 — Token subtype buffs (match payoffs to produced token types)~~
 

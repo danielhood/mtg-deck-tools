@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [10-card-dependency-engine.md](10-card-dependency-engine.md).
 
-**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). **UX4 shipped** — wizard step back-navigation (`wizard/navigation.py`, orchestration in `wizard/run.py`). Next: **UX5** wizard prepopulate on regen — see [09-next-steps.md](09-next-steps.md).
+**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). **UX4 shipped** — wizard step back-navigation (`wizard/navigation.py`, orchestration in `wizard/run.py`). **UX5 shipped** — wizard prepopulate on regen. Next: **UX7** local web — see [09-next-steps.md](09-next-steps.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -365,7 +365,7 @@ Engine requirements for swaps:
 | ~~**UX2**~~ | ~~Wizard: “Synergy strictness” prompts (`strict_dependencies`, `repair_dependencies`) + focus-level presets (incidental/supported/focused/engine) for every profile activated by the user’s theme/mechanic selections~~ — **Shipped 2026-06-03** (`wizard` step 3) | D2–D3 |
 | ~~**UX3**~~ | ~~`criteria` linter warnings in wizard~~ — **Shipped 2026-06-04** (`rules/criteria_linter.py`, wizard preflight after step 7) | D2 + profiles |
 | ~~**UX4**~~ | ~~**Wizard step back-navigation** — return to earlier steps to revise selections~~ — **Shipped 2026-06-04** | None (wizard orchestration) |
-| **UX5** | **Wizard prepopulate on regen** — seed wizard from saved `.deck.json` criteria | `.deck.json` criteria round-trip |
+| ~~**UX5**~~ | ~~Wizard prepopulate on regen~~ — **Shipped 2026-06-04** | `.deck.json` criteria round-trip |
 | **UX6** | `.deck.json` per-card `dependency_roles` | D2 |
 | **UX7** | Local web: dependency dashboard + swap | D5 + API wrapper |
 | **UX8** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
@@ -493,20 +493,13 @@ The original UX2 spec named only energy and auras as focus-preset candidates. De
 
 **Explicit non-goals:** Reordering wizard steps (defer to UX8c); disabling options (UX8a).
 
-### UX5 — wizard prepopulate on regen (planned)
+### ~~UX5 — wizard prepopulate on regen~~ **Done (2026-06-04)**
 
-**Problem:** Regen today is split: `generate --from deck.json` reloads criteria silently; `generate --wizard` always starts blank and **ignores `--from`** ([`cli/main.py`](../src/mtg_deck_tools/cli/main.py)). Users who want to tweak budget or themes on a saved deck must hand-edit JSON or re-enter every wizard answer.
-
-**Deliverables:**
-
-1. **`generate --wizard --from path.deck.json`** — load `criteria` and `commanders` from the file; pass as initial state into `run_wizard()`.
-2. **`mtg-deck-tools wizard --from path.deck.json`** (optional standalone) — same prepopulation for criteria-only runs.
-3. **Step defaults** — each wizard step reads existing `DeckCriteria` fields (already partially true for some steps); commander step pre-selects saved oracle IDs when still legal in DB.
-4. **Generate after wizard** — when invoked via `generate --wizard --from`, write a new deck using updated criteria (same as today’s regen output paths).
+**Shipped:** `load_deck_criteria_for_wizard`; **`generate --wizard --from`** and **`wizard --from`** pre-fill criteria and commander oracle IDs; wizard then runs a **fresh** slot fill (not `run_generate_from_deck`). Commander step offers “Keep your current commander selection?” when IDs remain in the DB (`filter_eligible_commander_ids`). `--refill-slot` cannot combine with `--wizard`.
 
 **CLI fit:** **Good** — primary workflow for “change one thing and regen”. Complements UX4 (prefilled + back to revise).
 
-**Explicit non-goals:** Prepopulating from partial decks without a criteria block; merging old maindeck `cards` into wizard (cards stay out of scope until UX11 lock/swap).
+**Explicit non-goals (unchanged):** Prepopulating from partial decks without a criteria block; merging old maindeck `cards` into wizard (cards stay out of scope until UX11 lock/swap).
 
 ---
 
