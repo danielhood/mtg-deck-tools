@@ -142,6 +142,21 @@ def search_commanders(
     return [_row_to_commander(r) for r in rows]
 
 
+def filter_eligible_commander_ids(
+    conn: sqlite3.Connection,
+    oracle_ids: list[str],
+) -> tuple[list[str], list[str]]:
+    """Return commander oracle IDs still eligible in the DB, and any dropped IDs."""
+    still: list[str] = []
+    dropped: list[str] = []
+    for oracle_id in oracle_ids:
+        if fetch_commander(conn, oracle_id):
+            still.append(oracle_id)
+        else:
+            dropped.append(oracle_id)
+    return still, dropped
+
+
 def fetch_commander(conn: sqlite3.Connection, oracle_id: str) -> CommanderRow | None:
     row = conn.execute(
         """

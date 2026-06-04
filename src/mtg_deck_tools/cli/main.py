@@ -12,6 +12,7 @@ from rich.table import Table
 from mtg_deck_tools import __version__
 from mtg_deck_tools.analysis.matrix import DEFAULT_MATRIX_PATH
 from mtg_deck_tools.analysis.runner import run_analysis_suite
+from mtg_deck_tools.builder.deck_load import load_deck_criteria_for_wizard
 from mtg_deck_tools.builder.generate import run_generate
 from mtg_deck_tools.builder.reload import run_generate_from_deck
 from mtg_deck_tools.builder.stub import run_generate_stub
@@ -165,10 +166,32 @@ def wizard_cmd(
         Optional[int],
         typer.Option("--seed", help="RNG seed stored in criteria for later generate steps"),
     ] = None,
+    deck_from: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--from",
+            help="Pre-fill wizard from a saved .deck.json (criteria and commanders)",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ] = None,
 ) -> None:
     """Run the full deck-building wizard (steps 1–6)."""
+    initial_criteria = None
+    if deck_from:
+        try:
+            initial_criteria = load_deck_criteria_for_wizard(deck_from)
+        except (FileNotFoundError, ValueError) as exc:
+            console.print(f"[red]Error:[/red] {exc}")
+            raise typer.Exit(1) from exc
+
     try:
-        run_wizard(seed=seed)
+        run_wizard(
+            seed=seed,
+            initial_criteria=initial_criteria,
+            prepopulated_from=deck_from,
+        )
     except KeyboardInterrupt:
         console.print("\n[dim]Wizard cancelled.[/dim]")
         raise typer.Exit(130) from None
@@ -281,19 +304,30 @@ def generate_cmd(
     if refill_slot and not deck_from:
         console.print("[red]Error:[/red] --refill-slot requires --from.")
         raise typer.Exit(1)
+    if wizard and refill_slot:
+        console.print("[red]Error:[/red] --refill-slot cannot be used with --wizard.")
+        raise typer.Exit(1)
 
     criteria = None
+    wizard_initial: DeckCriteria | None = None
     if wizard:
         if deck_from:
-            console.print(
-                "[yellow]Note:[/yellow] --from is ignored when --wizard is set."
-            )
+            try:
+                wizard_initial = load_deck_criteria_for_wizard(deck_from)
+            except (FileNotFoundError, ValueError) as exc:
+                console.print(f"[red]Error:[/red] {exc}")
+                raise typer.Exit(1) from exc
         if colors or themes:
             console.print(
                 "[yellow]Note:[/yellow] --colors and --themes are ignored when --wizard is set."
             )
         try:
-            criteria = run_wizard(seed=seed, db_path=db_path)
+            criteria = run_wizard(
+                seed=seed,
+                db_path=db_path,
+                initial_criteria=wizard_initial,
+                prepopulated_from=deck_from,
+            )
         except KeyboardInterrupt:
             console.print("\n[dim]Wizard cancelled.[/dim]")
             raise typer.Exit(130) from None
@@ -324,7 +358,7 @@ def generate_cmd(
             criteria = criteria.model_copy(update=patch)
 
     try:
-        if deck_from:
+        if deck_from and not wizard:
             out = run_generate_from_deck(
                 deck_from,
                 db_path=db_path,
@@ -361,6 +395,10 @@ def generate_cmd(
     console.print(f"[green]Wrote[/green] {md_path}")
     if stub:
         console.print("[dim]Phase 1 stub preview — omit --stub for full slot-filled decks.[/dim]")
+    elif deck_from and wizard:
+        console.print(
+            f"[dim]Generated deck from wizard (pre-filled from {deck_from.name}).[/dim]"
+        )
     elif deck_from and refill_slot:
         console.print(f"[dim]Refilled slot '{refill_slot}' from {deck_from.name}.[/dim]")
     elif deck_from:

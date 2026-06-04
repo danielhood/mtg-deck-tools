@@ -125,7 +125,7 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 | Progressive wizard restrictions (UX8) | D2 calibrated + D0.5 `profile_counts_by_ci` |
 | `ConstraintState` / criteria linter (UX3) | ☑ UX3 shipped 2026-06-04 (`criteria_linter.py`); full `ConstraintState` deferred to UX8 |
 | ~~Wizard step back-navigation (UX4)~~ | **Shipped 2026-06-04** — `wizard/navigation.py` |
-| Wizard prepopulate on regen (UX5) | `.deck.json` criteria round-trip |
+| ~~Wizard prepopulate on regen (UX5)~~ | **Shipped 2026-06-04** — `load_deck_criteria_for_wizard` |
 | Pick-time strict pool filter (D4) | **Shipped** — `--strict-dependencies` |
 | Repair / swap pass (D5) | **Shipped** — `--repair-dependencies` |
 | Web constraint panel (UX9) | Separate milestone; UX7 shell |

@@ -145,6 +145,10 @@ mtg-deck-tools wizard
 # Wizard then generate
 mtg-deck-tools generate --wizard --seed 42
 
+# Tweak criteria interactively, then generate a fresh deck (pre-fills from saved file)
+mtg-deck-tools generate --wizard --from output/my-deck.deck.json --seed 42
+mtg-deck-tools wizard --from output/my-deck.deck.json
+
 # Regenerate from a saved deck (edit criteria in the .deck.json first)
 mtg-deck-tools generate --from output/my-deck-20260530.deck.json --seed 42
 mtg-deck-tools generate --from output/my-deck-20260530.deck.json --refill-slot synergy --seed 42
