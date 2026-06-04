@@ -6,7 +6,13 @@ import questionary
 from rich.panel import Panel
 
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.wizard.common import WIZARD_STYLE, console, format_tag_label, require_tty
+from mtg_deck_tools.wizard.common import (
+    WIZARD_STYLE,
+    apply_checkbox_selection,
+    console,
+    format_tag_label,
+    require_tty,
+)
 from mtg_deck_tools.wizard.mechanics import (
     MechanicChoice,
     keyword_mechanic_choices,
@@ -17,26 +23,31 @@ from mtg_deck_tools.wizard.mechanics import (
 def _prompt_mechanic_checkbox(
     prompt: str,
     choices: list[MechanicChoice],
+    *,
+    selected: list[str],
 ) -> list[str]:
     if not choices:
         return []
 
-    options = [
-        questionary.Choice(
-            title=format_tag_label(c.id, c.description),
-            value=c.id,
-        )
-        for c in choices
-    ]
-    selected = questionary.checkbox(
+    options = apply_checkbox_selection(
+        [
+            questionary.Choice(
+                title=format_tag_label(c.id, c.description),
+                value=c.id,
+            )
+            for c in choices
+        ],
+        selected,
+    )
+    picked = questionary.checkbox(
         prompt,
         choices=options,
         style=WIZARD_STYLE,
         instruction="(Space to toggle, Enter to confirm; none is OK)",
     ).ask()
-    if selected is None:
+    if picked is None:
         raise KeyboardInterrupt
-    return list(selected)
+    return list(picked)
 
 
 def run_step2(criteria: DeckCriteria) -> DeckCriteria:
@@ -53,8 +64,16 @@ def run_step2(criteria: DeckCriteria) -> DeckCriteria:
         )
     )
 
-    include = _prompt_mechanic_checkbox("Include mechanics (prefer in deck)", choices)
-    avoid = _prompt_mechanic_checkbox("Avoid mechanics (exclude from deck)", choices)
+    include = _prompt_mechanic_checkbox(
+        "Include mechanics (prefer in deck)",
+        choices,
+        selected=criteria.include_mechanics,
+    )
+    avoid = _prompt_mechanic_checkbox(
+        "Avoid mechanics (exclude from deck)",
+        choices,
+        selected=criteria.avoid_mechanics,
+    )
 
     errors = validate_mechanic_lists(include, avoid)
     if errors:

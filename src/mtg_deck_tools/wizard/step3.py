@@ -6,7 +6,13 @@ import questionary
 from rich.panel import Panel
 
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.wizard.common import COLOR_CHOICES, WIZARD_STYLE, console, require_tty
+from mtg_deck_tools.wizard.common import (
+    COLOR_CHOICES,
+    WIZARD_STYLE,
+    apply_checkbox_selection,
+    console,
+    require_tty,
+)
 
 
 def run_step3(criteria: DeckCriteria) -> DeckCriteria:
@@ -22,10 +28,13 @@ def run_step3(criteria: DeckCriteria) -> DeckCriteria:
         )
     )
 
-    options = [
-        questionary.Choice(title=f"{letter} — {name}", value=letter)
-        for letter, name in COLOR_CHOICES
-    ]
+    options = apply_checkbox_selection(
+        [
+            questionary.Choice(title=f"{letter} — {name}", value=letter)
+            for letter, name in COLOR_CHOICES
+        ],
+        criteria.colors,
+    )
     selected = questionary.checkbox(
         "Commander color identity",
         choices=options,
