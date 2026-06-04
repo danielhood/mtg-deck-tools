@@ -148,7 +148,9 @@ Shipped `rad_*`, `oil_*`, `charge_*` effect atoms; `RAD_BALANCE`, `OIL_BALANCE`,
 
 Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**. Priority 1–6 expansion items are shipped.
 
-**Suggested next task:** **UX3** criteria linter warnings in wizard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
+**Suggested next task (UX):** **UX3** criteria linter warnings in wizard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
+
+**Suggested next task (dependency):** **Priority 7 — Graveyard filler atoms** (surveil, discover, broader “fill your graveyard” extraction) — [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) § Priority 7. Extends shipped `SELF_MILL_BALANCE` / `mill_enabler` (Priority 5); surveil is **not** covered today.
 
 **Recently shipped (2026-06):** **UX2** wizard synergy step (`strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` for all activated profiles); **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
 
@@ -157,6 +159,17 @@ Each feature: patterns → import → rule → optional package → dogfood scen
 ### ~~2. UX2 — wizard synergy controls~~ **Done**
 
 Shipped wizard **step 3** (synergy & dependencies): `strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` presets (incidental/supported/focused/engine) for every profile activated in steps 1–2. Criteria summary shows dependency settings. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md).
+
+### 4. Graveyard filler dependency enhancement (Priority 7) — **planned**
+
+Extend graveyard **enabler** extraction so dependency balancing sees cards that fill the yard without explicit “mill” or “put top … of library” wording.
+
+| Item | Notes |
+| --- | --- |
+| **Surveil / discover** | Not referenced in repo; do not match current `mill_enabler` regex |
+| **`SELF_MILL_BALANCE`** | Only compares `mill_enabler` vs `graveyard_payoff` when `graveyard` profile active (`themes: [recursion]`) |
+| **Delivery** | Patterns → import → graveyard role collection / balance rules → dogfood scenario; optional post-fill package only if needed |
+| **Spec** | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) § Priority 7 |
 
 ### 3. Rule scoping and threshold tuning — **mostly done**
 
@@ -188,6 +201,8 @@ Shipped wizard **step 3** (synergy & dependencies): `strict_dependencies`, `repa
 ## Suggested next task
 
 **UX3** criteria linter warnings in the wizard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). UX2 wizard synergy controls shipped 2026-06-03 (step 3: strict/repair flags + `mechanic_focus` for activated profiles).
+
+**Dependency (next enhancement):** [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) **Priority 7** — surveil, discover, and other graveyard-filler patterns for `SELF_MILL_BALANCE` (engineering sequence item **3** in doc 15).
 
 Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` — **28/28** ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 

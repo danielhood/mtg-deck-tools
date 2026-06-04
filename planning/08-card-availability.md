@@ -2,6 +2,10 @@
 
 **Audience context:** Users typically build from **used inventory** (cards that have been on the market for months or years). The tool should bias toward cards that are **findable and familiar**, not toward the newest releases. A **static** card DB is acceptable — see [01-goals-and-scope.md](01-goals-and-scope.md) and [02-data-sources.md](02-data-sources.md).
 
+## Basic land pricing
+
+All **basic lands** use a fixed **$0.05** USD each at import and in deck builds (overrides Scryfall; applies even when `prices.usd` is null). Re-run `import` to refresh existing `cards.db` rows.
+
 ## v1 — Budget null prices
 
 **Policy:** **Allow with warning** (decided).

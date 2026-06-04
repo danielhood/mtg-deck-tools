@@ -58,7 +58,7 @@ flowchart TD
 | `whenever_equipped` | “Whenever equipped” / equip payoff triggers |
 | `reanimate` | Return target from graveyard to battlefield/hand |
 | `graveyard_cost` | Delve / flashback (needs graveyard fodder over time) |
-| `mill_enabler` | Self-mill and library-to-graveyard enablers |
+| `mill_enabler` | Self-mill and explicit “put top … of library into graveyard” only — **not** surveil/discover (see Priority 7) |
 | `graveyard_payoff` | “For each … in your graveyard” and similar payoffs |
 | `landfall_payoff` | Landfall keyword triggers |
 | `land_ramp` | Spells that put lands onto the battlefield |
@@ -171,6 +171,30 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | ~~**Self-mill**~~ | Mill enablers vs graveyard payoffs | Shipped — `SELF_MILL_BALANCE` |
 | ~~**Landfall**~~ | Land ramp count vs landfall payoffs | Shipped — `LANDFALL_BALANCE` when `themes: [landfall]` or ≥2 payoffs |
 
+### Priority 7 — Graveyard filler atoms (surveil, discover, generic mill)
+
+**Not shipped.** Priority 5 shipped **warn-only** graveyard heuristics with a **narrow** `mill_enabler` extractor. Many cards that fill the graveyard for synergy are **not** counted today, so `SELF_MILL_BALANCE` and related reports under-count enablers.
+
+| Gap | Example oracle / mechanic | Today | Target |
+| --- | --- | --- | --- |
+| **Surveil** | “Surveil N” (look at top N, put any number into your graveyard) | Not in codebase; not `mill_enabler` | New pattern or extend `mill_enabler` |
+| **Discover** | “Discover N” (same structure as surveil) | Same | Same |
+| **Generic library → GY** | “Put the top N cards of your library into your graveyard” without “mill” keyword | Matched by `mill_enabler` | Keep |
+| **Other GY stuffing** | Discard, “put target … into your graveyard”, dies-to-GY enablers | Usually **no** atom | Case-by-case patterns; exclude reanimate / `graveyard_cost` overlaps |
+| **Keyword tag** | Wizard `include_mechanics` / avoid | No `surveil` in `mechanic-taxonomy.yaml` | Optional taxonomy id for UX2 focus |
+
+**Proposed delivery** (same checklist as § Implementation checklist):
+
+1. **Patterns** — Extend `mill_enabler` and/or add `graveyard_filler` in `config/effect-patterns.yaml` (regex for `\bsurveil\b`, `\bdiscover\b`, optional discard-to-GY); golden rows in `tests/fixtures/effect_golden.yaml`.
+2. **Import** — Re-run `import`; confirm atom counts in `dependency-audit` evidence.
+3. **Validate** — Ensure `collect_graveyard_roles` / `SELF_MILL_BALANCE` in [`rules/graveyard_landfall.py`](../src/mtg_deck_tools/rules/graveyard_landfall.py) counts new kinds (may alias to `mill_enabler` or separate role with combined balance).
+4. **Optional package** — Post-fill swaps for `themes: [recursion]` (Priority 5 explicitly deferred packages); only if warn-only proves insufficient in dogfood.
+5. **Dogfood** — New matrix scenario (e.g. Dimir surveil commander, `themes: [recursion]`); `rules_must_not_warn` / `rules_must_warn` as appropriate.
+
+**Activation:** Existing `graveyard` profile (`themes: [recursion]`); optional future `include_mechanics: [surveil]` if taxonomy adds the keyword.
+
+**Non-goals for this row:** Reanimation density and delve/flashback fodder are already covered by `REANIMATION_SUPPORT` and `GRAVEYARD_COST_SUPPORT`; do not duplicate those atoms.
+
 ### ~~Priority 6 — Equipment depth~~
 
 **Shipped 2026-06** — [`rules/equipment_depth.py`](../src/mtg_deck_tools/rules/equipment_depth.py): `type_line_equipment`, `whenever_equipped`; `EQUIPMENT_BALANCE`; `ensure_equipment_package`; profile `equipment` (`equipment_min: 4`, `carrier_creature_min: 22`; activation `include_mechanics: [equip]`, `themes: [voltron]`).
@@ -225,6 +249,7 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 | ~~0~~ | ~~**Dogfood matrix 25/25**~~ | **Done 2026-06-03** — blood consume patterns; +1/+1 incidental threshold |
 | ~~1~~ | ~~**Rad / oil / charge counters**~~ | **Done 2026-06-03** — `rad_*`, `oil_*`, `charge_*`; dogfood `rad-mothman`, `oil-migloz`, `charge-immard` |
 | ~~2~~ | ~~**Equipment depth**~~ | **Done 2026-06** — `EQUIPMENT_BALANCE`, `type_line_equipment`, `whenever_equipped` |
+| **3** | **Graveyard filler atoms (Priority 7)** | Surveil, discover, broader GY enablers → `SELF_MILL_BALANCE` accuracy; patterns + dogfood before optional package |
 
 **Shipped (2026-06):** **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; profiles `rad`, `oil`, `charge`; wizard `include_mechanics`); **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; profiles `graveyard`, `landfall`).
 

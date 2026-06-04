@@ -397,6 +397,7 @@ D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras,
 
 - Shipped inventory (`effect_kind`, `rule_id`, packages)
 - High-value additions (enchantment matters, tutor payloads, graveyard heuristics, counter resources)
+- **Next (planned):** Priority 7 graveyard filler atoms — surveil, discover, broader GY enablers for `SELF_MILL_BALANCE` ([15](15-dependency-expansion-roadmap.md) § Priority 7)
 - Explicit non-goals
 - Per-feature implementation checklist
 - Suggested build order
