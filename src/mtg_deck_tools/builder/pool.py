@@ -6,6 +6,7 @@ import json
 import sqlite3
 from dataclasses import dataclass
 
+from mtg_deck_tools.pricing import resolve_card_price
 from mtg_deck_tools.rules.commander import (
     COLOR_ORDER,
     is_land_card,
@@ -40,6 +41,12 @@ class CardCandidate:
 
 
 def _row_to_candidate(row: sqlite3.Row) -> CardCandidate:
+    price_usd, price_known = resolve_card_price(
+        price_usd=row["price_usd"],
+        price_known=bool(row["price_known"]),
+        is_basic_land=bool(row["is_basic_land"]),
+        type_line=row["type_line"] or "",
+    )
     return CardCandidate(
         oracle_id=row["oracle_id"],
         name=row["name"],
@@ -47,8 +54,8 @@ def _row_to_candidate(row: sqlite3.Row) -> CardCandidate:
         type_line=row["type_line"] or "",
         mana_cost=row["mana_cost"] or "",
         color_identity=json.loads(row["color_identity"] or "[]"),
-        price_usd=row["price_usd"],
-        price_known=bool(row["price_known"]),
+        price_usd=price_usd,
+        price_known=price_known,
         edhrec_rank=row["edhrec_rank"],
         oracle_text=row["oracle_text"] or "",
         keywords=json.loads(row["keywords"] or "[]"),

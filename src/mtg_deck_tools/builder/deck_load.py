@@ -8,6 +8,7 @@ from pathlib import Path
 
 from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.pricing import resolve_card_price
 
 SUPPORTED_SCHEMA_VERSION = "1.0"
 
@@ -21,6 +22,12 @@ class LoadedDeckFile:
 
 
 def _deck_card_from_saved(entry: dict) -> DeckCard:
+    type_line = entry.get("type_line") or ""
+    price_usd, price_known = resolve_card_price(
+        price_usd=entry.get("price_usd"),
+        price_known=bool(entry.get("price_known", entry.get("price_usd") is not None)),
+        type_line=type_line,
+    )
     return DeckCard(
         oracle_id=entry["oracle_id"],
         name=entry["name"],
@@ -28,9 +35,9 @@ def _deck_card_from_saved(entry: dict) -> DeckCard:
         quantity=int(entry.get("quantity", 1)),
         cmc=float(entry.get("cmc", 0)),
         mana_cost=entry.get("mana_cost") or "",
-        type_line=entry.get("type_line") or "",
-        price_usd=entry.get("price_usd"),
-        price_known=bool(entry.get("price_known", entry.get("price_usd") is not None)),
+        type_line=type_line,
+        price_usd=price_usd,
+        price_known=price_known,
         scryfall_uri=entry.get("scryfall_uri"),
         image_uri=entry.get("image_uri"),
         mechanic_tags=list(entry.get("mechanic_tags") or []),

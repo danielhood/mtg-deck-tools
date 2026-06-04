@@ -6,6 +6,7 @@ import json
 from typing import Any
 
 from mtg_deck_tools.availability.score import compute_availability_score
+from mtg_deck_tools.pricing import basic_land_price
 from mtg_deck_tools.rules.commander import (
     detect_partner_kind,
     is_commander_eligible,
@@ -83,6 +84,9 @@ def normalize_card(raw: dict[str, Any]) -> dict[str, Any] | None:
         cmc = 0.0
 
     is_basic = type_line.startswith("Basic Land")
+    if is_basic:
+        price_usd, price_known = basic_land_price()
+        price_known = int(price_known)
     set_type = raw.get("set_type")
     reprint = bool(raw.get("reprint"))
     released_at = raw.get("released_at")

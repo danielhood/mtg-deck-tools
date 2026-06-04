@@ -33,6 +33,7 @@ from mtg_deck_tools.builder.scorer import score_candidate, score_land_budget
 from mtg_deck_tools.rules.dependencies import fetch_card_effects
 from mtg_deck_tools.builder.slot_quality import refine_slot_candidates, slot_relax_steps
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.pricing import resolve_card_price
 from mtg_deck_tools.rules.validate import (
     adjust_slot_template_for_commanders,
     mainboard_size_for_commanders,
@@ -355,6 +356,12 @@ def _fill_lands(
         if not row:
             state.warnings.append(f"Basic land '{basic_name}' not found in database.")
             continue
+        price_usd, price_known = resolve_card_price(
+            price_usd=row["price_usd"],
+            price_known=bool(row["price_known"]),
+            is_basic_land=True,
+            type_line=row["type_line"] or "",
+        )
         candidate = CardCandidate(
             oracle_id=row["oracle_id"],
             name=row["name"],
@@ -362,8 +369,8 @@ def _fill_lands(
             type_line=row["type_line"] or "",
             mana_cost=row["mana_cost"] or "",
             color_identity=json.loads(row["color_identity"] or "[]"),
-            price_usd=row["price_usd"],
-            price_known=bool(row["price_known"]),
+            price_usd=price_usd,
+            price_known=price_known,
             edhrec_rank=row["edhrec_rank"],
             oracle_text=row["oracle_text"] or "",
             keywords=json.loads(row["keywords"] or "[]"),

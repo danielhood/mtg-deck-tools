@@ -19,8 +19,11 @@ def passes_card_price_usd(
     min_usd: float | None,
     max_usd: float | None,
     strict: bool,
+    is_basic_land: bool = False,
 ) -> bool:
     """True when USD price satisfies optional per-card min/max (shared with commander search)."""
+    if is_basic_land:
+        return True
     if not price_known or price_usd is None:
         if min_usd is not None:
             return False
@@ -46,6 +49,7 @@ def _passes_card_price_range(
         min_usd=min_usd,
         max_usd=max_usd,
         strict=strict,
+        is_basic_land=candidate.is_basic_land,
     )
 
 
