@@ -6,7 +6,13 @@ import questionary
 from rich.panel import Panel
 
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.wizard.common import WIZARD_STYLE, console, format_tag_label, require_tty
+from mtg_deck_tools.wizard.common import (
+    WIZARD_STYLE,
+    apply_checkbox_selection,
+    console,
+    format_tag_label,
+    require_tty,
+)
 from mtg_deck_tools.wizard.mechanics import (
     MechanicChoice,
     keyword_mechanic_choices,
@@ -23,17 +29,19 @@ def _prompt_mechanic_checkbox(
     if not choices:
         return []
 
-    options = [
-        questionary.Choice(
-            title=format_tag_label(c.id, c.description),
-            value=c.id,
-        )
-        for c in choices
-    ]
+    options = apply_checkbox_selection(
+        [
+            questionary.Choice(
+                title=format_tag_label(c.id, c.description),
+                value=c.id,
+            )
+            for c in choices
+        ],
+        selected,
+    )
     picked = questionary.checkbox(
         prompt,
         choices=options,
-        default=selected,
         style=WIZARD_STYLE,
         instruction="(Space to toggle, Enter to confirm; none is OK)",
     ).ask()

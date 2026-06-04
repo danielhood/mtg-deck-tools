@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from mtg_deck_tools.wizard.navigation import (
+    FIRST_STEP_WITH_POST_NAVIGATION,
     NavigationAction,
     NavigationChoice,
     WIZARD_STEP_COUNT,
@@ -17,6 +18,10 @@ from mtg_deck_tools.wizard.navigation import (
 
 def test_wizard_has_seven_steps() -> None:
     assert WIZARD_STEP_COUNT == 7
+
+
+def test_post_navigation_starts_after_step_one() -> None:
+    assert FIRST_STEP_WITH_POST_NAVIGATION == 2
 
 
 def test_back_target_steps_after_step_one_is_empty() -> None:
@@ -51,14 +56,30 @@ def test_build_navigation_choices_step_one_has_no_back() -> None:
 
 
 def test_build_navigation_preflight_lists_all_steps() -> None:
-    values = [c.value for c in build_navigation_choices(context="preflight")]
+    choices = build_navigation_choices(context="preflight")
+    titles = [c.title for c in choices]
+    values = [c.value for c in choices]
+    assert titles[1] == "Re-run criteria review"
+    assert values[1].action == NavigationAction.RESTART_CURRENT
     back_steps = sorted(
         v.back_to_step for v in values if v.action == NavigationAction.BACK
     )
     assert back_steps == list(range(1, WIZARD_STEP_COUNT + 1))
 
 
-def test_resolve_navigation_rejects_back_to_same_or_later_step() -> None:
+def test_build_navigation_includes_rerun_current_step() -> None:
+    titles = [c.title for c in build_navigation_choices(completed_step=5, context="step")]
+    assert titles[1] == "Re-run step 5 — Budget & card prices"
+    assert "Back to step 4 — Colors" in titles
+
+
+def test_resolve_navigation_allows_rerun_current_step() -> None:
     choice = NavigationChoice(NavigationAction.BACK, back_to_step=5)
-    with pytest.raises(ValueError, match="earlier"):
+    resolved = resolve_navigation(choice, completed_step=5)
+    assert resolved.back_to_step == 5
+
+
+def test_resolve_navigation_rejects_back_to_later_step() -> None:
+    choice = NavigationChoice(NavigationAction.BACK, back_to_step=6)
+    with pytest.raises(ValueError, match="later"):
         resolve_navigation(choice, completed_step=5)

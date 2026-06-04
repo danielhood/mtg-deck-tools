@@ -164,7 +164,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 | `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms |
 | `stats` | Row counts, import metadata, top tags, effect counts |
 | `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
-| `wizard` | Interactive wizard (7 steps + criteria preflight): themes, mechanics, synergy/dependency controls, colors, budget & per-card prices, commander (color + price filters), rarity; after each step and at preflight you can **go back** to revise earlier choices (downstream steps re-run automatically); end-of-wizard **criteria linter** warns on conflicting include/avoid, focus vs avoid, heavy theme pairs, and over-constrained budget before showing the summary (criteria only; does not write a deck) |
+| `wizard` | Interactive wizard (7 steps + criteria preflight): themes, mechanics, synergy/dependency controls, colors, budget & per-card prices, commander (color + price filters), rarity; after **step 2 onward** and at preflight you can **re-run** the step you just finished, **go back** to an earlier step (downstream steps re-run automatically), or at preflight **re-run criteria review**; step 1 advances directly to step 2; end-of-wizard **criteria linter** warns on conflicting include/avoid, focus vs avoid, heavy theme pairs, and over-constrained budget before showing the summary (criteria only; does not write a deck) |
 | `generate` | Build a 99-card maindeck plus commander metadata → `output/*.deck.json` and `output/*.md` |
 
 ### `generate` — how it works

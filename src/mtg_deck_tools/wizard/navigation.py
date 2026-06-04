@@ -16,6 +16,7 @@ WizardContext = Literal["step", "preflight"]
 class NavigationAction(str, Enum):
     CONTINUE = "continue"
     BACK = "back"
+    RESTART_CURRENT = "restart_current"
     CANCEL = "cancel"
 
 
@@ -39,6 +40,9 @@ WIZARD_STEPS: tuple[WizardStepMeta, ...] = (
 
 WIZARD_STEP_COUNT = len(WIZARD_STEPS)
 
+# Step 1 advances straight to step 2; continue/back/cancel starts after step 2.
+FIRST_STEP_WITH_POST_NAVIGATION = 2
+
 
 @dataclass(frozen=True)
 class NavigationChoice:
@@ -46,8 +50,14 @@ class NavigationChoice:
     back_to_step: int | None = None
 
 
+def wizard_step_meta(step_number: int) -> WizardStepMeta:
+    if not 1 <= step_number <= WIZARD_STEP_COUNT:
+        raise ValueError(f"step_number must be 1–{WIZARD_STEP_COUNT}")
+    return WIZARD_STEPS[step_number - 1]
+
+
 def back_target_steps(*, completed_step: int) -> list[WizardStepMeta]:
-    """Steps the user may jump back to after completing `completed_step` (1–7)."""
+    """Earlier steps the user may jump back to after completing `completed_step` (1–7)."""
     if completed_step <= 1:
         return []
     return [s for s in WIZARD_STEPS if s.number < completed_step]
@@ -71,6 +81,12 @@ def build_navigation_choices(
     ]
 
     if context == "preflight":
+        choices.append(
+            questionary.Choice(
+                title="Re-run criteria review",
+                value=NavigationChoice(NavigationAction.RESTART_CURRENT),
+            )
+        )
         for step in WIZARD_STEPS:
             choices.append(
                 questionary.Choice(
@@ -82,6 +98,17 @@ def build_navigation_choices(
                 )
             )
     elif completed_step is not None:
+        if completed_step >= FIRST_STEP_WITH_POST_NAVIGATION:
+            current = wizard_step_meta(completed_step)
+            choices.append(
+                questionary.Choice(
+                    title=f"Re-run step {current.number} — {current.label}",
+                    value=NavigationChoice(
+                        NavigationAction.BACK,
+                        back_to_step=current.number,
+                    ),
+                )
+            )
         for step in back_target_steps(completed_step=completed_step):
             choices.append(
                 questionary.Choice(
@@ -143,6 +170,6 @@ def resolve_navigation(
         return choice
     if choice.back_to_step is None:
         raise ValueError("Back navigation requires back_to_step")
-    if choice.back_to_step >= completed_step:
-        raise ValueError("Can only go back to an earlier step")
+    if choice.back_to_step > completed_step:
+        raise ValueError("Cannot go back to a later step")
     return choice

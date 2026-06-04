@@ -6,6 +6,7 @@ from pathlib import Path
 
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.wizard.navigation import (
+    FIRST_STEP_WITH_POST_NAVIGATION,
     NavigationAction,
     NavigationChoice,
     WIZARD_STEP_COUNT,
@@ -106,12 +107,15 @@ def run_wizard(
     """Run all seven wizard steps and return complete DeckCriteria."""
     criteria = DeckCriteria(seed=seed)
     for step in range(1, WIZARD_STEP_COUNT + 1):
-        criteria = _run_step_with_navigation(
-            step,
-            criteria,
-            seed=seed,
-            db_path=db_path,
-        )
+        if step < FIRST_STEP_WITH_POST_NAVIGATION:
+            criteria = _run_step(step, criteria, seed=seed, db_path=db_path)
+        else:
+            criteria = _run_step_with_navigation(
+                step,
+                criteria,
+                seed=seed,
+                db_path=db_path,
+            )
 
     while True:
         criteria, action, back_to = run_preflight(criteria)

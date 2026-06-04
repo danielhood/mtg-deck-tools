@@ -7,7 +7,12 @@ from rich.panel import Panel
 from rich.table import Table
 
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.wizard.common import WIZARD_STYLE, console, require_tty
+from mtg_deck_tools.wizard.common import (
+    WIZARD_STYLE,
+    apply_checkbox_selection,
+    console,
+    require_tty,
+)
 from mtg_deck_tools.wizard.slots import (
     COMMANDER_DECK_SIZE,
     SlotTemplateConfig,
@@ -37,17 +42,19 @@ def _prompt_themes(
     if not choices:
         return []
 
-    options = [
-        questionary.Choice(
-            title=f"{c.id} — {c.description}" if c.description else c.id,
-            value=c.id,
-        )
-        for c in choices
-    ]
+    options = apply_checkbox_selection(
+        [
+            questionary.Choice(
+                title=f"{c.id} — {c.description}" if c.description else c.id,
+                value=c.id,
+            )
+            for c in choices
+        ],
+        selected_themes,
+    )
     selected = questionary.checkbox(
         "Select deck themes (archetypes)",
         choices=options,
-        default=selected_themes,
         style=WIZARD_STYLE,
         instruction="(Space to toggle, Enter to confirm; none is OK)",
     ).ask()

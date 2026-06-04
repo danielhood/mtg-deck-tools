@@ -48,6 +48,8 @@ def run_preflight(criteria: DeckCriteria) -> tuple[DeckCriteria, NavigationActio
         choice = prompt_wizard_navigation(context="preflight")
         if choice.action == NavigationAction.CANCEL:
             raise RuntimeError("Wizard cancelled at criteria review.")
+        if choice.action == NavigationAction.RESTART_CURRENT:
+            continue
         if choice.action == NavigationAction.BACK:
             if choice.back_to_step is None:
                 raise ValueError("Back navigation requires back_to_step")

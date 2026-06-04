@@ -484,7 +484,7 @@ The original UX2 spec named only energy and auras as focus-preset candidates. De
 
 **Shipped:**
 
-1. **Back action on every step** — after each step and at criteria preflight, a questionary menu offers **Continue**, **Back to step N — …**, or **Cancel wizard** ([`wizard/navigation.py`](../src/mtg_deck_tools/wizard/navigation.py)).
+1. **Back action from step 2 onward** — step 1 advances directly to step 2; after steps 2–7 and at criteria preflight, a questionary menu offers **Continue**, **Re-run** the step just finished (or **Re-run criteria review** at preflight), **Back to step N — …** for earlier steps, or **Cancel wizard** ([`wizard/navigation.py`](../src/mtg_deck_tools/wizard/navigation.py)).
 2. **Preserve in-progress criteria** — re-entering a step pre-selects themes, mechanics, colors, synergy flags, budget, rarity, and offers **Keep current commander** when commanders were already chosen.
 3. **Re-run downstream steps** — backing to step N re-runs steps N through the step you were on (inclusive) so synergy focus and dependent prompts stay consistent.
 4. **Re-run preflight** — backing from preflight re-walks steps through rarity, then runs `lint_criteria()` again before the summary.
