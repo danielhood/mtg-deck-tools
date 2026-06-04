@@ -16,7 +16,6 @@ from mtg_deck_tools.wizard.commanders import (
     CommanderRow,
     combined_color_identity,
     fetch_commander,
-    filter_eligible_commander_ids,
     format_commander_choice,
     search_commanders,
 )
@@ -132,6 +131,19 @@ def run_step5(
     conn = _require_db(path)
 
     try:
+        if criteria.commander_oracle_ids:
+            still, dropped = filter_eligible_commander_ids(
+                conn, criteria.commander_oracle_ids
+            )
+            if dropped:
+                console.print(
+                    "[yellow]Saved commander(s) not found in database "
+                    "(re-import or pick again):[/yellow] "
+                    + ", ".join(dropped)
+                )
+            if still != criteria.commander_oracle_ids:
+                criteria = criteria.model_copy(update={"commander_oracle_ids": still})
+
         console.print(
             Panel(
                 "[bold]Step 6 of 7[/bold] — Commander\n"
