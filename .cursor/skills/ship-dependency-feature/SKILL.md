@@ -10,7 +10,7 @@ End-to-end workflow for dependency expansion PRs. Combines implementation, verif
 
 ## Phase A — Implementation
 
-Follow checklist in [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and [docs/roadmap/dependency-expansion.md](../../docs/roadmap/dependency-expansion.md):
+Follow [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and [docs/sdlc/dependency-validation.md](../../docs/sdlc/dependency-validation.md):
 
 1. Patterns → `config/effect-patterns.yaml` + `tests/fixtures/effect_golden.yaml`
 2. Profile → `config/dependency-profiles.yaml`; scope in `dependency_scope.py` if needed
@@ -21,15 +21,14 @@ Follow checklist in [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and [docs/roadmap/d
 
 ## Phase B — Ship documentation (same PR)
 
-When the feature is **complete** (roadmap row done):
+When the feature is **complete** (row in `docs/roadmap/dependency/active.md` done):
 
 | File | Action |
 | --- | --- |
-| `docs/roadmap/dependency-expansion.md` | `~~**Work item**~~` in Priority grid; **Shipped YYYY-MM** in Notes |
-| `docs/roadmap/dependency-expansion.md` | Remove from Suggested sequence; append to **Shipped** line |
-| `docs/roadmap/dependency-expansion.md` | Update Shipped inventory tables if new kinds/rules/packages |
+| `docs/specs/dependency-engine/shipped-inventory.md` | Update inventory tables |
 | `docs/history/changelog.md` | Append one dated bullet |
-| `docs/roadmap/active.md` | Remove from open tables if listed; update **Suggested next task** |
+| `docs/roadmap/dependency/active.md` | Remove shipped row |
+| `docs/history/dependency-priorities.md` | Strike through **only** if item is in archived Priority grid |
 | `README.md` | User-facing mechanic/flag if applicable |
 
 ## Phase C — Finish
@@ -40,8 +39,6 @@ When the feature is **complete** (roadmap row done):
 
 ## Partial work (not shipping yet)
 
-If the PR is incremental (WIP, no roadmap row closed):
-
-- Update dependency-expansion **only** if inventory tables or checklist semantics change
-- Do **not** strike through roadmap rows until the feature is fully shipped
-- Still run `/sync-documentation` for any behavior README users would see
+- Update `shipped-inventory.md` **only** if inventory semantics change before ship
+- Do **not** remove backlog rows until the feature is fully shipped
+- Promote work: `dependency/backlog.md` → `dependency/active.md` before starting

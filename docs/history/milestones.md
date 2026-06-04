@@ -1,6 +1,6 @@
 # Shipped milestones
 
-Historical record of major capabilities. For day-to-day “what to build next,” use [roadmap/active.md](../roadmap/active.md). For dependency effect/rule inventory, use [roadmap/dependency-expansion.md](../roadmap/dependency-expansion.md).
+Historical record of major capabilities. For day-to-day “what to build next,” use [roadmap/active.md](../roadmap/active.md). For dependency effect/rule inventory, use [shipped-inventory.md](../specs/dependency-engine/shipped-inventory.md).
 
 ## Phase 1
 
@@ -54,7 +54,7 @@ Technical detail: [overview.md](../specs/dependency-engine/overview.md), [implem
 
 ## Dependency expansion (2026-06)
 
-Enchantment matters, subtype lords, tokens, vehicles, equipment depth, rad/oil/charge counters, graveyard/landfall heuristics, sacrifice/token refinements, resource counters, tutor payload upgrades, graveyard filler atoms (surveil/discover/discard), token subtype buffs — see [dependency-expansion.md](../roadmap/dependency-expansion.md) shipped inventory.
+Enchantment matters, subtype lords, tokens, vehicles, equipment depth, rad/oil/charge counters, graveyard/landfall heuristics, sacrifice/token refinements, resource counters, tutor payload upgrades, graveyard filler atoms (surveil/discover/discard), token subtype buffs — see [shipped-inventory.md](../specs/dependency-engine/shipped-inventory.md).
 
 ## Dogfood
 

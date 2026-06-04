@@ -16,8 +16,8 @@ This repo prototypes a **Cursor-driven SDLC**. Agents own documentation quality;
 
 ## Non-negotiables
 
-- **Ship status** changes (feature complete, backlog reorder) → update [dependency-expansion.md](../../docs/roadmap/dependency-expansion.md) strike-through grid, [active.md](../../docs/roadmap/active.md) / [changelog.md](../../docs/history/changelog.md), and README when user-facing.
-- **Never** leave roadmap docs listing shipped work as "next" (see subtype lords / tokens / vehicles pattern in dependency-expansion).
+- **Ship status** changes → update [shipped-inventory.md](../../docs/specs/dependency-engine/shipped-inventory.md) for dependency code, [roadmap/active.md](../../docs/roadmap/active.md) / [dependency/active.md](../../docs/roadmap/dependency/active.md), [changelog.md](../../docs/history/changelog.md), and README when user-facing.
+- **Never** leave shipped work listed under **active** when it belongs in history/changelog only.
 - If no docs need updates, state why explicitly in the PR body.
 
 ## PR body

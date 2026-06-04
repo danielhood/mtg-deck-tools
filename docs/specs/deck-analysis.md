@@ -85,7 +85,7 @@ Not implemented. Planned **UX10** ([deck-output-format.md](../product/deck-outpu
 
 - Add scenarios to the YAML (no code change).
 - For new check types, extend `expect` parsing in `analysis/matrix.py` and `analysis/expectations.py`.
-- For new dependency rules and mechanic packages, follow [dependency-expansion.md](../roadmap/dependency-expansion.md).
+- For new dependency rules and mechanic packages, follow [dependency-validation.md](../sdlc/dependency-validation.md) and [shipped-inventory.md](dependency-engine/shipped-inventory.md).
 - Programmatic use: `build_generate_outcome()` → inspect `GenerateOutcome` without writing decks.
 
 ## CI

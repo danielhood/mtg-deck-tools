@@ -8,8 +8,8 @@ alwaysApply: false
 
 When editing matched dependency paths:
 
-1. Follow [docs/DOC-MAP.md](../../docs/DOC-MAP.md) **Dependency feature implementation checklist**.
-2. If shipping a roadmap item: strike through in [docs/roadmap/dependency-expansion.md](../../docs/roadmap/dependency-expansion.md), append [docs/history/changelog.md](../../docs/history/changelog.md), update [docs/roadmap/active.md](../../docs/roadmap/active.md), and [README.md](../../README.md) when users gain a new mechanic or flag.
+1. Follow [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and [docs/sdlc/dependency-validation.md](../../docs/sdlc/dependency-validation.md).
+2. If shipping: update [docs/specs/dependency-engine/shipped-inventory.md](../../docs/specs/dependency-engine/shipped-inventory.md), [docs/history/changelog.md](../../docs/history/changelog.md), [docs/roadmap/dependency/active.md](../../docs/roadmap/dependency/active.md), and [README.md](../../README.md) when users gain a new mechanic or flag.
 3. Invoke **`/ship-dependency-feature`** before finishing the task.
 
 Do not merge dependency code without the corresponding doc updates in the same PR.

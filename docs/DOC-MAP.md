@@ -25,8 +25,8 @@ If no doc updates apply, state **explicitly** in the PR body: *No doc changes �
 | --- | --- |
 | **CLI commands, flags, wizard steps, setup** | [README.md](../README.md) |
 | **User-facing generate / analyze behavior** | [README.md](../README.md); [specs/dependency-engine/user-experience.md](specs/dependency-engine/user-experience.md) if dependency UX |
-| **Shipped feature or backlog priority shift** | [roadmap/active.md](roadmap/active.md) (suggested next / open rows only); [history/changelog.md](history/changelog.md) (one dated line); [roadmap/dependency-expansion.md](roadmap/dependency-expansion.md) if dependency-related |
-| **New / changed dependency profile, rule, package, pattern** | Dependency checklist (below); dependency-expansion shipped grid; [README.md](../README.md) if user selects new mechanic |
+| **Shipped feature or backlog priority shift** | [roadmap/active.md](roadmap/active.md) / [roadmap/backlog.md](roadmap/backlog.md); [history/changelog.md](history/changelog.md) (one line) |
+| **New / changed dependency profile, rule, package, pattern** | [dependency-validation.md](sdlc/dependency-validation.md); [shipped-inventory.md](specs/dependency-engine/shipped-inventory.md); [README.md](../README.md) if user selects new mechanic |
 | **Dogfood matrix or analyze expectations** | [specs/deck-analysis.md](specs/deck-analysis.md) if semantics change; [config/dogfood-matrix.yaml](../config/dogfood-matrix.yaml) |
 | **Effect extraction contract** | [specs/dependency-engine/overview.md](specs/dependency-engine/overview.md); [specs/dependency-engine/effect-extraction-policy.md](specs/dependency-engine/effect-extraction-policy.md); golden fixtures |
 | **Architecture / data layout** | Relevant doc under `docs/architecture/` or `docs/product/`; [specs/data/oracle-bulk-contract.md](specs/data/oracle-bulk-contract.md) if import fields change; [README.md](../README.md) project layout if paths move |
@@ -35,51 +35,42 @@ If no doc updates apply, state **explicitly** in the PR body: *No doc changes �
 
 **Do not** duplicate maintenance tables in [README.md](README.md). That file indexes the tree; **this file** owns the update map.
 
+**Roadmap rule:** [roadmap/active.md](roadmap/active.md) = selected immediate work only. Parked items stay in [roadmap/backlog.md](roadmap/backlog.md) or [roadmap/dependency/backlog.md](roadmap/dependency/backlog.md).
+
 ---
 
 ## Shipping a dependency expansion feature
 
-When a row in [dependency-expansion.md](roadmap/dependency-expansion.md) Priority 1–8 is **completed**, update in the **same PR**:
+When dependency work listed in [roadmap/dependency/active.md](roadmap/dependency/active.md) is **completed**, update in the **same PR**:
 
 | Step | File | Action |
 | --- | --- | --- |
-| 1 | `docs/roadmap/dependency-expansion.md` | Strike through the work item in the Priority grid (`~~**Name**~~`, **Shipped YYYY-MM** in Notes) |
-| 2 | `docs/roadmap/dependency-expansion.md` | Remove from **Suggested sequence**; add to **Shipped (YYYY-MM)** line |
-| 3 | `docs/history/changelog.md` | Append one dated bullet (title + optional PR) |
-| 4 | `docs/roadmap/active.md` | Remove from open tables if listed; update **Suggested next task** if this was the top item |
-| 5 | `README.md` | Update dependency expansion blurb if users can select the new mechanic |
-| 6 | `docs/roadmap/dependency-expansion.md` | Confirm **Shipped inventory** tables list new `effect_kind` / `rule_id` / package if applicable |
+| 1 | `docs/specs/dependency-engine/shipped-inventory.md` | Add/update inventory tables (`effect_kind`, `rule_id`, package) |
+| 2 | `docs/history/changelog.md` | Append one dated bullet |
+| 3 | `docs/roadmap/dependency/active.md` | Remove shipped row |
+| 4 | `docs/history/dependency-priorities.md` | Strike through **only** if the item is in the archived Priority 1–8 grid |
+| 5 | `README.md` | User-facing mechanic blurb if applicable |
+| 6 | `docs/roadmap/active.md` | Update **Suggested next task** if this was the top product item |
 
-Use skill **`/ship-dependency-feature`** for the full implementation + doc checklist.
+Use skill **`/ship-dependency-feature`**. Full checklist: [dependency-validation.md](sdlc/dependency-validation.md).
 
 ---
 
 ## Dependency feature implementation checklist
 
-From [dependency-expansion.md](roadmap/dependency-expansion.md) — code **and** docs in one PR:
+From [dependency-validation.md](sdlc/dependency-validation.md) — code **and** docs in one PR (summary):
 
-1. **Patterns** — `config/effect-patterns.yaml`; golden cases in `tests/fixtures/effect_golden.yaml`
-2. **Import** — Re-run `mtg-deck-tools import`; note new `effect_count` in PR
-3. **Audit** — Optional `dependency-audit` refresh
-4. **Profile** — `config/dependency-profiles.yaml`
-5. **Scope** — `rules/dependency_scope.py` if needed
-6. **Validate** — `rules/dependencies.py`
-7. **Build** — profiles, scoring, `mechanic_packages.py`, `dependency_repair.py`
-8. **Rubric** — `analysis/rubric.py` if dogfood metrics change
-9. **Dogfood** — `config/dogfood-matrix.yaml`
-10. **Tests** — Unit tests + `analyze run --fail-on-expect`
-11. **Doc map** — Steps in [Shipping a dependency expansion feature](#shipping-a-dependency-expansion-feature) above
+1. Patterns → import → profile → scope → validate → build → rubric → dogfood → tests
+2. Doc map steps in [Shipping a dependency expansion feature](#shipping-a-dependency-expansion-feature) above
 
 ---
 
 ## Path triggers (Cursor rules)
 
-Rules under `.cursor/rules/` auto-attach when matching paths are edited:
-
 | Rule | Paths | Purpose |
 | --- | --- | --- |
 | `sdlc-documentation` | always | Every agent turn: doc map + pre-PR sync |
-| `dependency-documentation` | `config/dependency-*.yaml`, `config/effect-patterns.yaml`, `config/dogfood-matrix.yaml`, dependency engine `src/` | Require dependency-expansion / active / README updates |
+| `dependency-documentation` | `config/dependency-*.yaml`, `config/effect-patterns.yaml`, `config/dogfood-matrix.yaml`, dependency engine `src/` | Require shipped-inventory / active / backlog / README updates |
 | `cli-documentation` | `src/mtg_deck_tools/cli/**`, `src/mtg_deck_tools/wizard/**` | Require README (+ UX spec if UX) |
 
 ---
@@ -101,8 +92,12 @@ Rules under `.cursor/rules/` auto-attach when matching paths are edited:
 
 | Doc | Role |
 | --- | --- |
-| [roadmap/active.md](roadmap/active.md) | Active work and suggested next task |
-| [roadmap/dependency-expansion.md](roadmap/dependency-expansion.md) | Dependency inventory + expansion backlog |
-| [history/changelog.md](history/changelog.md) | Recent ships (append-only) |
+| [roadmap/active.md](roadmap/active.md) | Selected immediate product work |
+| [roadmap/backlog.md](roadmap/backlog.md) | Parked product / UX work |
+| [roadmap/dependency/active.md](roadmap/dependency/active.md) | Selected dependency expansion |
+| [roadmap/dependency/backlog.md](roadmap/dependency/backlog.md) | Parked dependency work |
+| [specs/dependency-engine/shipped-inventory.md](specs/dependency-engine/shipped-inventory.md) | Shipped dependency spec |
+| [sdlc/dependency-validation.md](sdlc/dependency-validation.md) | Dogfood gate + ship checklist |
+| [history/dependency-priorities.md](history/dependency-priorities.md) | Archived Priority 1–8 grid |
+| [history/changelog.md](history/changelog.md) | Recent ships |
 | [specs/deck-analysis.md](specs/deck-analysis.md) | Dogfood matrix runner |
-| [specs/dependency-engine/user-experience.md](specs/dependency-engine/user-experience.md) | Wizard / CLI dependency UX |

@@ -200,7 +200,7 @@ Versioned **`config/effect-patterns.yaml`** (or extend taxonomy) defining:
 | Modal / “choose one” | Extract each mode line separately |
 | “Choose a creature type” | Warning only — no static proof |
 | “Any card” tutors | Skip target check or require ≥1 nonland spell |
-| Tokens created with types | Shipped: generic `token_produce` / `TOKEN_BALANCE`; **planned:** subtype capture + buff pairing ([15](../../roadmap/dependency-expansion.md) § Priority 8) |
+| Tokens created with types | Shipped: `token_produce` / `TOKEN_BALANCE` + subtype buffs — [shipped-inventory.md](shipped-inventory.md) |
 | Commander outside 99 | Tutor for “legendary creature” can use commander — special case |
 
 ---
@@ -393,11 +393,11 @@ Engine implementation should read profile thresholds from YAML rather than hard-
 
 ## Post–D5 expansion (active)
 
-D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras, artifacts, subtype lords, tokens, vehicles, dogfood matrix). Further effect kinds, rules, and packages are tracked in **[dependency-expansion.md](../../roadmap/dependency-expansion.md)**:
+D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras, artifacts, subtype lords, tokens, vehicles, dogfood matrix). Shipped effect kinds, rules, and packages: **[shipped-inventory.md](shipped-inventory.md)**. Future work: **[dependency/backlog.md](../../roadmap/dependency/backlog.md)**:
 
 - Shipped inventory (`effect_kind`, `rule_id`, packages)
 - High-value additions (enchantment matters, tutor payloads, graveyard heuristics, counter resources)
-- **Shipped:** Priority 7–8 graveyard filler + token subtype buffs ([15](../../roadmap/dependency-expansion.md))
+- **Shipped:** Priority 7–8 graveyard filler + token subtype buffs ([dependency-priorities.md](../../history/dependency-priorities.md))
 - Explicit non-goals
 - Per-feature implementation checklist
 - Suggested build order

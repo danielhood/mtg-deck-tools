@@ -14,26 +14,20 @@ Open [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and identify which rows apply to f
 
 ## 2. Update required docs
 
-Edit every doc listed for those change types. Common gaps to check:
-
 | Signal | Doc action |
 | --- | --- |
 | New CLI flag or command | `README.md` |
-| Shipped roadmap item | `docs/roadmap/dependency-expansion.md` strike-through + shipped line; `docs/history/changelog.md` one line; `docs/roadmap/active.md` if listed |
-| New dependency profile/rule | dependency-expansion inventory tables; README mechanic blurb |
-| Dogfood scenario added | `config/dogfood-matrix.yaml`; `docs/specs/deck-analysis.md` only if runner semantics change |
-| Backlog priority shift | `docs/roadmap/active.md`; dependency-expansion suggested sequence |
+| Shipped roadmap item | `shipped-inventory.md` + `changelog.md`; clear `roadmap/dependency/active.md` or `roadmap/active.md` |
+| New dependency profile/rule | `shipped-inventory.md`; README mechanic blurb |
+| Dogfood scenario added | `config/dogfood-matrix.yaml`; `deck-analysis.md` only if runner semantics change |
+| Backlog / priority shift | Move rows between `roadmap/active.md` ↔ `roadmap/backlog.md` (and `dependency/` counterparts) |
 
 ## 3. Self-check (must pass)
 
-- [ ] No shipped feature still listed as "next" in dependency-expansion Priority grid or active.md open table
+- [ ] No shipped feature still listed under **active** (product or dependency)
 - [ ] README commands/flags match `src/mtg_deck_tools/cli/`
 - [ ] PR body will list docs touched OR explicit "none — reason"
 
-## 4. Commit docs with code
-
-Documentation updates belong in the **same PR** as the implementation, not a follow-up.
-
 ## When to use `/ship-dependency-feature` instead
 
-If the branch adds or ships dependency engine behavior (patterns, profiles, packages, dogfood), run **`/ship-dependency-feature`** — it includes this sync plus the full dependency checklist.
+Dependency engine behavior (patterns, profiles, packages, dogfood): run **`/ship-dependency-feature`**.

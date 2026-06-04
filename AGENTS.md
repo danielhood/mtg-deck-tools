@@ -9,7 +9,7 @@ Documentation is **agent-enforced**, not CI-gated. On every task that changes co
 3. Before commit/push/PR: run skill **`/sync-documentation`**.
 4. Dependency expansion: run **`/ship-dependency-feature`** (includes sync + dependency-expansion ship steps).
 
-PRs must include a **Documentation** section (docs touched, or explicit reason for none). Never leave shipped features listed as "next" in [dependency-expansion.md](docs/roadmap/dependency-expansion.md) or [active.md](docs/roadmap/active.md).
+PRs must include a **Documentation** section (docs touched, or explicit reason for none). Never leave shipped features listed as "next" in [roadmap/active.md](docs/roadmap/active.md), [roadmap/dependency/active.md](docs/roadmap/dependency/active.md), or [roadmap/backlog.md](docs/roadmap/backlog.md).
 
 ## Cursor Cloud specific instructions
 
