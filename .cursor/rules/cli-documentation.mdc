@@ -1,15 +1,18 @@
 ---
-description: CLI and wizard changes require README and optional UX planning doc updates.
+description: CLI and wizard changes — implementation phase docs (README + UX spec).
 globs: src/mtg_deck_tools/cli/**,src/mtg_deck_tools/wizard/**
 alwaysApply: false
 ---
 
-# CLI / wizard changes → documentation
+# CLI / wizard → documentation
 
-When editing matched CLI or wizard paths:
+**Phase:** implementation (see [agent-phases.md](../../docs/sdlc/agent-phases.md)).
 
-1. Update [README.md](../../README.md) — commands, flags, setup, examples.
-2. If dependency strictness, repair, or mechanic focus UX changes: update [docs/specs/dependency-engine/user-experience.md](../../docs/specs/dependency-engine/user-experience.md).
-3. Run **`/sync-documentation`** before PR.
+When editing matched paths:
 
-User-facing behavior must not drift from README.
+1. [README.md](../../README.md) — commands, flags, examples.
+2. [user-experience.md](../../docs/specs/dependency-engine/user-experience.md) if wizard/dependency UX behavior changes.
+3. If shipping a task: remove from [active.md](../../docs/roadmap/active.md); [changelog.md](../../docs/history/changelog.md).
+4. **`/sync-documentation`** before PR.
+
+Planning-only UX design (no code): update UX spec + roadmap; do not changelog.

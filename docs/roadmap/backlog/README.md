@@ -1,6 +1,6 @@
 # Backlog (by component)
 
-Parked work — **not** in [active.md](../active.md) until promoted into the unified task register.
+Parked work — **not** in [active.md](../active.md) until promoted (planning phase: [agent-phases.md](../../sdlc/agent-phases.md) § Phase 1).
 
 | Component | Backlog | Typical code |
 | --- | --- | --- |

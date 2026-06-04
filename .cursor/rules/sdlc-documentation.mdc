@@ -1,25 +1,32 @@
 ---
-description: Agent SDLC — keep documentation in sync with code on every PR; no human doc review gate.
+description: Agent SDLC — planning and implementation doc phases; sync before every PR.
 alwaysApply: true
 ---
 
 # Documentation SDLC (always)
 
-This repo prototypes a **Cursor-driven SDLC**. Agents own documentation quality; do not rely on CI doc gates or human PR checklists.
+Agents own `docs/` quality. Read [docs/sdlc/agent-phases.md](../../docs/sdlc/agent-phases.md) for **planning** vs **implementation** vs **ship**.
 
 ## Before every commit / push / PR
 
-1. Read [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and classify the change.
-2. Update every doc listed for that change type **in the same branch** as the code.
-3. Run skill **`/sync-documentation`** before opening or updating a PR.
-4. For dependency expansion (profiles, packages, effect patterns, dogfood): run **`/ship-dependency-feature`** instead of or in addition to sync-documentation.
+1. Identify **phase** (planning | implementation).
+2. Read [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and update every listed doc **in the same branch**.
+3. Run **`/sync-documentation`** before opening or updating a PR.
+4. Dependency engine implementation: **`/ship-dependency-feature`**.
+
+## Planning phase
+
+- **Read:** [roadmap/active.md](../../docs/roadmap/active.md), [roadmap/backlog/](../../docs/roadmap/backlog/), relevant `docs/specs/`.
+- **Write:** active/backlog promotion, spec design, product docs.
+- **Do not:** [changelog.md](../../docs/history/changelog.md) or remove active rows until the feature is **shipped**.
+
+## Implementation phase
+
+- **Write:** code/config/tests + DOC-MAP targets in the **same PR**.
+- **Ship:** remove task from active, append changelog, update inventory/README per DOC-MAP.
+- **WIP:** keep task in active; no changelog.
 
 ## Non-negotiables
 
-- **Ship status** changes → update [roadmap/active.md](../../docs/roadmap/active.md), relevant [roadmap/backlog/](../../docs/roadmap/backlog/), [changelog.md](../../docs/history/changelog.md), [shipped-inventory.md](../../docs/specs/dependency-engine/shipped-inventory.md) for dependency code, README when user-facing.
-- **Never** leave shipped work listed under **active** when it belongs in history/changelog only.
-- If no docs need updates, state why explicitly in the PR body.
-
-## PR body
-
-Include a **Documentation** section listing touched files or "none — [reason]". See DOC-MAP PR template.
+- Never leave **shipped** work in [roadmap/active.md](../../docs/roadmap/active.md).
+- PR body: **Phase** + **Documentation** section (paths or explicit none).

@@ -1,6 +1,6 @@
 # Dependency expansion — validation and ship workflow
 
-SDLC for shipping new dependency profiles, rules, and patterns. **Spec:** [shipped-inventory.md](../specs/dependency-engine/shipped-inventory.md). **Runner:** [deck-analysis.md](../specs/deck-analysis.md). **Active register:** [active.md](../roadmap/active.md).
+SDLC for shipping new dependency profiles, rules, and patterns. **Phases:** [agent-phases.md](agent-phases.md). **Spec:** [shipped-inventory.md](../specs/dependency-engine/shipped-inventory.md). **Runner:** [deck-analysis.md](../specs/deck-analysis.md). **Active register:** [active.md](../roadmap/active.md).
 
 ---
 

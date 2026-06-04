@@ -1,11 +1,22 @@
 ---
-description: Dependency engine changes require docs and README updates per DOC-MAP.
+description: Dependency engine — planning (promote active) and implementation (inventory, dogfood, ship).
 globs: config/dependency-profiles.yaml,config/effect-patterns.yaml,config/dogfood-matrix.yaml,src/mtg_deck_tools/builder/mechanic_packages.py,src/mtg_deck_tools/builder/dependency_scoring.py,src/mtg_deck_tools/builder/dependency_repair.py,src/mtg_deck_tools/rules/dependencies.py,src/mtg_deck_tools/rules/dependency_profiles.py,src/mtg_deck_tools/rules/dependency_scope.py,src/mtg_deck_tools/effects/**,src/mtg_deck_tools/analysis/rubric.py
 alwaysApply: false
 ---
 
-# Dependency changes → documentation
+# Dependency engine → documentation
 
-1. [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and [docs/sdlc/dependency-validation.md](../../docs/sdlc/dependency-validation.md).
-2. If shipping: [shipped-inventory.md](../../docs/specs/dependency-engine/shipped-inventory.md), [changelog.md](../../docs/history/changelog.md), [active.md](../../docs/roadmap/active.md), [README.md](../../README.md) when user-facing.
-3. **`/ship-dependency-feature`** before finishing.
+Read [agent-phases.md](../../docs/sdlc/agent-phases.md) and [dependency-validation.md](../../docs/sdlc/dependency-validation.md).
+
+## Starting new expansion work (planning)
+
+- Promote from [backlog/cli-engine.md](../../docs/roadmap/backlog/cli-engine.md) to [active.md](../../docs/roadmap/active.md) with Depends on / Parallel columns.
+
+## Implementation + ship
+
+1. [DOC-MAP.md](../../docs/DOC-MAP.md)
+2. [shipped-inventory.md](../../docs/specs/dependency-engine/shipped-inventory.md), [changelog.md](../../docs/history/changelog.md), [active.md](../../docs/roadmap/active.md) when complete
+3. [README.md](../../README.md) if users gain a new mechanic or flag
+4. **`/ship-dependency-feature`** before finishing
+
+Same PR for code and doc updates.

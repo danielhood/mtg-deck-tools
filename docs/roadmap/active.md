@@ -73,7 +73,7 @@ flowchart LR
 
 1. Add row to this register from the relevant [backlog/](backlog/) file.
 2. Fill **Depends on** and **Parallel OK with** before coding.
-3. On ship: remove row here → [changelog.md](../history/changelog.md); update specs/inventory per [DOC-MAP.md](../DOC-MAP.md).
+3. On ship (implementation complete): remove row here → [changelog.md](../history/changelog.md); update specs/inventory per [DOC-MAP.md](../DOC-MAP.md). Planning steps: [agent-phases.md](../sdlc/agent-phases.md).
 
 ---
 

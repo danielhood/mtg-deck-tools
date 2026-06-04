@@ -21,4 +21,4 @@ roadmap/
 | How do we **validate** dependency PRs? | [dependency-validation.md](../sdlc/dependency-validation.md) |
 | Priority 1–8 **archive**? | [dependency-priorities.md](../history/dependency-priorities.md) |
 
-Agent maintenance: [DOC-MAP.md](../DOC-MAP.md).
+**Agents:** Promote/demote via [agent-phases.md](../sdlc/agent-phases.md). File targets on ship: [DOC-MAP.md](../DOC-MAP.md).
