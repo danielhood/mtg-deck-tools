@@ -77,6 +77,7 @@ class DeckBuildStats:
     token_package_requested: bool = False
     needs_token_payoff: bool = False
     needs_token_producer: bool = False
+    token_produce_subtypes: dict[str, int] = field(default_factory=dict)
     vehicle_count: int = 0
     crew_creature_count: int = 0
     vehicle_floor: int = 0
@@ -235,6 +236,12 @@ def build_deck_build_stats(
     )
     stats.needs_token_payoff = stats.token_producers > 0 and stats.token_payoffs == 0
     stats.needs_token_producer = stats.token_payoffs > 0 and stats.token_producers == 0
+
+    from mtg_deck_tools.rules.token_subtype import aggregate_token_produce_subtypes
+
+    stats.token_produce_subtypes = dict(
+        aggregate_token_produce_subtypes(effects_map, partial)
+    )
 
     for spec in RESOURCE_COUNTER_SPECS:
         pid = spec.profile_id
@@ -450,6 +457,10 @@ def dependency_pick_score(
             score += 5.0 * weight
         elif effect.effect_kind == "token_produce" and stats.needs_token_producer:
             score += 3.5 * weight
+        elif effect.effect_kind == "token_buff_subtype" and stats.token_produce_subtypes:
+            subtypes = effect.payload.get("subtypes") or []
+            if subtypes and subtypes[0] in stats.token_produce_subtypes:
+                score += 4.0 * weight
         elif effect.effect_kind == "energy_consume" and stats.energy_producers >= 2:
             if stats.energy_consumers < stats.energy_producers:
                 score += 2.0 * weight

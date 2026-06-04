@@ -412,3 +412,16 @@ scenarios:
       dependency:
         rules_must_not_warn: [REANIMATION_SUPPORT, GRAVEYARD_COST_SUPPORT, SELF_MILL_BALANCE, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, RAD_BALANCE, OIL_BALANCE, CHARGE_BALANCE, EQUIPMENT_BALANCE, LANDFALL_BALANCE]
         max_inappropriate_warnings: 0
+
+  - id: treasure-prosper
+    label: Treasure tokens — subtype buff support
+    commander_names: ["Prosper, Tome-Bound"]
+    criteria:
+      themes: [tokens]
+      colors: [B, R]
+    expect:
+      validation:
+        passed: true
+      dependency:
+        rules_must_not_warn: [TOKEN_BALANCE, TOKEN_SUBTYPE_BUFF_SUPPORT, ENERGY_BALANCE, EXPERIENCE_BALANCE, BLOOD_BALANCE, PLUS_ONE_BALANCE, RAD_BALANCE, OIL_BALANCE, CHARGE_BALANCE, REANIMATION_SUPPORT, GRAVEYARD_COST_SUPPORT, SELF_MILL_BALANCE, EQUIPMENT_BALANCE, LANDFALL_BALANCE]
+        max_inappropriate_warnings: 0

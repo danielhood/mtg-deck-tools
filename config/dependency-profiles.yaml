@@ -110,10 +110,11 @@ profiles:
     label: Token synergies
     activation:
       themes: [tokens]
-    roles: [producer, payoff]
+    roles: [producer, payoff, token_buff_subtype]
     defaults:
       producer_min: 5
       payoff_min: 3
+      token_subtype_producer_min: 3
       share_max: 0.2
 
   # Audit 2026-05-30: Vehicle type line + crew; see planning/11 UX table

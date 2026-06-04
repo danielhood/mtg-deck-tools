@@ -65,6 +65,14 @@ def classify_dependency_warning(
             return "appropriate"
         return "inappropriate"
 
+    if rule_id == "TOKEN_SUBTYPE_BUFF_SUPPORT":
+        if scope.tokens_user_intent:
+            return "appropriate"
+        producer_count = detail.get("producer_count") or 0
+        if producer_count >= 3:
+            return "appropriate"
+        return "inappropriate"
+
     if rule_id == "VEHICLE_BALANCE":
         if scope.vehicles_user_intent:
             return "appropriate"

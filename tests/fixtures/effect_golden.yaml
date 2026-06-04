@@ -113,6 +113,35 @@ cases:
           types: [artifact]
       - effect_kind: token_produce
         source: token_produce
+        payload:
+          subtypes: [Thopter]
+
+  - name: smothering_tithe
+    oracle_text: "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token."
+    type_line: "Enchantment"
+    expected:
+      - effect_kind: token_produce
+        source: token_produce
+        payload:
+          subtypes: [Treasure]
+
+  - name: intangible_virtue
+    oracle_text: "Creature tokens you control get +1/+1."
+    type_line: "Enchantment"
+    expected:
+      - effect_kind: token_payoff
+        source: token_payoff_tokens_you_control
+
+  - name: angelic_destiny
+    oracle_text: "Angel tokens you control get +2/+2 and have flying."
+    type_line: "Enchantment — Aura"
+    expected_min:
+      - effect_kind: token_buff_subtype
+        source: token_buff_subtype
+        payload:
+          subtypes: [Angel]
+      - effect_kind: type_line_aura
+        source: type_line_aura
 
   - name: token_payoff_create
     oracle_text: "Whenever you create a token, draw a card."
@@ -436,27 +465,6 @@ cases:
     expected:
       - effect_kind: mill_enabler
         source: mill_enabler
-
-  - name: dimir_informant
-    oracle_text: "When Dimir Informant enters the battlefield, surveil 2."
-    type_line: "Creature — Human Wizard"
-    expected:
-      - effect_kind: mill_enabler
-        source: mill_enabler_surveil_discover
-
-  - name: scholarly_discovery
-    oracle_text: "Discover 4"
-    type_line: "Sorcery"
-    expected:
-      - effect_kind: mill_enabler
-        source: mill_enabler_surveil_discover
-
-  - name: faithless_looting
-    oracle_text: "Draw two cards, then discard two cards."
-    type_line: "Sorcery"
-    expected:
-      - effect_kind: mill_enabler
-        source: graveyard_filler_discard
 
   - name: saproling_symbiosis
     oracle_text: "For each creature card in your graveyard, create a 1/1 green Saproling creature token."

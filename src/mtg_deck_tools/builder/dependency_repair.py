@@ -41,6 +41,7 @@ ISSUE_PRIORITY = (
     "PLUS_ONE_BALANCE",
     "SACRIFICE_BALANCE",
     "TOKEN_BALANCE",
+    "TOKEN_SUBTYPE_BUFF_SUPPORT",
     "VEHICLE_BALANCE",
     "EQUIPMENT_BALANCE",
     "TYPE_SYNERGY_MIN",
@@ -353,6 +354,30 @@ def swap_matching_card(
     )
 
 
+
+def _filter_pool_by_effect_subtype(
+    conn: sqlite3.Connection,
+    pool: list[CardCandidate],
+    *,
+    effect_kind: str,
+    subtype: str,
+) -> list[CardCandidate]:
+    from mtg_deck_tools.rules.token_subtype import effect_payload_matches_subtype
+
+    if not pool:
+        return []
+    effect_map = fetch_card_effects(conn, [c.oracle_id for c in pool])
+    filtered: list[CardCandidate] = []
+    for candidate in pool:
+        for effect in effect_map.get(candidate.oracle_id, []):
+            if effect.effect_kind != effect_kind:
+                continue
+            if effect_payload_matches_subtype(effect, subtype):
+                filtered.append(candidate)
+                break
+    return filtered
+
+
 def swap_effect_kind_card(
     conn: sqlite3.Connection,
     cards: list[DeckCard],
@@ -364,6 +389,7 @@ def swap_effect_kind_card(
     commander_oracle_ids: set[str],
     commander_theme_tags: set[str],
     protect_oracle_ids: set[str] | None = None,
+    payload_subtype: str | None = None,
 ) -> tuple[list[DeckCard], str] | None:
     """Replace a flex/synergy card with another card that has the given effect kind."""
     victim = _pick_victim(cards, protect_oracle_ids=protect_oracle_ids or set())
@@ -380,6 +406,10 @@ def swap_effect_kind_card(
         exclude_names=exclude_names,
         criteria=criteria,
     )
+    if payload_subtype:
+        pool = _filter_pool_by_effect_subtype(
+            conn, pool, effect_kind=effect_kind, subtype=payload_subtype
+        )
     pool = _prepare_pool(
         conn,
         pool,
@@ -518,6 +548,34 @@ def _fix_token_balance(
         identity=identity,
         commander_oracle_ids=commander_oracle_ids,
         commander_theme_tags=commander_theme_tags,
+    )
+
+
+
+def _fix_token_subtype_buff(
+    conn: sqlite3.Connection,
+    cards: list[DeckCard],
+    issue: DependencyIssue,
+    *,
+    criteria: DeckCriteria,
+    identity: list[str],
+    commander_oracle_ids: set[str],
+    commander_theme_tags: set[str],
+) -> tuple[list[DeckCard], str] | None:
+    detail = issue.detail or {}
+    subtype = detail.get("subtype")
+    if not subtype:
+        return None
+    return swap_effect_kind_card(
+        conn,
+        cards,
+        "token_buff_subtype",
+        role_label=f"{subtype} token buff",
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=commander_oracle_ids,
+        commander_theme_tags=commander_theme_tags,
+        payload_subtype=str(subtype),
     )
 
 
@@ -801,6 +859,16 @@ def _attempt_repair(
         )
     if issue.rule_id == "TOKEN_BALANCE":
         return _fix_token_balance(
+            conn,
+            cards,
+            issue,
+            criteria=criteria,
+            identity=identity,
+            commander_oracle_ids=commander_oracle_ids,
+            commander_theme_tags=commander_theme_tags,
+        )
+    if issue.rule_id == "TOKEN_SUBTYPE_BUFF_SUPPORT":
+        return _fix_token_subtype_buff(
             conn,
             cards,
             issue,

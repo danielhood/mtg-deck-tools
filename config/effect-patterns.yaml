@@ -344,6 +344,17 @@ patterns:
       - whenever_cast_aura
       - whenever_cast_enchantment
 
+  - id: token_buff_subtype
+    effect_kind: token_buff_subtype
+    confidence: 0.9
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)\\b(?!creature\\b|artifact\\b)([A-Z][a-z]+) tokens? (?:you control )?(?:get|have|gain)"
+    payload:
+      role: buff
+    capture:
+      subtypes: 1
+
   # --- tokens (payoff before produce; aristocrats fodder also counts token_produce in code) ---
   - id: token_payoff_on_create
     effect_kind: token_payoff
@@ -379,7 +390,7 @@ patterns:
     confidence: 0.85
     matchers:
       - type: oracle_regex
-        pattern: "(?i)(?:number of|amount of) tokens you control|tokens you control (?:get|have|gain)"
+        pattern: "(?i)(?:for each |number of |amount of )?tokens you control (?:get|have|gain)(?![^\n]{0,40}\\b(?:creature|artifact)\\b tokens)"
     payload:
       trigger: control
     exclude_if_matched:
@@ -399,9 +410,11 @@ patterns:
     confidence: 0.9
     matchers:
       - type: oracle_regex
-        pattern: "(?i)create (?:a |an |two |three |four |five |\\d+/\\d+ |one or more |any number of )?(?:[\\w'/.-]+ )*token"
+        pattern: "(?i)create (?:a |an |two |three |four |five |\\d+/\\d+ |one or more |any number of )?(?:[\\w'/.-]+ )*?([A-Z][a-z]+)(?: artifact)?(?: creature)? tokens?"
     payload:
       role: producer
+    capture:
+      subtypes: 1
     exclude_if_matched:
       - token_doubler_or_replacement
       - token_payoff_on_create
