@@ -2,7 +2,7 @@
 
 Local utility for building **Commander** (EDH) decks: a terminal wizard walks through themes, mechanics, colors, budget, commander, and rarity, then generates a legal 100-card list with Markdown and machine-readable output.
 
-Planning docs: [`planning/README.md`](planning/README.md) · agent doc map: [`planning/DOC-MAP.md`](planning/DOC-MAP.md) · next steps: [`planning/09-next-steps.md`](planning/09-next-steps.md).
+Documentation: [`docs/README.md`](docs/README.md) · agent doc map: [`docs/DOC-MAP.md`](docs/DOC-MAP.md) · active roadmap: [`docs/roadmap/active.md`](docs/roadmap/active.md).
 
 ## Prerequisites
 
@@ -58,7 +58,9 @@ Use the effective date in the filename so updates are obvious. Commander deck co
 
 ```
 mtg-deck-tools/
-  planning/                 # Architecture and product decisions
+  docs/                     # Product, architecture, specs, roadmap, history (see docs/README.md)
+  src/mtg_deck_tools/       # CLI package (today)
+  packages/web/             # Web UI (planned — UX7)
   scripts/                  # bootstrap-linux.sh (uv-based env on Linux)
   resources/
     scryfall/               # Oracle bulk JSON (local download) + field docs
@@ -258,7 +260,7 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 
 **Dependency engine (D0–D5):** effect extraction at import (`card_effects`), post-build `dependency_report` in Markdown/JSON, pick-time scoring (D3), `--strict-dependencies` (D4), and `--repair-dependencies` (D5) — **complete** as of 2026-05-31.
 
-**Dependency expansion:** **tutor payload matching** (CMC bands, colors, land subtypes, multi-type OR for `TUTOR_TARGET_EXISTS`), **enchantments** profile (`ENCHANTMENT_SUPPORT_MIN`, wizard `themes: [enchantress]`), **tokens** (`TOKEN_BALANCE`), **vehicles** (`VEHICLE_BALANCE`), **equipment depth** (`EQUIPMENT_BALANCE`, `include_mechanics: [equip]` or `themes: [voltron]`), **rad/oil/charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`), **subtype lords**, **sacrifice/token refinements** (aristocrats fodder includes token makers; Grave Pact-style `sacrifice_opponent`; persist/undying/escape `death_recursion`), **graveyard/landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; wizard `themes: [recursion, landfall]`), **graveyard filler atoms** (surveil, discover, looting discard; `include_mechanics: [surveil]`), and **token subtype buffs** (`TOKEN_SUBTYPE_BUFF_SUPPORT`, subtype capture on `token_produce`) — shipped as of 2026-06. **UX2** wizard step 3 sets `strict_dependencies`, `repair_dependencies`, and optional `mechanic_focus` presets for activated profiles. **UX3** end-of-wizard criteria linter warns on conflicting selections before generate. **UX4** wizard back-navigation. **UX5** `generate --wizard --from` and `wizard --from` pre-fill the wizard from saved criteria. Next: **UX7** local web — see [`planning/09-next-steps.md`](planning/09-next-steps.md).
+**Dependency expansion:** **tutor payload matching** (CMC bands, colors, land subtypes, multi-type OR for `TUTOR_TARGET_EXISTS`), **enchantments** profile (`ENCHANTMENT_SUPPORT_MIN`, wizard `themes: [enchantress]`), **tokens** (`TOKEN_BALANCE`), **vehicles** (`VEHICLE_BALANCE`), **equipment depth** (`EQUIPMENT_BALANCE`, `include_mechanics: [equip]` or `themes: [voltron]`), **rad/oil/charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`), **subtype lords**, **sacrifice/token refinements** (aristocrats fodder includes token makers; Grave Pact-style `sacrifice_opponent`; persist/undying/escape `death_recursion`), **graveyard/landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; wizard `themes: [recursion, landfall]`), **graveyard filler atoms** (surveil, discover, looting discard; `include_mechanics: [surveil]`), and **token subtype buffs** (`TOKEN_SUBTYPE_BUFF_SUPPORT`, subtype capture on `token_produce`) — shipped as of 2026-06. **UX2** wizard step 3 sets `strict_dependencies`, `repair_dependencies`, and optional `mechanic_focus` presets for activated profiles. **UX3** end-of-wizard criteria linter warns on conflicting selections before generate. **UX4** wizard back-navigation. **UX5** `generate --wizard --from` and `wizard --from` pre-fill the wizard from saved criteria. Next: **UX7** local web — see [`docs/roadmap/active.md`](docs/roadmap/active.md).
 
 ## License
 

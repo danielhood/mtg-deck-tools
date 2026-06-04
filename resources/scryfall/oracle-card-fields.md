@@ -67,7 +67,7 @@ Reference for card objects in the Scryfall **oracle-cards** bulk file (e.g. `ora
 | Field | Type | Relevance | Details |
 | --- | --- | --- | --- |
 | `prices` | Object | **gameplay** | Budget filtering. |
-| `prices.usd` | String | **gameplay** | Nullable; see budget policy in planning docs. |
+| `prices.usd` | String | **gameplay** | Nullable; see budget policy in [docs/product/card-availability.md](../../docs/product/card-availability.md). |
 | `released_at` | Date | secondary | Distinguish new vs old when price is null (future). |
 | `edhrec_rank` | Integer | secondary | Popularity prior for slot ranking. |
 | `rarity` | String | secondary | Budget heuristics. |

@@ -8,7 +8,7 @@ from pathlib import Path
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.dependency_scope import _load_profile_activation
 
-# Profiles with focus-level wizard prompts (planning/11 UX2 table).
+# Profiles with focus-level wizard prompts (docs/specs/dependency-engine/user-experience.md UX2 table).
 UX2_PROFILE_IDS: tuple[str, ...] = (
     "energy",
     "aura_support",
@@ -29,7 +29,7 @@ UX2_PROFILE_IDS: tuple[str, ...] = (
 
 FOCUS_LEVELS: tuple[str, ...] = ("incidental", "supported", "focused", "engine")
 
-# Prompt labels from planning/11-dependency-engine-user-experience.md (UX2 table).
+# Prompt labels from docs/specs/dependency-engine/user-experience.md (UX2 table).
 WIZARD_FOCUS_PROMPT_LABELS: dict[str, str] = {
     "energy": "Energy focus",
     "aura_support": "Aura support",

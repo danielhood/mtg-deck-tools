@@ -9,7 +9,7 @@ alwaysApply: false
 When editing matched CLI or wizard paths:
 
 1. Update [README.md](../../README.md) — commands, flags, setup, examples.
-2. If dependency strictness, repair, or mechanic focus UX changes: update [planning/11-dependency-engine-user-experience.md](../../planning/11-dependency-engine-user-experience.md).
+2. If dependency strictness, repair, or mechanic focus UX changes: update [docs/specs/dependency-engine/user-experience.md](../../docs/specs/dependency-engine/user-experience.md).
 3. Run **`/sync-documentation`** before PR.
 
 User-facing behavior must not drift from README.

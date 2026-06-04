@@ -1,6 +1,6 @@
 # Mechanic profiles for dependency balance and user-facing focus presets.
 # Consumed by the dependency engine (planned) and documented in:
-# planning/11-dependency-engine-user-experience.md
+# docs/specs/dependency-engine/user-experience.md
 #
 # focus_presets multiply defaults; criteria.mechanic_focus selects a preset per profile.
 
@@ -117,7 +117,7 @@ profiles:
       token_subtype_producer_min: 3
       share_max: 0.2
 
-  # Audit 2026-05-30: Vehicle type line + crew; see planning/11 UX table
+  # Audit 2026-05-30: Vehicle type line + crew; see docs/specs/dependency-engine/user-experience.md UX table
   vehicles:
     label: Vehicles
     activation:

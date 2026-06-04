@@ -100,7 +100,7 @@ Optional: store raw JSON as **Parquet** for faster reloads — only worth it if 
 
 ```
 mtg-deck-tools/
-  planning/              # this folder
+  docs/                  # product, architecture, specs, roadmap, history, SDLC
   resources/
     scryfall/
     mtg/

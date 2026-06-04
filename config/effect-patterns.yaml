@@ -1,10 +1,10 @@
-# Effect pattern registry — D0 contract for dependency extraction (see planning/10, planning/14).
+# Effect pattern registry — D0 contract for dependency extraction (see docs/specs/dependency-engine/overview.md, docs/specs/deck-analysis.md).
 # Pattern id (source) → effect_kind; payload is static or built from regex capture groups.
 
 schema_version: 1
 extraction_version: 1
 
-# Face policy: planning/14-effect-extraction-face-policy.md
+# Face policy: docs/specs/dependency-engine/effect-extraction-policy.md
 # v1 import uses merged oracle_text (// separated), face_index always 0.
 
 patterns:

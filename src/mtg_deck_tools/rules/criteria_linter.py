@@ -15,7 +15,7 @@ from mtg_deck_tools.rules.rarity import RARITY_RANK
 _FOCUS_LEVELS = frozenset({"incidental", "supported", "focused", "engine"})
 _HIGH_FOCUS_LEVELS = frozenset({"focused", "engine"})
 
-# Profiles with UX2 focus prompts (planning/11 UX2 table).
+# Profiles with UX2 focus prompts (docs/specs/dependency-engine/user-experience.md UX2 table).
 _UX2_PROFILE_IDS: tuple[str, ...] = (
     "energy",
     "aura_support",
@@ -48,7 +48,7 @@ PROFILE_AVOID_TAGS: dict[str, tuple[str, ...]] = {
     "artifacts": ("equip", "vehicles"),
 }
 
-# Theme pairs that compete for synergy slot budget (planning/11 UX6 step 1).
+# Theme pairs that compete for synergy slot budget (docs/specs/dependency-engine/user-experience.md UX6 step 1).
 _HEAVY_THEME_PAIRS: tuple[frozenset[str], str] = (
     (frozenset({"tokens", "aristocrats"}), "tokens and aristocrats both need large synergy packages"),
 )

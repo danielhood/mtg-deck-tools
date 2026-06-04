@@ -9,15 +9,15 @@ This repo prototypes a **Cursor-driven SDLC**. Agents own documentation quality;
 
 ## Before every commit / push / PR
 
-1. Read [planning/DOC-MAP.md](../../planning/DOC-MAP.md) and classify the change.
+1. Read [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and classify the change.
 2. Update every doc listed for that change type **in the same branch** as the code.
 3. Run skill **`/sync-documentation`** before opening or updating a PR.
 4. For dependency expansion (profiles, packages, effect patterns, dogfood): run **`/ship-dependency-feature`** instead of or in addition to sync-documentation.
 
 ## Non-negotiables
 
-- **Ship status** changes (feature complete, backlog reorder) → update doc 15 strike-through grid, doc 09 priorities, and README when user-facing.
-- **Never** leave planning docs listing shipped work as "next" (see subtype lords / tokens / vehicles pattern in doc 15).
+- **Ship status** changes (feature complete, backlog reorder) → update [dependency-expansion.md](../../docs/roadmap/dependency-expansion.md) strike-through grid, [active.md](../../docs/roadmap/active.md) / [changelog.md](../../docs/history/changelog.md), and README when user-facing.
+- **Never** leave roadmap docs listing shipped work as "next" (see subtype lords / tokens / vehicles pattern in dependency-expansion).
 - If no docs need updates, state why explicitly in the PR body.
 
 ## PR body

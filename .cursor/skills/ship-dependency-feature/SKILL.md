@@ -1,6 +1,6 @@
 ---
 name: ship-dependency-feature
-description: Implement or ship a dependency expansion feature with code, tests, dogfood, and all planning doc updates per DOC-MAP. Use when changing effect-patterns, dependency-profiles, mechanic_packages, dependencies validation, or dogfood-matrix for dependency rules.
+description: Implement or ship a dependency expansion feature with code, tests, dogfood, and all docs updates per DOC-MAP. Use when changing effect-patterns, dependency-profiles, mechanic_packages, dependencies validation, or dogfood-matrix for dependency rules.
 paths: config/dependency-profiles.yaml,config/effect-patterns.yaml,config/dogfood-matrix.yaml,src/mtg_deck_tools/builder/mechanic_packages.py,src/mtg_deck_tools/rules/dependencies.py,src/mtg_deck_tools/effects/**,tests/test_mechanic_packages.py,tests/test_dependencies_validate.py
 ---
 
@@ -10,7 +10,7 @@ End-to-end workflow for dependency expansion PRs. Combines implementation, verif
 
 ## Phase A — Implementation
 
-Follow checklist in [planning/DOC-MAP.md](../../planning/DOC-MAP.md) and [planning/15-dependency-expansion-roadmap.md](../../planning/15-dependency-expansion-roadmap.md):
+Follow checklist in [docs/DOC-MAP.md](../../docs/DOC-MAP.md) and [docs/roadmap/dependency-expansion.md](../../docs/roadmap/dependency-expansion.md):
 
 1. Patterns → `config/effect-patterns.yaml` + `tests/fixtures/effect_golden.yaml`
 2. Profile → `config/dependency-profiles.yaml`; scope in `dependency_scope.py` if needed
@@ -25,11 +25,11 @@ When the feature is **complete** (roadmap row done):
 
 | File | Action |
 | --- | --- |
-| `planning/15-dependency-expansion-roadmap.md` | `~~**Work item**~~` in Priority grid; **Shipped YYYY-MM** in Notes |
-| `planning/15-dependency-expansion-roadmap.md` | Remove from Suggested sequence; append to **Shipped** line |
-| `planning/15-dependency-expansion-roadmap.md` | Update Shipped inventory tables if new kinds/rules/packages |
-| `planning/09-next-steps.md` | Move from active priority → **Recently shipped** |
-| `planning/09-next-steps.md` | Renumber priorities; update **Suggested next task** |
+| `docs/roadmap/dependency-expansion.md` | `~~**Work item**~~` in Priority grid; **Shipped YYYY-MM** in Notes |
+| `docs/roadmap/dependency-expansion.md` | Remove from Suggested sequence; append to **Shipped** line |
+| `docs/roadmap/dependency-expansion.md` | Update Shipped inventory tables if new kinds/rules/packages |
+| `docs/history/changelog.md` | Append one dated bullet |
+| `docs/roadmap/active.md` | Remove from open tables if listed; update **Suggested next task** |
 | `README.md` | User-facing mechanic/flag if applicable |
 
 ## Phase C — Finish
@@ -42,6 +42,6 @@ When the feature is **complete** (roadmap row done):
 
 If the PR is incremental (WIP, no roadmap row closed):
 
-- Update doc 15 **only** if inventory tables or checklist semantics change
+- Update dependency-expansion **only** if inventory tables or checklist semantics change
 - Do **not** strike through roadmap rows until the feature is fully shipped
 - Still run `/sync-documentation` for any behavior README users would see

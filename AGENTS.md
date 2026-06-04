@@ -4,12 +4,12 @@
 
 Documentation is **agent-enforced**, not CI-gated. On every task that changes code or ship status:
 
-1. Follow [planning/DOC-MAP.md](planning/DOC-MAP.md) for which files to update.
+1. Follow [docs/DOC-MAP.md](docs/DOC-MAP.md) for which files to update.
 2. Obey Cursor rules in `.cursor/rules/` (especially `sdlc-documentation`, always applied).
 3. Before commit/push/PR: run skill **`/sync-documentation`**.
-4. Dependency expansion: run **`/ship-dependency-feature`** (includes sync + doc 15 ship steps).
+4. Dependency expansion: run **`/ship-dependency-feature`** (includes sync + dependency-expansion ship steps).
 
-PRs must include a **Documentation** section (docs touched, or explicit reason for none). Never leave shipped features listed as "next" in doc 15 or doc 09.
+PRs must include a **Documentation** section (docs touched, or explicit reason for none). Never leave shipped features listed as "next" in [dependency-expansion.md](docs/roadmap/dependency-expansion.md) or [active.md](docs/roadmap/active.md).
 
 ## Cursor Cloud specific instructions
 
@@ -32,7 +32,7 @@ From repo root:
 ```bash
 source .venv/bin/activate   # after update script creates .venv
 pytest                      # uses in-memory SQLite, no Scryfall file
-mtg-deck-tools analyze run --fail-on-expect  # after import; see planning/14-deck-analysis.md
+mtg-deck-tools analyze run --fail-on-expect  # after import; see docs/specs/deck-analysis.md
 ruff check src tests        # configured in pyproject.toml; ruff is not a declared dev dep — pip install ruff if needed
 ```
 

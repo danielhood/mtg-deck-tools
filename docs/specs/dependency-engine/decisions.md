@@ -1,6 +1,6 @@
 # Dependency engine — locked decisions (D0)
 
-Resolved before D1 implementation (2026-05-30). Revisit only with evidence from [D0.5 inventory audit](12-dependency-engine-pre-implementation-checklist.md) or dogfood calibration in [09-next-steps.md](09-next-steps.md).
+Resolved before D1 implementation (2026-05-30). Revisit only with evidence from [D0.5 inventory audit](implementation-checklist.md) or dogfood calibration in [09-next-steps.md](../../roadmap/active.md).
 
 | Decision | Answer | Notes |
 | --- | --- | --- |
@@ -11,8 +11,8 @@ Resolved before D1 implementation (2026-05-30). Revisit only with evidence from 
 | Storage | `card_effects` table + JSON `payload` | No `effect_predicates` table in v1 |
 | Include mechanic vs `mechanic_focus` | **Independent** | Wizard include does not auto-set focus |
 | Combined themed share cap | **Defer** to UX8 | Use per-profile `share_max` only |
-| Face extraction (v1) | **Merged** oracle only, `face_index=0` | See [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md) |
-| Static card data | Manual bulk refresh | [01-goals-and-scope.md](01-goals-and-scope.md) |
+| Face extraction (v1) | **Merged** oracle only, `face_index=0` | See [14-effect-extraction-face-policy.md](effect-extraction-policy.md) |
+| Static card data | Manual bulk refresh | [01-goals-and-scope.md](../../product/goals-and-scope.md) |
 
 ## v1 validator rules (default warn)
 

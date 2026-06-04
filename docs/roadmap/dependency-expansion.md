@@ -2,9 +2,9 @@
 
 Status as of 2026-06-02. **D0–D5 is shipped** (validate, score, strict filter, repair, mechanic packages). This doc captures **what runs today**, **candidate effect atoms and rules**, and a **suggested build order** for the next dependency work.
 
-**Agent merge gate:** Any PR that ships or changes dependency behavior must update this doc (shipped grid, inventory, sequence), [09-next-steps.md](09-next-steps.md), and user-facing [README.md](../README.md) in the **same PR**. Enforcement: [DOC-MAP.md](DOC-MAP.md), `.cursor/rules/`, skills `/sync-documentation` and `/ship-dependency-feature` — not CI.
+**Agent merge gate:** Any PR that ships or changes dependency behavior must update this doc (shipped grid, inventory, sequence), [active.md](active.md), [history/changelog.md](../history/changelog.md), and user-facing [README.md](../../README.md) in the **same PR**. Enforcement: [DOC-MAP.md](../DOC-MAP.md), `.cursor/rules/`, skills `/sync-documentation` and `/ship-dependency-feature` — not CI.
 
-Related: [10-card-dependency-engine.md](10-card-dependency-engine.md) (architecture), [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) (UX knobs), [DOC-MAP.md](DOC-MAP.md) (doc maintenance map), [`config/effect-patterns.yaml`](../config/effect-patterns.yaml), [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml), [`resources/dependency/hard-cases.yaml`](../resources/dependency/hard-cases.yaml).
+Related: [overview.md](../specs/dependency-engine/overview.md) (architecture), [user-experience.md](../specs/dependency-engine/user-experience.md) (UX knobs), [DOC-MAP.md](../DOC-MAP.md) (doc maintenance map), [`config/effect-patterns.yaml`](../../config/effect-patterns.yaml), [`config/dependency-profiles.yaml`](../../config/dependency-profiles.yaml), [`resources/dependency/hard-cases.yaml`](../../resources/dependency/hard-cases.yaml).
 
 ---
 
@@ -220,18 +220,18 @@ Priority 5 shipped narrow `mill_enabler` (explicit mill / library→GY). **Prior
 | --- | --- | --- |
 | Removal / wipe density | Slot template, not oracle atoms | `slot-templates.yaml`, themes |
 | Curve / land count | Mana base planner (avg CMC + ramp → land count) | `mana_base.py`, validation |
-| Deck-wide CMC distribution / “good curve” UX | Post-build metrics & optional advisories, not `card_effects` | Planned **UX10** — [07-deck-output-format.md](07-deck-output-format.md), [11](11-dependency-engine-user-experience.md) |
+| Deck-wide CMC distribution / “good curve” UX | Post-build metrics & optional advisories, not `card_effects` | Planned **UX10** — [07-deck-output-format.md](../product/deck-output-format.md), [11](../specs/dependency-engine/user-experience.md) |
 | Named combo pairs | Needs external combo data | — |
-| Power level / salt | No simple dial | [06-open-questions.md](06-open-questions.md) |
-| Aura removal risk | Not statically provable | UX note in [11](11-dependency-engine-user-experience.md) |
+| Power level / salt | No simple dial | [06-open-questions.md](../product/open-questions.md) |
+| Aura removal risk | Not statically provable | UX note in [11](../specs/dependency-engine/user-experience.md) |
 | Commander partners / companion | Construction layer | `validate.py`, commander pick |
-| In-game timing / stack | Non-goal per [10](10-card-dependency-engine.md) | — |
+| In-game timing / stack | Non-goal per [10](../specs/dependency-engine/overview.md) | — |
 
 ---
 
 ## Implementation checklist (per feature)
 
-Canonical doc-update map: **[DOC-MAP.md](DOC-MAP.md)**. Agents: invoke **`/ship-dependency-feature`** for this checklist plus ship-status edits.
+Canonical doc-update map: **[DOC-MAP.md](../DOC-MAP.md)**. Agents: invoke **`/ship-dependency-feature`** for this checklist plus ship-status edits.
 
 Use this for each expansion PR:
 
@@ -250,7 +250,7 @@ Use this for each expansion PR:
 
 ## Suggested sequence (engineering)
 
-Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
+Aligned with [09-next-steps.md](active.md) and dogfood matrix coverage:
 
 | Order | Deliverable | Rationale |
 | --- | --- | --- |
@@ -260,7 +260,7 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 
 **Shipped (2026-06):** **Token subtype buffs** (`TOKEN_SUBTYPE_BUFF_SUPPORT`, `token_buff_subtype`, subtype `token_produce`; dogfood `treasure-prosper`); **Graveyard filler atoms** (`mill_enabler_surveil_discover`, `graveyard_filler_discard`; dogfood `surveil-mirko`); **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; profiles `rad`, `oil`, `charge`; wizard `include_mechanics`); **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; profiles `graveyard`, `landfall`).
 
-**Parallel track:** ~~**UX2**~~ wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` — **Shipped 2026-06-03** (wizard step 3; [11](11-dependency-engine-user-experience.md)).
+**Parallel track:** ~~**UX2**~~ wizard controls for `strict_dependencies`, `repair_dependencies`, and `mechanic_focus` — **Shipped 2026-06-03** (wizard step 3; [11](../specs/dependency-engine/user-experience.md)).
 
 ---
 
@@ -268,5 +268,5 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 
 - Deferred card stances: [`resources/dependency/hard-cases.yaml`](../resources/dependency/hard-cases.yaml) (`v1_stance`: `defer_tokens`, `defer_vehicles`, `defer_graveyard`, `defer_counters`, …)
 - Profile thresholds: [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml)
-- Automated regression: [14-deck-analysis.md](14-deck-analysis.md)
-- Locked v1 scope: [13-dependency-engine-decisions.md](13-dependency-engine-decisions.md)
+- Automated regression: [14-deck-analysis.md](../specs/deck-analysis.md)
+- Locked v1 scope: [13-dependency-engine-decisions.md](../specs/dependency-engine/decisions.md)

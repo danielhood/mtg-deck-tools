@@ -142,7 +142,7 @@ def _render_summary_md(summary: SuiteSummary) -> str:
     if summary.false_positive_rate is not None:
         lines.append(
             f"- **False-positive rate:** {summary.false_positive_rate:.1%} "
-            f"(target &lt; 5% per planning/13)"
+            f"(target &lt; 5% per docs/specs/dependency-engine/decisions.md)"
         )
     lines.extend(["", "## Scenarios", ""])
     lines.append("| ID | Label | Validation | Expect | Dep warns | Inappropriate |")
