@@ -103,9 +103,24 @@ def run_wizard(
     *,
     seed: int | None = None,
     db_path: Path | None = None,
+    initial_criteria: DeckCriteria | None = None,
+    prepopulated_from: Path | None = None,
 ) -> DeckCriteria:
     """Run all seven wizard steps and return complete DeckCriteria."""
-    criteria = DeckCriteria(seed=seed)
+    if initial_criteria is not None:
+        criteria = initial_criteria
+        if seed is not None:
+            criteria = criteria.model_copy(update={"seed": seed})
+    else:
+        criteria = DeckCriteria(seed=seed)
+
+    if prepopulated_from is not None:
+        from mtg_deck_tools.wizard.common import console
+
+        console.print(
+            f"[dim]Wizard pre-filled from {prepopulated_from.name}. "
+            "Adjust any step, then continue.[/dim]"
+        )
     for step in range(1, WIZARD_STEP_COUNT + 1):
         if step < FIRST_STEP_WITH_POST_NAVIGATION:
             criteria = _run_step(step, criteria, seed=seed, db_path=db_path)

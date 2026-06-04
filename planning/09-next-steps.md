@@ -170,9 +170,9 @@ Shipped end-of-wizard **criteria preflight** (`rules/criteria_linter.py`, `wizar
 
 Shipped **Back to step N** after each wizard step and at criteria preflight; re-entering steps preserves current selections as defaults; downstream steps re-run automatically; preflight re-runs after edits from review. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX4.
 
-### 5. UX5 — wizard prepopulate on regen — **planned**
+### ~~5. UX5 — wizard prepopulate on regen~~ **Done (2026-06-04)**
 
-Support **`generate --wizard --from deck.json`** (and optional standalone `wizard --from`) so saved `.deck.json` criteria and commanders seed wizard defaults instead of starting blank. Complements UX4 for “tweak one setting and regen”. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX5.
+Shipped **`generate --wizard --from deck.json`** and **`wizard --from`**: `load_deck_criteria_for_wizard` seeds wizard defaults from saved criteria and commander oracle IDs; wizard then produces a fresh deck (not silent reload). Commander step drops IDs missing from the DB. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX5.
 
 ### 6. Graveyard filler dependency enhancement (Priority 7) — **planned**
 

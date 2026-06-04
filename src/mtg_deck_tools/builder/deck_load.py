@@ -50,6 +50,37 @@ def _deck_card_from_saved(entry: dict) -> DeckCard:
     )
 
 
+def _criteria_from_deck_data(data: dict) -> DeckCriteria:
+    if "criteria" not in data:
+        raise ValueError("Deck file has no criteria block.")
+    criteria = DeckCriteria.model_validate(data["criteria"])
+    commanders = list(data.get("commanders") or [])
+    commander_ids = [c["oracle_id"] for c in commanders if c.get("oracle_id")]
+    if commander_ids and not criteria.commander_oracle_ids:
+        criteria = criteria.model_copy(update={"commander_oracle_ids": commander_ids})
+    return criteria
+
+
+def load_deck_criteria_for_wizard(path: Path) -> DeckCriteria:
+    """Load criteria (and commander IDs) from a .deck.json for wizard prepopulation.
+
+    Unlike :func:`load_deck_json`, maindeck ``cards`` are optional — only ``criteria``
+    (and optional ``commanders`` for oracle IDs) are required.
+    """
+    if not path.exists():
+        raise FileNotFoundError(f"Deck file not found: {path}")
+    if path.suffix != ".json":
+        raise ValueError(f"Expected a .deck.json file, got: {path.name}")
+
+    data = json.loads(path.read_text(encoding="utf-8"))
+    version = data.get("schema_version")
+    if version != SUPPORTED_SCHEMA_VERSION:
+        raise ValueError(
+            f"Unsupported schema_version {version!r}; expected {SUPPORTED_SCHEMA_VERSION!r}"
+        )
+    return _criteria_from_deck_data(data)
+
+
 def load_deck_json(path: Path) -> LoadedDeckFile:
     """Parse a .deck.json file written by write_deck_outputs."""
     if not path.exists():
@@ -64,11 +95,8 @@ def load_deck_json(path: Path) -> LoadedDeckFile:
             f"Unsupported schema_version {version!r}; expected {SUPPORTED_SCHEMA_VERSION!r}"
         )
 
-    criteria = DeckCriteria.model_validate(data["criteria"])
+    criteria = _criteria_from_deck_data(data)
     commanders = list(data.get("commanders") or [])
-    commander_ids = [c["oracle_id"] for c in commanders if c.get("oracle_id")]
-    if commander_ids and not criteria.commander_oracle_ids:
-        criteria = criteria.model_copy(update={"commander_oracle_ids": commander_ids})
 
     cards = [_deck_card_from_saved(entry) for entry in data.get("cards") or []]
     if not cards:

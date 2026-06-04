@@ -9,6 +9,7 @@ from mtg_deck_tools.db.schema import apply_schema
 from mtg_deck_tools.wizard.commanders import (
     CommanderRow,
     combined_color_identity,
+    filter_eligible_commander_ids,
     format_commander_choice,
     search_commanders,
 )
@@ -138,6 +139,16 @@ def test_search_commanders_filters_per_card_price_range(
         name_query="Expensive",
     )
     assert out_of_range == []
+
+
+
+
+def test_filter_eligible_commander_ids(commander_db: sqlite3.Connection) -> None:
+    still, dropped = filter_eligible_commander_ids(
+        commander_db, ["cmd-1", "missing", "cmd-1"]
+    )
+    assert still == ["cmd-1", "cmd-1"]
+    assert dropped == ["missing"]
 
 
 def test_search_commanders_loads_price_and_date(commander_db: sqlite3.Connection) -> None:

@@ -660,7 +660,7 @@ Batch CLI `generate` may never expose pick-by-pick UI; `.deck.json` reload + `--
 | --- | --- | --- |
 | **UX3** | End-of-wizard warnings; user confirms | No — warn only |
 | ~~**UX4**~~ | ~~Back to earlier wizard step to revise selections~~ — **Shipped 2026-06-04** | No — navigation only |
-| **UX5** | Pre-filled wizard from `.deck.json` on regen | No — defaults only |
+| ~~**UX5**~~ | ~~Pre-filled wizard from `.deck.json` on regen~~ — **Shipped 2026-06-04** | No — defaults only |
 | **UX8a** | Disable wizard options with **zero** pool support in CI (high confidence) | Yes — layer 1, narrow |
 | **UX8b** | `--strict-dependencies` on generate | Yes — layer 2 |
 | **UX8c** | Reorder wizard; commander-driven suggestions | Yes — layer 1 enriched |
