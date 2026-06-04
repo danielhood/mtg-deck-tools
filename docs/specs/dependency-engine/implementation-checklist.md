@@ -1,8 +1,8 @@
 # Dependency engine — pre-implementation checklist
 
-Gate for starting **D1+ engine code** (extraction, validation, scoring). Planning direction lives in [10-card-dependency-engine.md](10-card-dependency-engine.md) and [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md); this doc tracks **evidence and contracts** that must exist first.
+Gate for starting **D1+ engine code** (extraction, validation, scoring). Planning direction lives in [overview.md](overview.md) and [user-experience.md](user-experience.md); this doc tracks **evidence and contracts** that must exist first.
 
-**Product context:** Static oracle snapshot, used-card audience — [01-goals-and-scope.md](01-goals-and-scope.md), [02-data-sources.md](02-data-sources.md).
+**Product context:** Static oracle snapshot, used-card audience — [goals-and-scope.md](../../product/goals-and-scope.md), [data-sources.md](../../architecture/data-sources.md).
 
 ---
 
@@ -14,7 +14,7 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 | ◐ | In progress |
 | ☑ | Done — link PR, commit, or artifact path in notes column |
 
-**Rule:** D0–D5 are **complete** (2026-05-31). Use this checklist for dogfood acceptance and UX2+ work; do not reopen D1 gate unless schema or pattern contracts change. **Post–D5 expansion** (new effect kinds and profiles) — see [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md).
+**Rule:** D0–D5 are **complete** (2026-05-31). Use this checklist for dogfood acceptance and UX2+ work; do not reopen D1 gate unless schema or pattern contracts change. **Post–D5 expansion** (new effect kinds and profiles) — see [backlog/cli-engine.md](../../roadmap/backlog/cli-engine.md) and [dependency-validation.md](../../sdlc/dependency-validation.md).
 
 **Suggested order:** § Snapshot → § D0 → § D0.5 → § Decisions → § Output contract → then D1 → D2.
 
@@ -36,8 +36,8 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 | --- | --- | --- |
 | ☑ | `config/effect-patterns.yaml` skeleton with version field | `config/effect-patterns.yaml` |
 | ☑ | Canonical **effect atom** schema (Pydantic models + `payload` JSON shape) | `src/mtg_deck_tools/models/effects.py` |
-| ☑ | Pattern ID → `effect_kind` mapping documented | `config/effect-patterns.yaml` + [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md) |
-| ☑ | Face policy documented (per `face_index` vs merged oracle; align with `normalize.py`) | [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md) |
+| ☑ | Pattern ID → `effect_kind` mapping documented | `config/effect-patterns.yaml` + [effect-extraction-policy.md](effect-extraction-policy.md) |
+| ☑ | Face policy documented (per `face_index` vs merged oracle; align with `normalize.py`) | [effect-extraction-policy.md](effect-extraction-policy.md) |
 | ☑ | **Golden tests:** ≥20 oracle texts → expected atoms (pass / warn-only / no atom) | `tests/fixtures/effect_golden.yaml`, `tests/test_effect_extraction.py` (20 cases) |
 | ☑ | **Hard-case sample set:** ≥50 cards (modal DFC, adventure, choose-one, changeling, partner) reviewed manually | `resources/dependency/hard-cases.yaml` (50 cases, v1_stance) |
 
@@ -55,7 +55,7 @@ Gate for starting **D1+ engine code** (extraction, validation, scoring). Plannin
 
 ### Decisions locked (avoid D1 rework)
 
-Record answers in [13-dependency-engine-decisions.md](13-dependency-engine-decisions.md).
+Record answers in [decisions.md](decisions.md).
 
 | ☐ | Decision | Recommended v1 answer |
 | --- | --- | --- |
@@ -71,7 +71,7 @@ Record answers in [13-dependency-engine-decisions.md](13-dependency-engine-decis
 
 | ☐ | Item | Notes / artifact |
 | --- | --- | --- |
-| ☑ | `dependency_report` JSON schema documented in [07-deck-output-format.md](07-deck-output-format.md) | Optional field on schema 1.0 |
+| ☑ | `dependency_report` JSON schema documented in [deck-output-format.md](../../product/deck-output-format.md) | Optional field on schema 1.0 |
 | ☑ | Markdown **Deck dependencies** Notes group format | Section + Notes bucket `dependencies` |
 | ◐ | `.deck.json` schema bump plan (`1.0` vs `1.1`) for `dependency_preferences` / `mechanic_focus` | Deferred — criteria unchanged |
 | ☑ | `generate --from` behavior when report fields absent | Report omitted when DB has no effects / not run |
@@ -164,8 +164,9 @@ Before UX2 / default strict mode, manually review generated decks:
 
 ## References
 
-- [10-card-dependency-engine.md](10-card-dependency-engine.md) — D0–D5 technical phases
-- [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) — UX phases, progressive constraints
-- [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) — post–D5 expansion backlog
-- [09-next-steps.md](09-next-steps.md) — backlog
+- [overview.md](overview.md) — D0–D5 technical phases
+- [user-experience.md](user-experience.md) — UX phases, progressive constraints
+- [backlog/cli-engine.md](../../roadmap/backlog/cli-engine.md) — post–D5 expansion backlog
+- [shipped-inventory.md](shipped-inventory.md) — shipped atoms and rules
+- [active.md](../../roadmap/active.md) — unified active register
 - [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml) — thresholds (update after D0.5)

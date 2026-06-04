@@ -1,4 +1,4 @@
-"""Availability heuristics for deck building (see planning/08-card-availability.md)."""
+"""Availability heuristics for deck building (see docs/product/card-availability.md)."""
 
 from __future__ import annotations
 

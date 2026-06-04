@@ -1,0 +1,21 @@
+# Documentation changelog (recent ships)
+
+Append a dated line when merging a user-visible or roadmap-closing feature. Agents: update this instead of duplicating long “recently shipped” prose in [active.md](../roadmap/active.md).
+
+Format: `- **YYYY-MM-DD** — Short title — optional PR/issue`
+
+---
+
+## 2026-06
+
+- **2026-06-04** — UX5 wizard prepopulate on regen (`generate --wizard --from`, `wizard --from`)
+- **2026-06-04** — UX4 wizard step back-navigation (continue / back / cancel; preserved defaults)
+- **2026-06-04** — UX3 criteria linter (end-of-wizard preflight)
+- **2026-06** — Token subtype buffs (`TOKEN_SUBTYPE_BUFF_SUPPORT`, dogfood `treasure-prosper`)
+- **2026-06** — Graveyard filler atoms (surveil/discover/discard; dogfood `surveil-mirko`)
+- **2026-06** — UX2 wizard synergy step (strict/repair/focus for activated profiles)
+- **2026-06-03** — Rad / oil / charge counter profiles and balance rules
+- **2026-06-03** — Dogfood matrix restored 25/25 → 30/30 after bulk refresh fixes
+- **2026-06** — Equipment depth, graveyard/landfall heuristics, sacrifice/token refinements, resource counters, tutor payload upgrades, enchantment matters, subtype lords, tokens/vehicles packages
+
+Older milestone narrative: [milestones.md](milestones.md).

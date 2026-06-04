@@ -2,14 +2,26 @@
 
 ## Cursor-driven SDLC
 
-Documentation is **agent-enforced**, not CI-gated. On every task that changes code or ship status:
+Documentation is **agent-enforced**, not CI-gated.
 
-1. Follow [planning/DOC-MAP.md](planning/DOC-MAP.md) for which files to update.
-2. Obey Cursor rules in `.cursor/rules/` (especially `sdlc-documentation`, always applied).
-3. Before commit/push/PR: run skill **`/sync-documentation`**.
-4. Dependency expansion: run **`/ship-dependency-feature`** (includes sync + doc 15 ship steps).
+### Planning vs implementation
 
-PRs must include a **Documentation** section (docs touched, or explicit reason for none). Never leave shipped features listed as "next" in doc 15 or doc 09.
+| Phase | Guide | When |
+| --- | --- | --- |
+| **Planning** | [docs/sdlc/agent-phases.md](docs/sdlc/agent-phases.md) § Phase 1 | Promote backlog → active, design specs/UX, docs-only PRs |
+| **Implementation** | [docs/DOC-MAP.md](docs/DOC-MAP.md) + agent-phases § Phase 2–3 | Code/config/tests; update docs in the **same PR** |
+| **Ship** | Remove row from [roadmap/active.md](docs/roadmap/active.md); append [changelog](docs/history/changelog.md) | Feature complete |
+
+**Do not** update changelog or shipped-inventory for planning-only work.
+
+### Every task
+
+1. Read [docs/sdlc/agent-phases.md](docs/sdlc/agent-phases.md) and classify phase.
+2. Follow [docs/DOC-MAP.md](docs/DOC-MAP.md) for file targets.
+3. Obey `.cursor/rules/` (`sdlc-documentation` always applies).
+4. Before PR: **`/sync-documentation`**; dependency expansion: **`/ship-dependency-feature`**.
+
+PRs must include **Phase** (planning | implementation) and a **Documentation** section.
 
 ## Cursor Cloud specific instructions
 
@@ -32,7 +44,7 @@ From repo root:
 ```bash
 source .venv/bin/activate   # after update script creates .venv
 pytest                      # uses in-memory SQLite, no Scryfall file
-mtg-deck-tools analyze run --fail-on-expect  # after import; see planning/14-deck-analysis.md
+mtg-deck-tools analyze run --fail-on-expect  # after import; see docs/specs/deck-analysis.md
 ruff check src tests        # configured in pyproject.toml; ruff is not a declared dev dep — pip install ruff if needed
 ```
 

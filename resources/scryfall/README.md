@@ -1,6 +1,6 @@
 # Scryfall oracle bulk snapshot
 
-The deck builder uses a **static** oracle-cards JSON file (not live API calls). See [planning/02-data-sources.md](../../planning/02-data-sources.md).
+The deck builder uses a **static** oracle-cards JSON file (not live API calls). See [docs/architecture/data-sources.md](../../docs/architecture/data-sources.md).
 
 ## Expected filename
 

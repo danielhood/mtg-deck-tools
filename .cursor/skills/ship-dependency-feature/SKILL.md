@@ -1,47 +1,43 @@
 ---
 name: ship-dependency-feature
-description: Implement or ship a dependency expansion feature with code, tests, dogfood, and all planning doc updates per DOC-MAP. Use when changing effect-patterns, dependency-profiles, mechanic_packages, dependencies validation, or dogfood-matrix for dependency rules.
+description: Implement and ship a dependency expansion feature — implementation + ship docs. Use for effect-patterns, dependency-profiles, mechanic_packages, dependencies validation, dogfood-matrix. Includes planning step (promote to active) when starting new work.
 paths: config/dependency-profiles.yaml,config/effect-patterns.yaml,config/dogfood-matrix.yaml,src/mtg_deck_tools/builder/mechanic_packages.py,src/mtg_deck_tools/rules/dependencies.py,src/mtg_deck_tools/effects/**,tests/test_mechanic_packages.py,tests/test_dependencies_validate.py
 ---
 
 # Ship dependency feature
 
-End-to-end workflow for dependency expansion PRs. Combines implementation, verification, and **mandatory** doc updates.
+**Phase:** implementation + ship. Read [docs/sdlc/agent-phases.md](../../docs/sdlc/agent-phases.md) and [docs/sdlc/dependency-validation.md](../../docs/sdlc/dependency-validation.md).
+
+---
+
+## Phase 0 — Planning (if not already active)
+
+1. Read [roadmap/active.md](../../docs/roadmap/active.md) for parallel constraints.
+2. Promote task from [backlog/cli-engine.md](../../docs/roadmap/backlog/cli-engine.md) → **active** (ID, Depends on, Parallel OK with).
+3. Update specs if behavior is new (patterns contract in `effect-patterns.yaml` is code; design notes in specs optional).
+
+---
 
 ## Phase A — Implementation
 
-Follow checklist in [planning/DOC-MAP.md](../../planning/DOC-MAP.md) and [planning/15-dependency-expansion-roadmap.md](../../planning/15-dependency-expansion-roadmap.md):
+1. Patterns → `config/effect-patterns.yaml` + golden fixtures
+2. Profile → `config/dependency-profiles.yaml`
+3. Validate / build / rubric / dogfood matrix
+4. Tests + `mtg-deck-tools analyze run --fail-on-expect`
 
-1. Patterns → `config/effect-patterns.yaml` + `tests/fixtures/effect_golden.yaml`
-2. Profile → `config/dependency-profiles.yaml`; scope in `dependency_scope.py` if needed
-3. Validate → `rules/dependencies.py` (new or extended `rule_id`)
-4. Build → `dependency_profiles.py`, `dependency_scoring.py`, `mechanic_packages.py`, `dependency_repair.py`
-5. Dogfood → `config/dogfood-matrix.yaml`; rubric in `analysis/rubric.py` if needed
-6. Tests → unit tests; `pytest`; after import, `mtg-deck-tools analyze run --fail-on-expect`
+---
 
 ## Phase B — Ship documentation (same PR)
 
-When the feature is **complete** (roadmap row done):
-
 | File | Action |
 | --- | --- |
-| `planning/15-dependency-expansion-roadmap.md` | `~~**Work item**~~` in Priority grid; **Shipped YYYY-MM** in Notes |
-| `planning/15-dependency-expansion-roadmap.md` | Remove from Suggested sequence; append to **Shipped** line |
-| `planning/15-dependency-expansion-roadmap.md` | Update Shipped inventory tables if new kinds/rules/packages |
-| `planning/09-next-steps.md` | Move from active priority → **Recently shipped** |
-| `planning/09-next-steps.md` | Renumber priorities; update **Suggested next task** |
-| `README.md` | User-facing mechanic/flag if applicable |
+| `docs/specs/dependency-engine/shipped-inventory.md` | Inventory tables |
+| `docs/history/changelog.md` | Dated bullet |
+| `docs/roadmap/active.md` | Remove shipped task row |
+| `README.md` | User-facing blurb if applicable |
+
+---
 
 ## Phase C — Finish
 
-1. Run **`/sync-documentation`** as a final pass.
-2. PR body: list all docs touched + verification commands run.
-3. Do not open PR until Phase B is complete for shipped work.
-
-## Partial work (not shipping yet)
-
-If the PR is incremental (WIP, no roadmap row closed):
-
-- Update doc 15 **only** if inventory tables or checklist semantics change
-- Do **not** strike through roadmap rows until the feature is fully shipped
-- Still run `/sync-documentation` for any behavior README users would see
+Run **`/sync-documentation`**. PR: **Phase: implementation** + Documentation section + verification commands.
