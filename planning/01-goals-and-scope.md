@@ -50,6 +50,7 @@ From CR 903 ([`resources/mtg/MagicCompRules 20260417.txt`](../resources/mtg/Magi
 - Real-time Scryfall API sync (static bulk JSON per release is sufficient for offline)
 - Automatic or scheduled card-data updates (manual bulk refresh only)
 - Third-party site export (Moxfield/Archidekt) — v2; v1 uses Markdown + `.deck.json`
+- Related **token card** companion list in deck output (acquisition aid; not part of 100-card count) — planned; [07-deck-output-format.md](07-deck-output-format.md)
 
 ## Success criteria for v1
 

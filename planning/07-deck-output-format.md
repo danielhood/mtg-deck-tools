@@ -145,6 +145,67 @@ Markdown output includes a **Deck dependencies** section (and dependency lines u
 | `price_known` | Budget transparency when `prices.usd` was null |
 | `schema_version` | Forward-compatible migrations |
 
+### Related token cards (planned — acquisition companion list)
+
+**Status:** Not implemented. Token layout objects exist in Scryfall oracle bulk (~1k entries) but are **excluded** from `cards.db` import (not Commander-deckable). See [02-data-sources.md](02-data-sources.md).
+
+**Goal:** After a successful build, append a **companion list** of token cards that the 99 (plus commander) is likely to create or reference, so a player can buy or sleeve the right tokens. This list is **not** part of the Commander deck, does **not** count toward the 100-card requirement, and must **not** affect legality validation, singleton checks, color identity, or budget totals for the main deck.
+
+| Property | Rule |
+| --- | --- |
+| Deck size / `stats.total_cards` | Unchanged — still 100 (commander + 99) |
+| Budget | Token companion prices optional; separate subtotal if shown |
+| Validation (903 / 702.124) | Main `cards` only |
+| Reload / `--refill-slot` | Companion list regenerated or preserved per CLI policy (TBD) |
+
+**Data sources (v1 proposal):**
+
+1. **`all_parts` on oracle bulk** — For each card in the built deck, follow Scryfall `all_parts` entries whose related object has `component: "token"` (or `layout` `token` / `double_faced_token`). Resolve to `oracle_id`, name, type line, `scryfall_uri`, `image_uri`.
+2. **Oracle-text heuristics (stretch)** — “Create a … token” without `all_parts` (older cards, generic tokens) — defer or warn-only; see [resources/dependency/hard-cases.yaml](../resources/dependency/hard-cases.yaml) `defer_tokens` stance.
+3. **Import option (stretch)** — Secondary `tokens` table or read-through cache keyed by `oracle_id`, populated at import from bulk token layouts, without adding tokens to the playable pool.
+
+**Aggregation:** Deduplicate by token `oracle_id`; optional `quantity` when multiple main-deck cards produce the same token (default 1 per distinct token unless rules text implies multiples — product decision). Group under producing card names in Markdown for clarity.
+
+**Markdown (illustrative):**
+
+```markdown
+## Related tokens (not in deck)
+Companion list for acquisition — not counted in the 100-card Commander deck.
+
+| Token | Type | Produced by |
+| --- | --- | --- |
+| Clue Token | Artifact — Clue | … |
+| Treasure Token | Artifact — Treasure | …, … |
+```
+
+**`.deck.json` (illustrative — schema bump likely `1.1`):**
+
+```json
+{
+  "related_tokens": [
+    {
+      "oracle_id": "...",
+      "name": "Clue Token",
+      "type_line": "Artifact — Clue",
+      "quantity": 1,
+      "scryfall_uri": "https://scryfall.com/card/...",
+      "image_uri": "https://cards.scryfall.io/...",
+      "sources": [{ "oracle_id": "...", "name": "Trail of Evidence" }]
+    }
+  ],
+  "stats": {
+    "total_cards": 100,
+    "related_token_count": 4
+  }
+}
+```
+
+**CLI / UX (TBD):** e.g. `--include-related-tokens` / `--no-related-tokens`; wizard toggle default on. Omit section when no tokens resolved.
+
+**Non-goals for first ship:** Emblems, planes, scheme cards; meld back faces; choosing a specific printing art for tokens (any English token printing is enough for acquisition).
+
+Tracked in backlog: [09-next-steps.md](09-next-steps.md).
+
 ### Future utility operations on `.deck.json`
 
 - **Load & modify** — swap a card, re-validate color identity and budget

@@ -190,6 +190,7 @@ Extend graveyard **enabler** extraction so dependency balancing sees cards that 
 | Dependency swap packages | `generate --swap-profile energy` — needs UX5 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
+| **Related token companion list** | MD + `.deck.json` section: tokens linked to the built deck via `all_parts`; **not** in the 100-card count; acquisition aid | [07-deck-output-format.md](07-deck-output-format.md) § Related token cards |
 | Local web / desktop UI | Reuse Python core; dependency dashboard | [06-open-questions.md](06-open-questions.md) |
 | Image gallery / diff | Utility ops on `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
 | Parquet / faster import | Only if import time hurts | [05-technology-options.md](05-technology-options.md) |

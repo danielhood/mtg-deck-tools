@@ -68,6 +68,12 @@ Preprocessing should drop or flag:
 
 **Note:** Only **6** distinct basic land oracle entries exist in this file (Plains, Island, Swamp, Mountain, Forest, Wastes). Basic lands can appear unlimited times in decks; the generator should treat them as a special pool.
 
+### Token cards in bulk vs playable DB
+
+Oracle bulk includes **~1,000** token-layout objects (`layout`: `token`, `double_faced_token`). Import **drops** them from `cards.db` (see `NON_DECKABLE_LAYOUTS` in code). Deck **themes: tokens** and `TOKEN_BALANCE` refer to **main-deck spells** that create or care about tokens, not token layout rows.
+
+**Planned:** [07-deck-output-format.md](07-deck-output-format.md) — **Related token companion list** in generated Markdown/JSON: resolve tokens for the built deck (primarily parent card `all_parts`), listed for acquisition, **outside** the 100-card deck count.
+
 ## Comprehensive Rules
 
 **File:** `resources/mtg/MagicCompRules 20260417.txt`
