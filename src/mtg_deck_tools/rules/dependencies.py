@@ -851,6 +851,18 @@ def validate_dependencies(
         profiles=profile_cfg,
     )
 
+    from mtg_deck_tools.rules.token_subtype import append_token_subtype_balance
+
+    append_token_subtype_balance(
+        report,
+        scope=dep_scope,
+        maindeck=maindeck,
+        effects_map=effects_map,
+        severity=severity,
+        strict=strict,
+        profiles=profile_cfg,
+    )
+
     return report
 
 

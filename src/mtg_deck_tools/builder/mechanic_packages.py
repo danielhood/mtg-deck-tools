@@ -564,7 +564,23 @@ def ensure_token_package(
                         ):
                             protect.add(card.oracle_id)
 
-        role_label = effect_kind.replace("token_", "token ")
+        payload_subtype: str | None = None
+        if effect_kind == "token_payoff":
+            from mtg_deck_tools.rules.token_subtype import (
+                dominant_missing_token_buff_subtype,
+            )
+
+            effects_map = fetch_card_effects(conn, [c.oracle_id for c in working])
+            missing_subtype = dominant_missing_token_buff_subtype(effects_map, working)
+            if missing_subtype:
+                effect_kind = "token_buff_subtype"
+                payload_subtype = missing_subtype
+
+        role_label = (
+            f"{payload_subtype} token buff"
+            if payload_subtype
+            else effect_kind.replace("token_", "token ")
+        )
         result = swap_effect_kind_card(
             conn,
             working,
@@ -575,7 +591,20 @@ def ensure_token_package(
             commander_oracle_ids=commander_oracle_ids,
             commander_theme_tags=commander_theme_tags,
             protect_oracle_ids=protect,
+            payload_subtype=payload_subtype,
         )
+        if result is None and payload_subtype:
+            result = swap_effect_kind_card(
+                conn,
+                working,
+                "token_payoff",
+                role_label="token payoff",
+                criteria=criteria,
+                identity=identity,
+                commander_oracle_ids=commander_oracle_ids,
+                commander_theme_tags=commander_theme_tags,
+                protect_oracle_ids=protect,
+            )
         if result is None:
             messages.append(
                 f"Token package: could not add {role_label} "
