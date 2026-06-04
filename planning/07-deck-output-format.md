@@ -232,10 +232,33 @@ Tracked in backlog: [09-next-steps.md](09-next-steps.md).
 
 Spec and UX phasing: [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX8. Backlog: [09-next-steps.md](09-next-steps.md).
 
+### GUI deck editor (parked — UX9)
+
+**Status:** Not implemented. Planned for **UX5** GUI; schema and core should allow it without a breaking migration.
+
+| Feature | Behavior |
+| --- | --- |
+| **Lock** | Per-card `"locked": true` in `cards[]` — excluded from slot refill and from automatic package/repair swaps unless user overrides |
+| **Swap** | User selects card(s) → replacements chosen with the same rules as `generate` (criteria, CI, budget, tags, strict dependencies, slot guards) |
+
+Illustrative card entry:
+
+```json
+{
+  "oracle_id": "...",
+  "name": "Grave Pact",
+  "slot": "synergy",
+  "quantity": 1,
+  "locked": false
+}
+```
+
+CLI today: `--refill-slot` replaces **all** cards in that slot; no `locked` field. Stretch: `--keep-locked` on refill. Full spec: [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX9.
+
 ### Future utility operations on `.deck.json`
 
-- **Load & modify** — swap a card, re-validate color identity and budget
-- **Re-generate slot** — keep commanders + criteria, refill one slot
+- **Load & modify** — swap a card, re-validate color identity and budget (GUI **Swap** — UX9)
+- **Re-generate slot** — keep commanders + criteria, refill one slot (respect **locked** cards — UX9)
 - **Image gallery** — fetch or cache images from `image_uri`
 - **Diff two decks** — compare oracle_id sets
 - **Export to Moxfield/Archidekt** — translation layer in v2

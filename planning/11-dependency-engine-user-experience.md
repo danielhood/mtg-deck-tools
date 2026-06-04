@@ -351,6 +351,8 @@ Engine requirements for swaps:
 | Visual tutor target preview | **Poor** | Needs card images / list UI |
 | Multi-profile balance dashboard | **Poor** | Web or desktop |
 | Swap dependency package | **Poor** | Interactive selection |
+| Swap selected card(s) | **Poor** | **Swap** button — UX9 |
+| Per-card lock on refill | **Poor** | **Lock** flag — UX9; stretch `--keep-locked` on CLI |
 
 **Conclusion:** CLI remains the **right first shell** for D0–D3 (reporting, strict flag, simple presets). Plan a **local web or desktop UI** when swap workflows, dashboards, and side-by-side card previews become requirements — reuse Option B/C from [04-architecture-options.md](04-architecture-options.md) without forking the engine.
 
@@ -366,6 +368,44 @@ Engine requirements for swaps:
 | **UX5** | Local web: dependency dashboard + swap | D5 + API wrapper |
 | **UX6** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
 | **UX8** | **Deck composition metrics** — CMC distribution report (+ optional curve advisories); CLI MD/JSON first, charts in UX5 | Build result / `output.py`; no new `card_effects` |
+| **UX9** | **GUI deck editor** — per-card **lock** + **swap** selection; refill/swap respect `DeckCriteria` and validation | `reload.py`, `filler.py`, `.deck.json` schema; UX5 shell |
+
+### UX9 — GUI deck editor: swap and lock (parked)
+
+**Status:** Not implemented. CLI today: full regen or `--refill-slot <name>` refills **every** card in that slot ([`reload.py`](../src/mtg_deck_tools/builder/reload.py), [`filler.refill_deck_slot`](../src/mtg_deck_tools/builder/filler.py)). Post-build **dependency repair** swaps cards automatically (D5), not user-picked rows. Profile-level “swap energy package” is separate ([§ Understanding and swapping dependencies](#understanding-and-swapping-dependencies-future)).
+
+**Target shell:** Local web or desktop (**UX5**). These interactions are poor fits for the terminal; park the product model now so `.deck.json` and the Python core do not paint us into a corner.
+
+#### Swap button (selected cards)
+
+| Aspect | Spec |
+| --- | --- |
+| **User action** | Select one or more maindeck cards (not commander unless product allows) → **Swap** |
+| **Engine behavior** | Remove selected `oracle_id`s from the working list; for each vacated **slot** (and quantity for basics), run the **same pick pipeline** as `generate` — pool filters (`DeckCriteria`, CI, budget, rarity, tags, `--strict-dependencies`, availability, slot oracle guards, scorer) — excluding cards already in deck and **locked** cards |
+| **Output** | Inline diff (old → new), re-run validation + `dependency_report`; optional seed control for reproducibility |
+| **Multi-select** | Batch swap: process slots in deterministic order; warn if budget/dependency repair needed after batch |
+| **Relation to D5** | User-initiated swap is **not** `repair_dependencies`; may call shared pool/score helpers with a “replacement for oracle_id X in slot Y” hint |
+
+#### Lock flag (per card)
+
+| Aspect | Spec |
+| --- | --- |
+| **User action** | Toggle **lock** on a card row (pin icon / checkbox) |
+| **Persistence** | Optional field on each entry in `.deck.json` `cards[]` — e.g. `"locked": true` (default false). Commander row policy TBD (default locked). |
+| **Refill** | `generate --from deck.json --refill-slot synergy` (and GUI equivalent) **must not** replace locked cards in that slot; reduce refill count by locked cards in slot; error or warn if locked cards exceed slot size |
+| **Full regen** | Policy TBD: (a) full regen keeps all locked maindeck cards and only fills open slots, or (b) full regen ignores locks with confirmation — **recommended (a)** for GUI parity |
+| **Budget trim / mechanic packages** | Locked cards exempt from automatic swap passes unless user opts in |
+| **Distinct from UX6 “slot lock”** | UX6 *slot lock* = keep a **profile package** together; UX9 *card lock* = pin **specific** cards regardless of profile |
+
+#### CLI fit (UX9)
+
+| Control | CLI | GUI |
+| --- | --- | --- |
+| Swap selected cards | Poor (multi oracle_id args conceivable later) | **Primary** |
+| Lock / unlock card | Poor (manual JSON edit) | **Primary** |
+| Refill slot respecting locks | **Stretch** — e.g. `--keep-locked` on `--refill-slot` | **Primary** |
+
+Contract sketch: [07-deck-output-format.md](07-deck-output-format.md) § GUI deck editor. Backlog: [09-next-steps.md](09-next-steps.md).
 
 ### UX8 — Deck composition metrics (planned)
 
@@ -554,10 +594,12 @@ This is **D3–D4** engine work; UI “restriction” here is the generator sile
 | --- | --- |
 | **Constraint panel** | Live list: “Need ≥2 energy payoffs (0 now)” |
 | **Pick preview** | Hover card → “Would add 1 producer; still need 2 consumers” |
-| **Slot lock** | User locks “aura package”; refill only swaps within profile |
+| **Slot lock** | User locks “aura package”; refill only swaps within profile (UX6) |
+| **Card lock** | Per-card pin; slot refill / regen must not replace locked rows (UX9) |
+| **Swap** | Replace selected card(s) under current `DeckCriteria` (UX9) |
 | **Undo** | Revert pick; recompute `ConstraintState` |
 
-Batch CLI `generate` may never expose pick-by-pick UI; `.deck.json` reload + `--refill-slot` is the interim.
+Batch CLI `generate` may never expose pick-by-pick UI; `.deck.json` reload + `--refill-slot` is the interim. See **UX9** for GUI-first swap/lock.
 
 ### What to build before restricting choices
 

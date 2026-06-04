@@ -192,7 +192,8 @@ Extend graveyard **enabler** extraction so dependency balancing sees cards that 
 | Moxfield / Archidekt export | Translate from `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
 | **Related token companion list** | MD + `.deck.json` section: tokens linked to the built deck via `all_parts`; **not** in the 100-card count; acquisition aid | [07-deck-output-format.md](07-deck-output-format.md) § Related token cards |
 | **Deck composition metrics (UX8)** | CMC distribution report/visualization in MD/JSON; optional curve advisories; charts in UX5 | [07-deck-output-format.md](07-deck-output-format.md) § Deck composition metrics; [11](11-dependency-engine-user-experience.md) § UX8 |
-| Local web / desktop UI | Reuse Python core; dependency dashboard + deck metrics charts | [06-open-questions.md](06-open-questions.md) |
+| **GUI deck editor (UX9)** | **Swap** selected card(s) under current build rules; **lock** flag so refills/regen do not replace pinned cards | [11](11-dependency-engine-user-experience.md) § UX9; [07](07-deck-output-format.md) § GUI deck editor |
+| Local web / desktop UI | Reuse Python core; dependency dashboard, deck metrics (UX8), swap/lock editor (UX9) | [06-open-questions.md](06-open-questions.md) |
 | Image gallery / diff | Utility ops on `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
 | Parquet / faster import | Only if import time hurts | [05-technology-options.md](05-technology-options.md) |
 | DFC / adventure normalization | Risk in [03-problem-decomposition.md](03-problem-decomposition.md) | Import layer |
