@@ -52,7 +52,7 @@ flowchart TD
 | `whenever_cast_aura` | “Whenever you cast an Aura spell …” (voltron / aura support trigger) |
 | `whenever_cast_enchantment` | “Whenever you cast an enchantment spell …” (enchantress / non-voltron) |
 | `type_line_aura` | Aura on type line (extraction aid) |
-| `token_produce` / `token_payoff` | Token producers vs “whenever you create a token” payoffs |
+| `token_produce` / `token_payoff` | Token producers vs generic payoffs (create / enter / for each / “tokens you control get …”) — **not** subtype-matched buffs (see Priority 8) |
 | `type_line_vehicle` | Vehicle on type line (crew density checks) |
 | `type_line_equipment` | Equipment on type line (equip depth checks) |
 | `whenever_equipped` | “Whenever equipped” / equip payoff triggers |
@@ -122,7 +122,7 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | Work item | New / extended atoms | Rule / package | Activation | Notes |
 | --- | --- | --- | --- | --- |
 | ~~**Generic subtype lords**~~ | Extend `buff_subtype` capture (Goblin, Vampire, Dragon, Pirate, …) | Per-subtype floors in `subtype_lords` profile; lord package runs for any lord | Card-driven + optional tribal themes | **Shipped 2026-06** — per-subtype minimums (Elf, Goblin, Vampire, Pirate, Zombie, Dragon); Krenko/Edgar dogfood |
-| ~~**Tokens package**~~ | `token_produce`, `token_payoff` | `TOKEN_BALANCE` | `themes: [tokens]` | **Shipped 2026-06** |
+| ~~**Tokens package**~~ | `token_produce`, `token_payoff` | `TOKEN_BALANCE` | `themes: [tokens]` | **Shipped 2026-06** — generic producers/payoffs only; subtype buff pairing → **Priority 8** |
 | ~~**Vehicles profile**~~ | `type_line_vehicle` + crew creature count | `VEHICLE_BALANCE` | `include_mechanics: [vehicles]` | **Shipped 2026-06** — `vehicle_min: 3`, `creature_min: 25` |
 | ~~**Enchantment matters**~~ | `whenever_cast_enchantment` (non-Aura) | `ENCHANTMENT_SUPPORT_MIN` | `themes: [enchantress]` + card-driven | **Shipped 2026-06** — `enchantment_min: 8`; Sythis dogfood; separate from `AURA_SUPPORT_MIN` |
 
@@ -195,6 +195,30 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 
 **Non-goals for this row:** Reanimation density and delve/flashback fodder are already covered by `REANIMATION_SUPPORT` and `GRAVEYARD_COST_SUPPORT`; do not duplicate those atoms.
 
+### Priority 8 — Token subtype buffs (match payoffs to produced token types)
+
+**Not shipped.** Shipped **Priority 4 / tokens profile** counts generic `token_produce` and `token_payoff` only. A token-themed deck can get makers plus cards that care about **any** token (create triggers, “for each token you control”, broad “tokens you control get +1/+1”), but the builder does **not** ensure buffs for the **specific** token types the deck creates (Angel vs Treasure vs Goblin vs Clue, etc.).
+
+| Gap | Example | Today | Target |
+| --- | --- | --- | --- |
+| **Producer subtype** | “Create a Treasure token”, “create a 3/3 white Angel creature token” | `token_produce` regex may see words before `token`; payload has no `subtypes` | Capture token subtype(s) on produce atoms (e.g. `Treasure`, `Angel`, `Goblin`) |
+| **Subtype buff** | “Angel tokens you control get +1/+1”, “Goblin tokens get +1/+1” | `buff_subtype` only matches “Other **Elves** you control” (creature lords), not token-type text | New `token_buff_subtype` (or extend payoff patterns) with payload `subtypes: [Angel]` |
+| **Deck balance** | Deck makes Treasures but only generic token payoffs | `TOKEN_BALANCE` checks producer vs payoff **counts** only | Warn / package: dominant produce subtype(s) should have ≥1 matching buff (or generic anthem counts as partial) |
+| **Pick-time** | — | Scoring boosts any `token_payoff` when `themes: [tokens]` | Boost payoffs whose buff subtype overlaps deck’s aggregated produce subtypes |
+
+**Proposed delivery** (same checklist as § Implementation checklist):
+
+1. **Patterns** — Extend `token_produce` capture; add `token_buff_subtype` / `token_payoff_buff` regexes in `effect-patterns.yaml`; golden cases (Treasure matters, Angel anthem, Intangible Virtue as generic vs specific).
+2. **Import** — Re-run `import`; audit hit counts per token subtype in `dependency-audit` evidence.
+3. **Validate** — New rule e.g. `TOKEN_SUBTYPE_BUFF_SUPPORT` (warn-only first): when ≥N producers share subtype X, deck should include a buff/payoff for X or document generic fallback.
+4. **Package** — Extend `ensure_token_package` to swap in subtype-matched payoffs (protect producers; similar to lord protection in token package today).
+5. **Scoring** — `dependency_scoring.py` overlap between candidate payoff subtypes and `deck_stats.token_produce_subtypes`.
+6. **Dogfood** — Scenario with mono-subtype token commander or forced Treasure shell; `expect.dependency` for new rule when calibrated.
+
+**Activation:** `themes: [tokens]` and/or card-driven when aggregated produce subtypes exceed threshold (e.g. ≥3 cards making Treasure).
+
+**Non-goals for this row:** Token **layout** cards in Scryfall bulk (acquisition list is [07-deck-output-format.md](07-deck-output-format.md) § Related token cards); “target Angel” activated abilities without buff (separate `target_subtype` idea); simulating token **creature** vs **artifact** legality on the stack.
+
 ### ~~Priority 6 — Equipment depth~~
 
 **Shipped 2026-06** — [`rules/equipment_depth.py`](../src/mtg_deck_tools/rules/equipment_depth.py): `type_line_equipment`, `whenever_equipped`; `EQUIPMENT_BALANCE`; `ensure_equipment_package`; profile `equipment` (`equipment_min: 4`, `carrier_creature_min: 22`; activation `include_mechanics: [equip]`, `themes: [voltron]`).
@@ -251,6 +275,7 @@ Aligned with [09-next-steps.md](09-next-steps.md) and dogfood matrix coverage:
 | ~~1~~ | ~~**Rad / oil / charge counters**~~ | **Done 2026-06-03** — `rad_*`, `oil_*`, `charge_*`; dogfood `rad-mothman`, `oil-migloz`, `charge-immard` |
 | ~~2~~ | ~~**Equipment depth**~~ | **Done 2026-06** — `EQUIPMENT_BALANCE`, `type_line_equipment`, `whenever_equipped` |
 | **3** | **Graveyard filler atoms (Priority 7)** | Surveil, discover, broader GY enablers → `SELF_MILL_BALANCE` accuracy; patterns + dogfood before optional package |
+| **4** | **Token subtype buffs (Priority 8)** | Match payoffs/anthems to produced token types; extend `TOKEN_BALANCE` / `ensure_token_package` beyond generic payoffs |
 
 **Shipped (2026-06):** **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; profiles `rad`, `oil`, `charge`; wizard `include_mechanics`); **Resource counters** (experience, blood, +1/+1); tutor payload upgrades (`TUTOR_TARGET_EXISTS` matching: CMC bands, colors, land subtypes, multi-type OR); enchantment matters profile (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, `themes: [enchantress]`); subtype lord generalization (`TYPE_SYNERGY_MIN`, `ensure_subtype_lord_packages`, `subtype_lords` profile); Tokens package (`TOKEN_BALANCE`); Vehicles profile (`VEHICLE_BALANCE`, crew density); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder includes `token_produce`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; profiles `graveyard`, `landfall`).
 

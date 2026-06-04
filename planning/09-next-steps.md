@@ -198,6 +198,7 @@ Extend graveyard **enabler** extraction so dependency balancing sees cards that 
 | Parquet / faster import | Only if import time hurts | [05-technology-options.md](05-technology-options.md) |
 | DFC / adventure normalization | Risk in [03-problem-decomposition.md](03-problem-decomposition.md) | Import layer |
 | Post-validation CR repair | Swap illegal cards after validate | Deferred — fill-time filters sufficient today |
+| **Token subtype buffs (Priority 8)** | Capture token type on `token_produce`; buff atoms for “Angel/Treasure/Goblin … tokens”; warn/package when makers lack matching payoffs — generic `TOKEN_BALANCE` only today | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) § Priority 8 |
 
 ---
 
@@ -205,7 +206,7 @@ Extend graveyard **enabler** extraction so dependency balancing sees cards that 
 
 **UX3** criteria linter warnings in the wizard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). UX2 wizard synergy controls shipped 2026-06-03 (step 3: strict/repair flags + `mechanic_focus` for activated profiles).
 
-**Dependency (next enhancement):** [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) **Priority 7** — surveil, discover, and other graveyard-filler patterns for `SELF_MILL_BALANCE` (engineering sequence item **3** in doc 15).
+**Dependency (next enhancement):** [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) **Priority 7** — surveil, discover, and other graveyard-filler patterns for `SELF_MILL_BALANCE` (engineering sequence item **3** in doc 15). **Priority 8** — token subtype buffs (sequence item **4**).
 
 Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` — **28/28** ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 

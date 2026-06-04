@@ -200,7 +200,7 @@ Versioned **`config/effect-patterns.yaml`** (or extend taxonomy) defining:
 | Modal / “choose one” | Extract each mode line separately |
 | “Choose a creature type” | Warning only — no static proof |
 | “Any card” tutors | Skip target check or require ≥1 nonland spell |
-| Tokens created with types | Soft count via token makers tagged `tokens` + subtype regex |
+| Tokens created with types | Shipped: generic `token_produce` / `TOKEN_BALANCE`; **planned:** subtype capture + buff pairing ([15](15-dependency-expansion-roadmap.md) § Priority 8) |
 | Commander outside 99 | Tutor for “legendary creature” can use commander — special case |
 
 ---
@@ -397,7 +397,7 @@ D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras,
 
 - Shipped inventory (`effect_kind`, `rule_id`, packages)
 - High-value additions (enchantment matters, tutor payloads, graveyard heuristics, counter resources)
-- **Next (planned):** Priority 7 graveyard filler atoms — surveil, discover, broader GY enablers for `SELF_MILL_BALANCE` ([15](15-dependency-expansion-roadmap.md) § Priority 7)
+- **Next (planned):** Priority 7 graveyard filler atoms — surveil, discover, broader GY enablers for `SELF_MILL_BALANCE` ([15](15-dependency-expansion-roadmap.md) § Priority 7); Priority 8 token subtype buffs ([15](15-dependency-expansion-roadmap.md) § Priority 8)
 - Explicit non-goals
 - Per-feature implementation checklist
 - Suggested build order
