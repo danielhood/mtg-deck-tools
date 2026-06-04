@@ -51,8 +51,8 @@ From CR 903 ([`resources/mtg/MagicCompRules 20260417.txt`](../resources/mtg/Magi
 - Automatic or scheduled card-data updates (manual bulk refresh only)
 - Third-party site export (Moxfield/Archidekt) — v2; v1 uses Markdown + `.deck.json`
 - Related **token card** companion list in deck output (acquisition aid; not part of 100-card count) — planned; [07-deck-output-format.md](07-deck-output-format.md)
-- **Deck composition metrics** (CMC distribution report/visualization; optional curve advisories) — planned UX8; [07-deck-output-format.md](07-deck-output-format.md), [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)
-- **GUI deck editor** (per-card lock; swap selected cards under current build rules) — planned UX9; [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)
+- **Deck composition metrics** (CMC distribution report/visualization; optional curve advisories) — planned UX10; [07-deck-output-format.md](07-deck-output-format.md), [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)
+- **GUI deck editor** (per-card lock; swap selected cards under current build rules) — planned UX11; [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)
 
 ## Success criteria for v1
 

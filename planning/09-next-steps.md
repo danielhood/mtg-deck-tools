@@ -149,7 +149,7 @@ Shipped `rad_*`, `oil_*`, `charge_*` effect atoms; `RAD_BALANCE`, `OIL_BALANCE`,
 
 Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**. Priority 1–6 expansion items are shipped.
 
-**Suggested next task (UX):** **UX5** local web dependency dashboard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
+**Suggested next task (UX):** **UX4** wizard step back-navigation, then **UX5** wizard prepopulate on regen ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
 
 **Suggested next task (dependency):** None — dependency expansion sequence complete through Priority 8; next dependency work is backlog-driven (see doc 15 non-goals).
 
@@ -165,7 +165,15 @@ Shipped wizard **step 3** (synergy & dependencies): `strict_dependencies`, `repa
 
 Shipped end-of-wizard **criteria preflight** (`rules/criteria_linter.py`, `wizard/preflight.py`): warn-only checks for include/avoid overlap, avoid vs activated dependency profiles or `mechanic_focus`, voltron + avoid equip, tokens + aristocrats theme stack, more than two focused/engine profiles, and strict budget + rare minimum + three focused profiles. User confirms before the criteria summary. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md).
 
-### 4. Graveyard filler dependency enhancement (Priority 7) — **planned**
+### 4. UX4 — wizard step back-navigation — **planned**
+
+Allow users to **return to earlier wizard steps** and revise selections (themes, mechanics, synergy focus, colors, budget, commander, rarity) without restarting. Re-run dependent steps and UX3 preflight when criteria change. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX4.
+
+### 5. UX5 — wizard prepopulate on regen — **planned**
+
+Support **`generate --wizard --from deck.json`** (and optional standalone `wizard --from`) so saved `.deck.json` criteria and commanders seed wizard defaults instead of starting blank. Complements UX4 for “tweak one setting and regen”. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX5.
+
+### 6. Graveyard filler dependency enhancement (Priority 7) — **planned**
 
 Extend graveyard **enabler** extraction so dependency balancing sees cards that fill the yard without explicit “mill” or “put top … of library” wording.
 
@@ -191,14 +199,16 @@ Extend graveyard **enabler** extraction so dependency balancing sees cards that 
 
 | Topic | Notes | Doc |
 | --- | --- | --- |
-| Progressive wizard/build constraints | Parked UX6 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
-| Dependency swap packages | `generate --swap-profile energy` — needs UX5 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
+| Progressive wizard/build constraints | Parked UX8 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
+| Wizard step back-navigation (UX4) | Return to earlier wizard steps to revise selections after preflight or mid-flow | [11](11-dependency-engine-user-experience.md) § UX4 |
+| Wizard prepopulate on regen (UX5) | `generate --wizard --from` seeds wizard from saved `.deck.json` criteria | [11](11-dependency-engine-user-experience.md) § UX5 |
+| Dependency swap packages | `generate --swap-profile energy` — needs UX7 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
 | **Related token companion list** | MD + `.deck.json` section: tokens linked to the built deck via `all_parts`; **not** in the 100-card count; acquisition aid | [07-deck-output-format.md](07-deck-output-format.md) § Related token cards |
-| **Deck composition metrics (UX8)** | CMC distribution report/visualization in MD/JSON; optional curve advisories; charts in UX5 | [07-deck-output-format.md](07-deck-output-format.md) § Deck composition metrics; [11](11-dependency-engine-user-experience.md) § UX8 |
-| **GUI deck editor (UX9)** | **Swap** selected card(s) under current build rules; **lock** flag so refills/regen do not replace pinned cards | [11](11-dependency-engine-user-experience.md) § UX9; [07](07-deck-output-format.md) § GUI deck editor |
-| Local web / desktop UI | Reuse Python core; dependency dashboard, deck metrics (UX8), swap/lock editor (UX9) | [06-open-questions.md](06-open-questions.md) |
+| **Deck composition metrics (UX10)** | CMC distribution report/visualization in MD/JSON; optional curve advisories; charts in UX7 | [07-deck-output-format.md](07-deck-output-format.md) § Deck composition metrics; [11](11-dependency-engine-user-experience.md) § UX10 |
+| **GUI deck editor (UX11)** | **Swap** selected card(s) under current build rules; **lock** flag so refills/regen do not replace pinned cards | [11](11-dependency-engine-user-experience.md) § UX11; [07](07-deck-output-format.md) § GUI deck editor |
+| Local web / desktop UI | Reuse Python core; dependency dashboard, deck metrics (UX10), swap/lock editor (UX11) | [06-open-questions.md](06-open-questions.md) |
 | Image gallery / diff | Utility ops on `.deck.json` | [07-deck-output-format.md](07-deck-output-format.md) |
 | Parquet / faster import | Only if import time hurts | [05-technology-options.md](05-technology-options.md) |
 | DFC / adventure normalization | Risk in [03-problem-decomposition.md](03-problem-decomposition.md) | Import layer |
@@ -209,10 +219,10 @@ Extend graveyard **enabler** extraction so dependency balancing sees cards that 
 
 ## Suggested next task
 
-**UX5** local web dependency dashboard ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). UX3 criteria linter shipped 2026-06-04 (wizard preflight after step 7). UX2 wizard synergy controls shipped 2026-06-03 (step 3: strict/repair flags + `mechanic_focus` for activated profiles).
+**UX4** wizard step back-navigation, then **UX5** wizard prepopulate on regen ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). UX3 criteria linter shipped 2026-06-04. UX7 local web follows after CLI wizard flow improvements.
 
 **Dependency (next enhancement):** [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) **Priority 7** — surveil, discover, and other graveyard-filler patterns for `SELF_MILL_BALANCE` (engineering sequence item **3** in doc 15). **Priority 8** — token subtype buffs (sequence item **4**).
 
 Dogfood regression: `mtg-deck-tools analyze run --fail-on-expect` — **28/28** ([14-deck-analysis.md](14-deck-analysis.md), [`config/dogfood-matrix.yaml`](../config/dogfood-matrix.yaml)).
 
-See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX5 local web → UX6 progressive constraints).
+See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) for the UX roadmap (UX4–UX5 wizard → UX7 local web → UX8 progressive constraints).

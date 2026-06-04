@@ -65,7 +65,7 @@ Record answers in [13-dependency-engine-decisions.md](13-dependency-engine-decis
 | ☑ | `strict_dependencies` default | **Off** until D2 false-positive rate reviewed |
 | ☑ | Storage | `card_effects` + JSON `payload`; no `effect_predicates` table until needed |
 | ☑ | Include mechanic vs `mechanic_focus` | Independent unless product decides otherwise |
-| ☑ | Combined themed share cap | Defer to UX6 |
+| ☑ | Combined themed share cap | Defer to UX8 |
 
 ### Output contract (before D2, design before D1)
 
@@ -122,12 +122,14 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 
 | Topic | Defer until |
 | --- | --- |
-| Progressive wizard restrictions (UX6) | D2 calibrated + D0.5 `profile_counts_by_ci` |
-| `ConstraintState` / criteria linter (UX3) | ☑ UX3 shipped 2026-06-04 (`criteria_linter.py`); full `ConstraintState` deferred to UX6 |
+| Progressive wizard restrictions (UX8) | D2 calibrated + D0.5 `profile_counts_by_ci` |
+| `ConstraintState` / criteria linter (UX3) | ☑ UX3 shipped 2026-06-04 (`criteria_linter.py`); full `ConstraintState` deferred to UX8 |
+| Wizard step back-navigation (UX4) | Wizard orchestration only |
+| Wizard prepopulate on regen (UX5) | `.deck.json` criteria round-trip |
 | Pick-time strict pool filter (D4) | **Shipped** — `--strict-dependencies` |
 | Repair / swap pass (D5) | **Shipped** — `--repair-dependencies` |
-| Web constraint panel (UX7) | Separate milestone |
-| Wizard reorder (colors → commander first) | UX6c |
+| Web constraint panel (UX9) | Separate milestone; UX7 shell |
+| Wizard reorder (colors → commander first) | UX8c |
 | Live Scryfall sync | Out of product scope |
 
 ---

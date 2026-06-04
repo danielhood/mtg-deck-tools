@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [10-card-dependency-engine.md](10-card-dependency-engine.md).
 
-**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). Next: **UX5** local web — see [09-next-steps.md](09-next-steps.md).
+**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). Next: **UX4** wizard step back-navigation — see [09-next-steps.md](09-next-steps.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -344,15 +344,15 @@ Engine requirements for swaps:
 | On/off strict dependencies | **Good** | Flag on `generate` |
 | Include/avoid mechanics (existing) | **Good** | Keep as-is |
 | Post-build dependency report | **Good** | Markdown Notes + JSON |
-| Deck composition metrics (CMC histogram) | **Good** | Markdown table / ASCII bars; JSON `deck_metrics` (UX8a) |
-| CMC curve visualization (interactive) | **Poor** | UX8b with UX5 web |
+| Deck composition metrics (CMC histogram) | **Good** | Markdown table / ASCII bars; JSON `deck_metrics` (UX10a) |
+| CMC curve visualization (interactive) | **Poor** | UX10b with UX7 web |
 | Focus presets (incidental → engine) | **Adequate** | Wizard step with numbered menu |
 | Per-mechanic min/max overrides | **Poor** | JSON edit or defer to UI |
 | Visual tutor target preview | **Poor** | Needs card images / list UI |
 | Multi-profile balance dashboard | **Poor** | Web or desktop |
 | Swap dependency package | **Poor** | Interactive selection |
-| Swap selected card(s) | **Poor** | **Swap** button — UX9 |
-| Per-card lock on refill | **Poor** | **Lock** flag — UX9; stretch `--keep-locked` on CLI |
+| Swap selected card(s) | **Poor** | **Swap** button — UX11 |
+| Per-card lock on refill | **Poor** | **Lock** flag — UX11; stretch `--keep-locked` on CLI |
 
 **Conclusion:** CLI remains the **right first shell** for D0–D3 (reporting, strict flag, simple presets). Plan a **local web or desktop UI** when swap workflows, dashboards, and side-by-side card previews become requirements — reuse Option B/C from [04-architecture-options.md](04-architecture-options.md) without forking the engine.
 
@@ -364,17 +364,20 @@ Engine requirements for swaps:
 | **UX1** | Notes + `dependency_report`; `--strict-dependencies` | D2 |
 | ~~**UX2**~~ | ~~Wizard: “Synergy strictness” prompts (`strict_dependencies`, `repair_dependencies`) + focus-level presets (incidental/supported/focused/engine) for every profile activated by the user’s theme/mechanic selections~~ — **Shipped 2026-06-03** (`wizard` step 3) | D2–D3 |
 | ~~**UX3**~~ | ~~`criteria` linter warnings in wizard~~ — **Shipped 2026-06-04** (`rules/criteria_linter.py`, wizard preflight after step 7) | D2 + profiles |
-| **UX4** | `.deck.json` per-card `dependency_roles` | D2 |
-| **UX5** | Local web: dependency dashboard + swap | D5 + API wrapper |
-| **UX6** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
-| **UX8** | **Deck composition metrics** — CMC distribution report (+ optional curve advisories); CLI MD/JSON first, charts in UX5 | Build result / `output.py`; no new `card_effects` |
-| **UX9** | **GUI deck editor** — per-card **lock** + **swap** selection; refill/swap respect `DeckCriteria` and validation | `reload.py`, `filler.py`, `.deck.json` schema; UX5 shell |
+| **UX4** | **Wizard step back-navigation** — return to earlier steps to revise selections | None (wizard orchestration) |
+| **UX5** | **Wizard prepopulate on regen** — seed wizard from saved `.deck.json` criteria | `.deck.json` criteria round-trip |
+| **UX6** | `.deck.json` per-card `dependency_roles` | D2 |
+| **UX7** | Local web: dependency dashboard + swap | D5 + API wrapper |
+| **UX8** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
+| **UX9** | Web constraint panel + pick preview (interactive build) | D3–D4 + UX7 shell |
+| **UX10** | **Deck composition metrics** — CMC distribution report (+ optional curve advisories); CLI MD/JSON first, charts in UX7 | Build result / `output.py`; no new `card_effects` |
+| **UX11** | **GUI deck editor** — per-card **lock** + **swap** selection; refill/swap respect `DeckCriteria` and validation | `reload.py`, `filler.py`, `.deck.json` schema; UX7 shell |
 
-### UX9 — GUI deck editor: swap and lock (parked)
+### UX11 — GUI deck editor: swap and lock (parked)
 
 **Status:** Not implemented. CLI today: full regen or `--refill-slot <name>` refills **every** card in that slot ([`reload.py`](../src/mtg_deck_tools/builder/reload.py), [`filler.refill_deck_slot`](../src/mtg_deck_tools/builder/filler.py)). Post-build **dependency repair** swaps cards automatically (D5), not user-picked rows. Profile-level “swap energy package” is separate ([§ Understanding and swapping dependencies](#understanding-and-swapping-dependencies-future)).
 
-**Target shell:** Local web or desktop (**UX5**). These interactions are poor fits for the terminal; park the product model now so `.deck.json` and the Python core do not paint us into a corner.
+**Target shell:** Local web or desktop (**UX7**). These interactions are poor fits for the terminal; park the product model now so `.deck.json` and the Python core do not paint us into a corner.
 
 #### Swap button (selected cards)
 
@@ -395,9 +398,9 @@ Engine requirements for swaps:
 | **Refill** | `generate --from deck.json --refill-slot synergy` (and GUI equivalent) **must not** replace locked cards in that slot; reduce refill count by locked cards in slot; error or warn if locked cards exceed slot size |
 | **Full regen** | Policy TBD: (a) full regen keeps all locked maindeck cards and only fills open slots, or (b) full regen ignores locks with confirmation — **recommended (a)** for GUI parity |
 | **Budget trim / mechanic packages** | Locked cards exempt from automatic swap passes unless user opts in |
-| **Distinct from UX6 “slot lock”** | UX6 *slot lock* = keep a **profile package** together; UX9 *card lock* = pin **specific** cards regardless of profile |
+| **Distinct from UX8 “slot lock”** | UX8 *slot lock* = keep a **profile package** together; UX11 *card lock* = pin **specific** cards regardless of profile |
 
-#### CLI fit (UX9)
+#### CLI fit (UX11)
 
 | Control | CLI | GUI |
 | --- | --- | --- |
@@ -407,7 +410,7 @@ Engine requirements for swaps:
 
 Contract sketch: [07-deck-output-format.md](07-deck-output-format.md) § GUI deck editor. Backlog: [09-next-steps.md](09-next-steps.md).
 
-### UX8 — Deck composition metrics (planned)
+### UX10 — Deck composition metrics (planned)
 
 **Problem:** Users cannot see whether the generated list has enough early plays and late threats. Average CMC alone hides a deck of all 5-drops vs a balanced curve. Pick-time `_curve_score` only nudges **per slot** (ramp ≈2, wincon ≈5), not deck-wide creature distribution.
 
@@ -415,15 +418,15 @@ Contract sketch: [07-deck-output-format.md](07-deck-output-format.md) § GUI dec
 
 | Sub-phase | Shell | Content |
 | --- | --- | --- |
-| **UX8a** | Markdown + `.deck.json` after `generate` / `--from` regen | `cmc_histogram` (nonlands, quantity-weighted), `creature_cmc_histogram`, type-line counts, existing `avg_cmc_nonland`, ramp/land counts; ASCII or table in **Deck metrics** section |
-| **UX8b** | UX5 local web / desktop | Interactive bar chart; filter by creature / noncreature; compare to archetype reference curves (stretch) |
-| **UX8c** | Optional warn-only rules | e.g. `CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY` — thresholds in YAML, scoped by theme; **not** pick-time block unless user enables strict curve mode (TBD) |
+| **UX10a** | Markdown + `.deck.json` after `generate` / `--from` regen | `cmc_histogram` (nonlands, quantity-weighted), `creature_cmc_histogram`, type-line counts, existing `avg_cmc_nonland`, ramp/land counts; ASCII or table in **Deck metrics** section |
+| **UX10b** | UX7 local web / desktop | Interactive bar chart; filter by creature / noncreature; compare to archetype reference curves (stretch) |
+| **UX10c** | Optional warn-only rules | e.g. `CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY` — thresholds in YAML, scoped by theme; **not** pick-time block unless user enables strict curve mode (TBD) |
 
 **Data:** Computed from built `DeckCard` rows (`cmc`, `type_line`, `quantity`) — no Scryfall API. `analyze run` may aggregate the same metrics into `summary.json` for regression dashboards ([14-deck-analysis.md](14-deck-analysis.md)).
 
-**CLI fit:** **Good** for text histogram and summary table; **poor** for interactive charts (defer to UX8b). Flags TBD: `--deck-metrics` / `--no-deck-metrics`.
+**CLI fit:** **Good** for text histogram and summary table; **poor** for interactive charts (defer to UX10b). Flags TBD: `--deck-metrics` / `--no-deck-metrics`.
 
-**Explicit non-goals:** Replacing `mana_base` land math; mandatory curve validation on every deck; wizard step for target curve shape (could follow UX3/UX6).
+**Explicit non-goals:** Replacing `mana_base` land math; mandatory curve validation on every deck; wizard step for target curve shape (could follow UX3/UX8).
 
 Contract: [07-deck-output-format.md](07-deck-output-format.md) § Deck composition metrics.
 
@@ -460,9 +463,9 @@ The original UX2 spec named only energy and auras as focus-preset candidates. De
 **No new engine or schema work required.** `DeckCriteria.mechanic_focus` is already a generic `dict[str, str]`; `dependency_scope.py` already evaluates `_focus_requests_profile()` for every profile ID. The wizard just needs to populate it.
 
 **What stays out of UX2:**
-- Per-profile min/max overrides (CLI/JSON edit only; poor terminal fit — defer to UX5 web)
+- Per-profile min/max overrides (CLI/JSON edit only; poor terminal fit — defer to UX7 web)
 - ~~Criteria linter warnings (UX3)~~ — shipped 2026-06-04
-- Progressive constraint narrowing in the wizard (UX6)
+- Progressive constraint narrowing in the wizard (UX8)
 - `disabled_rule_ids` expert mode (stays CLI/JSON for now)
 
 ### UX3 — criteria linter (shipped 2026-06-04)
@@ -473,7 +476,37 @@ The original UX2 spec named only energy and auras as focus-preset candidates. De
 2. **Wizard preflight** — after step 7 (rarity), before the criteria summary: show warnings in a yellow panel; user confirms or cancels.
 3. **Checks (v1):** include/avoid overlap; avoid vs activated profile or `mechanic_focus`; voltron + avoid equip; tokens + aristocrats theme stack; >2 profiles at focused/engine; strict budget + rare minimum + ≥3 focused profiles.
 
-**Explicit non-goals (defer to UX6):** disabling wizard options; inventory-backed CI feasibility; fix loop / re-run wizard steps.
+**Explicit non-goals (defer to UX4 / UX8):** disabling wizard options; inventory-backed CI feasibility; full “Fix” loop without step back-navigation (UX4 addresses revise-in-place).
+
+### UX4 — wizard step back-navigation (planned)
+
+**Problem:** The wizard is linear today ([`wizard/run.py`](../src/mtg_deck_tools/wizard/run.py)): once a step completes, earlier choices cannot be changed without restarting. UX3 preflight may surface issues the user wants to fix at the source step (e.g. lower focus on step 3 after seeing a budget warning).
+
+**Deliverables:**
+
+1. **Back action on every step** — after each prompt (and at preflight/summary), offer **Back to step N** (or “Revise themes / mechanics / …”) to jump to an earlier step.
+2. **Preserve in-progress criteria** — re-entering a step shows current selections as defaults (checkboxes ticked, selects pre-selected, confirm defaults unchanged).
+3. **Re-run downstream steps** — after editing an earlier step, resume from the next step (or optionally re-walk all later steps) so dependent prompts stay consistent (e.g. synergy focus list updates when mechanics change).
+4. **Re-run preflight** — if criteria changed after back-navigation, run `lint_criteria()` again before summary.
+
+**CLI fit:** **Good** — questionary select for “Continue / Back to step … / Cancel”. No new engine or schema fields.
+
+**Explicit non-goals:** Reordering wizard steps (defer to UX8c); disabling options (UX8a).
+
+### UX5 — wizard prepopulate on regen (planned)
+
+**Problem:** Regen today is split: `generate --from deck.json` reloads criteria silently; `generate --wizard` always starts blank and **ignores `--from`** ([`cli/main.py`](../src/mtg_deck_tools/cli/main.py)). Users who want to tweak budget or themes on a saved deck must hand-edit JSON or re-enter every wizard answer.
+
+**Deliverables:**
+
+1. **`generate --wizard --from path.deck.json`** — load `criteria` and `commanders` from the file; pass as initial state into `run_wizard()`.
+2. **`mtg-deck-tools wizard --from path.deck.json`** (optional standalone) — same prepopulation for criteria-only runs.
+3. **Step defaults** — each wizard step reads existing `DeckCriteria` fields (already partially true for some steps); commander step pre-selects saved oracle IDs when still legal in DB.
+4. **Generate after wizard** — when invoked via `generate --wizard --from`, write a new deck using updated criteria (same as today’s regen output paths).
+
+**CLI fit:** **Good** — primary workflow for “change one thing and regen”. Complements UX4 (prefilled + back to revise).
+
+**Explicit non-goals:** Prepopulating from partial decks without a criteria block; merging old maindeck `cards` into wizard (cards stay out of scope until UX11 lock/swap).
 
 ---
 
@@ -488,9 +521,9 @@ The original UX2 spec named only energy and auras as focus-preset candidates. De
 | **Add to the plan** (interaction model, phases, data prerequisites) | **Now** | Shapes `card_effects` schema, inventory audit, and criteria fields before code hardens |
 | **Implement restrictive wizard UI** | **Not yet** | Needs reliable atoms, inventory-backed feasibility tables, and warn-only calibration first |
 | **Implement generate-time pool restriction** | **After D2–D3** | Same engine as post-build report; start warn-only, then opt-in strict |
-| **Full “dependency tree” UI** | **After UX5+** | Rich UI for hierarchy visualization and per-node overrides |
+| **Full “dependency tree” UI** | **After UX7+** | Rich UI for hierarchy visualization and per-node overrides |
 
-Treat progressive constraints as **UX6**, dependent on **D0.5 inventory audit** and **D1–D4** — not a v1 wizard change.
+Treat progressive constraints as **UX8**, dependent on **D0.5 inventory audit** and **D1–D4** — not a v1 wizard change.
 
 ### Three layers of “restriction” (do not conflate)
 
@@ -565,14 +598,14 @@ These apply to **CLI wizard**, future **local web**, and **interactive refill** 
 | Mode | UX behavior | Default phase |
 | --- | --- | --- |
 | **hidden** | Option not shown | Strict + high-confidence rule only |
-| **disabled** | Visible, cannot select; short reason | Layer 1 feasibility (later UX6) |
-| **warn** | Selectable; confirmation prompt | UX3 linter, early UX6 |
+| **disabled** | Visible, cannot select; short reason | Layer 1 feasibility (later UX8) |
+| **warn** | Selectable; confirmation prompt | UX3 linter, early UX8 |
 | **info** | Selectable; badge “needs payoffs” | UX2 focus presets (all profiles activated by user selections) |
 | **off** | No restriction | Until dependency engine enabled |
 
 **Escape hatch (required):** “Show incompatible options” / `--no-progressive-constraints` so experts are not blocked by false positives.
 
-#### Wizard step behaviors (future UX6)
+#### Wizard step behaviors (future UX8)
 
 Current order: themes → mechanics → colors → commander → budget ([`wizard/run.py`](../src/mtg_deck_tools/wizard/run.py)).
 
@@ -586,7 +619,7 @@ Current order: themes → mechanics → colors → commander → budget ([`wizar
 | **5 — Budget** | Warn if strict budget makes focus floors unreachable (inventory + price histogram) |
 | **After wizard** | `criteria_warnings` + optional “Fix” loop before `generate` |
 
-**Open product question:** Reorder to **colors → commander → themes → mechanics** so layer-1 restrictions use CI + commander earlier. Defer reorder until UX6; document as breaking wizard UX change.
+**Open product question:** Reorder to **colors → commander → themes → mechanics** so layer-1 restrictions use CI + commander earlier. Defer reorder until UX8; document as breaking wizard UX change.
 
 #### During generate (layer 2 — not wizard, but same mental model)
 
@@ -604,12 +637,12 @@ This is **D3–D4** engine work; UI “restriction” here is the generator sile
 | --- | --- |
 | **Constraint panel** | Live list: “Need ≥2 energy payoffs (0 now)” |
 | **Pick preview** | Hover card → “Would add 1 producer; still need 2 consumers” |
-| **Slot lock** | User locks “aura package”; refill only swaps within profile (UX6) |
-| **Card lock** | Per-card pin; slot refill / regen must not replace locked rows (UX9) |
-| **Swap** | Replace selected card(s) under current `DeckCriteria` (UX9) |
+| **Slot lock** | User locks “aura package”; refill only swaps within profile (UX8) |
+| **Card lock** | Per-card pin; slot refill / regen must not replace locked rows (UX11) |
+| **Swap** | Replace selected card(s) under current `DeckCriteria` (UX11) |
 | **Undo** | Revert pick; recompute `ConstraintState` |
 
-Batch CLI `generate` may never expose pick-by-pick UI; `.deck.json` reload + `--refill-slot` is the interim. See **UX9** for GUI-first swap/lock.
+Batch CLI `generate` may never expose pick-by-pick UI; `.deck.json` reload + `--refill-slot` is the interim. See **UX11** for GUI-first swap/lock.
 
 ### What to build before restricting choices
 
@@ -626,12 +659,14 @@ Batch CLI `generate` may never expose pick-by-pick UI; `.deck.json` reload + `--
 | Sub-phase | User-visible | Restricts? |
 | --- | --- | --- |
 | **UX3** | End-of-wizard warnings; user confirms | No — warn only |
-| **UX6a** | Disable wizard options with **zero** pool support in CI (high confidence) | Yes — layer 1, narrow |
-| **UX6b** | `--strict-dependencies` on generate | Yes — layer 2 |
-| **UX6c** | Reorder wizard; commander-driven suggestions | Yes — layer 1 enriched |
-| **UX7** | Web constraint panel + pick preview | Yes — layers 2–3 interactive |
+| **UX4** | Back to earlier wizard step to revise selections | No — navigation only |
+| **UX5** | Pre-filled wizard from `.deck.json` on regen | No — defaults only |
+| **UX8a** | Disable wizard options with **zero** pool support in CI (high confidence) | Yes — layer 1, narrow |
+| **UX8b** | `--strict-dependencies` on generate | Yes — layer 2 |
+| **UX8c** | Reorder wizard; commander-driven suggestions | Yes — layer 1 enriched |
+| **UX9** | Web constraint panel + pick preview | Yes — layers 2–3 interactive |
 
-### Success criteria (when UX6 ships)
+### Success criteria (when UX8 ships)
 
 - With progressive constraints **on** and strict **off**, user never sees a disabled option unless pool count in CI is 0 for that tag/profile.
 - With strict **on**, generated deck has no `fail` rows in `dependency_report` for enabled rule classes.

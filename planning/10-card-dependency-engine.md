@@ -316,7 +316,7 @@ Before tightening **wizard restrictions** or default thresholds, run a read-only
 | `predicate_target_counts` | Tutor feasibility per search predicate × color identity |
 | False-positive review queue | Do not hard-disable UI until confidence is high |
 
-Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) (UX6). The audit can ship as `dependency-audit` CLI or import sidecar without enabling generate-time strict mode.
+Feeds progressive constraints in [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) (UX8). The audit can ship as `dependency-audit` CLI or import sidecar without enabling generate-time strict mode.
 
 **Static DB:** Audit results are valid for the **bundled oracle snapshot** only. Re-run audit when maintainers refresh bulk import ([02-data-sources.md](02-data-sources.md)); users are not expected to update for new sets.
 

@@ -10,7 +10,7 @@ Resolved before D1 implementation (2026-05-30). Revisit only with evidence from 
 | `strict_dependencies` default | **Off** | Until D2 false-positive review |
 | Storage | `card_effects` table + JSON `payload` | No `effect_predicates` table in v1 |
 | Include mechanic vs `mechanic_focus` | **Independent** | Wizard include does not auto-set focus |
-| Combined themed share cap | **Defer** to UX6 | Use per-profile `share_max` only |
+| Combined themed share cap | **Defer** to UX8 | Use per-profile `share_max` only |
 | Face extraction (v1) | **Merged** oracle only, `face_index=0` | See [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md) |
 | Static card data | Manual bulk refresh | [01-goals-and-scope.md](01-goals-and-scope.md) |
 
@@ -27,4 +27,4 @@ Resolved before D1 implementation (2026-05-30). Revisit only with evidence from 
 
 ## False-positive budget (D2 gate)
 
-Target: **&lt;5%** inappropriate warnings on **20** hand-reviewed generated decks before enabling strict mode or UX6 disables.
+Target: **&lt;5%** inappropriate warnings on **20** hand-reviewed generated decks before enabling strict mode or UX8 disables.
