@@ -30,6 +30,7 @@ Status as of 2026-06-04. **v1 is complete.** Phase 1, Phase 2, v1 polish, **Phas
 | `--repair-dependencies` | Done — D5 post-build swap pass |
 | Wizard dependency controls (UX2) | **Done** — wizard step 3: `strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` per activated profile |
 | Wizard criteria linter (UX3) | **Done** — end-of-wizard preflight (`rules/criteria_linter.py`); user confirms before summary |
+| Wizard step back-navigation (UX4) | **Done** — back to earlier steps after each step and at preflight; downstream steps re-run (`wizard/navigation.py`) |
 | Dependency dogfood calibration | **Done** — `analyze run --fail-on-expect`: **25/25** after 2026-06 bulk refresh (blood consume patterns, +1/+1 incidental threshold) |
 | Mechanic packages | **Done** — energy, experience, blood, +1/+1 counters, sacrifice/aristocrats, voltron auras, enchantments, equip/vehicles artifacts, subtype lords, tokens, vehicles, equipment |
 | Sacrifice / aristocrats profile | **Done** — `SACRIFICE_BALANCE` + `ensure_sacrifice_package` |
@@ -149,11 +150,11 @@ Shipped `rad_*`, `oil_*`, `charge_*` effect atoms; `RAD_BALANCE`, `OIL_BALANCE`,
 
 Full analysis: **[15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md)**. Priority 1–6 expansion items are shipped.
 
-**Suggested next task (UX):** **UX4** wizard step back-navigation, then **UX5** wizard prepopulate on regen ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
+**Suggested next task (UX):** **UX5** wizard prepopulate on regen ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)).
 
 **Suggested next task (dependency):** None — dependency expansion sequence complete through Priority 8; next dependency work is backlog-driven (see doc 15 non-goals).
 
-**Recently shipped (2026-06):** **UX3** criteria linter (end-of-wizard preflight: include/avoid overlap, avoid vs activated profiles/focus, voltron+avoid equip, tokens+aristocrats theme stack, too many focused profiles, over-constrained budget); **Token subtype buffs** (`TOKEN_SUBTYPE_BUFF_SUPPORT`, `token_buff_subtype`, subtype capture on `token_produce`; dogfood `treasure-prosper`); **Graveyard filler atoms** (`mill_enabler_surveil_discover`, `graveyard_filler_discard`; dogfood `surveil-mirko`); **UX2** wizard synergy step (`strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` for all activated profiles); **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
+**Recently shipped (2026-06):** **UX4** wizard step back-navigation (continue / back / cancel after each step and at preflight; preserved defaults on re-entry); **UX3** criteria linter (end-of-wizard preflight: include/avoid overlap, avoid vs activated profiles/focus, voltron+avoid equip, tokens+aristocrats theme stack, too many focused profiles, over-constrained budget); **Token subtype buffs** (`TOKEN_SUBTYPE_BUFF_SUPPORT`, `token_buff_subtype`, subtype capture on `token_produce`; dogfood `treasure-prosper`); **Graveyard filler atoms** (`mill_enabler_surveil_discover`, `graveyard_filler_discard`; dogfood `surveil-mirko`); **UX2** wizard synergy step (`strict_dependencies`, `repair_dependencies`, optional `mechanic_focus` for all activated profiles); **Equipment depth** (`EQUIPMENT_BALANCE`, `ensure_equipment_package`, `type_line_equipment`, `whenever_equipped`; profile `equipment`); **Rad / oil / charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`); **Graveyard / landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; `graveyard` / `landfall` profiles; `rules/graveyard_landfall.py`); **Sacrifice / token refinements** (`sacrifice_opponent`, `death_recursion`, aristocrats fodder counts `token_produce`, shared role helpers in `sacrifice_roles.py`); **Resource counters** (`EXPERIENCE_BALANCE`, `BLOOD_BALANCE`, `PLUS_ONE_BALANCE`, `include_mechanics: [experience, blood, counters]`); **Tutor payload upgrades** (CMC min/max, colored creatures, land subtypes, multi-type OR, creature-or-planeswalker); **Enchantment matters** (`ENCHANTMENT_SUPPORT_MIN`, `whenever_cast_enchantment`, wizard `themes: [enchantress]`); **Subtype lord generalization** (`TYPE_SYNERGY_MIN`, `subtype_lords` profile); **Tokens package** (`TOKEN_BALANCE`); **Vehicles profile** (`VEHICLE_BALANCE`).
 
 Each feature: patterns → import → rule → optional package → dogfood scenario (checklist in doc 15). **Doc updates:** [DOC-MAP.md](DOC-MAP.md); agents run `/ship-dependency-feature` before PR.
 
@@ -165,9 +166,9 @@ Shipped wizard **step 3** (synergy & dependencies): `strict_dependencies`, `repa
 
 Shipped end-of-wizard **criteria preflight** (`rules/criteria_linter.py`, `wizard/preflight.py`): warn-only checks for include/avoid overlap, avoid vs activated dependency profiles or `mechanic_focus`, voltron + avoid equip, tokens + aristocrats theme stack, more than two focused/engine profiles, and strict budget + rare minimum + three focused profiles. User confirms before the criteria summary. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md).
 
-### 4. UX4 — wizard step back-navigation — **planned**
+### ~~4. UX4 — wizard step back-navigation~~ **Done (2026-06-04)**
 
-Allow users to **return to earlier wizard steps** and revise selections (themes, mechanics, synergy focus, colors, budget, commander, rarity) without restarting. Re-run dependent steps and UX3 preflight when criteria change. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX4.
+Shipped **Back to step N** after each wizard step and at criteria preflight; re-entering steps preserves current selections as defaults; downstream steps re-run automatically; preflight re-runs after edits from review. See [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX4.
 
 ### 5. UX5 — wizard prepopulate on regen — **planned**
 
@@ -200,7 +201,7 @@ Extend graveyard **enabler** extraction so dependency balancing sees cards that 
 | Topic | Notes | Doc |
 | --- | --- | --- |
 | Progressive wizard/build constraints | Parked UX8 — restrict choices by CI/commander/partial deck | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § Progressive constraints |
-| Wizard step back-navigation (UX4) | Return to earlier wizard steps to revise selections after preflight or mid-flow | [11](11-dependency-engine-user-experience.md) § UX4 |
+| ~~Wizard step back-navigation (UX4)~~ | **Shipped 2026-06-04** — back-navigation after each step and at preflight | [11](11-dependency-engine-user-experience.md) § UX4 |
 | Wizard prepopulate on regen (UX5) | `generate --wizard --from` seeds wizard from saved `.deck.json` criteria | [11](11-dependency-engine-user-experience.md) § UX5 |
 | Dependency swap packages | `generate --swap-profile energy` — needs UX7 or CLI design | [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) |
 | Power level / salt | No simple dial; needs richer model | [06-open-questions.md](06-open-questions.md) |
@@ -219,7 +220,7 @@ Extend graveyard **enabler** extraction so dependency balancing sees cards that 
 
 ## Suggested next task
 
-**UX4** wizard step back-navigation, then **UX5** wizard prepopulate on regen ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). UX3 criteria linter shipped 2026-06-04. UX7 local web follows after CLI wizard flow improvements.
+**UX5** wizard prepopulate on regen ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)). UX4 back-navigation shipped 2026-06-04. UX7 local web follows after CLI wizard flow improvements.
 
 **Dependency (next enhancement):** [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) **Priority 7** — surveil, discover, and other graveyard-filler patterns for `SELF_MILL_BALANCE` (engineering sequence item **3** in doc 15). **Priority 8** — token subtype buffs (sequence item **4**).
 

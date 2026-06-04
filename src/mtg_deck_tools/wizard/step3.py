@@ -29,6 +29,7 @@ def run_step3(criteria: DeckCriteria) -> DeckCriteria:
     selected = questionary.checkbox(
         "Commander color identity",
         choices=options,
+        default=criteria.colors,
         style=WIZARD_STYLE,
         instruction="(Space to toggle, Enter to confirm)",
     ).ask()

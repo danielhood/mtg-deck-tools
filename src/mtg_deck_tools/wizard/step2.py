@@ -17,6 +17,8 @@ from mtg_deck_tools.wizard.mechanics import (
 def _prompt_mechanic_checkbox(
     prompt: str,
     choices: list[MechanicChoice],
+    *,
+    selected: list[str],
 ) -> list[str]:
     if not choices:
         return []
@@ -28,15 +30,16 @@ def _prompt_mechanic_checkbox(
         )
         for c in choices
     ]
-    selected = questionary.checkbox(
+    picked = questionary.checkbox(
         prompt,
         choices=options,
+        default=selected,
         style=WIZARD_STYLE,
         instruction="(Space to toggle, Enter to confirm; none is OK)",
     ).ask()
-    if selected is None:
+    if picked is None:
         raise KeyboardInterrupt
-    return list(selected)
+    return list(picked)
 
 
 def run_step2(criteria: DeckCriteria) -> DeckCriteria:
@@ -53,8 +56,16 @@ def run_step2(criteria: DeckCriteria) -> DeckCriteria:
         )
     )
 
-    include = _prompt_mechanic_checkbox("Include mechanics (prefer in deck)", choices)
-    avoid = _prompt_mechanic_checkbox("Avoid mechanics (exclude from deck)", choices)
+    include = _prompt_mechanic_checkbox(
+        "Include mechanics (prefer in deck)",
+        choices,
+        selected=criteria.include_mechanics,
+    )
+    avoid = _prompt_mechanic_checkbox(
+        "Avoid mechanics (exclude from deck)",
+        choices,
+        selected=criteria.avoid_mechanics,
+    )
 
     errors = validate_mechanic_lists(include, avoid)
     if errors:

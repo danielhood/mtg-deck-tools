@@ -19,7 +19,7 @@ Planning documents for a local Windows utility that walks users through deck-bui
 | [14-deck-analysis.md](14-deck-analysis.md) | **Automated dogfood** — `analyze run` matrix and reports |
 | [15-dependency-expansion-roadmap.md](15-dependency-expansion-roadmap.md) | **Active** — shipped dependency inventory + high-value expansion backlog |
 | [10-card-dependency-engine.md](10-card-dependency-engine.md) | **Shipped (D0–D5)** — cross-card synergy / tutor-target / resource-balance checks |
-| [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) | **Active** — user control, focus presets, feedback; UX2–UX3 wizard shipped; UX4–UX5 next; UX7+ planned |
+| [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) | **Active** — user control, focus presets, feedback; UX2–UX4 wizard shipped; UX5 next; UX7+ planned |
 | [12-dependency-engine-pre-implementation-checklist.md](12-dependency-engine-pre-implementation-checklist.md) | **Complete gate** — D0–D5 checklist; dogfood acceptance open |
 | [13-dependency-engine-decisions.md](13-dependency-engine-decisions.md) | Locked D0 decisions and v1 rule scope |
 | [14-effect-extraction-face-policy.md](14-effect-extraction-face-policy.md) | Merged-face extraction policy (v1) |
@@ -86,4 +86,4 @@ See **[09-next-steps.md](09-next-steps.md)** for the active backlog.
 
 **Agent documentation SDLC:** **[DOC-MAP.md](DOC-MAP.md)** — required updates per change type; enforced via `.cursor/rules/` and skills `/sync-documentation`, `/ship-dependency-feature` (no CI doc gates).
 
-**Recommended first tasks:** **UX4** wizard step back-navigation, then **UX5** wizard prepopulate on regen ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)); threshold tuning per doc 15.
+**Recommended first tasks:** **UX5** wizard prepopulate on regen ([11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md)); threshold tuning per doc 15.

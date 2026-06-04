@@ -38,26 +38,38 @@ def _focus_level_choices() -> list[questionary.Choice]:
     ]
 
 
+def _retained_mechanic_focus(criteria: DeckCriteria) -> dict[str, str]:
+    activated_ids = {e.profile_id for e in activated_profiles_for_wizard(criteria)}
+    return {
+        profile_id: level
+        for profile_id, level in criteria.mechanic_focus.items()
+        if profile_id in activated_ids and level in FOCUS_LEVELS
+    }
+
+
 def _prompt_focus_levels(criteria: DeckCriteria) -> dict[str, str]:
     activated = activated_profiles_for_wizard(criteria)
     if not activated:
         return {}
 
+    has_focus = bool(_retained_mechanic_focus(criteria))
     set_focus = questionary.confirm(
         f"Set synergy focus levels for {len(activated)} activated mechanic(s)?",
-        default=False,
+        default=has_focus,
         style=WIZARD_STYLE,
     ).ask()
     if set_focus is None:
         raise KeyboardInterrupt
     if not set_focus:
-        return {}
+        return _retained_mechanic_focus(criteria)
 
     focus: dict[str, str] = {}
     for entry in activated:
+        current = criteria.mechanic_focus.get(entry.profile_id)
         picked = questionary.select(
             entry.prompt_label,
             choices=_focus_level_choices(),
+            default=current,
             style=WIZARD_STYLE,
         ).ask()
         if picked is None:

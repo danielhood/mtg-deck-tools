@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
-import questionary
 from rich.panel import Panel
 
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.rules.criteria_linter import CriteriaWarning, lint_criteria
-from mtg_deck_tools.wizard.common import WIZARD_STYLE, console, require_tty
+from mtg_deck_tools.wizard.common import console, require_tty
+from mtg_deck_tools.wizard.navigation import (
+    NavigationAction,
+    NavigationChoice,
+    prompt_wizard_navigation,
+)
 
 
 def format_criteria_warnings(warnings: list[CriteriaWarning]) -> str:
@@ -17,16 +21,17 @@ def format_criteria_warnings(warnings: list[CriteriaWarning]) -> str:
     return "\n".join(f"  • [{w.rule_id}] {w.message}" for w in warnings)
 
 
-def run_preflight(criteria: DeckCriteria) -> DeckCriteria:
+def run_preflight(criteria: DeckCriteria) -> tuple[DeckCriteria, NavigationAction, int | None]:
     """
     Show criteria linter warnings and require acknowledgment before finishing.
 
-    Returns criteria unchanged when there are no warnings or the user confirms.
+    Returns (criteria, CONTINUE, None) when there are no warnings or the user continues.
+    Returns (criteria, BACK, step_number) when the user chooses to revise an earlier step.
     """
     require_tty()
     warnings = lint_criteria(criteria)
     if not warnings:
-        return criteria
+        return criteria, NavigationAction.CONTINUE, None
 
     console.print(
         Panel(
@@ -39,14 +44,12 @@ def run_preflight(criteria: DeckCriteria) -> DeckCriteria:
         )
     )
 
-    proceed = questionary.confirm(
-        "Continue with these criteria?",
-        default=True,
-        style=WIZARD_STYLE,
-    ).ask()
-    if proceed is None:
-        raise KeyboardInterrupt
-    if not proceed:
-        raise RuntimeError("Wizard cancelled at criteria review.")
-
-    return criteria
+    while True:
+        choice = prompt_wizard_navigation(context="preflight")
+        if choice.action == NavigationAction.CANCEL:
+            raise RuntimeError("Wizard cancelled at criteria review.")
+        if choice.action == NavigationAction.BACK:
+            if choice.back_to_step is None:
+                raise ValueError("Back navigation requires back_to_step")
+            return criteria, NavigationAction.BACK, choice.back_to_step
+        return criteria, NavigationAction.CONTINUE, None

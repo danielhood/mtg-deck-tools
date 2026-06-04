@@ -20,7 +20,20 @@ from mtg_deck_tools.wizard.slots import (
 from mtg_deck_tools.wizard.themes import ArchetypeChoice, archetype_choices
 
 
-def _prompt_themes(choices: list[ArchetypeChoice]) -> list[str]:
+def _slot_template_is_default(
+    slot_template: dict[str, int],
+    config: SlotTemplateConfig,
+) -> bool:
+    if not slot_template:
+        return True
+    return slot_template == dict(config.default)
+
+
+def _prompt_themes(
+    choices: list[ArchetypeChoice],
+    *,
+    selected_themes: list[str],
+) -> list[str]:
     if not choices:
         return []
 
@@ -34,6 +47,7 @@ def _prompt_themes(choices: list[ArchetypeChoice]) -> list[str]:
     selected = questionary.checkbox(
         "Select deck themes (archetypes)",
         choices=options,
+        default=selected_themes,
         style=WIZARD_STYLE,
         instruction="(Space to toggle, Enter to confirm; none is OK)",
     ).ask()
@@ -43,7 +57,11 @@ def _prompt_themes(choices: list[ArchetypeChoice]) -> list[str]:
     return list(selected)
 
 
-def _prompt_use_default_slots(config: SlotTemplateConfig) -> bool:
+def _prompt_use_default_slots(
+    config: SlotTemplateConfig,
+    *,
+    use_defaults: bool,
+) -> bool:
     default = config.default
     summary = ", ".join(
         f"{config.labels.get(slot, slot)} {default[slot]}"
@@ -59,6 +77,7 @@ def _prompt_use_default_slots(config: SlotTemplateConfig) -> bool:
             ),
             questionary.Choice(title="Customize slot counts", value=False),
         ],
+        default=use_defaults,
         style=WIZARD_STYLE,
     ).ask()
     if choice is None:
@@ -114,8 +133,12 @@ def _validate_count_text(
     return True
 
 
-def _prompt_custom_slots(config: SlotTemplateConfig) -> dict[str, int]:
-    slots: dict[str, int] = {}
+def _prompt_custom_slots(
+    config: SlotTemplateConfig,
+    *,
+    existing_slots: dict[str, int],
+) -> dict[str, int]:
+    slots: dict[str, int] = dict(existing_slots)
     for slot in config.order:
         if slot == "lands":
             continue
@@ -149,7 +172,12 @@ def print_step1_summary(criteria: DeckCriteria, config: SlotTemplateConfig | Non
     console.print(table)
 
 
-def run_step1(*, seed: int | None = None, show_summary: bool = True) -> DeckCriteria:
+def run_step1(
+    *,
+    seed: int | None = None,
+    criteria: DeckCriteria | None = None,
+    show_summary: bool = True,
+) -> DeckCriteria:
     """
     Interactive step 1: archetype themes and slot template counts.
 
@@ -158,6 +186,8 @@ def run_step1(*, seed: int | None = None, show_summary: bool = True) -> DeckCrit
     require_tty()
     config = load_slot_template_config()
     choices = archetype_choices()
+    base = criteria if criteria is not None else DeckCriteria(seed=seed)
+    effective_seed = base.seed if base.seed is not None else seed
 
     console.print(
         Panel(
@@ -168,20 +198,23 @@ def run_step1(*, seed: int | None = None, show_summary: bool = True) -> DeckCrit
         )
     )
 
-    themes = _prompt_themes(choices)
+    themes = _prompt_themes(choices, selected_themes=base.themes)
 
-    if _prompt_use_default_slots(config):
+    use_defaults = _slot_template_is_default(base.slot_template, config)
+    if _prompt_use_default_slots(config, use_defaults=use_defaults):
         slot_template = dict(config.default)
     else:
-        slot_template = _prompt_custom_slots(config)
+        slot_template = _prompt_custom_slots(config, existing_slots=base.slot_template)
         errors = validate_slot_template(slot_template, config)
         if errors:
             raise RuntimeError("Invalid slot template: " + "; ".join(errors))
 
-    criteria = DeckCriteria(
-        themes=themes,
-        slot_template=slot_template,
-        seed=seed,
+    criteria = base.model_copy(
+        update={
+            "themes": themes,
+            "slot_template": slot_template,
+            "seed": effective_seed,
+        }
     )
     if show_summary:
         print_step1_summary(criteria, config)

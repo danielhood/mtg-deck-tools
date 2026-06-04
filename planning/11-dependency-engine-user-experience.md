@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [10-card-dependency-engine.md](10-card-dependency-engine.md).
 
-**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). Next: **UX4** wizard step back-navigation — see [09-next-steps.md](09-next-steps.md).
+**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). **UX4 shipped** — wizard step back-navigation (`wizard/navigation.py`, orchestration in `wizard/run.py`). Next: **UX5** wizard prepopulate on regen — see [09-next-steps.md](09-next-steps.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -364,7 +364,7 @@ Engine requirements for swaps:
 | **UX1** | Notes + `dependency_report`; `--strict-dependencies` | D2 |
 | ~~**UX2**~~ | ~~Wizard: “Synergy strictness” prompts (`strict_dependencies`, `repair_dependencies`) + focus-level presets (incidental/supported/focused/engine) for every profile activated by the user’s theme/mechanic selections~~ — **Shipped 2026-06-03** (`wizard` step 3) | D2–D3 |
 | ~~**UX3**~~ | ~~`criteria` linter warnings in wizard~~ — **Shipped 2026-06-04** (`rules/criteria_linter.py`, wizard preflight after step 7) | D2 + profiles |
-| **UX4** | **Wizard step back-navigation** — return to earlier steps to revise selections | None (wizard orchestration) |
+| ~~**UX4**~~ | ~~**Wizard step back-navigation** — return to earlier steps to revise selections~~ — **Shipped 2026-06-04** | None (wizard orchestration) |
 | **UX5** | **Wizard prepopulate on regen** — seed wizard from saved `.deck.json` criteria | `.deck.json` criteria round-trip |
 | **UX6** | `.deck.json` per-card `dependency_roles` | D2 |
 | **UX7** | Local web: dependency dashboard + swap | D5 + API wrapper |
@@ -476,20 +476,20 @@ The original UX2 spec named only energy and auras as focus-preset candidates. De
 2. **Wizard preflight** — after step 7 (rarity), before the criteria summary: show warnings in a yellow panel; user confirms or cancels.
 3. **Checks (v1):** include/avoid overlap; avoid vs activated profile or `mechanic_focus`; voltron + avoid equip; tokens + aristocrats theme stack; >2 profiles at focused/engine; strict budget + rare minimum + ≥3 focused profiles.
 
-**Explicit non-goals (defer to UX4 / UX8):** disabling wizard options; inventory-backed CI feasibility; full “Fix” loop without step back-navigation (UX4 addresses revise-in-place).
+**Explicit non-goals (defer to UX8):** disabling wizard options; inventory-backed CI feasibility.
 
-### UX4 — wizard step back-navigation (planned)
+### ~~UX4 — wizard step back-navigation~~ **Done (2026-06-04)**
 
-**Problem:** The wizard is linear today ([`wizard/run.py`](../src/mtg_deck_tools/wizard/run.py)): once a step completes, earlier choices cannot be changed without restarting. UX3 preflight may surface issues the user wants to fix at the source step (e.g. lower focus on step 3 after seeing a budget warning).
+**Problem:** The wizard was linear: once a step completed, earlier choices could not be changed without restarting. UX3 preflight surfaced issues users wanted to fix at the source step (e.g. lower focus on step 3 after a budget warning).
 
-**Deliverables:**
+**Shipped:**
 
-1. **Back action on every step** — after each prompt (and at preflight/summary), offer **Back to step N** (or “Revise themes / mechanics / …”) to jump to an earlier step.
-2. **Preserve in-progress criteria** — re-entering a step shows current selections as defaults (checkboxes ticked, selects pre-selected, confirm defaults unchanged).
-3. **Re-run downstream steps** — after editing an earlier step, resume from the next step (or optionally re-walk all later steps) so dependent prompts stay consistent (e.g. synergy focus list updates when mechanics change).
-4. **Re-run preflight** — if criteria changed after back-navigation, run `lint_criteria()` again before summary.
+1. **Back action on every step** — after each step and at criteria preflight, a questionary menu offers **Continue**, **Back to step N — …**, or **Cancel wizard** ([`wizard/navigation.py`](../src/mtg_deck_tools/wizard/navigation.py)).
+2. **Preserve in-progress criteria** — re-entering a step pre-selects themes, mechanics, colors, synergy flags, budget, rarity, and offers **Keep current commander** when commanders were already chosen.
+3. **Re-run downstream steps** — backing to step N re-runs steps N through the step you were on (inclusive) so synergy focus and dependent prompts stay consistent.
+4. **Re-run preflight** — backing from preflight re-walks steps through rarity, then runs `lint_criteria()` again before the summary.
 
-**CLI fit:** **Good** — questionary select for “Continue / Back to step … / Cancel”. No new engine or schema fields.
+**CLI fit:** **Good** — questionary select; no new engine or schema fields.
 
 **Explicit non-goals:** Reordering wizard steps (defer to UX8c); disabling options (UX8a).
 
@@ -659,7 +659,7 @@ Batch CLI `generate` may never expose pick-by-pick UI; `.deck.json` reload + `--
 | Sub-phase | User-visible | Restricts? |
 | --- | --- | --- |
 | **UX3** | End-of-wizard warnings; user confirms | No — warn only |
-| **UX4** | Back to earlier wizard step to revise selections | No — navigation only |
+| ~~**UX4**~~ | ~~Back to earlier wizard step to revise selections~~ — **Shipped 2026-06-04** | No — navigation only |
 | **UX5** | Pre-filled wizard from `.deck.json` on regen | No — defaults only |
 | **UX8a** | Disable wizard options with **zero** pool support in CI (high confidence) | Yes — layer 1, narrow |
 | **UX8b** | `--strict-dependencies` on generate | Yes — layer 2 |

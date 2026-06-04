@@ -142,6 +142,17 @@ def run_step5(
             )
         )
 
+        if criteria.commander_oracle_ids:
+            keep = questionary.confirm(
+                "Keep your current commander selection?",
+                default=True,
+                style=WIZARD_STYLE,
+            ).ask()
+            if keep is None:
+                raise KeyboardInterrupt
+            if keep:
+                return criteria
+
         color_match = _prompt_color_match_mode()
 
         primary = _prompt_commander_pick(

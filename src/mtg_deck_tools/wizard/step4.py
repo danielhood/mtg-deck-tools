@@ -49,23 +49,41 @@ def _prompt_optional_money(label: str, *, default: str = "") -> float | None:
 
 
 def _prompt_card_price_range(criteria: DeckCriteria) -> DeckCriteria:
+    has_range = (
+        criteria.card_price_min_usd is not None or criteria.card_price_max_usd is not None
+    )
     set_range = questionary.confirm(
         "Set a per-card price range (USD min and/or max)?",
-        default=False,
+        default=has_range,
         style=WIZARD_STYLE,
     ).ask()
     if set_range is None:
         raise KeyboardInterrupt
     if not set_range:
-        return criteria
+        return criteria.model_copy(
+            update={
+                "card_price_min_usd": None,
+                "card_price_max_usd": None,
+            }
+        )
 
+    min_default = (
+        f"{criteria.card_price_min_usd:.2f}"
+        if criteria.card_price_min_usd is not None
+        else ""
+    )
+    max_default = (
+        f"{criteria.card_price_max_usd:.2f}"
+        if criteria.card_price_max_usd is not None
+        else ""
+    )
     min_usd = _prompt_optional_money(
         "Minimum price per card (USD, blank for none)",
-        default="",
+        default=min_default,
     )
     max_usd = _prompt_optional_money(
         "Maximum price per card (USD, blank for none)",
-        default="",
+        default=max_default,
     )
     if min_usd is None and max_usd is None:
         console.print("[yellow]No range set — skipping per-card price limits.[/yellow]")
@@ -98,18 +116,24 @@ def run_step4(criteria: DeckCriteria) -> DeckCriteria:
         )
     )
 
+    has_budget = criteria.budget_usd is not None
     set_budget = questionary.confirm(
         "Set a total deck budget (USD)?",
-        default=False,
+        default=has_budget,
         style=WIZARD_STYLE,
     ).ask()
     if set_budget is None:
         raise KeyboardInterrupt
 
     if set_budget:
+        budget_default = (
+            f"{criteria.budget_usd:.2f}"
+            if criteria.budget_usd is not None
+            else "150"
+        )
         raw = questionary.text(
             "Maximum deck budget (USD)",
-            default="150",
+            default=budget_default,
             style=WIZARD_STYLE,
             validate=_validate_positive_money,
         ).ask()
@@ -118,7 +142,7 @@ def run_step4(criteria: DeckCriteria) -> DeckCriteria:
         criteria = criteria.model_copy(update={"budget_usd": float(raw.strip())})
         exclude_unpriced = questionary.confirm(
             "Exclude cards without USD prices from the build?",
-            default=True,
+            default=criteria.strict_budget if has_budget else True,
             style=WIZARD_STYLE,
         ).ask()
         if exclude_unpriced is None:
@@ -127,11 +151,19 @@ def run_step4(criteria: DeckCriteria) -> DeckCriteria:
 
         prefer_available = questionary.confirm(
             "Prefer readily available cards (filter obscure / hard-to-find picks)?",
-            default=True,
+            default=criteria.prefer_available if has_budget else True,
             style=WIZARD_STYLE,
         ).ask()
         if prefer_available is None:
             raise KeyboardInterrupt
         criteria = criteria.model_copy(update={"prefer_available": prefer_available})
+    else:
+        criteria = criteria.model_copy(
+            update={
+                "budget_usd": None,
+                "strict_budget": False,
+                "prefer_available": False,
+            }
+        )
 
     return _prompt_card_price_range(criteria)
