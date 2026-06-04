@@ -437,6 +437,27 @@ cases:
       - effect_kind: mill_enabler
         source: mill_enabler
 
+  - name: dimir_informant
+    oracle_text: "When Dimir Informant enters the battlefield, surveil 2."
+    type_line: "Creature — Human Wizard"
+    expected:
+      - effect_kind: mill_enabler
+        source: mill_enabler_surveil_discover
+
+  - name: scholarly_discovery
+    oracle_text: "Discover 4"
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: mill_enabler
+        source: mill_enabler_surveil_discover
+
+  - name: faithless_looting
+    oracle_text: "Draw two cards, then discard two cards."
+    type_line: "Sorcery"
+    expected:
+      - effect_kind: mill_enabler
+        source: graveyard_filler_discard
+
   - name: saproling_symbiosis
     oracle_text: "For each creature card in your graveyard, create a 1/1 green Saproling creature token."
     type_line: "Sorcery"

@@ -163,6 +163,13 @@ tags:
       - type: oracle_regex
         pattern: "(?i)scry [0-9]+"
 
+  - id: surveil
+    layer: keyword
+    description: Surveil and discover (graveyard filler)
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)\\b(?:surveil|discover)\\b"
+
   - id: energy
     layer: keyword
     matchers:

@@ -190,6 +190,23 @@ def test_self_mill_imbalance_warns_with_recursion_intent(gy_db: sqlite3.Connecti
     assert any(i.rule_id == RULE_SELF_MILL_BALANCE for i in report.warnings)
 
 
+def test_self_mill_surveil_enabler_warns_with_recursion_intent(gy_db: sqlite3.Connection) -> None:
+    conn = gy_db
+    _insert_card(conn, "informant", "Dimir Informant", "Creature — Human Wizard")
+    _insert_effect(conn, "informant", "mill_enabler", "mill_enabler_surveil_discover")
+    conn.commit()
+    maindeck = [
+        _deck_card(oracle_id="informant", name="Dimir Informant", type_line="Creature"),
+    ]
+    report = validate_dependencies(
+        conn,
+        maindeck=maindeck,
+        commanders=[],
+        criteria=DeckCriteria(themes=["recursion"]),
+    )
+    assert any(i.rule_id == RULE_SELF_MILL_BALANCE for i in report.warnings)
+
+
 def test_self_mill_single_enabler_silent_without_intent(gy_db: sqlite3.Connection) -> None:
     conn = gy_db
     _insert_card(conn, "supplier", "Stitcher's Supplier", "Creature — Zombie")

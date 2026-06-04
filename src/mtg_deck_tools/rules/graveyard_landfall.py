@@ -68,7 +68,10 @@ def collect_graveyard_roles(
     effects_map: dict[str, list[CardEffectRow]],
     cards: list[DeckCard],
 ) -> tuple[list[str], list[str], list[str], list[str]]:
-    """Return (reanimate, graveyard_cost, mill_enabler, graveyard_payoff) card names."""
+    """Return (reanimate, graveyard_cost, mill_enabler, graveyard_payoff) card names.
+
+    ``mill_enabler`` includes mill, surveil, discover, and looting-style discard.
+    """
     reanimate: list[str] = []
     graveyard_cost: list[str] = []
     mill_enabler: list[str] = []

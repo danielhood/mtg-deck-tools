@@ -171,29 +171,9 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | ~~**Self-mill**~~ | Mill enablers vs graveyard payoffs | Shipped — `SELF_MILL_BALANCE` |
 | ~~**Landfall**~~ | Land ramp count vs landfall payoffs | Shipped — `LANDFALL_BALANCE` when `themes: [landfall]` or ≥2 payoffs |
 
-### Priority 7 — Graveyard filler atoms (surveil, discover, generic mill)
+### ~~Priority 7 — Graveyard filler atoms (surveil, discover, generic mill)~~
 
-**Not shipped.** Priority 5 shipped **warn-only** graveyard heuristics with a **narrow** `mill_enabler` extractor. Many cards that fill the graveyard for synergy are **not** counted today, so `SELF_MILL_BALANCE` and related reports under-count enablers.
-
-| Gap | Example oracle / mechanic | Today | Target |
-| --- | --- | --- | --- |
-| **Surveil** | “Surveil N” (look at top N, put any number into your graveyard) | Not in codebase; not `mill_enabler` | New pattern or extend `mill_enabler` |
-| **Discover** | “Discover N” (same structure as surveil) | Same | Same |
-| **Generic library → GY** | “Put the top N cards of your library into your graveyard” without “mill” keyword | Matched by `mill_enabler` | Keep |
-| **Other GY stuffing** | Discard, “put target … into your graveyard”, dies-to-GY enablers | Usually **no** atom | Case-by-case patterns; exclude reanimate / `graveyard_cost` overlaps |
-| **Keyword tag** | Wizard `include_mechanics` / avoid | No `surveil` in `mechanic-taxonomy.yaml` | Optional taxonomy id for UX2 focus |
-
-**Proposed delivery** (same checklist as § Implementation checklist):
-
-1. **Patterns** — Extend `mill_enabler` and/or add `graveyard_filler` in `config/effect-patterns.yaml` (regex for `\bsurveil\b`, `\bdiscover\b`, optional discard-to-GY); golden rows in `tests/fixtures/effect_golden.yaml`.
-2. **Import** — Re-run `import`; confirm atom counts in `dependency-audit` evidence.
-3. **Validate** — Ensure `collect_graveyard_roles` / `SELF_MILL_BALANCE` in [`rules/graveyard_landfall.py`](../src/mtg_deck_tools/rules/graveyard_landfall.py) counts new kinds (may alias to `mill_enabler` or separate role with combined balance).
-4. **Optional package** — Post-fill swaps for `themes: [recursion]` (Priority 5 explicitly deferred packages); only if warn-only proves insufficient in dogfood.
-5. **Dogfood** — New matrix scenario (e.g. Dimir surveil commander, `themes: [recursion]`); `rules_must_not_warn` / `rules_must_warn` as appropriate.
-
-**Activation:** Existing `graveyard` profile (`themes: [recursion]`); optional future `include_mechanics: [surveil]` if taxonomy adds the keyword.
-
-**Non-goals for this row:** Reanimation density and delve/flashback fodder are already covered by `REANIMATION_SUPPORT` and `GRAVEYARD_COST_SUPPORT`; do not duplicate those atoms.
+**Shipped 2026-06** — `mill_enabler_surveil_discover`, `graveyard_filler_discard` (same `mill_enabler` kind for `SELF_MILL_BALANCE`); taxonomy `surveil`; dogfood `surveil-mirko`. No post-fill package.
 
 ### Priority 8 — Token subtype buffs (match payoffs to produced token types)
 

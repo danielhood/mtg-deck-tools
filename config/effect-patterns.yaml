@@ -588,6 +588,24 @@ patterns:
     payload:
       role: mill
 
+  - id: mill_enabler_surveil_discover
+    effect_kind: mill_enabler
+    confidence: 0.95
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)\\b(?:surveil|discover)\\b"
+    payload:
+      role: graveyard_filler
+
+  - id: graveyard_filler_discard
+    effect_kind: mill_enabler
+    confidence: 0.85
+    matchers:
+      - type: oracle_regex
+        pattern: "(?i)(?:then discard (?:a |an |two |three |four |five |\\d+ )?cards?(?: at random)?|each (?:player|opponent) discards (?:a |an |two |three |four |five |\\d+ )?cards?)"
+    payload:
+      role: graveyard_filler
+
   - id: graveyard_payoff
     effect_kind: graveyard_payoff
     confidence: 0.85
