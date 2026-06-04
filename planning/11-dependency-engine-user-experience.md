@@ -344,6 +344,8 @@ Engine requirements for swaps:
 | On/off strict dependencies | **Good** | Flag on `generate` |
 | Include/avoid mechanics (existing) | **Good** | Keep as-is |
 | Post-build dependency report | **Good** | Markdown Notes + JSON |
+| Deck composition metrics (CMC histogram) | **Good** | Markdown table / ASCII bars; JSON `deck_metrics` (UX8a) |
+| CMC curve visualization (interactive) | **Poor** | UX8b with UX5 web |
 | Focus presets (incidental → engine) | **Adequate** | Wizard step with numbered menu |
 | Per-mechanic min/max overrides | **Poor** | JSON edit or defer to UI |
 | Visual tutor target preview | **Poor** | Needs card images / list UI |
@@ -363,6 +365,27 @@ Engine requirements for swaps:
 | **UX4** | `.deck.json` per-card `dependency_roles` | D2 |
 | **UX5** | Local web: dependency dashboard + swap | D5 + API wrapper |
 | **UX6** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
+| **UX8** | **Deck composition metrics** — CMC distribution report (+ optional curve advisories); CLI MD/JSON first, charts in UX5 | Build result / `output.py`; no new `card_effects` |
+
+### UX8 — Deck composition metrics (planned)
+
+**Problem:** Users cannot see whether the generated list has enough early plays and late threats. Average CMC alone hides a deck of all 5-drops vs a balanced curve. Pick-time `_curve_score` only nudges **per slot** (ramp ≈2, wincon ≈5), not deck-wide creature distribution.
+
+**Deliverables (phased):**
+
+| Sub-phase | Shell | Content |
+| --- | --- | --- |
+| **UX8a** | Markdown + `.deck.json` after `generate` / `--from` regen | `cmc_histogram` (nonlands, quantity-weighted), `creature_cmc_histogram`, type-line counts, existing `avg_cmc_nonland`, ramp/land counts; ASCII or table in **Deck metrics** section |
+| **UX8b** | UX5 local web / desktop | Interactive bar chart; filter by creature / noncreature; compare to archetype reference curves (stretch) |
+| **UX8c** | Optional warn-only rules | e.g. `CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY` — thresholds in YAML, scoped by theme; **not** pick-time block unless user enables strict curve mode (TBD) |
+
+**Data:** Computed from built `DeckCard` rows (`cmc`, `type_line`, `quantity`) — no Scryfall API. `analyze run` may aggregate the same metrics into `summary.json` for regression dashboards ([14-deck-analysis.md](14-deck-analysis.md)).
+
+**CLI fit:** **Good** for text histogram and summary table; **poor** for interactive charts (defer to UX8b). Flags TBD: `--deck-metrics` / `--no-deck-metrics`.
+
+**Explicit non-goals:** Replacing `mana_base` land math; mandatory curve validation on every deck; wizard step for target curve shape (could follow UX3/UX6).
+
+Contract: [07-deck-output-format.md](07-deck-output-format.md) § Deck composition metrics.
 
 ### UX2 — expanded scope (2026-06-03)
 

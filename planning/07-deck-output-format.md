@@ -206,6 +206,32 @@ Companion list for acquisition — not counted in the 100-card Commander deck.
 
 Tracked in backlog: [09-next-steps.md](09-next-steps.md).
 
+### Deck composition metrics (planned — UX8)
+
+**Status:** Not implemented. Today the builder only uses **average nonland CMC** for land-count heuristics (`mana_base.py`) and **per-slot target CMC** while scoring picks (`scorer.py`); output may show `avg_cmc_nonland` in stats. There is **no** deck-wide check or report for a healthy mix of low- and high-CMC cards (especially creatures).
+
+**Goal:** After a successful build, give the user **actionable composition metrics** — starting with **mana curve / CMC distribution** — in Markdown and `.deck.json`, and eventually in a richer UI (UX5). Metrics are **informational** by default; optional **advisory warnings** (e.g. “few cards at CMC 2–3”, “creature curve top-heavy”) are separate from legality and from dependency `fail` rules unless the user opts into strict curve hints later.
+
+| Layer | Deliverable |
+| --- | --- |
+| **Report (UX8a)** | CMC histogram (0–7+ buckets), counts by primary type (creature, instant, …), `avg_cmc_nonland`, **creature-only** average and histogram, ramp count, land count (reuse build stats) |
+| **Markdown** | Table and/or ASCII bar chart; short interpretation blurb |
+| **JSON** | `deck_metrics` or extended `stats` with `cmc_histogram`, `creature_cmc_histogram`, `type_counts` |
+| **Visualization (UX8b)** | Local web or desktop: bar chart, pip color breakdown (stretch) — depends on UX5 shell |
+| **Advisory rules (stretch)** | Warn-only `CURVE_TOP_HEAVY` / `CURVE_MISSING_EARLY` — profile- or archetype-specific thresholds; not v1 gate |
+
+**Relationship to existing behavior:**
+
+| Today | UX8 adds |
+| --- | --- |
+| Slot fill prefers CMC near `SLOT_TARGET_CMC` | Post-build **whole-deck** view the user can sanity-check |
+| `REANIMATION_SUPPORT` checks creature count / avg creature CMC when reanimation present | General curve metrics for any deck |
+| `mana_base` uses `avg_cmc_nonland` | Same stat, plus **distribution** so average alone is not misleading |
+
+**Non-goals for first ship:** Enforcing a universal “correct” Commander curve; simulating goldfish turns; sideboard metrics.
+
+Spec and UX phasing: [11-dependency-engine-user-experience.md](11-dependency-engine-user-experience.md) § UX8. Backlog: [09-next-steps.md](09-next-steps.md).
+
 ### Future utility operations on `.deck.json`
 
 - **Load & modify** — swap a card, re-validate color identity and budget

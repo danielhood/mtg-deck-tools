@@ -212,7 +212,8 @@ Each row follows the same delivery pattern: **patterns → import → rule → o
 | Concern | Why deferred | Where handled today |
 | --- | --- | --- |
 | Removal / wipe density | Slot template, not oracle atoms | `slot-templates.yaml`, themes |
-| Curve / land count | Mana base planner | `mana_base.py`, validation |
+| Curve / land count | Mana base planner (avg CMC + ramp → land count) | `mana_base.py`, validation |
+| Deck-wide CMC distribution / “good curve” UX | Post-build metrics & optional advisories, not `card_effects` | Planned **UX8** — [07-deck-output-format.md](07-deck-output-format.md), [11](11-dependency-engine-user-experience.md) |
 | Named combo pairs | Needs external combo data | — |
 | Power level / salt | No simple dial | [06-open-questions.md](06-open-questions.md) |
 | Aura removal risk | Not statically provable | UX note in [11](11-dependency-engine-user-experience.md) |
