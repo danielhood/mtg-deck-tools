@@ -65,7 +65,7 @@ docs/
 | [dependency-engine/shipped-inventory.md](specs/dependency-engine/shipped-inventory.md) | **Shipped** atoms, rules, packages |
 | [dependency-engine/user-experience.md](specs/dependency-engine/user-experience.md) | Wizard / CLI UX |
 | [dependency-engine/decisions.md](specs/dependency-engine/decisions.md) | Locked v1 decisions |
-| [web/README.md](specs/web/README.md) | Web UI (planned) |
+| [web/README.md](specs/web/README.md) | Web API (UX7a shipped); SPA UX7c planned |
 
 ## Roadmap · history · SDLC
 

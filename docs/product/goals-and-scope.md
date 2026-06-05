@@ -6,7 +6,7 @@ Building a Commander deck involves many interdependent choices: commander identi
 
 ## Goal
 
-A **local, cross-platform** utility (CLI today; web UI planned) that:
+A **local, cross-platform** utility (CLI + optional HTTP API today; web SPA planned) that:
 
 1. Walks the user through selection criteria (mechanics, types, themes, colors, CMC ranges, commander choice, budget, etc.)
 2. Uses Scryfall oracle card data as the card library
