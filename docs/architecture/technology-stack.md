@@ -1,25 +1,26 @@
-# Technology Options
+# Technology stack
 
-Target environment: **Windows 10/11**, local database, offline-capable after import.
+Target environment: **cross-platform** (Windows, Linux, macOS) CLI; **web UI** for interactive use on desktop and **mobile browsers**. Local SQLite database, offline-capable after import.
 
 ## Language / runtime
 
 | Option | Pros | Cons | Fit |
 | --- | --- | --- | --- |
 | **Python 3.12+** | Fast JSON/SQLite work, rich text/regex for tagging, `questionary` for CLI wizard | Packaging for non-dev users needs PyInstaller/uv | **Strong** — best for data pipeline + CLI v1 |
-| **C# / .NET 8** | Native Windows, WPF/WinUI, excellent SQLite | Slower iteration on text tagging rules | **Strong** if native GUI is v1 |
-| **TypeScript (Node)** | Good if web UI is primary | Weaker for offline CLI-first workflow | Moderate |
-| **Rust** | Performance | Overkill for ~31k cards | Low priority |
+| **TypeScript (frontend only)** | Mobile-first SPA, OpenAPI client | Must not host engine rules | **Web UI client** |
+| **C# / .NET 8** | Native Windows shell | Duplicate engine; abandoned for v1 GUI | **Deferred** |
+| **Rust** | Performance | Overkill for ~31k cards; rewrite cost | **Not planned** |
 
 ### Recommendation
 
-**Python core + SQLite** for phases 1–2, with UI added as either:
+**Python engine + SQLite** remains the single source of truth. UI layers:
 
-- **CLI:** `questionary` / `typer` / `rich` (minimal deps, good UX for power users)
-- **Local web:** FastAPI + HTMX or small React SPA (best wizard UX / card preview)
-- **Later:** Thin WPF app calling Python via subprocess, or port core to C#
+- **CLI (shipped):** `typer` / `questionary` / `rich` — scripting, dogfood, power users
+- **Service layer (planned UX7):** `service/` facades shared by CLI and HTTP API
+- **Web API (planned UX7):** FastAPI + OpenAPI — local `serve` and simple self-hosting
+- **Web SPA (planned UX7):** Mobile-first app in `packages/web/` — no engine port
 
-Since UI preference is **undecided**, Python keeps options open without committing to a GUI framework yet.
+See [specs/web/architecture.md](../specs/web/architecture.md) for layering and deployment.
 
 ## Database
 
@@ -75,17 +76,16 @@ CREATE INDEX idx_cards_commander_legal ON cards(commander_legal);
 
 Optional: store raw JSON as **Parquet** for faster reloads — only worth it if import time becomes painful (currently ~4–5s load in Python).
 
-## UI options (since undecided)
+## UI options
 
-| UI | Effort | UX quality | Notes |
-| --- | ---: | ---: | --- |
-| **Typer + questionary CLI** | Low | Medium | Good for v1 proof; scriptable |
-| **FastAPI + HTMX** | Medium | High | Localhost wizard, show Scryfall images |
-| **Streamlit** | Low–Medium | Medium | Rapid prototype; less customizable |
-| **WPF (.NET)** | High | High | Best native Windows feel |
-| **Tauri + web frontend** | High | High | Cross-platform packaging |
+| UI | Status | Notes |
+| --- | --- | --- |
+| **Typer + questionary CLI** | **Shipped** | Scriptable; calls engine directly (→ `service/` over time) |
+| **FastAPI + mobile-first SPA** | **Planned UX7** | Cross-platform + mobile; `mtg-deck-tools serve` |
+| **WPF / native desktop** | Deferred | Superseded by web for cross-platform reach |
+| **Tauri installable shell** | Optional later | Only if offline installable `.app` / `.exe` is required beyond browser |
 
-**Pragmatic path:** Start CLI → if wizard feels cramped, add FastAPI layer reusing same Python modules.
+**Path:** CLI proved the engine → **UX7** adds `service/` + API + `packages/web` without forking rules.
 
 ## Testing
 

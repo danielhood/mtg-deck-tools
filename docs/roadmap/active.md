@@ -19,7 +19,7 @@ Status as of 2026-06-04.
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX7** | web-ui | Local web / desktop shell (UX7); reuse Python core | **Selected — P1** | API contract sketch ([specs/web/README.md](../specs/web/README.md)); no blocker to start UI scaffold | **ENG-MAINT**, doc-only |
+| **UX7** | web-ui | Cross-platform web shell (mobile-first); `service/` + FastAPI + `packages/web` — [specs/web/architecture.md](../specs/web/architecture.md) | **Selected — P1** | Architecture spec (linked); UX7a service extraction before full SPA | **ENG-MAINT**, doc-only |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | **UX7** (different paths), dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
@@ -31,18 +31,20 @@ Status as of 2026-06-04.
 
 ```mermaid
 flowchart LR
-  UX7[UX7 web-ui shell]
-  API[Web API contract spec]
+  UX7a[UX7a service layer]
+  UX7b[UX7b serve API]
+  UX7c[UX7c web shell]
   CORE[cli-engine core]
+  CLI[cli-ui]
   UX10[UX10 metrics UI]
   UX11[UX11 deck editor UI]
-  UX8[UX8 progressive CLI]
 
-  API --> UX7
-  CORE --> UX7
-  UX7 --> UX10
-  UX7 --> UX11
-  UX7 -.->|optional later| UX8
+  CORE --> UX7a
+  UX7a --> UX7b
+  UX7a --> CLI
+  UX7b --> UX7c
+  UX7c --> UX10
+  UX7c --> UX11
 ```
 
 - **UX7** does not block **ENG-MAINT** (engine-only PRs).

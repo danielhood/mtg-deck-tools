@@ -1,6 +1,6 @@
-# Architecture Options
+# Architecture options
 
-Three viable architectures for a local Windows tool. All assume **preprocessed oracle data in a local database**.
+Architectures for a **cross-platform** local tool (CLI + web). All assume **preprocessed oracle data in a local SQLite database**.
 
 ## Option A — CLI-first monolith (recommended for v1)
 
@@ -32,20 +32,22 @@ Three viable architectures for a local Windows tool. All assume **preprocessed o
 
 ---
 
-## Option B — Local web app
+## Option B — Local / hosted web app (**selected for UX7**)
 
 ```
-Browser UI  ←→  FastAPI / ASP.NET  ←→  SQLite
-     (React/Vue/Svelte or HTMX)
+Browser (desktop + mobile)  ←→  FastAPI  ←→  service/  ←→  Engine  ←→  SQLite
+        packages/web SPA
 ```
 
 | Pros | Cons |
 | --- | --- |
-| Rich wizard UX (forms, previews, card images) | More moving parts |
-| Can show card images from Scryfall URLs | Requires local server process |
-| Easy export / share screenshots | |
+| Cross-platform without native ports | Requires API process (`serve`) |
+| Mobile-first UX; card images via Scryfall CDN | Card images need network (engine does not) |
+| Same stack works locally and on simple PaaS hosting | Single-writer SQLite — one user per instance |
 
-**Best when:** UX quality matters early and you're comfortable with a small frontend.
+**Best when:** Interactive dashboards, swap/lock, and charts matter (UX7, UX10, UX11).
+
+Detail: [specs/web/architecture.md](../specs/web/architecture.md).
 
 ---
 
@@ -55,13 +57,26 @@ Browser UI  ←→  FastAPI / ASP.NET  ←→  SQLite
 WPF / WinUI / Tauri shell  ←→  Core library  ←→  SQLite
 ```
 
+**Status:** Deferred. Web UI (Option B) covers desktop and mobile; revisit Tauri only for installable offline shell.
+
+---
+
+## Option D — Unified service layer (companion to B)
+
+CLI and web share **`service/`** facades over the same engine:
+
+```
+CLI (in-process) ──→ service/ ──→ builder · rules · …
+Web (HTTP)       ──→ api/     ──→ service/
+```
+
 | Pros | Cons |
 | --- | --- |
-| Feels like a Windows app | Highest UI effort |
-| No browser tab | Tauri/Electron adds packaging complexity |
-| Offline-native | |
+| One implementation of orchestration + DTOs | Refactor CLI entrypoints incrementally |
+| OpenAPI contract for frontend | Optional `--api-url` adds test surface |
+| Dogfood unchanged (in-process CLI) | |
 
-**Best when:** You explicitly want a installable `.exe` with native feel in v1.
+**Best when:** CLI and web must stay in sync without duplicating logic — **required for UX7**.
 
 ---
 
