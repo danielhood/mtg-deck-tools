@@ -65,7 +65,7 @@ flowchart LR
 
 | Stream | Owner component | Safe in parallel with |
 | --- | --- | --- |
-| A — Web scaffold + API design | web-ui | ENG-MAINT, planning/docs, cli-ui idle |
+| A — UX7b `serve` + UX7c SPA | web-ui | ENG-MAINT, planning/docs, cli-ui idle |
 | B — Engine maintenance / dogfood | cli-engine | Stream A if no conflicting `src/` edits |
 | C — CLI feature work | cli-ui | *None active* — backlog only |
 

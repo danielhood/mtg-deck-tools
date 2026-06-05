@@ -27,7 +27,7 @@ PRs must include **Phase** (planning | implementation) and a **Documentation** s
 
 ### Product
 
-**MTG Deck Tools** is a single Python CLI package (no web server, no Docker). Entry point: `mtg-deck-tools` after `pip install -e ".[dev]"`. See [README.md](README.md) for commands and data layout.
+**MTG Deck Tools** is a Python package: **CLI** (default) plus optional **HTTP API** (UX7a). No Docker. Entry point: `mtg-deck-tools` after `pip install -e ".[dev]"`; API after `pip install -e ".[web]"` or `".[dev,web]"`. See [README.md](README.md) for CLI, import, and API launch (`uvicorn`).
 
 ### One-time VM prerequisites
 
@@ -62,4 +62,4 @@ Tests do **not** need Scryfall bulk JSON. Manual `import` / `generate` do:
 
 ### Services
 
-Nothing listens on a port. No `docker compose` or background daemons are required.
+**CLI-only:** nothing listens on a port. **With `[web]`:** run `uvicorn mtg_deck_tools.api.app:app` locally (see README → HTTP API); `mtg-deck-tools serve` planned in UX7b. No `docker compose` or background daemons required for dogfood or pytest.

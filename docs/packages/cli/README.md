@@ -1,6 +1,6 @@
 # CLI package
 
-Entry point: `mtg-deck-tools` after `pip install -e ".[dev]"`. User-facing commands: root [README.md](../../../README.md).
+Entry point: `mtg-deck-tools` after `pip install -e ".[dev]"`. Commands call `service/` facades in-process (same layer as the HTTP API). User-facing commands: root [README.md](../../../README.md).
 
 ## Specs
 
@@ -13,4 +13,4 @@ Entry point: `mtg-deck-tools` after `pip install -e ".[dev]"`. User-facing comma
 
 ## Active work
 
-[active.md](../../roadmap/active.md) — UX7 web UI will consume this Python core without forking business logic.
+[active.md](../../roadmap/active.md) — **UX7a shipped** (`service/`, `api/`, OpenAPI). **UX7b–UX7c** add `serve` and the web SPA without forking business logic.
