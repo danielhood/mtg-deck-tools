@@ -1,6 +1,6 @@
 # Web UI specification (planned)
 
-**Status:** **UX7a shipped** (service layer + OpenAPI) — **UX7** remains active for UX7b–UX7d.
+**Status:** **UX7a–UX7b shipped** (service layer + OpenAPI + `serve`) — **UX7** remains active for UX7c–UX7d.
 
 ## Code location
 
@@ -30,7 +30,7 @@ Summary:
 | [architecture.md](architecture.md) | **Draft** — stack and layering |
 | [openapi.yaml](openapi.yaml) | **UX7a** — health, stats, import, generate |
 | `routes.md` | Not started — wizard screens, dashboard, editor |
-| `deployment.md` | Not started — Docker, env vars, PaaS notes |
+| [deployment.md](deployment.md) | **UX7b** — env vars, self-host, PaaS notes |
 
 ## Shared contracts
 

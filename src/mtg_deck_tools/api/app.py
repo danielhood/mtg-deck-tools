@@ -7,8 +7,11 @@ from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from mtg_deck_tools import __version__
+from mtg_deck_tools.paths import resolve_static_ui_dir
 from mtg_deck_tools.service import (
     GenerateFromDeckRequest,
     GenerateRequest,
@@ -26,7 +29,19 @@ from mtg_deck_tools.service.dto import (
 )
 
 
-def create_app() -> FastAPI:
+class SPAStaticFiles(StaticFiles):
+    """Serve static assets and fall back to ``index.html`` for client-side routes."""
+
+    async def get_response(self, path: str, scope):
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as exc:
+            if exc.status_code == 404:
+                return await super().get_response("index.html", scope)
+            raise
+
+
+def create_app(*, static_dir: Path | None = None) -> FastAPI:
     app = FastAPI(
         title="MTG Deck Tools API",
         version=__version__,
@@ -96,6 +111,15 @@ def create_app() -> FastAPI:
             return generate_deck_from_saved(body, include_deck=True)
         except (FileNotFoundError, RuntimeError, ValueError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    ui_dir = resolve_static_ui_dir(static_dir)
+    if ui_dir is not None:
+        if not ui_dir.is_dir():
+            raise FileNotFoundError(
+                f"Web UI build not found: {ui_dir}. "
+                "Build packages/web (see docs/packages/web/README.md) or omit --with-ui."
+            )
+        app.mount("/", SPAStaticFiles(directory=ui_dir, html=True), name="ui")
 
     return app
 

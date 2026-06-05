@@ -13,4 +13,4 @@ Entry point: `mtg-deck-tools` after `pip install -e ".[dev]"`. Commands call `se
 
 ## Active work
 
-[active.md](../../roadmap/active.md) — **UX7a shipped** (`service/`, `api/`, OpenAPI). **UX7b–UX7c** add `serve` and the web SPA without forking business logic.
+[active.md](../../roadmap/active.md) — **UX7a–UX7b shipped** (`service/`, `api/`, `serve`). **UX7c** adds the web SPA without forking business logic.

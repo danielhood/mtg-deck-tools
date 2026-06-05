@@ -1,6 +1,6 @@
 # Web UI architecture (planned)
 
-**Status:** **UX7a implemented** — service + OpenAPI; **UX7b** (`serve`) next.  
+**Status:** **UX7a–UX7b implemented** — service + OpenAPI + `mtg-deck-tools serve`; **UX7c** (SPA) next.  
 **Phase:** Implementation in progress (UX7 active).
 
 ## Strategic shift
@@ -72,7 +72,7 @@ flowchart TB
 | --- | --- | --- |
 | **Engine** | `src/mtg_deck_tools/{builder,rules,...}` | Pure domain logic; UI-agnostic (unchanged principle) |
 | **Service** | `src/mtg_deck_tools/service/` | **Shipped (UX7a)** — facades + pydantic DTOs; CLI uses in-process |
-| **HTTP API** | `src/mtg_deck_tools/api/` | **Shipped (UX7a)** — FastAPI routes + [openapi.yaml](openapi.yaml); `serve` in UX7b |
+| **HTTP API** | `src/mtg_deck_tools/api/` | **Shipped (UX7a–UX7b)** — FastAPI routes + [openapi.yaml](openapi.yaml); `mtg-deck-tools serve` |
 | **Web client** | `packages/web/` | Mobile-first SPA; generated or hand-written API client |
 | **CLI** | `src/mtg_deck_tools/cli/` | Thin Typer commands → `service/` (not raw `builder/` calls over time) |
 
@@ -243,7 +243,7 @@ Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `p
 - [ ] Web SPA runs against local `serve` on Linux, macOS, and Windows.
 - [ ] Layout usable on phone-width viewport (375px) without horizontal scroll on wizard steps.
 - [ ] CLI dogfood gate unchanged: `analyze run --fail-on-expect` without starting a server.
-- [ ] Documented path to self-host with persistent `cards.db`.
+- [x] Documented path to self-host with persistent `cards.db` ([deployment.md](deployment.md)).
 
 ---
 

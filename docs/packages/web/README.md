@@ -1,6 +1,6 @@
 # Web UI package (planned)
 
-**Status:** **UX7a shipped** (backend facades + OpenAPI) — SPA (**UX7c**) not started.
+**Status:** **UX7a–UX7b shipped** (backend + `mtg-deck-tools serve`) — SPA (**UX7c**) not started.
 
 ## Stack (locked)
 

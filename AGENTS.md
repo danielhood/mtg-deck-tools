@@ -62,4 +62,4 @@ Tests do **not** need Scryfall bulk JSON. Manual `import` / `generate` do:
 
 ### Services
 
-**CLI-only:** nothing listens on a port. **With `[web]`:** run `uvicorn mtg_deck_tools.api.app:app` locally (see README → HTTP API); `mtg-deck-tools serve` planned in UX7b. No `docker compose` or background daemons required for dogfood or pytest.
+**CLI-only:** nothing listens on a port. **With `[web]`:** run `mtg-deck-tools serve` locally (see README → HTTP API). No `docker compose` or background daemons required for dogfood or pytest.

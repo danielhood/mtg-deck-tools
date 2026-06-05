@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -11,6 +12,7 @@ DATA_DIR = PROJECT_ROOT / "data"
 RESOURCES_DIR = PROJECT_ROOT / "resources"
 SCRYFALL_DIR = RESOURCES_DIR / "scryfall"
 DEFAULT_DB_PATH = DATA_DIR / "cards.db"
+WEB_UI_DIST_DIR = PROJECT_ROOT / "packages" / "web" / "dist"
 TAXONOMY_PATH = CONFIG_DIR / "mechanic-taxonomy.yaml"
 EFFECT_PATTERNS_PATH = CONFIG_DIR / "effect-patterns.yaml"
 DEPENDENCY_PROFILES_PATH = CONFIG_DIR / "dependency-profiles.yaml"
@@ -30,6 +32,26 @@ NON_DECKABLE_LAYOUTS = frozenset(
         "vanguard",
     }
 )
+
+
+def resolve_db_path(db_path: Path | None = None) -> Path:
+    """Resolve SQLite path: explicit arg, then ``MTG_DB_PATH`` env, then default."""
+    if db_path is not None:
+        return db_path
+    env = os.environ.get("MTG_DB_PATH")
+    if env:
+        return Path(env)
+    return DEFAULT_DB_PATH
+
+
+def resolve_static_ui_dir(static_dir: Path | None = None) -> Path | None:
+    """Resolve SPA static root: explicit arg, then ``MTG_SERVE_STATIC_DIR`` env."""
+    if static_dir is not None:
+        return static_dir
+    env = os.environ.get("MTG_SERVE_STATIC_DIR")
+    if env:
+        return Path(env)
+    return None
 
 
 def find_oracle_cards_json(directory: Path | None = None) -> Path:

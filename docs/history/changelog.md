@@ -8,6 +8,7 @@ Format: `- **YYYY-MM-DD** — Short title — optional PR/issue`
 
 ## 2026-06
 
+- **2026-06-04** — UX7b `mtg-deck-tools serve` (uvicorn launcher, `MTG_*` env defaults, `--with-ui` static mount)
 - **2026-06-04** — UX7a service layer + OpenAPI (`service/`, `api/`, CLI facades; `pip install -e ".[web]"` for FastAPI) (#44)
 - **2026-06-04** — UX5 wizard prepopulate on regen (`generate --wizard --from`, `wizard --from`)
 - **2026-06-04** — UX4 wizard step back-navigation (continue / back / cancel; preserved defaults)

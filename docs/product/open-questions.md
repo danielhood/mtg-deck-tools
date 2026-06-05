@@ -23,7 +23,7 @@ All v1 planning questions are resolved. Revisit only when scope changes.
 | Power level dial | **Deferred** — needs richer model than a simple dial |
 | Card availability | v1: EDHREC bias + `availability_score`; obscure > new-unpriced — [card-availability.md](card-availability.md) |
 | Card data freshness | **Static snapshot** — manual bulk refresh; used-card audience — [goals-and-scope.md](goals-and-scope.md), [data-sources.md](../architecture/data-sources.md) |
-| Interactive UI (UX7+) | Cross-platform **web** (mobile-first) + **CLI**; **`service/` + HTTP API shipped (UX7a)**; SPA + `serve` in UX7b–UX7c — [specs/web/architecture.md](../specs/web/architecture.md) |
+| Interactive UI (UX7+) | Cross-platform **web** (mobile-first) + **CLI**; **`service/` + HTTP API + `serve` shipped (UX7a–UX7b)**; SPA in UX7c — [specs/web/architecture.md](../specs/web/architecture.md) |
 | Web auth | **None for v1** — no login, sessions, or API keys in the product |
 | Web multi-tenant | **Out of scope** — one deployment = one user; single-writer SQLite |
 | Engine language (web era) | **Python** — no port; FastAPI exposes `service/` to the SPA |

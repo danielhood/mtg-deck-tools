@@ -5,12 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from mtg_deck_tools.db.stats import fetch_stats
-from mtg_deck_tools.paths import DEFAULT_DB_PATH
+from mtg_deck_tools.paths import resolve_db_path
 from mtg_deck_tools.service.dto import DatabaseStatsResponse, TopTagRow
 
 
 def get_database_stats(db_path: Path | None = None) -> DatabaseStatsResponse:
-    path = db_path or DEFAULT_DB_PATH
+    path = resolve_db_path(db_path)
     if not path.exists():
         raise FileNotFoundError(f"Database not found: {path}")
 
