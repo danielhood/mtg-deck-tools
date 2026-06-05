@@ -1,0 +1,441 @@
+openapi: 3.1.0
+info:
+  title: MTG Deck Tools API
+  version: 0.1.0
+  description: >-
+    HTTP surface for the MTG Deck Tools engine. Validation and deck rules run
+    server-side; clients send DeckCriteria and receive .deck.json-shaped documents.
+paths:
+  /health:
+    get:
+      tags:
+        - meta
+      summary: Health
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/v1/stats:
+    get:
+      tags:
+        - database
+      summary: Stats
+      operationId: stats_api_v1_stats_get
+      parameters:
+        - name: db
+          in: query
+          required: false
+          schema:
+            type: string
+            nullable: true
+          description: SQLite database path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseStatsResponse'
+        '404':
+          description: Database not found
+  /api/v1/import:
+    post:
+      tags:
+        - database
+      summary: Import Cards
+      operationId: import_cards_api_v1_import_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResponse'
+        '404':
+          description: Source JSON or paths not found
+  /api/v1/generate:
+    post:
+      tags:
+        - deck
+      summary: Generate
+      operationId: generate_api_v1_generate_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateResponse'
+        '400':
+          description: Build failed
+  /api/v1/generate/from-deck:
+    post:
+      tags:
+        - deck
+      summary: Generate From Deck
+      operationId: generate_from_deck_api_v1_generate_from_deck_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateFromDeckRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateResponse'
+        '400':
+          description: Build failed
+components:
+  schemas:
+    DeckCriteria:
+      description: User selections from the deck wizard — consumed by the builder.
+      properties:
+        themes:
+          items:
+            type: string
+          type: array
+          title: Themes
+        include_mechanics:
+          items:
+            type: string
+          type: array
+          title: Include Mechanics
+        avoid_mechanics:
+          items:
+            type: string
+          type: array
+          title: Avoid Mechanics
+        colors:
+          items:
+            type: string
+          type: array
+          title: Colors
+        commander_oracle_ids:
+          items:
+            type: string
+          type: array
+          title: Commander Oracle Ids
+        budget_usd:
+          anyOf:
+            - type: number
+            - type: 'null'
+          title: Budget Usd
+        card_price_min_usd:
+          anyOf:
+            - type: number
+            - type: 'null'
+          title: Card Price Min Usd
+        card_price_max_usd:
+          anyOf:
+            - type: number
+            - type: 'null'
+          title: Card Price Max Usd
+        strict_budget:
+          type: boolean
+          default: false
+          title: Strict Budget
+        strict_dependencies:
+          type: boolean
+          default: false
+          title: Strict Dependencies
+        repair_dependencies:
+          type: boolean
+          default: false
+          title: Repair Dependencies
+        mechanic_focus:
+          additionalProperties:
+            type: string
+          type: object
+          title: Mechanic Focus
+        prefer_available:
+          type: boolean
+          default: false
+          title: Prefer Available
+        min_rarity:
+          type: string
+          default: common
+          title: Min Rarity
+        slot_template:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Slot Template
+        seed:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Seed
+      type: object
+      title: DeckCriteria
+    HealthResponse:
+      properties:
+        status:
+          type: string
+          default: ok
+          title: Status
+        version:
+          type: string
+          title: Version
+      required:
+        - version
+      type: object
+      title: HealthResponse
+    TopTagRow:
+      properties:
+        tag:
+          type: string
+          title: Tag
+        layer:
+          type: string
+          title: Layer
+        n:
+          type: integer
+          title: N
+      required:
+        - tag
+        - layer
+        - n
+      type: object
+      title: TopTagRow
+    DatabaseStatsResponse:
+      properties:
+        db_path:
+          type: string
+          title: Db Path
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+          title: Metadata
+        total_cards:
+          type: integer
+          title: Total Cards
+        commander_eligible:
+          type: integer
+          title: Commander Eligible
+        with_partner:
+          type: integer
+          title: With Partner
+        tag_assignments:
+          type: integer
+          title: Tag Assignments
+        distinct_tags:
+          type: integer
+          title: Distinct Tags
+        effect_rows:
+          type: integer
+          default: 0
+          title: Effect Rows
+        distinct_effect_kinds:
+          type: integer
+          default: 0
+          title: Distinct Effect Kinds
+        top_tags:
+          items:
+            $ref: '#/components/schemas/TopTagRow'
+          type: array
+          title: Top Tags
+      required:
+        - db_path
+        - total_cards
+        - commander_eligible
+        - with_partner
+        - tag_assignments
+        - distinct_tags
+      type: object
+      title: DatabaseStatsResponse
+    ImportRequest:
+      properties:
+        json_path:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Json Path
+        db_path:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Db Path
+      type: object
+      title: ImportRequest
+    ImportResponse:
+      properties:
+        source_file:
+          type: string
+          title: Source File
+        source_count:
+          type: integer
+          title: Source Count
+        playable_count:
+          type: integer
+          title: Playable Count
+        tag_count:
+          type: integer
+          title: Tag Count
+        effect_count:
+          type: integer
+          title: Effect Count
+        db_path:
+          type: string
+          title: Db Path
+      required:
+        - source_file
+        - source_count
+        - playable_count
+        - tag_count
+        - effect_count
+        - db_path
+      type: object
+      title: ImportResponse
+    GenerateRequest:
+      properties:
+        criteria:
+          anyOf:
+            - $ref: '#/components/schemas/DeckCriteria'
+            - type: 'null'
+        colors:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: 'null'
+          title: Colors
+        themes:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: 'null'
+          title: Themes
+        seed:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Seed
+        db_path:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Db Path
+        output_dir:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Output Dir
+        stub:
+          type: boolean
+          default: false
+          title: Stub
+        strict_budget:
+          type: boolean
+          default: false
+          title: Strict Budget
+        strict_dependencies:
+          type: boolean
+          default: false
+          title: Strict Dependencies
+        repair_dependencies:
+          type: boolean
+          default: false
+          title: Repair Dependencies
+        prefer_available:
+          type: boolean
+          default: false
+          title: Prefer Available
+        commander_names:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: 'null'
+          title: Commander Names
+      type: object
+      title: GenerateRequest
+    GenerateFromDeckRequest:
+      properties:
+        deck_path:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Deck Path
+        deck:
+          anyOf:
+            - type: object
+            - type: 'null'
+          title: Deck
+        seed:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Seed
+        db_path:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Db Path
+        output_dir:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Output Dir
+        refill_slot:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Refill Slot
+        strict_budget:
+          type: boolean
+          default: false
+          title: Strict Budget
+        strict_dependencies:
+          type: boolean
+          default: false
+          title: Strict Dependencies
+        repair_dependencies:
+          type: boolean
+          default: false
+          title: Repair Dependencies
+        prefer_available:
+          type: boolean
+          default: false
+          title: Prefer Available
+      type: object
+      title: GenerateFromDeckRequest
+    GenerateResponse:
+      properties:
+        json_path:
+          type: string
+          title: Json Path
+        md_path:
+          type: string
+          title: Md Path
+        deck:
+          anyOf:
+            - type: object
+            - type: 'null'
+          title: Deck
+      required:
+        - json_path
+        - md_path
+      type: object
+      title: GenerateResponse

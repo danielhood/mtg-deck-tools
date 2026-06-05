@@ -13,15 +13,17 @@ from mtg_deck_tools import __version__
 from mtg_deck_tools.analysis.matrix import DEFAULT_MATRIX_PATH
 from mtg_deck_tools.analysis.runner import run_analysis_suite
 from mtg_deck_tools.builder.deck_load import load_deck_criteria_for_wizard
-from mtg_deck_tools.builder.generate import run_generate
-from mtg_deck_tools.builder.reload import run_generate_from_deck
-from mtg_deck_tools.builder.stub import run_generate_stub
-from mtg_deck_tools.db.stats import fetch_stats
-from mtg_deck_tools.import_.pipeline import run_import
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.effects.audit import run_audit_to_disk
 from mtg_deck_tools.paths import DEFAULT_DB_PATH, DEPENDENCY_RESOURCES_DIR
-from mtg_deck_tools.wizard.run import run_wizard
+from mtg_deck_tools.service import (
+    GenerateFromDeckRequest,
+    generate_deck_cli,
+    generate_deck_from_saved,
+    get_database_stats,
+    import_oracle_cards,
+    run_interactive_wizard,
+)
 
 app = typer.Typer(
     name="mtg-deck-tools",
@@ -63,7 +65,9 @@ def import_cmd(
         console.print(msg)
 
     try:
-        result = run_import(json_path=json_path, db_path=db_path, progress=progress)
+        result = import_oracle_cards(
+            json_path=json_path, db_path=db_path, progress=progress
+        )
     except FileNotFoundError as exc:
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(1) from exc
@@ -71,7 +75,7 @@ def import_cmd(
     table = Table(title="Import summary")
     table.add_column("Metric", style="cyan")
     table.add_column("Value")
-    for key, value in result.items():
+    for key, value in result.model_dump().items():
         table.add_row(key, str(value))
     console.print(table)
 
@@ -85,33 +89,35 @@ def stats_cmd(
 ) -> None:
     """Show database statistics."""
     path = db_path or DEFAULT_DB_PATH
-    if not path.exists():
+
+    try:
+        stats = get_database_stats(path)
+    except FileNotFoundError:
         console.print(f"[red]Database not found:[/red] {path}\nRun: mtg-deck-tools import")
         raise typer.Exit(1)
 
-    stats = fetch_stats(path)
     table = Table(title=f"Database — {path}")
     table.add_column("Metric", style="cyan")
     table.add_column("Value")
-    table.add_row("Playable cards", str(stats["total_cards"]))
-    table.add_row("Commander-eligible", str(stats["commander_eligible"]))
-    table.add_row("With partner ability", str(stats["with_partner"]))
-    table.add_row("Tag assignments", str(stats["tag_assignments"]))
-    table.add_row("Distinct tags", str(stats["distinct_tags"]))
-    if stats.get("effect_rows"):
-        table.add_row("Effect atom rows", str(stats["effect_rows"]))
-        table.add_row("Distinct effect kinds", str(stats["distinct_effect_kinds"]))
-    for key, value in stats["metadata"].items():
+    table.add_row("Playable cards", str(stats.total_cards))
+    table.add_row("Commander-eligible", str(stats.commander_eligible))
+    table.add_row("With partner ability", str(stats.with_partner))
+    table.add_row("Tag assignments", str(stats.tag_assignments))
+    table.add_row("Distinct tags", str(stats.distinct_tags))
+    if stats.effect_rows:
+        table.add_row("Effect atom rows", str(stats.effect_rows))
+        table.add_row("Distinct effect kinds", str(stats.distinct_effect_kinds))
+    for key, value in stats.metadata.items():
         table.add_row(key, value)
     console.print(table)
 
-    if stats["top_tags"]:
+    if stats.top_tags:
         tag_table = Table(title="Top tags")
         tag_table.add_column("Tag")
         tag_table.add_column("Layer")
         tag_table.add_column("Cards", justify="right")
-        for row in stats["top_tags"]:
-            tag_table.add_row(row["tag"], row["layer"], str(row["n"]))
+        for row in stats.top_tags:
+            tag_table.add_row(row.tag, row.layer, str(row.n))
         console.print(tag_table)
 
 
@@ -187,7 +193,7 @@ def wizard_cmd(
             raise typer.Exit(1) from exc
 
     try:
-        run_wizard(
+        run_interactive_wizard(
             seed=seed,
             initial_criteria=initial_criteria,
             prepopulated_from=deck_from,
@@ -322,7 +328,7 @@ def generate_cmd(
                 "[yellow]Note:[/yellow] --colors and --themes are ignored when --wizard is set."
             )
         try:
-            criteria = run_wizard(
+            criteria = run_interactive_wizard(
                 seed=seed,
                 db_path=db_path,
                 initial_criteria=wizard_initial,
@@ -359,38 +365,41 @@ def generate_cmd(
 
     try:
         if deck_from and not wizard:
-            out = run_generate_from_deck(
-                deck_from,
-                db_path=db_path,
-                seed=seed,
-                output_dir=output_dir,
-                refill_slot=refill_slot,
-                strict_budget=strict_budget,
-                strict_dependencies=strict_dependencies,
-                repair_dependencies=repair_dependencies,
-                prefer_available=prefer_available,
+            response = generate_deck_from_saved(
+                GenerateFromDeckRequest(
+                    deck_path=str(deck_from),
+                    db_path=str(db_path) if db_path else None,
+                    output_dir=str(output_dir) if output_dir else None,
+                    seed=seed,
+                    refill_slot=refill_slot,
+                    strict_budget=strict_budget,
+                    strict_dependencies=strict_dependencies,
+                    repair_dependencies=repair_dependencies,
+                    prefer_available=prefer_available,
+                ),
             )
+            out = Path(response.json_path)
+            md_path = Path(response.md_path)
         else:
-            runner = run_generate_stub if stub else run_generate
-            kwargs = dict(
+            result = generate_deck_cli(
+                stub=stub,
                 db_path=db_path,
                 seed=seed,
                 colors=color_list,
                 themes=theme_list,
                 criteria=criteria,
                 output_dir=output_dir,
+                strict_budget=strict_budget,
+                strict_dependencies=strict_dependencies,
+                repair_dependencies=repair_dependencies,
+                prefer_available=prefer_available,
             )
-            if not stub:
-                kwargs["strict_budget"] = strict_budget
-                kwargs["strict_dependencies"] = strict_dependencies
-                kwargs["repair_dependencies"] = repair_dependencies
-                kwargs["prefer_available"] = prefer_available
-            out = runner(**kwargs)
+            out = result.json_path
+            md_path = result.md_path
     except (FileNotFoundError, RuntimeError, ValueError) as exc:
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(1) from exc
 
-    md_path = out.with_suffix(".md")
     console.print(f"[green]Wrote[/green] {out}")
     console.print(f"[green]Wrote[/green] {md_path}")
     if stub:

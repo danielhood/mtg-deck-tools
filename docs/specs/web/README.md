@@ -1,13 +1,13 @@
 # Web UI specification (planned)
 
-**Status:** Planning — **UX7** in [user-experience.md](../dependency-engine/user-experience.md) and [active.md](../../roadmap/active.md).
+**Status:** **UX7a shipped** (service layer + OpenAPI) — **UX7** remains active for UX7b–UX7d.
 
 ## Code location
 
 | Artifact | Path |
 | --- | --- |
 | Frontend app | [`packages/web/`](../../../packages/web/) (`.gitkeep` until implementation) |
-| Service + API (planned) | `src/mtg_deck_tools/service/`, `src/mtg_deck_tools/api/` |
+| Service + API | `src/mtg_deck_tools/service/`, `src/mtg_deck_tools/api/` |
 | Package index | [packages/web/README.md](../../packages/web/README.md) |
 
 ## Architecture (read first)
@@ -28,7 +28,7 @@ Summary:
 | Doc | Status |
 | --- | --- |
 | [architecture.md](architecture.md) | **Draft** — stack and layering |
-| `openapi.yaml` | Not started — after UX7a service extraction |
+| [openapi.yaml](openapi.yaml) | **UX7a** — health, stats, import, generate |
 | `routes.md` | Not started — wizard screens, dashboard, editor |
 | `deployment.md` | Not started — Docker, env vars, PaaS notes |
 

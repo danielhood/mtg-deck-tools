@@ -1,7 +1,7 @@
 # Web UI architecture (planned)
 
-**Status:** Planning — **UX7** in [active.md](../../roadmap/active.md).  
-**Phase:** Planning only; no changelog until implementation ships.
+**Status:** **UX7a implemented** — service + OpenAPI; **UX7b** (`serve`) next.  
+**Phase:** Implementation in progress (UX7 active).
 
 ## Strategic shift
 
@@ -71,8 +71,8 @@ flowchart TB
 | Layer | Location (proposed) | Role |
 | --- | --- | --- |
 | **Engine** | `src/mtg_deck_tools/{builder,rules,...}` | Pure domain logic; UI-agnostic (unchanged principle) |
-| **Service** | `src/mtg_deck_tools/service/` | Stable operations + request/response models; used by API **and** CLI |
-| **HTTP API** | `src/mtg_deck_tools/api/` | FastAPI routes, OpenAPI schema, CORS, static UI mount |
+| **Service** | `src/mtg_deck_tools/service/` | **Shipped (UX7a)** — facades + pydantic DTOs; CLI uses in-process |
+| **HTTP API** | `src/mtg_deck_tools/api/` | **Shipped (UX7a)** — FastAPI routes + [openapi.yaml](openapi.yaml); `serve` in UX7b |
 | **Web client** | `packages/web/` | Mobile-first SPA; generated or hand-written API client |
 | **CLI** | `src/mtg_deck_tools/cli/` | Thin Typer commands → `service/` (not raw `builder/` calls over time) |
 
@@ -211,7 +211,7 @@ mtg-deck-tools/
   docs/specs/web/
     README.md
     architecture.md   # this file
-    openapi.yaml      # ADD when UX7a lands (or generated from FastAPI)
+    openapi.yaml      # UX7a — regenerate via scripts/export_openapi.py
 ```
 
 ### New dependencies (implementation phase)
@@ -238,8 +238,8 @@ Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `p
 
 ## Success criteria for UX7 architecture
 
-- [ ] `service/` facades used by at least `generate`, `stats`, and wizard-equivalent criteria build.
-- [ ] OpenAPI document describes request/response shapes aligned with `.deck.json` and `DeckCriteria`.
+- [x] `service/` facades used by at least `generate`, `stats`, and wizard-equivalent criteria build.
+- [x] OpenAPI document describes request/response shapes aligned with `.deck.json` and `DeckCriteria`.
 - [ ] Web SPA runs against local `serve` on Linux, macOS, and Windows.
 - [ ] Layout usable on phone-width viewport (375px) without horizontal scroll on wizard steps.
 - [ ] CLI dogfood gate unchanged: `analyze run --fail-on-expect` without starting a server.

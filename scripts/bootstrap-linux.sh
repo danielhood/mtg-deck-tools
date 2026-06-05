@@ -24,6 +24,7 @@ After bootstrap:
   source .venv/bin/activate
   # Download oracle bulk JSON (see README), then:
   mtg-deck-tools import
+  # HTTP API (optional): uvicorn mtg_deck_tools.api.app:app --host 127.0.0.1 --port 8000
 EOF
 }
 
@@ -101,13 +102,14 @@ if [[ "$CLEAR" -eq 1 ]]; then
 fi
 "$UV_BIN" "${VENV_ARGS[@]}"
 
-"$UV_BIN" pip install -e ".[dev]"
+"$UV_BIN" pip install -e ".[dev,web]"
 
 cat <<EOF
 
 Bootstrap complete.
   Activate:  source .venv/bin/activate
   CLI:       mtg-deck-tools --help
+  API:       uvicorn mtg_deck_tools.api.app:app --host 127.0.0.1 --port 8000 --reload
 
 Next: download Scryfall oracle bulk JSON (README → External data), then run:
   mtg-deck-tools import

@@ -23,7 +23,7 @@ MVP tracked as **UX7** in [active.md](../active.md). Architecture: [specs/web/ar
 
 | Sub-phase | Deliverable | Notes |
 | --- | --- | --- |
-| **UX7a** | `service/` extraction + OpenAPI | Shared facades for CLI and API; no behavior change |
+| ~~**UX7a**~~ | ~~`service/` extraction + OpenAPI~~ | **Shipped** — `service/`, `api/`, [openapi.yaml](../../specs/web/openapi.yaml) |
 | **UX7b** | `mtg-deck-tools serve` | FastAPI, health/stats, optional static UI mount |
 | **UX7c** | Web wizard shell | Mobile-first; theme → commander parity with CLI |
 | **UX7d** | Dependency dashboard | D5 reporting; path to UX10 charts |
