@@ -1,20 +1,44 @@
 # Web UI package (planned)
 
-**Status:** Not started. Tracked as **UX7** in [user-experience.md](../../specs/dependency-engine/user-experience.md) and [active.md](../../roadmap/active.md).
+**Status:** Planning — **UX7** in [user-experience.md](../../specs/dependency-engine/user-experience.md) and [active.md](../../roadmap/active.md).
+
+## Stack (locked)
+
+| Piece | Choice |
+| --- | --- |
+| Framework | **Svelte 5** |
+| Build | **Vite** SPA (`@sveltejs/vite-plugin-svelte`) |
+| API client | OpenAPI-generated TypeScript |
+| Hosting | Built `dist/` served by `mtg-deck-tools serve` (FastAPI static mount) |
+
+Not **SvelteKit** — Python owns HTTP; frontend is a client-only bundle.
 
 ## Intended layout
 
 ```
-packages/web/          # frontend app (framework TBD)
-docs/packages/web/     # this file — package index
-docs/specs/web/        # routes, API surface, deployment (add when UX7 starts)
+packages/web/
+  src/                   # Svelte components, routes (client-side)
+  static/                # Public assets
+  package.json
+  vite.config.ts
+  svelte.config.js
+docs/packages/web/       # this file
+docs/specs/web/        # architecture, OpenAPI, routes, deployment
+src/mtg_deck_tools/
+  service/               # Shared facades (CLI + API) — planned
+  api/                   # FastAPI app — planned
 ```
 
 ## Principles
 
-- Reuse the Python core (`src/mtg_deck_tools/`) via API or subprocess — no duplicate rules in the frontend.
-- Shared product goals: `docs/product/` · shared roadmap: `docs/roadmap/`.
+- **Cross-platform:** Browser UI on Windows, Linux, macOS, and mobile without native builds.
+- **Mobile-first:** Single-column UX; phone-width layouts are the design baseline.
+- **One engine:** Python core via `service/` + HTTP — no duplicate rules in Svelte.
+- **CLI coexistence:** Terminal wizard remains; web is the rich shell for dashboards, charts, swap/lock.
+- **Local-first:** Default launch is `mtg-deck-tools serve` on localhost; simple self-hosting supported.
 
-Web technical spec placeholder: [specs/web/README.md](../../specs/web/README.md).
+Architecture: [specs/web/architecture.md](../../specs/web/architecture.md).
 
-When implementation begins, update both READMEs with framework choice, API routes, and deployment.
+## When implementation begins
+
+Add `package.json` scripts (`dev`, `build`, `check`), document Vite proxy to local API in dev, and how `serve` mounts `dist/`. Add OpenAPI and route docs under `docs/specs/web/`.

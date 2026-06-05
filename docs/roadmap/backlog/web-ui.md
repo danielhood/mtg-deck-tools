@@ -19,4 +19,17 @@ Spec placeholder: [specs/web/README.md](../../specs/web/README.md) · Package in
 
 ## UX7 scope (reference — active, not backlog)
 
-MVP tracked as **UX7** in [active.md](../active.md): local web/desktop shell, dependency dashboard, path to host UX10/UX11.
+MVP tracked as **UX7** in [active.md](../active.md). Architecture: [specs/web/architecture.md](../../specs/web/architecture.md).
+
+| Sub-phase | Deliverable | Notes |
+| --- | --- | --- |
+| **UX7a** | `service/` extraction + OpenAPI | Shared facades for CLI and API; no behavior change |
+| **UX7b** | `mtg-deck-tools serve` | FastAPI, health/stats, optional static UI mount |
+| **UX7c** | Web wizard shell | Mobile-first; theme → commander parity with CLI |
+| **UX7d** | Dependency dashboard | D5 reporting; path to UX10 charts |
+
+**Platform:** Windows, Linux, macOS browsers + mobile layouts. **Not** a native desktop port. **Engine:** Python only — no language port. **Frontend:** Svelte 5 + Vite SPA.
+
+**CLI:** In-process `service/` by default; optional HTTP client (`--api-url`) deferred until API is stable.
+
+**Hosting:** Local-first `serve`; document self-host / simple PaaS after UX7b.

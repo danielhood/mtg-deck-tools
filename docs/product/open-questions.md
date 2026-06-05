@@ -10,7 +10,7 @@ All v1 planning questions are resolved. Revisit only when scope changes.
 | Deck generation style | Guided slot template |
 | Mechanic matching | Curated taxonomy + rule-based tagging on `oracle_text` |
 | v1 constraints | Commander rules, budget, commander synergy, include/avoid mechanics |
-| Runtime | Local Windows, local DB OK |
+| Runtime | Local cross-platform (Windows, Linux, macOS), local DB OK |
 | Preprocessing | Acceptable and recommended |
 | UI (v1) | Terminal wizard (CLI) — Python + `typer` / `questionary` / `rich` |
 | Include / avoid mechanics | Keyword-level want / avoid lists — see [problem-decomposition.md](../architecture/problem-decomposition.md) |
@@ -23,6 +23,11 @@ All v1 planning questions are resolved. Revisit only when scope changes.
 | Power level dial | **Deferred** — needs richer model than a simple dial |
 | Card availability | v1: EDHREC bias + `availability_score`; obscure > new-unpriced — [card-availability.md](card-availability.md) |
 | Card data freshness | **Static snapshot** — manual bulk refresh; used-card audience — [goals-and-scope.md](goals-and-scope.md), [data-sources.md](../architecture/data-sources.md) |
+| Interactive UI (UX7+) | Cross-platform **web** (mobile-first) + existing **CLI**; shared Python `service/` layer — [specs/web/architecture.md](../specs/web/architecture.md) |
+| Web auth | **None for v1** — no login, sessions, or API keys in the product |
+| Web multi-tenant | **Out of scope** — one deployment = one user; single-writer SQLite |
+| Engine language (web era) | **Python** — no port; FastAPI exposes `service/` to the SPA |
+| Frontend framework | **Svelte 5 + Vite** SPA (`packages/web/`) — not SvelteKit; FastAPI serves API + static build |
 
 ## Deferred (post-v1)
 
@@ -34,7 +39,7 @@ See [active.md](../roadmap/active.md) for the active backlog (dependency UX cali
 | Power level / salt | Complicated, context-dependent; not a single dial |
 | Obscure vs new null-price classification | Shipped heuristic favors obscure detection — [card-availability.md](card-availability.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` |
-| Local web / desktop UI | Reuse Python core |
+| Product auth / accounts | User login, shared hosted multi-user DB — only if scope changes beyond v1 single-instance model |
 
 ## Historical
 
