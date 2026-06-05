@@ -1,6 +1,6 @@
 # Web UI package (planned)
 
-**Status:** Planning — **UX7** in [user-experience.md](../../specs/dependency-engine/user-experience.md) and [active.md](../../roadmap/active.md).
+**Status:** **UX7a shipped** (backend facades + OpenAPI) — SPA (**UX7c**) not started.
 
 ## Stack (locked)
 
@@ -25,8 +25,8 @@ packages/web/
 docs/packages/web/       # this file
 docs/specs/web/        # architecture, OpenAPI, routes, deployment
 src/mtg_deck_tools/
-  service/               # Shared facades (CLI + API) — planned
-  api/                   # FastAPI app — planned
+  service/               # Shared facades (CLI + API) — UX7a
+  api/                   # FastAPI app — UX7a
 ```
 
 ## Principles

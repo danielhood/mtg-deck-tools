@@ -19,7 +19,7 @@ Status as of 2026-06-04.
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX7** | web-ui | Cross-platform web shell (mobile-first); `service/` + FastAPI + `packages/web` — [specs/web/architecture.md](../specs/web/architecture.md) | **Selected — P1** | Architecture spec (linked); UX7a service extraction before full SPA | **ENG-MAINT**, doc-only |
+| **UX7** | web-ui | Cross-platform web shell (mobile-first); UX7b `serve` + UX7c SPA — [specs/web/architecture.md](../specs/web/architecture.md) | **Selected — P1** | UX7a shipped (`service/`, `api/`, OpenAPI) | **ENG-MAINT**, doc-only |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | **UX7** (different paths), dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 

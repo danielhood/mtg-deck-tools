@@ -16,8 +16,8 @@ Target environment: **cross-platform** (Windows, Linux, macOS) CLI; **web UI** f
 **Python engine + SQLite** remains the single source of truth. UI layers:
 
 - **CLI (shipped):** `typer` / `questionary` / `rich` — scripting, dogfood, power users
-- **Service layer (planned UX7):** `service/` facades shared by CLI and HTTP API
-- **Web API (planned UX7):** FastAPI + OpenAPI — local `serve` and simple self-hosting
+- **Service layer (UX7a):** `src/mtg_deck_tools/service/` facades shared by CLI and HTTP API
+- **Web API (UX7a):** FastAPI + [openapi.yaml](../specs/web/openapi.yaml); `mtg-deck-tools serve` in UX7b
 - **Web SPA (planned UX7):** Mobile-first app in `packages/web/` — no engine port
 
 See [specs/web/architecture.md](../specs/web/architecture.md) for layering and deployment.

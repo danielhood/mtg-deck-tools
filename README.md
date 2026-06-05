@@ -59,8 +59,8 @@ Use the effective date in the filename so updates are obvious. Commander deck co
 ```
 mtg-deck-tools/
   docs/                     # Product, architecture, specs, roadmap, history (see docs/README.md)
-  src/mtg_deck_tools/       # CLI package (today)
-  packages/web/             # Web UI (planned — UX7; .gitkeep)
+  src/mtg_deck_tools/       # CLI + engine; service/ + api/ (UX7a)
+  packages/web/             # Web SPA (planned — UX7c; .gitkeep)
   scripts/                  # bootstrap-linux.sh (uv-based env on Linux)
   resources/
     scryfall/               # Oracle bulk JSON (local download) + field docs
@@ -71,7 +71,13 @@ mtg-deck-tools/
 
 ## Setup (development)
 
-Pick one path. All options install editable package `mtg-deck-tools` with dev dependencies into `.venv/`.
+Pick one path. All options install editable package `mtg-deck-tools` with dev dependencies into `.venv/`. Add the **`[web]`** extra when you want the HTTP API (FastAPI + uvicorn):
+
+```bash
+pip install -e ".[dev,web]"
+```
+
+CLI-only installs can omit `[web]` until you run the API locally.
 
 ### Standard (Python `venv` + `pip`)
 
@@ -81,7 +87,7 @@ Pick one path. All options install editable package `mtg-deck-tools` with dev de
 cd mtg-deck-tools
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -e ".[dev]"
+pip install -e ".[dev,web]"   # omit ,web for CLI-only
 ```
 
 **Linux / macOS (bash)**
@@ -90,14 +96,14 @@ pip install -e ".[dev]"
 cd mtg-deck-tools
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e ".[dev,web]"   # omit ,web for CLI-only
 ```
 
 On Debian/Ubuntu, if `python3 -m venv` fails, install the matching `python3.*-venv` package once (e.g. `python3.12-venv`).
 
 ### Bootstrap with uv (Linux)
 
-Use this when you have **Python 3.12+** but not a working `pip` or `venv` module (minimal cloud images, fresh Ubuntu without `python3-venv`). The script downloads a project-local [uv](https://docs.astral.sh/uv/) binary to `.tools/uv` (gitignored), creates `.venv`, and runs `uv pip install -e ".[dev]"`. It does **not** install Python itself.
+Use this when you have **Python 3.12+** but not a working `pip` or `venv` module (minimal cloud images, fresh Ubuntu without `python3-venv`). The script downloads a project-local [uv](https://docs.astral.sh/uv/) binary to `.tools/uv` (gitignored), creates `.venv`, and runs `uv pip install -e ".[dev,web]"` (CLI, pytest, FastAPI, uvicorn). It does **not** install Python itself.
 
 ```bash
 cd mtg-deck-tools
@@ -122,6 +128,61 @@ Ensure oracle cards JSON and Comprehensive Rules are in place (see [External dat
 mtg-deck-tools import
 mtg-deck-tools stats
 ```
+
+## HTTP API (local)
+
+The same engine as the CLI is exposed over REST for web clients and integration tests. Contract: [`docs/specs/web/openapi.yaml`](docs/specs/web/openapi.yaml). Architecture: [`docs/specs/web/architecture.md`](docs/specs/web/architecture.md).
+
+**Requires:** `pip install -e ".[web]"` (or `".[dev,web]"`) and a built `data/cards.db` (`mtg-deck-tools import`).
+
+### Launch
+
+From the repo root with `.venv` activated:
+
+```bash
+uvicorn mtg_deck_tools.api.app:app --host 127.0.0.1 --port 8000 --reload
+```
+
+| URL | Purpose |
+| --- | --- |
+| http://127.0.0.1:8000/health | Liveness + package version |
+| http://127.0.0.1:8000/docs | Swagger UI (interactive) |
+| http://127.0.0.1:8000/redoc | ReDoc |
+| http://127.0.0.1:8000/openapi.json | OpenAPI schema (for client codegen) |
+
+Bind another host/port with `--host` / `--port` (e.g. `--host 0.0.0.0` only when you intend to expose the machine on the LAN). **v1 has no auth** — keep the default `127.0.0.1` for local use.
+
+A dedicated `mtg-deck-tools serve` command (static UI mount, env defaults) is planned in **UX7b**; until then, use `uvicorn` as above.
+
+Regenerate the committed OpenAPI file after API changes:
+
+```bash
+python scripts/export_openapi.py
+```
+
+### Routes (v1)
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/health` | Service health |
+| `GET` | `/api/v1/stats` | Database stats (`?db=` optional path to SQLite) |
+| `POST` | `/api/v1/import` | Import oracle JSON → SQLite (body: optional `json_path`, `db_path`) |
+| `POST` | `/api/v1/generate` | Build deck from `DeckCriteria` + flags; response includes `.deck.json` document |
+| `POST` | `/api/v1/generate/from-deck` | Regenerate from `deck_path` or inline `deck` object |
+
+### Quick checks
+
+```bash
+curl -s http://127.0.0.1:8000/health
+
+curl -s "http://127.0.0.1:8000/api/v1/stats"
+
+curl -s -X POST http://127.0.0.1:8000/api/v1/generate \
+  -H "Content-Type: application/json" \
+  -d '{"stub": true, "seed": 42, "colors": ["G"], "themes": ["tokens"]}'
+```
+
+Full generate runs can take a few seconds; the API returns the same `.deck.json` shape as CLI `generate` (paths on disk plus optional `deck` body in the JSON response).
 
 ## Usage
 
@@ -165,6 +226,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 | --- | --- |
 | `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms |
 | `stats` | Row counts, import metadata, top tags, effect counts |
+| *(HTTP)* | Same operations via REST — see [HTTP API (local)](#http-api-local); `mtg-deck-tools serve` coming in UX7b |
 | `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
 | `wizard` | Interactive wizard (7 steps + criteria preflight): themes, mechanics, synergy/dependency controls, colors, budget & per-card prices, commander (color + price filters), rarity; after **step 2 onward** and at preflight you can **re-run** the step you just finished, **go back** to an earlier step (downstream steps re-run automatically), or at preflight **re-run criteria review**; step 1 advances directly to step 2; end-of-wizard **criteria linter** warns on conflicting include/avoid, focus vs avoid, heavy theme pairs, and over-constrained budget before showing the summary (criteria only; does not write a deck) |
 | `generate` | Build a 99-card maindeck plus commander metadata → `output/*.deck.json` and `output/*.md` |
@@ -260,7 +322,7 @@ Use a different `--seed` to get another random synergy pool; omit `--seed` to us
 
 **Dependency engine (D0–D5):** effect extraction at import (`card_effects`), post-build `dependency_report` in Markdown/JSON, pick-time scoring (D3), `--strict-dependencies` (D4), and `--repair-dependencies` (D5) — **complete** as of 2026-05-31.
 
-**Dependency expansion:** **tutor payload matching** (CMC bands, colors, land subtypes, multi-type OR for `TUTOR_TARGET_EXISTS`), **enchantments** profile (`ENCHANTMENT_SUPPORT_MIN`, wizard `themes: [enchantress]`), **tokens** (`TOKEN_BALANCE`), **vehicles** (`VEHICLE_BALANCE`), **equipment depth** (`EQUIPMENT_BALANCE`, `include_mechanics: [equip]` or `themes: [voltron]`), **rad/oil/charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`), **subtype lords**, **sacrifice/token refinements** (aristocrats fodder includes token makers; Grave Pact-style `sacrifice_opponent`; persist/undying/escape `death_recursion`), **graveyard/landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; wizard `themes: [recursion, landfall]`), **graveyard filler atoms** (surveil, discover, looting discard; `include_mechanics: [surveil]`), and **token subtype buffs** (`TOKEN_SUBTYPE_BUFF_SUPPORT`, subtype capture on `token_produce`) — shipped as of 2026-06. **UX2** wizard step 3 sets `strict_dependencies`, `repair_dependencies`, and optional `mechanic_focus` presets for activated profiles. **UX3** end-of-wizard criteria linter warns on conflicting selections before generate. **UX4** wizard back-navigation. **UX5** `generate --wizard --from` and `wizard --from` pre-fill the wizard from saved criteria. Next: **UX7** local web — see [`docs/roadmap/active.md`](docs/roadmap/active.md).
+**Dependency expansion:** **tutor payload matching** (CMC bands, colors, land subtypes, multi-type OR for `TUTOR_TARGET_EXISTS`), **enchantments** profile (`ENCHANTMENT_SUPPORT_MIN`, wizard `themes: [enchantress]`), **tokens** (`TOKEN_BALANCE`), **vehicles** (`VEHICLE_BALANCE`), **equipment depth** (`EQUIPMENT_BALANCE`, `include_mechanics: [equip]` or `themes: [voltron]`), **rad/oil/charge counters** (`RAD_BALANCE`, `OIL_BALANCE`, `CHARGE_BALANCE`; `include_mechanics: [rad, oil, charge]`), **subtype lords**, **sacrifice/token refinements** (aristocrats fodder includes token makers; Grave Pact-style `sacrifice_opponent`; persist/undying/escape `death_recursion`), **graveyard/landfall heuristics** (`REANIMATION_SUPPORT`, `GRAVEYARD_COST_SUPPORT`, `SELF_MILL_BALANCE`, `LANDFALL_BALANCE`; wizard `themes: [recursion, landfall]`), **graveyard filler atoms** (surveil, discover, looting discard; `include_mechanics: [surveil]`), and **token subtype buffs** (`TOKEN_SUBTYPE_BUFF_SUPPORT`, subtype capture on `token_produce`) — shipped as of 2026-06. **UX2** wizard step 3 sets `strict_dependencies`, `repair_dependencies`, and optional `mechanic_focus` presets for activated profiles. **UX3** end-of-wizard criteria linter warns on conflicting selections before generate. **UX4** wizard back-navigation. **UX5** `generate --wizard --from` and `wizard --from` pre-fill the wizard from saved criteria. **UX7a** shared `service/` layer + HTTP API (launch with `uvicorn`; see [HTTP API](#http-api-local)). Next: **UX7b** `serve`, **UX7c** web SPA — [`docs/roadmap/active.md`](docs/roadmap/active.md).
 
 ## License
 
