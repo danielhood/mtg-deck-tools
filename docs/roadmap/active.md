@@ -19,7 +19,7 @@ Status as of 2026-06-04.
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX7** | web-ui | Cross-platform web shell (mobile-first); UX7b `serve` + UX7c SPA — [specs/web/architecture.md](../specs/web/architecture.md) | **Selected — P1** | UX7a shipped (`service/`, `api/`, OpenAPI) | **ENG-MAINT**, doc-only |
+| **UX7** | web-ui | Cross-platform web shell (mobile-first); UX7c SPA + UX7d dashboard — [specs/web/architecture.md](../specs/web/architecture.md) | **Selected — P1** | UX7a–UX7b shipped (`service/`, `api/`, `serve`) | **ENG-MAINT**, doc-only |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | **UX7** (different paths), dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
@@ -65,7 +65,7 @@ flowchart LR
 
 | Stream | Owner component | Safe in parallel with |
 | --- | --- | --- |
-| A — UX7b `serve` + UX7c SPA | web-ui | ENG-MAINT, planning/docs, cli-ui idle |
+| A — UX7c SPA + UX7d dashboard | web-ui | ENG-MAINT, planning/docs, cli-ui idle |
 | B — Engine maintenance / dogfood | cli-engine | Stream A if no conflicting `src/` edits |
 | C — CLI feature work | cli-ui | *None active* — backlog only |
 

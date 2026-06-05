@@ -24,7 +24,7 @@ After bootstrap:
   source .venv/bin/activate
   # Download oracle bulk JSON (see README), then:
   mtg-deck-tools import
-  # HTTP API (optional): uvicorn mtg_deck_tools.api.app:app --host 127.0.0.1 --port 8000
+  # HTTP API (optional): mtg-deck-tools serve
 EOF
 }
 
@@ -109,7 +109,7 @@ cat <<EOF
 Bootstrap complete.
   Activate:  source .venv/bin/activate
   CLI:       mtg-deck-tools --help
-  API:       uvicorn mtg_deck_tools.api.app:app --host 127.0.0.1 --port 8000 --reload
+  API:       mtg-deck-tools serve --reload
 
 Next: download Scryfall oracle bulk JSON (README → External data), then run:
   mtg-deck-tools import

@@ -140,7 +140,22 @@ The same engine as the CLI is exposed over REST for web clients and integration 
 From the repo root with `.venv` activated:
 
 ```bash
-uvicorn mtg_deck_tools.api.app:app --host 127.0.0.1 --port 8000 --reload
+mtg-deck-tools serve
+```
+
+| Flag / env | Purpose |
+| --- | --- |
+| `--host` / `MTG_SERVE_HOST` | Bind address (default `127.0.0.1`) |
+| `--port` / `MTG_SERVE_PORT` | Listen port (default `8000`) |
+| `--db` / `MTG_DB_PATH` | Default SQLite path for API requests without `?db=` |
+| `--with-ui` | Mount built SPA from `packages/web/dist` |
+| `--ui-dir` | Override static UI directory |
+| `--reload` | Auto-restart on code changes (development) |
+
+API-only with hot reload (equivalent to `serve --reload`):
+
+```bash
+uvicorn mtg_deck_tools.api.serve:create_serve_app --factory --host 127.0.0.1 --port 8000 --reload
 ```
 
 | URL | Purpose |
@@ -152,7 +167,7 @@ uvicorn mtg_deck_tools.api.app:app --host 127.0.0.1 --port 8000 --reload
 
 Bind another host/port with `--host` / `--port` (e.g. `--host 0.0.0.0` only when you intend to expose the machine on the LAN). **v1 has no auth** — keep the default `127.0.0.1` for local use.
 
-A dedicated `mtg-deck-tools serve` command (static UI mount, env defaults) is planned in **UX7b**; until then, use `uvicorn` as above.
+Self-hosting notes: [`docs/specs/web/deployment.md`](docs/specs/web/deployment.md).
 
 Regenerate the committed OpenAPI file after API changes:
 
@@ -226,7 +241,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 | --- | --- |
 | `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms |
 | `stats` | Row counts, import metadata, top tags, effect counts |
-| *(HTTP)* | Same operations via REST — see [HTTP API (local)](#http-api-local); `mtg-deck-tools serve` coming in UX7b |
+| `serve` | Start HTTP API (`--with-ui` mounts built SPA); see [HTTP API (local)](#http-api-local) |
 | `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
 | `wizard` | Interactive wizard (7 steps + criteria preflight): themes, mechanics, synergy/dependency controls, colors, budget & per-card prices, commander (color + price filters), rarity; after **step 2 onward** and at preflight you can **re-run** the step you just finished, **go back** to an earlier step (downstream steps re-run automatically), or at preflight **re-run criteria review**; step 1 advances directly to step 2; end-of-wizard **criteria linter** warns on conflicting include/avoid, focus vs avoid, heavy theme pairs, and over-constrained budget before showing the summary (criteria only; does not write a deck) |
 | `generate` | Build a 99-card maindeck plus commander metadata → `output/*.deck.json` and `output/*.md` |

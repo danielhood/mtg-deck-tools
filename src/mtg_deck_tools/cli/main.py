@@ -15,6 +15,12 @@ from mtg_deck_tools.analysis.runner import run_analysis_suite
 from mtg_deck_tools.builder.deck_load import load_deck_criteria_for_wizard
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.effects.audit import run_audit_to_disk
+from mtg_deck_tools.api.serve import (
+    DEFAULT_HOST,
+    DEFAULT_PORT,
+    run_server,
+    serve_config_from_options,
+)
 from mtg_deck_tools.paths import DEFAULT_DB_PATH, DEPENDENCY_RESOURCES_DIR
 from mtg_deck_tools.service import (
     GenerateFromDeckRequest,
@@ -47,6 +53,93 @@ def main(
     ] = None,
 ) -> None:
     """MTG Commander deck tools."""
+
+
+@app.command("serve")
+def serve_cmd(
+    host: Annotated[
+        Optional[str],
+        typer.Option(
+            "--host",
+            help=f"Bind address (default: {DEFAULT_HOST} or MTG_SERVE_HOST)",
+        ),
+    ] = None,
+    port: Annotated[
+        Optional[int],
+        typer.Option(
+            "--port",
+            help=f"Listen port (default: {DEFAULT_PORT} or MTG_SERVE_PORT)",
+        ),
+    ] = None,
+    with_ui: Annotated[
+        bool,
+        typer.Option(
+            "--with-ui",
+            help="Serve built SPA from packages/web/dist (or --ui-dir)",
+        ),
+    ] = False,
+    ui_dir: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--ui-dir",
+            help="Override static UI directory (implies bundled UI mount)",
+        ),
+    ] = None,
+    db_path: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--db",
+            help="Default SQLite path for API requests (also sets MTG_DB_PATH)",
+        ),
+    ] = None,
+    reload: Annotated[
+        bool,
+        typer.Option("--reload", help="Restart on code changes (development)"),
+    ] = False,
+) -> None:
+    """Start the HTTP API (and optionally the built web UI)."""
+    try:
+        config = serve_config_from_options(
+            host=host,
+            port=port,
+            reload=reload,
+            with_ui=with_ui,
+            ui_dir=ui_dir,
+            db_path=db_path,
+        )
+    except ValueError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
+
+    if config.static_dir is not None and not config.static_dir.is_dir():
+        console.print(f"[red]Web UI build not found:[/red] {config.static_dir}")
+        console.print(
+            "[dim]Build the SPA (see docs/packages/web/README.md) or omit --with-ui.[/dim]"
+        )
+        raise typer.Exit(1)
+
+    console.print(
+        f"[green]Starting API[/green] http://{config.host}:{config.port}/health"
+    )
+    if config.static_dir is not None:
+        console.print(f"[green]Serving UI[/green] from {config.static_dir}")
+    if config.db_path is not None:
+        console.print(f"[dim]Default database:[/dim] {config.db_path}")
+    elif db_path is None:
+        console.print(
+            "[dim]Default database: data/cards.db (override with --db or MTG_DB_PATH)[/dim]"
+        )
+
+    try:
+        run_server(config)
+    except KeyboardInterrupt:
+        console.print("\n[dim]Server stopped.[/dim]")
+        raise typer.Exit(0) from None
+    except SystemExit as exc:
+        if exc.code and exc.code != 0:
+            message = exc.args[0] if exc.args else str(exc.code)
+            console.print(f"[red]Error:[/red] {message}")
+        raise
 
 
 @app.command("import")

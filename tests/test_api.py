@@ -27,10 +27,7 @@ def test_health(client: TestClient) -> None:
 
 def test_stats_missing_db(client: TestClient, monkeypatch, tmp_path) -> None:
     missing = tmp_path / "nope.db"
-    monkeypatch.setattr(
-        "mtg_deck_tools.service.stats.DEFAULT_DB_PATH",
-        missing,
-    )
+    monkeypatch.setenv("MTG_DB_PATH", str(missing))
     response = client.get("/api/v1/stats")
     assert response.status_code == 404
 
