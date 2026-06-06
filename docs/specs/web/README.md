@@ -1,6 +1,6 @@
 # Web UI specification (planned)
 
-**Status:** **UX7a–UX7b shipped** (service layer + OpenAPI + `serve`) — **UX7** remains active for UX7c–UX7d.
+**Status:** **UX7a–UX7b shipped** (service layer + OpenAPI + `serve`) — **UX7c** design in progress.
 
 ## Code location
 
@@ -23,13 +23,17 @@ Summary:
 - **Run locally:** `mtg-deck-tools serve` (+ optional bundled static UI).
 - **Host simply:** Single process + persistent volume for `cards.db`.
 
-## Spec index (fill as UX7 progresses)
+## Spec index
 
-| Doc | Status |
+| Doc | Role |
 | --- | --- |
-| [architecture.md](architecture.md) | **Draft** — stack and layering |
-| [openapi.yaml](openapi.yaml) | **UX7a** — health, stats, import, generate |
-| `routes.md` | Not started — wizard screens, dashboard, editor |
+| [architecture.md](architecture.md) | Stack, layering, product modes, DB gate, phased delivery |
+| [routes.md](routes.md) | **Client routes only** |
+| [screens.md](screens.md) | Screen behavior per route; **API consumed per screen** |
+| [navigation.md](navigation.md) | Next/Back, review, home flows |
+| [wizard-api.md](wizard-api.md) | Planned wizard HTTP endpoints; screen → API index |
+| [design.md](design.md) | Visual design tokens |
+| [openapi.yaml](openapi.yaml) | **Shipped** — health, stats, import, generate |
 | [deployment.md](deployment.md) | **UX7b** — env vars, self-host, PaaS notes |
 
 ## Shared contracts
@@ -37,7 +41,8 @@ Summary:
 Reuse existing product specs — do not fork schemas in the frontend:
 
 - [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json`, metrics, lock/swap fields (UX11)
-- [user-experience.md](../dependency-engine/user-experience.md) — wizard flow, dependency UX, UX7–UX11 roadmap
+- [user-experience.md](../dependency-engine/user-experience.md) — wizard flow, UX7c scope, UX roadmap
+- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — delivery sequence, UX7e–UX7g
 
 ## Locked v1 decisions
 
@@ -58,5 +63,4 @@ Reuse existing product specs — do not fork schemas in the frontend:
 ## References
 
 - [active.md](../../roadmap/active.md) — UX7 is the primary product thread
-- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — UX10, UX11 after shell
 - [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — unified service option

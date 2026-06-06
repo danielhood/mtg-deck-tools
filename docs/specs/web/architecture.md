@@ -1,7 +1,7 @@
 # Web UI architecture (planned)
 
-**Status:** **UX7a–UX7b implemented** — service + OpenAPI + `mtg-deck-tools serve`; **UX7c** (SPA) next.  
-**Phase:** Implementation in progress (UX7 active).
+**Status:** **UX7a–UX7b implemented** — service + OpenAPI + `mtg-deck-tools serve`; **UX7c** (SPA wizard) in planning — [specs/web/README.md](README.md).  
+**Phase:** UX7 active — UX7c design locked; SPA implementation next.
 
 ## Strategic shift
 
@@ -9,7 +9,7 @@
 | --- | --- |
 | Local **Windows** utility | **Cross-platform** CLI and GUI: Windows, Linux, macOS |
 | Native desktop (WPF / WinUI) as a strong v1 path | **Web UI** as the primary interactive shell |
-| Terminal-first for all rich UX | **CLI remains** for scripting, dogfood, and power users; **web** for dashboards, swap/lock, charts |
+| Terminal-first for all rich UX | **Web** is the primary interactive shell; **CLI** for automation, dogfood, test harness, and bulk ops (TBD) |
 | Desktop-only UX | **Mobile** is a first-class layout target — constrains scope and keeps flows simple |
 
 The CLI is already cross-platform (Python 3.12+). A browser-based UI inherits that reach without maintaining three native clients.
@@ -136,12 +136,55 @@ The **common layer** is `service/`, not HTTP itself. HTTP is the wire format the
 
 ## Web client (packages/web)
 
+### Product modes
+
+The web app is the **primary interactive shell**. The CLI remains for automation, dogfood, test harness, and possible bulk operations (TBD).
+
+| Mode | When | Wizard? | Roadmap |
+| --- | --- | --- | --- |
+| **Build** | New deck from scratch | Yes — once | **UX7c** |
+| **Iterate** | Swap, slot regen, param changes → partial/full rebuild | No | **UX11** + **UX7f** |
+| **View** | Inspect active deck (filters, balance, analysis) | No | **UX7e** → **UX7d** / **UX10** |
+
+Routes: [routes.md](routes.md). Screens: [screens.md](screens.md). Navigation: [navigation.md](navigation.md). Wizard API: [wizard-api.md](wizard-api.md). Visual design: [design.md](design.md).
+
+```mermaid
+flowchart LR
+  HOME[Home]
+  WIZ[Build wizard UX7c]
+  REV[Review]
+  RES[Result]
+  VIEW[Deck view UX7e]
+  LIB[Library UX7f]
+  ITER[Iterate UX11]
+  DASH[Dashboard UX7d]
+
+  HOME -->|Build new deck| WIZ
+  WIZ --> REV --> RES
+  RES --> VIEW
+  LIB --> VIEW
+  VIEW --> ITER
+  VIEW --> DASH
+```
+
+Delivery priority and backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md). UX7c scope: [user-experience.md](../dependency-engine/user-experience.md) § UX7c.
+
 ### UX principles (mobile-first)
 
-- Single-column wizard; minimal steps per screen.
+- Single-column wizard; linear Next/Back (optional back-swipe only).
 - Touch targets for swap / lock (UX11).
 - Progressive disclosure — dependency dashboard as a drill-down, not a wall of controls.
 - Reuse wizard **semantics** from [user-experience.md](../dependency-engine/user-experience.md) (UX2–UX5 shipped in CLI).
+- Visual tokens: [design.md](design.md).
+
+### Database gate (UX7c)
+
+When `cards.db` is missing (`GET /api/v1/stats` → 404 or wizard meta reports not ready):
+
+- **Hard block** — no wizard or deck functionality.
+- **Home** (`/`) still renders with a **banner**; **Build new deck** disabled.
+- Copy directs user to CLI: `mtg-deck-tools import`.
+- **UX7g** (backlog): web-side init / Scryfall refresh when online.
 
 ### Technical choices (proposed — confirm at UX7 implementation)
 
@@ -190,10 +233,13 @@ Comparison retained for context (Vue was the alternative):
 | --- | --- | --- |
 | UX7a | Service extraction + OpenAPI | Engine stable |
 | UX7b | `serve` + health / stats | UX7a |
-| UX7c | Wizard shell (theme → commander) | UX7b |
-| UX7d | Dependency dashboard | UX7c, D5 |
-| UX10b | CMC / composition charts | UX7 shell |
-| UX11 | Deck editor (swap / lock) | UX7 shell, `.deck.json` contract |
+| UX7c | Build wizard (7 steps + review + MD HTML result) | UX7b — [routes.md](routes.md), [screens.md](screens.md) |
+| UX7e | Enhanced deck view (filters, summaries, art) | UX7c |
+| UX7f | Saved deck library | UX7e |
+| UX7d | Dependency dashboard | UX7f, D5 |
+| UX10b | CMC / composition charts | UX7e+ |
+| UX11 | Deck editor (swap / lock / iterate) | UX7e, `.deck.json` contract |
+| UX7g | Web DB init / Scryfall refresh | UX7b — backlog |
 
 ---
 
@@ -249,7 +295,12 @@ Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `p
 
 ## References
 
-- [user-experience.md](../dependency-engine/user-experience.md) — UX7, UX10, UX11
+- [routes.md](routes.md) — client route map
+- [screens.md](screens.md) — screen behavior per route
+- [navigation.md](navigation.md) — wizard and review flows
+- [wizard-api.md](wizard-api.md) — planned wizard HTTP endpoints
+- [design.md](design.md) — visual design tokens
+- [user-experience.md](../dependency-engine/user-experience.md) — UX7c scope, UX roadmap
 - [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — Option B + unified service
 - [technology-stack.md](../../architecture/technology-stack.md) — stack update
 - [deck-output-format.md](../../product/deck-output-format.md) — shared JSON contract

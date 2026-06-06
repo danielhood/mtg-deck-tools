@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-04):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). **UX4 shipped** — wizard step back-navigation (`wizard/navigation.py`, orchestration in `wizard/run.py`). **UX5 shipped** — wizard prepopulate on regen. **UX7a shipped** — `service/` + FastAPI + OpenAPI (CLI unchanged). **UX7b shipped** — `mtg-deck-tools serve`. Next: **UX7c–UX7d** (SPA, dependency dashboard) — [architecture.md](../web/architecture.md), [active.md](../../roadmap/active.md).
+**Status (2026-06-05):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). **UX4 shipped** — wizard step back-navigation (`wizard/navigation.py`, orchestration in `wizard/run.py`). **UX5 shipped** — wizard prepopulate on regen. **UX7a shipped** — `service/` + FastAPI + OpenAPI (CLI unchanged). **UX7b shipped** — `mtg-deck-tools serve`. **UX7c** web build wizard — design locked ([specs/web/](../web/)). Next implementation: UX7c → UX7e deck view → UX7f library → UX7d dashboard — [architecture.md](../web/architecture.md), [active.md](../../roadmap/active.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -354,7 +354,7 @@ Engine requirements for swaps:
 | Swap selected card(s) | **Poor** | **Swap** button — UX11 |
 | Per-card lock on refill | **Poor** | **Lock** flag — UX11; stretch `--keep-locked` on CLI |
 
-**Conclusion:** CLI remains the **right first shell** for D0–D3 (reporting, strict flag, simple presets). Plan a **local web or desktop UI** when swap workflows, dashboards, and side-by-side card previews become requirements — reuse Option B/C from [pipeline-and-components.md](../../architecture/pipeline-and-components.md) without forking the engine.
+**Conclusion:** CLI remains the **right shell** for automation and dogfood. The **web UI** is the primary interactive product for build, view, and iterate workflows — reuse Option B/C from [pipeline-and-components.md](../../architecture/pipeline-and-components.md) without forking the engine.
 
 ### Phased UX roadmap
 
@@ -367,11 +367,53 @@ Engine requirements for swaps:
 | ~~**UX4**~~ | ~~**Wizard step back-navigation** — return to earlier steps to revise selections~~ — **Shipped 2026-06-04** | None (wizard orchestration) |
 | ~~**UX5**~~ | ~~Wizard prepopulate on regen~~ — **Shipped 2026-06-04** | `.deck.json` criteria round-trip |
 | **UX6** | `.deck.json` per-card `dependency_roles` | D2 |
-| **UX7** | Cross-platform web (mobile-first): ~~`service/` + FastAPI~~ **UX7a shipped**; SPA + `serve` (UX7b–UX7c); dependency dashboard (UX7d); path to swap (UX11) | D5 + [architecture.md](../web/architecture.md) |
+| **UX7** | Cross-platform web (mobile-first): ~~`service/` + FastAPI~~ **UX7a shipped**; ~~`serve`~~ **UX7b shipped**; build wizard **UX7c** (design); deck view **UX7e**; library **UX7f**; dashboard **UX7d**; iterate **UX11** | D5 + [specs/web/](../web/) |
 | **UX8** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
 | **UX9** | Web constraint panel + pick preview (interactive build) | D3–D4 + UX7 shell |
 | **UX10** | **Deck composition metrics** — CMC distribution report (+ optional curve advisories); CLI MD/JSON first, charts in UX7 | Build result / `output.py`; no new `card_effects` |
-| **UX11** | **GUI deck editor** — per-card **lock** + **swap** selection; refill/swap respect `DeckCriteria` and validation | `reload.py`, `filler.py`, `.deck.json` schema; UX7 shell |
+| **UX11** | **GUI deck editor** — per-card **lock** + **swap** selection; refill/swap respect `DeckCriteria` and validation | `reload.py`, `filler.py`, `.deck.json` schema; **UX7e** deck view |
+
+### UX7c — Web build wizard (planned)
+
+**Status:** Design locked — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md). Implementation not started.
+
+**Product role:** Web is the primary interactive shell. **Build** mode uses the wizard **once** for a new deck. **Iterate** and **View** modes do not re-run the wizard (see **UX7e**, **UX7f**, **UX11**). Modes and flow: [architecture.md](../web/architecture.md) § Product modes.
+
+### Scope
+
+**In scope (UX7c):**
+
+- Home with **Build new deck** (disabled when DB missing).
+- Linear wizard: CLI steps 1–7 + **review** (preflight) + **generate** + **result**.
+- Server-side wizard helpers ([wizard-api.md](../web/wizard-api.md)); SPA holds `DeckCriteria` draft only.
+- Result: HTML render of generated `output.md` (no card art grid in UX7c).
+- Random **seed** at generate; stored in `.deck.json` when **UX7f** lands. User-visible seed deferred.
+
+**Out of scope (UX7c):** partner commander picker; custom slot editor; JSON download; enhanced deck view; saved decks; iterate; dependency dashboard; charts; dark mode; web DB import (**UX7g**).
+
+**Slices:**
+
+| Slice | Deliverable |
+| --- | --- |
+| **UX7c-a** | App shell, DB gate, home, wizard API, steps 1–7 (Next/Back; optional back-swipe) |
+| **UX7c-b** | Review screen (inline preflight warnings), generate, MD→HTML result |
+| **UX7c-c** | Loading/error polish, 375px layout pass |
+
+Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
+
+### UX7c decisions
+
+| Topic | Decision |
+| --- | --- |
+| Steps | CLI parity: 7 wizard steps + **review** + **generate** + **result** |
+| Navigation | [navigation.md](../web/navigation.md) — linear Next/Back; optional back-swipe |
+| Preflight | Inline warnings on review; Generate allowed with warnings |
+| Step 1 slots | Defaults only |
+| Step 3 focus | Horizontal chips per activated profile |
+| Step 6 commander | Search-as-you-type; `includes` / `exact` toggle; **no** partners |
+| Result | HTML render of output Markdown |
+| DB missing | Hard block; home banner; CLI `import` until **UX7g** |
+| Visual design | [design.md](../web/design.md) |
 
 ### UX11 — GUI deck editor: swap and lock (parked)
 
