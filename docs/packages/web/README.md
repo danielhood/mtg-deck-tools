@@ -1,6 +1,6 @@
 # Web UI package (planned)
 
-**Status:** **UX7a–UX7b shipped** (backend + `mtg-deck-tools serve`) — SPA (**UX7c**) not started.
+**Status:** **UX7a–UX7b shipped** (backend + `mtg-deck-tools serve`) — SPA (**UX7c**) design: [specs/web/README.md](../../specs/web/README.md).
 
 ## Stack (locked)
 
@@ -37,7 +37,7 @@ src/mtg_deck_tools/
 - **CLI coexistence:** Terminal wizard remains; web is the rich shell for dashboards, charts, swap/lock.
 - **Local-first:** Default launch is `mtg-deck-tools serve` on localhost; simple self-hosting supported.
 
-Architecture: [specs/web/architecture.md](../../specs/web/architecture.md).
+Architecture: [specs/web/architecture.md](../../specs/web/architecture.md). Routes: [routes.md](../../specs/web/routes.md).
 
 ## When implementation begins
 
