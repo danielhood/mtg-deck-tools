@@ -10,6 +10,8 @@ CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md)
 
 ## Home (`/`)
 
+**Wireframe:** [home.html](wireframes/home.html) (DB ready) · [home-db-missing.html](wireframes/home-db-missing.html) (DB gate)
+
 | Element | Behavior |
 | --- | --- |
 | DB banner | Visible when DB missing; explains CLI `mtg-deck-tools import` |
@@ -22,12 +24,15 @@ CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md)
 
 ## Step 1 — Themes & slot template (`/build/1`)
 
+**Wireframe:** [build-step-01-themes.html](wireframes/build-step-01-themes.html)
+
 CLI: [step1.py](../../../src/mtg_deck_tools/wizard/step1.py).
 
 | Control | UX7c |
 | --- | --- |
 | Theme multi-select | Chip or checkbox list |
 | Slot template | **Defaults only** — custom editor deferred |
+| Commander slot row | Read-only count **1**; shows full **100**-card deck total. **Future:** possible entry point for single vs partner commander (selection still on step 6 today; partners **out of scope** UX7c) |
 
 **API:** `GET /api/v1/wizard/themes`, `GET /api/v1/wizard/slot-template/defaults`.
 
@@ -35,10 +40,17 @@ CLI: [step1.py](../../../src/mtg_deck_tools/wizard/step1.py).
 
 ## Step 2 — Include / avoid mechanics (`/build/2`)
 
+**Wireframe:** [build-step-02-mechanics.html](wireframes/build-step-02-mechanics.html)
+
+CLI: [step2.py](../../../src/mtg_deck_tools/wizard/step2.py).
+
 | Control | UX7c |
 | --- | --- |
-| Include mechanics | Multi-select |
-| Avoid mechanics | Multi-select |
+| Mechanic triage | **3-column list** — **keyword · avoid · include**; left-aligned keyword column; tap zones on the **right** (avoid immediately left of include; include at screen edge for right-hand thumb reach) |
+| Include / avoid | Mutually exclusive per mechanic; tap active side again to clear |
+| Row highlight | Full-row tint when avoided (orange) or included (blue) |
+| Zone affordance | Ghost **×** (avoid) and **+** (include) in inactive zones when column headers scroll away — headers not sticky |
+| Overlap guard | Built into tri-state (cannot be both); no separate error state needed |
 
 **API:** `GET /api/v1/wizard/mechanics`.
 
@@ -46,13 +58,18 @@ CLI: [step1.py](../../../src/mtg_deck_tools/wizard/step1.py).
 
 ## Step 3 — Synergy & dependencies (`/build/3`)
 
+**Wireframe:** [build-step-03-synergy.html](wireframes/build-step-03-synergy.html)
+
 CLI: [step3_synergy.py](../../../src/mtg_deck_tools/wizard/step3_synergy.py).
 
 | Control | UX7c |
 | --- | --- |
 | `strict_dependencies` | Toggle |
 | `repair_dependencies` | Toggle |
-| `mechanic_focus` per activated profile | **Horizontal chips** (default / incidental / supported / focused / engine) |
+| `mechanic_focus` per activated profile | **Stepper list** — profile name + current level on the left; **−** / **+** on the right (same layout ergonomics as step 2); levels: Default → Incidental → Supported → Focused → Engine |
+| Focus level help | Definition list in shaded info panel at top of Mechanic focus section |
+| Profile stepper | Outside info panel — activated-context + − / + rows on white surface |
+| Focus magnitude | **Dot meter** in profile cell (right-aligned): 1 filled dot = Default … 5 = Engine; updates with stepper |
 
 Activated profiles depend on themes + include mechanics — server computes list.
 
@@ -62,9 +79,18 @@ Activated profiles depend on themes + include mechanics — server computes list
 
 ## Step 4 — Colors (`/build/4`)
 
+**Wireframe:** [build-step-04-colors.html](wireframes/build-step-04-colors.html)
+
+CLI: [step3.py](../../../src/mtg_deck_tools/wizard/step3.py) (wizard step 4 of 7).
+
 | Control | UX7c |
 | --- | --- |
-| Color identity | W/U/B/R/G multi-select (CLI parity) |
+| Color identity | W/U/B/R/G multi-select — fixed **52px slot** per pip; unselected inner ring ~34px; selected fills slot (same outer radius for all colours); gold fill for White when selected; **no outer box-shadow ring** |
+| Colorless (void) | **Separate control** below pips — colorless-only commanders; **mutually exclusive** with colored picks (no legendary combines empty identity with W/U/B/R/G) |
+| Any | No colored pips and Colorless off — no color filter (distinct from Colorless only — **engine TBD**) |
+| Selection summary | Read-only recap below controls |
+
+**Design note (engine):** Explicit Colorless at step 4 requires `DeckCriteria` / commander search to distinguish **Colorless only** (`color_identity: []`) from **Any** (no filter). Today `colors: []` behaves as colorless-only under `exact` match and unfiltered under `includes` ([`commanders.search_commanders`](../../../src/mtg_deck_tools/wizard/commanders.py), [`test_wizard_commanders.py`](../../../tests/test_wizard_commanders.py)) — resolve before UX7c implementation (e.g. `colorless_only` flag or color-filter enum).
 
 **API:** None required (static UI); validation via preflight on review.
 
@@ -93,7 +119,7 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 | --- | --- |
 | Search | Search-as-you-type |
 | Color match | Toggle: **`includes`** (default) vs **`exact`** |
-| Partner commanders | **Out of scope** |
+| Partner commanders | **Out of scope** UX7c. Step 1 commander slot row is a **future** hook for single vs partner mode; step 6 remains the commander pick surface until then |
 
 **API:** `GET /api/v1/wizard/commanders/search?q=&colors=&color_match=includes|exact&…` — budget filters from criteria query params.
 

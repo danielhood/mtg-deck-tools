@@ -409,7 +409,7 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | Navigation | [navigation.md](../web/navigation.md) — linear Next/Back; optional back-swipe |
 | Preflight | Inline warnings on review; Generate allowed with warnings |
 | Step 1 slots | Defaults only |
-| Step 3 focus | Horizontal chips per activated profile |
+| Step 3 focus | Stepper per activated profile (− / + through Default → Engine); level definitions at top of section |
 | Step 6 commander | Search-as-you-type; `includes` / `exact` toggle; **no** partners |
 | Result | HTML render of output Markdown |
 | DB missing | Hard block; home banner; CLI `import` until **UX7g** |

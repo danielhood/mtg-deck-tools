@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Step 1 · Themes &amp; slot template</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --disabled-bg: #f1f5f9;
+      --disabled-text: #94a3b8;
+      --frame-width: 375px;
+      --touch-min: 44px;
+      --footer-height: 72px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--blue-900);
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .step-pill {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--blue-100);
+      color: var(--blue-700);
+    }
+
+    .wizard-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(var(--footer-height) + 16px);
+    }
+
+    .wizard-intro {
+      margin-bottom: 20px;
+    }
+
+    .wizard-intro h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .wizard-intro p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .progress-segment {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+    }
+
+    .progress-segment.is-active {
+      background: var(--blue-700);
+    }
+
+    .progress-segment.is-complete {
+      background: var(--blue-500);
+    }
+
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      margin-bottom: 10px;
+    }
+
+    .section-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .section-header p {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.12s, background 0.12s, color 0.12s;
+    }
+
+    .chip input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .chip:has(input:checked) {
+      border-color: var(--blue-700);
+      background: var(--blue-100);
+      color: var(--blue-900);
+    }
+
+    .chip:has(input:checked)::after {
+      content: "✓";
+      margin-left: 6px;
+      font-size: 11px;
+      color: var(--blue-700);
+    }
+
+    .chip-desc {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .chip-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip-wide {
+      width: 100%;
+      border-radius: 10px;
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: auto;
+      padding: 10px 12px;
+    }
+
+    .chip-wide:has(input:checked)::after {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      margin-left: 0;
+    }
+
+    .chip-wide .chip-label {
+      font-weight: 600;
+    }
+
+    .selection-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .slot-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .slot-panel-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .slot-panel-header h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue-900);
+      margin-bottom: 4px;
+    }
+
+    .slot-panel-header p {
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--text-muted);
+    }
+
+    .slot-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0;
+    }
+
+    .slot-row {
+      display: contents;
+    }
+
+    .slot-row > span {
+      padding: 9px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .slot-row:last-child > span {
+      border-bottom: none;
+    }
+
+    .slot-name {
+      color: var(--text);
+    }
+
+    .slot-count {
+      font-weight: 700;
+      color: var(--blue-900);
+      text-align: right;
+      min-width: 2.5rem;
+    }
+
+    .slot-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--blue-100);
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue-900);
+    }
+
+    .slot-deferred {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      line-height: 1.4;
+      padding: 0 2px;
+    }
+
+    .slot-row-note {
+      grid-column: 1 / -1;
+      padding: 0 14px 10px;
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--text-muted);
+      font-style: italic;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wizard-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .btn-back {
+      background: var(--bg);
+      color: var(--blue-700);
+      border: 1.5px solid var(--blue-700);
+    }
+
+    .btn-next {
+      background: var(--blue-700);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .wireframe-note {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .wireframe-note a {
+      color: var(--blue-700);
+    }
+  </style>
+</head>
+<body>
+  <p class="preview-label">Wireframe · 375px · /build/1</p>
+
+  <div class="frame" role="document" aria-label="Wizard step 1 wireframe">
+    <header class="app-header">
+      <div class="app-brand">
+        <div class="app-mark" aria-hidden="true"></div>
+        <div>
+          <div class="app-title">MTG Deck Tools</div>
+          <div class="app-subtitle">Build wizard</div>
+        </div>
+      </div>
+      <span class="step-pill">Step 1 of 7</span>
+    </header>
+
+    <div class="wizard-scroll">
+      <div class="progress-bar" aria-hidden="true">
+        <div class="progress-segment is-active"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+      </div>
+
+      <section class="wizard-intro">
+        <h1>Themes &amp; slot template</h1>
+        <p>
+          Pick archetype tags for synergy cards and confirm deck slot counts.
+          Themes are optional.
+        </p>
+      </section>
+
+      <section class="section" aria-labelledby="themes-heading">
+        <div class="section-header">
+          <h2 id="themes-heading">Deck themes</h2>
+          <p>Archetype tags that steer synergy slot picks. Select none or more.</p>
+        </div>
+
+        <div class="chip-stack">
+          <div class="chip-row">
+            <label class="chip">
+              <input type="checkbox" name="theme" value="tokens" checked>
+              Tokens
+            </label>
+            <label class="chip">
+              <input type="checkbox" name="theme" value="aristocrats">
+              Aristocrats
+            </label>
+            <label class="chip">
+              <input type="checkbox" name="theme" value="landfall" checked>
+              Landfall
+            </label>
+          </div>
+          <div class="chip-row">
+            <label class="chip">
+              <input type="checkbox" name="theme" value="recursion">
+              Recursion
+            </label>
+            <label class="chip">
+              <input type="checkbox" name="theme" value="voltron">
+              Voltron
+            </label>
+            <label class="chip">
+              <input type="checkbox" name="theme" value="enchantress">
+              Enchantress
+            </label>
+          </div>
+        </div>
+
+        <p class="selection-hint">
+          Placeholder labels from wizard taxonomy — real copy comes from
+          <code>GET /api/v1/wizard/themes</code>.
+        </p>
+      </section>
+
+      <section class="section" aria-labelledby="slots-heading">
+        <div class="section-header">
+          <h2 id="slots-heading">Slot template</h2>
+          <p>How many cards per deck role.</p>
+        </div>
+
+        <div class="slot-panel">
+          <div class="slot-panel-header">
+            <h3>Default Commander template</h3>
+            <p>UX7c uses defaults only — custom slot editor deferred.</p>
+          </div>
+          <div class="slot-grid" role="table" aria-label="Default slot counts">
+            <div class="slot-row" role="row">
+              <span class="slot-name" role="cell">Commander</span>
+              <span class="slot-count" role="cell">1</span>
+            </div>
+            <p class="slot-row-note">
+              Future: this row could be the entry point for single vs partner
+              commander (UX7c: read-only, fixed at 1).
+            </p>
+            <div class="slot-row" role="row">
+              <span class="slot-name" role="cell">Ramp</span>
+              <span class="slot-count" role="cell">10</span>
+            </div>
+            <div class="slot-row" role="row">
+              <span class="slot-name" role="cell">Card draw</span>
+              <span class="slot-count" role="cell">8</span>
+            </div>
+            <div class="slot-row" role="row">
+              <span class="slot-name" role="cell">Removal</span>
+              <span class="slot-count" role="cell">8</span>
+            </div>
+            <div class="slot-row" role="row">
+              <span class="slot-name" role="cell">Board wipes</span>
+              <span class="slot-count" role="cell">2</span>
+            </div>
+            <div class="slot-row" role="row">
+              <span class="slot-name" role="cell">Synergy / theme</span>
+              <span class="slot-count" role="cell">30</span>
+            </div>
+            <div class="slot-row" role="row">
+              <span class="slot-name" role="cell">Win conditions</span>
+              <span class="slot-count" role="cell">4</span>
+            </div>
+            <div class="slot-row" role="row">
+              <span class="slot-name" role="cell">Flex / flavor</span>
+              <span class="slot-count" role="cell">6</span>
+            </div>
+            <div class="slot-row" role="row">
+              <span class="slot-name" role="cell">Lands</span>
+              <span class="slot-count" role="cell">31</span>
+            </div>
+          </div>
+          <div class="slot-total">
+            <span>Total</span>
+            <span>100 / 100</span>
+          </div>
+        </div>
+
+        <p class="slot-deferred">
+          Values from <code>config/slot-templates.yaml</code> via
+          <code>GET /api/v1/wizard/slot-template/defaults</code>.
+        </p>
+      </section>
+    </div>
+
+    <footer class="wizard-footer" aria-label="Wizard navigation">
+      <a class="btn btn-back" href="home.html">Back</a>
+      <a class="btn btn-next" href="build-step-02-mechanics.html">Next</a>
+    </footer>
+  </div>
+
+  <p class="wireframe-note">
+    Route: <strong>/build/1</strong> — theme chips (toggle to preview) + read-only defaults.
+    Back → <a href="home.html">home</a>.
+    Spec: <code>screens.md</code> § Step 1.
+  </p>
+</body>
+</html>
