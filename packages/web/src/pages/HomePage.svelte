@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { WizardMeta } from "../lib/api";
   import DbBanner from "../components/DbBanner.svelte";
+  import { resetDraft } from "../lib/criteria";
   import { navigate } from "../lib/router";
 
   interface Props {
@@ -10,7 +11,9 @@
   let { meta }: Props = $props();
 
   function startBuild(): void {
-    if (meta.db_ready) navigate("/build/1");
+    if (!meta.db_ready) return;
+    resetDraft();
+    navigate("/build/1");
   }
 </script>
 

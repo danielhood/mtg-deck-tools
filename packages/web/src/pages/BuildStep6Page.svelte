@@ -1,8 +1,15 @@
 <script lang="ts">
+  import CardLightbox from "../components/CardLightbox.svelte";
   import WizardChrome from "../components/WizardChrome.svelte";
   import WizardIntro from "../components/WizardIntro.svelte";
   import SectionHeader from "../components/SectionHeader.svelte";
   import { searchCommanders, type CommanderResult, type WizardMeta } from "../lib/api";
+  import {
+    mergeCommanderSearchResults,
+    restoreCommanderQuery,
+    restoreCommanderSelection,
+    resultToSnapshot,
+  } from "../lib/commander-step";
   import {
     commanderSearchColors,
     loadDraft,
@@ -19,10 +26,18 @@
   let { meta }: Props = $props();
 
   let draft = $state<WizardDraft>(loadDraft());
-  let query = $state("");
+  let query = $state(restoreCommanderQuery(draft));
   let results = $state<CommanderResult[]>([]);
-  let selected = $state<CommanderResult | null>(null);
+  let selected = $state<CommanderResult | null>(restoreCommanderSelection(draft));
   let showArt = $state(false);
+  let resultsEl = $state<HTMLDivElement | null>(null);
+
+  $effect(() => {
+    const q = query;
+    if (draft.commander_search_query !== q) {
+      draft = { ...draft, commander_search_query: q };
+    }
+  });
 
   $effect(() => {
     saveDraft(draft);
@@ -45,13 +60,17 @@
     }
     if (criteria.strict_budget) params.set("strict_budget", "true");
 
+    const oracleId = draft.commander_oracle_ids[0];
+    const fallback = selected ?? restoreCommanderSelection(draft);
+
     const timer = setTimeout(() => {
       searchCommanders(params)
         .then((rows) => {
-          results = rows;
-          if (draft.commander_oracle_ids[0]) {
-            selected =
-              rows.find((row) => row.oracle_id === draft.commander_oracle_ids[0]) ?? selected;
+          const merged = mergeCommanderSearchResults(rows, oracleId, fallback);
+          results = merged.results;
+          if (merged.selected) {
+            selected = merged.selected;
+            draft = { ...draft, commander_snapshot: resultToSnapshot(merged.selected) };
           }
         })
         .catch(() => {
@@ -61,12 +80,24 @@
     return () => clearTimeout(timer);
   });
 
+  $effect(() => {
+    const oracleId = draft.commander_oracle_ids[0];
+    if (!oracleId || !results.length || !resultsEl) return;
+
+    queueMicrotask(() => {
+      resultsEl
+        ?.querySelector(`[data-commander-id="${oracleId}"]`)
+        ?.scrollIntoView({ block: "nearest" });
+    });
+  });
+
   function pickCommander(row: CommanderResult): void {
     selected = row;
     draft = {
       ...draft,
       commander_oracle_ids: [row.oracle_id],
       commander_label: row.name,
+      commander_snapshot: resultToSnapshot(row),
     };
   }
 
@@ -163,12 +194,13 @@
       </div>
     </div>
 
-    <div class="commander-results" role="listbox" aria-label="Commander results">
+    <div class="commander-results" role="listbox" aria-label="Commander results" bind:this={resultsEl}>
       {#each results as row (row.oracle_id)}
         <button
           type="button"
           class="commander-row"
           class:is-selected={draft.commander_oracle_ids[0] === row.oracle_id}
+          data-commander-id={row.oracle_id}
           onclick={() => pickCommander(row)}
         >
           <strong>{row.name}</strong>
@@ -189,16 +221,13 @@
   </section>
 </WizardChrome>
 
-{#if showArt && selected?.image_uri}
-  <div class="lightbox" role="dialog" aria-modal="true">
-    <button type="button" class="lightbox-backdrop" aria-label="Close" onclick={() => (showArt = false)}></button>
-    <div class="lightbox-panel">
-      <button type="button" class="lightbox-close" onclick={() => (showArt = false)}>×</button>
-      <img src={selected.image_uri} alt={selected.name} />
-      <p class="lightbox-title">{selected.name}</p>
-    </div>
-  </div>
-{/if}
+<CardLightbox
+  open={showArt && selected != null}
+  name={selected?.name ?? ""}
+  imageUri={selected?.image_uri ?? null}
+  subtitle={selected?.type_line ?? null}
+  onclose={() => (showArt = false)}
+/>
 
 <style>
   .art-preview {
@@ -215,56 +244,5 @@
     border-radius: 10px;
     display: block;
     margin: 0 auto;
-  }
-
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 16px;
-  }
-
-  .lightbox-backdrop {
-    position: absolute;
-    inset: 0;
-    border: none;
-    background: rgba(15, 23, 42, 0.72);
-    cursor: pointer;
-  }
-
-  .lightbox-panel {
-    position: relative;
-    z-index: 1;
-    width: min(100%, 300px);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .lightbox-close {
-    align-self: flex-end;
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 999px;
-    background: var(--bg);
-    font-size: 22px;
-    cursor: pointer;
-  }
-
-  .lightbox-panel img {
-    width: 100%;
-    border-radius: 12px;
-  }
-
-  .lightbox-title {
-    text-align: center;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
   }
 </style>
