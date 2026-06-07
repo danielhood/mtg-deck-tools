@@ -106,6 +106,7 @@
         markdown: response.markdown,
         json_path: response.json_path,
         md_path: response.md_path,
+        deck: response.deck,
       });
       navigate("/build/result");
     } catch (err) {

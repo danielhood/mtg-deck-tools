@@ -4,6 +4,7 @@ export interface GenerateResultState {
   markdown: string;
   json_path: string;
   md_path: string;
+  deck: Record<string, unknown> | null;
 }
 
 export function saveResult(result: GenerateResultState): void {
@@ -20,6 +21,7 @@ export function loadResult(): GenerateResultState | null {
       markdown: parsed.markdown,
       json_path: parsed.json_path ?? "",
       md_path: parsed.md_path ?? "",
+      deck: parsed.deck ?? null,
     };
   } catch {
     return null;

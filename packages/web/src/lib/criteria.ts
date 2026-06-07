@@ -1,6 +1,19 @@
 export type ColorFilter = "any" | "colorless" | "selected";
 export type ColorMatchMode = "includes" | "exact";
 
+export interface CommanderSnapshot {
+  oracle_id: string;
+  name: string;
+  type_line: string;
+  color_identity: string[];
+  partner_kind: string | null;
+  edhrec_rank: number | null;
+  price_usd: number | null;
+  price_known: boolean;
+  released_at: string | null;
+  image_uri: string | null;
+}
+
 export interface WizardDraft {
   themes: string[];
   include_mechanics: string[];
@@ -10,6 +23,8 @@ export interface WizardDraft {
   colorMatch: ColorMatchMode;
   commander_oracle_ids: string[];
   commander_label: string | null;
+  commander_search_query: string;
+  commander_snapshot: CommanderSnapshot | null;
   budget_usd: number | null;
   card_price_min_usd: number | null;
   card_price_max_usd: number | null;
@@ -37,6 +52,8 @@ export function emptyDraft(): WizardDraft {
     colorMatch: "includes",
     commander_oracle_ids: [],
     commander_label: null,
+    commander_search_query: "",
+    commander_snapshot: null,
     budget_usd: null,
     card_price_min_usd: null,
     card_price_max_usd: null,
@@ -69,6 +86,11 @@ export function saveDraft(draft: WizardDraft): void {
 
 export function clearDraft(): void {
   sessionStorage.removeItem(STORAGE_KEY);
+}
+
+/** Clear wizard draft — use when starting a new build from home, not when stepping back. */
+export function resetDraft(): void {
+  clearDraft();
 }
 
 export function toDeckCriteria(draft: WizardDraft): Record<string, unknown> {
