@@ -163,14 +163,6 @@
     .triage-legend .col-avoid { color: var(--warn-700); }
     .triage-legend .col-include { color: var(--blue-700); }
 
-    .triage-hint {
-      font-size: 11px;
-      line-height: 1.4;
-      color: var(--text-muted);
-      text-align: center;
-      padding: 0 4px 10px;
-    }
-
     .triage-list {
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -482,10 +474,7 @@
       <section class="wizard-intro">
         <h1>Include / avoid mechanics</h1>
         <p>
-          Tap <strong>×</strong> to avoid or <strong>+</strong> to include. Tap
-          zones sit on the right — include at the screen edge for right-hand
-          thumb reach; avoid is immediately to its left. Leave both open for
-          neutral.
+          Choose which mechanics the build engine should include or avoid.
         </p>
       </section>
 
@@ -494,9 +483,6 @@
         <span class="col-avoid">Avoid</span>
         <span class="col-include">Include</span>
       </div>
-      <p class="triage-hint">
-        Headers scroll away — ghost × / + icons stay in each row.
-      </p>
 
       <div class="triage-list" role="list" aria-label="Keyword mechanics triage">
         <div class="triage-row is-avoid" role="listitem">

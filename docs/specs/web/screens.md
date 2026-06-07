@@ -65,7 +65,7 @@ CLI: [step3_synergy.py](../../../src/mtg_deck_tools/wizard/step3_synergy.py).
 | Control | UX7c |
 | --- | --- |
 | `strict_dependencies` | Toggle — short label (“Block picks with no valid targets.”) |
-| `repair_dependencies` | Toggle — short label (“Fix gaps after build”) |
+| `repair_dependencies` | Toggle — short label (“Fix gaps after build.”) |
 | `mechanic_focus` per activated profile | **Stepper list** — profile label (e.g. Tokens, Landfall) + **dot meter** + level name on the left; **−** / **+** on the right (same layout ergonomics as step 2); levels: Default → Incidental → Supported → Focused → Engine |
 | Focus level help | **Collapsed** “What do focus levels mean?” — expands to definition list; default closed |
 | Focus magnitude | **Dot meter** (right of profile name): 1 filled = Default … 5 = Engine; level name below (no descriptive suffix) |
