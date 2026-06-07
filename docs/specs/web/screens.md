@@ -58,18 +58,19 @@ CLI: [step2.py](../../../src/mtg_deck_tools/wizard/step2.py).
 
 ## Step 3 — Synergy & dependencies (`/build/3`)
 
-**Wireframe:** [build-step-03-synergy.html](wireframes/build-step-03-synergy.html)
+**Wireframe:** [build-step-03-synergy.html](wireframes/build-step-03-synergy.html) (profiles active) · [build-step-03-synergy-empty.html](wireframes/build-step-03-synergy-empty.html) (no profiles)
 
 CLI: [step3_synergy.py](../../../src/mtg_deck_tools/wizard/step3_synergy.py).
 
 | Control | UX7c |
 | --- | --- |
-| `strict_dependencies` | Toggle |
-| `repair_dependencies` | Toggle |
-| `mechanic_focus` per activated profile | **Stepper list** — profile name + current level on the left; **−** / **+** on the right (same layout ergonomics as step 2); levels: Default → Incidental → Supported → Focused → Engine |
-| Focus level help | Definition list in shaded info panel at top of Mechanic focus section |
-| Profile stepper | Outside info panel — activated-context + − / + rows on white surface |
-| Focus magnitude | **Dot meter** in profile cell (right-aligned): 1 filled dot = Default … 5 = Engine; updates with stepper |
+| `strict_dependencies` | Toggle — icon + short label (“Block orphan picks”) |
+| `repair_dependencies` | Toggle — icon + short label (“Fix gaps after build”) |
+| Activated profiles | Read-only **chip strip** above focus controls (from server) |
+| `mechanic_focus` per activated profile | **Stepper list** — profile name + **segment bar** + contextual hint on the left; **−** / **+** on the right (same layout ergonomics as step 2); levels: Default → Incidental → Supported → Focused → Engine |
+| Focus level help | **Collapsed** “What do focus levels mean?” — expands to definition list; default closed |
+| Focus magnitude | **5-segment bar** under profile name: 1 filled = Default … 5 = Engine; updates with stepper |
+| No activated profiles | Hide stepper + glossary; show dashed empty panel with links to steps 1–2 |
 
 Activated profiles depend on themes + include mechanics — server computes list.
 
