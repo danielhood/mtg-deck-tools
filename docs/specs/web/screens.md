@@ -118,12 +118,16 @@ CLI: [step4.py](../../../src/mtg_deck_tools/wizard/step4.py).
 
 ## Step 6 — Commander (`/build/6`)
 
+**Wireframe:** [build-step-06-commander.html](wireframes/build-step-06-commander.html) · [build-step-06-commander-empty.html](wireframes/build-step-06-commander-empty.html) (no results)
+
 CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 
 | Control | UX7c |
 | --- | --- |
 | Search | Search-as-you-type |
 | Color match | Toggle: **`includes`** (default) vs **`exact`** |
+| Commander art | Scryfall `image_uri` for the selected result, shown below the search list; tap opens full-size pop-out — close control above the card (clear of mana-cost region); dismiss via close, backdrop, or Escape |
+| Selection | Required — highlighted result row is the pick indicator (no separate summary panel) |
 | Partner commanders | **Out of scope** UX7c. Step 1 commander slot row is a **future** hook for single vs partner mode; step 6 remains the commander pick surface until then |
 
 **API:** `GET /api/v1/wizard/commanders/search?q=&colors=&color_match=includes|exact&…` — budget filters from criteria query params.
@@ -131,6 +135,8 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 ---
 
 ## Step 7 — Card rarity (`/build/7`)
+
+**Wireframe:** [build-step-07-rarity.html](wireframes/build-step-07-rarity.html)
 
 | Control | UX7c |
 | --- | --- |
@@ -141,6 +147,8 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 ---
 
 ## Review (`/build/review`)
+
+**Wireframe:** [build-review.html](wireframes/build-review.html) · [build-review-clean.html](wireframes/build-review-clean.html) (no warnings)
 
 | Element | Behavior |
 | --- | --- |
@@ -154,6 +162,8 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 ---
 
 ## Result (`/build/result`)
+
+**Wireframe:** [build-result.html](wireframes/build-result.html)
 
 | Element | UX7c |
 | --- | --- |

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Review &amp; preflight</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --warn-900: #9a3412;
+      --warn-700: #c2410c;
+      --warn-100: #ffedd5;
+      --warn-border: #fdba74;
+      --frame-width: 375px;
+      --touch-min: 44px;
+      --footer-height: 72px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--blue-900);
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .review-pill {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f3e8ff;
+      color: var(--magenta);
+    }
+
+    .wizard-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(var(--footer-height) + 16px);
+    }
+
+    .wizard-intro {
+      margin-bottom: 18px;
+    }
+
+    .wizard-intro h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .wizard-intro p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section-header {
+      margin-bottom: 10px;
+    }
+
+    .section-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .section-header p {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .warnings-panel {
+      border: 1px solid var(--warn-border);
+      border-radius: 10px;
+      background: var(--warn-100);
+      overflow: hidden;
+    }
+
+    .warnings-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--warn-border);
+      background: rgba(255, 237, 213, 0.65);
+    }
+
+    .warnings-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--warn-700);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .warnings-panel-header strong {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--warn-900);
+    }
+
+    .warnings-list {
+      list-style: none;
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .warnings-list li {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--warn-900);
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .warnings-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--warn-700);
+      font-weight: 700;
+    }
+
+    .warnings-footnote {
+      padding: 0 12px 12px;
+      font-size: 11px;
+      line-height: 1.45;
+      color: var(--warn-700);
+    }
+
+    .summary-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .summary-row {
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .summary-label {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .summary-value {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .summary-value.is-muted {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .summary-value-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .summary-details {
+      border-top: 1px solid var(--border);
+    }
+
+    .summary-details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue-700);
+      background: var(--surface);
+    }
+
+    .summary-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .summary-details summary::after {
+      content: " ▸";
+      color: var(--text-muted);
+    }
+
+    .summary-details[open] summary::after {
+      content: " ▾";
+    }
+
+    .slot-mini-grid {
+      padding: 4px 12px 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 4px 12px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .slot-mini-grid span:nth-child(odd) {
+      color: var(--text-muted);
+    }
+
+    .slot-mini-grid span:nth-child(even) {
+      font-weight: 600;
+      text-align: right;
+      color: var(--text);
+    }
+
+    .dev-note {
+      margin-top: 4px;
+      padding: 10px 12px 10px 10px;
+      border: 1px dashed #d8b4fe;
+      border-left: 3px solid var(--magenta);
+      border-radius: 8px;
+      background: #fdf4ff;
+    }
+
+    .dev-note-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .dev-note-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--magenta);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+      font-family: ui-monospace, "Cascadia Code", monospace;
+      letter-spacing: -0.04em;
+    }
+
+    .dev-note-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--magenta);
+    }
+
+    .dev-note-body {
+      font-size: 11px;
+      line-height: 1.45;
+      color: #6b21a8;
+    }
+
+    .dev-note-body p + p {
+      margin-top: 6px;
+    }
+
+    .dev-note-body code {
+      font-size: 10px;
+      background: rgba(192, 38, 211, 0.1);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .wizard-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .btn-back {
+      background: var(--bg);
+      color: var(--blue-700);
+      border: 1.5px solid var(--blue-700);
+    }
+
+    .btn-generate {
+      background: var(--blue-700);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .wireframe-meta {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      padding: 10px 12px;
+      border: 1px dashed #cbd5e1;
+      border-left: 3px solid #64748b;
+      border-radius: 8px;
+      background: #f1f5f9;
+      text-align: left;
+    }
+
+    .wireframe-meta-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .wireframe-meta-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: #64748b;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .wireframe-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .wireframe-meta-body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .wireframe-meta-body a { color: var(--blue-700); }
+  </style>
+</head>
+<body>
+  <p class="preview-label">Wireframe · 375px · /build/review</p>
+
+  <div class="frame" role="document" aria-label="Build review wireframe">
+    <header class="app-header">
+      <div class="app-brand">
+        <div class="app-mark" aria-hidden="true"></div>
+        <div>
+          <div class="app-title">MTG Deck Tools</div>
+          <div class="app-subtitle">Build wizard</div>
+        </div>
+      </div>
+      <span class="review-pill">Review</span>
+    </header>
+
+    <div class="wizard-scroll">
+      <section class="wizard-intro">
+        <h1>Review &amp; generate</h1>
+        <p>Check preflight warnings, then generate your deck.</p>
+      </section>
+
+      <section class="section" aria-labelledby="warnings-heading">
+        <div class="section-header">
+          <h2 id="warnings-heading">Preflight warnings</h2>
+        </div>
+
+        <div class="warnings-panel" role="region" aria-label="Preflight warnings">
+          <div class="warnings-panel-header">
+            <span class="warnings-icon" aria-hidden="true">!</span>
+            <strong>2 warnings</strong>
+          </div>
+          <ul class="warnings-list">
+            <li>
+              You selected tokens and aristocrats both need large synergy packages;
+              the deck may struggle to fit both packages.
+            </li>
+            <li>
+              3 profiles at focused or engine (Tokens, Landfall, Energy) — the deck
+              may not have room for all plans.
+            </li>
+          </ul>
+          <p class="warnings-footnote">
+            Use Back to revise earlier steps.
+          </p>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="criteria-heading">
+        <div class="section-header">
+          <h2 id="criteria-heading">Deck criteria</h2>
+          <p>Read-only recap of wizard selections.</p>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Themes</span>
+            <span class="summary-value">Tokens, Aristocrats, Landfall</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Include</span>
+            <span class="summary-value is-muted">(none)</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Avoid</span>
+            <span class="summary-value is-muted">(none)</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Colors</span>
+            <span class="summary-value">Blue, Green</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Commander</span>
+            <span class="summary-value">Tatyova, Benthic Emissary</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Budget</span>
+            <span class="summary-value summary-value-stack">
+              <span>$150 deck budget</span>
+              <span>Excluded unpriced cards</span>
+              <span>Prefer readily available</span>
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Card prices</span>
+            <span class="summary-value is-muted">(none)</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Min rarity</span>
+            <span class="summary-value">Common</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Synergy</span>
+            <span class="summary-value summary-value-stack">
+              <span>Strict dependencies: yes</span>
+              <span>Repair dependencies: no</span>
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Focus</span>
+            <span class="summary-value summary-value-stack">
+              <span>Tokens (focused)</span>
+              <span>Landfall (supported)</span>
+              <span>Energy (engine)</span>
+            </span>
+          </div>
+          <details class="summary-details">
+            <summary>Slot template (99 + commander)</summary>
+            <div class="slot-mini-grid" aria-label="Slot counts">
+              <span>Ramp</span><span>10</span>
+              <span>Draw</span><span>8</span>
+              <span>Removal</span><span>6</span>
+              <span>Synergy</span><span>24</span>
+              <span>Lands</span><span>38</span>
+              <span>Other</span><span>13</span>
+            </div>
+          </details>
+        </div>
+
+        <aside class="dev-note" role="note" aria-label="Developer note">
+          <div class="dev-note-header">
+            <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
+            <span class="dev-note-label">Dev note</span>
+          </div>
+          <div class="dev-note-body">
+            <p>
+              On load: <code>POST /api/v1/wizard/preflight</code> with full
+              <code>DeckCriteria</code> → <code>criteria_warnings[]</code>.
+              Generate: <code>POST /api/v1/generate</code> (random seed if absent).
+            </p>
+            <p>
+              Clean preflight:
+              <a href="build-review-clean.html">no warnings variant</a>.
+            </p>
+          </div>
+        </aside>
+      </section>
+    </div>
+
+    <footer class="wizard-footer" aria-label="Review navigation">
+      <a class="btn btn-back" href="build-step-07-rarity.html">Back</a>
+      <a class="btn btn-generate" href="build-result.html">Generate</a>
+    </footer>
+  </div>
+
+  <aside class="wireframe-meta" aria-label="Wireframe metadata">
+    <div class="wireframe-meta-header">
+      <span class="wireframe-meta-icon" aria-hidden="true">WF</span>
+      <span class="wireframe-meta-label">Wireframe</span>
+    </div>
+    <div class="wireframe-meta-body">
+      <p>
+        Route: <strong>/build/review</strong> — inline warnings + criteria recap.
+        Back → <a href="build-step-07-rarity.html">step 7</a> · Generate →
+        <a href="build-result.html">result</a>.
+        Spec: <code>screens.md</code> § Review.
+      </p>
+    </div>
+  </aside>
+</body>
+</html>
