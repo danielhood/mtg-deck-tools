@@ -10,5 +10,6 @@ Route → HTML mock map. Populate when the mock-and-review loop starts.
 | `/build/2` | [build-step-02-mechanics.html](build-step-02-mechanics.html) | draft | Triage: keyword · avoid · include; ghost zone icons |
 | `/build/3` | [build-step-03-synergy.html](build-step-03-synergy.html) | draft | Strict/repair toggles; focus stepper (− / +) + level definitions |
 | `/build/4` | [build-step-04-colors.html](build-step-04-colors.html) | draft | WUBRG pips + Colorless (void); engine design note |
+| `/build/5` | [build-step-05-budget.html](build-step-05-budget.html) | draft | Steppers + manual $ fields; independent min/max; range warning only |
 
 Process: [README.md](README.md).

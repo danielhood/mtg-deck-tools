@@ -66,6 +66,31 @@ docs/specs/web/wireframes/
 | Data | Placeholder labels (“Theme chip”, “Commander result row”) — no real card DB |
 | Dependencies | Self-contained single HTML + inline or `<style>` block; no build step |
 
+### Dev notes vs product UI
+
+Wireframes mix **shipped UI** (inside `.frame`) with **planning annotations**. Use the shared callout pattern so reviewers can scan layouts without mistaking notes for controls.
+
+| Class | Placement | Purpose |
+| --- | --- | --- |
+| `.dev-note` | Inside `.frame` | API paths, CLI flags, engine TBD, deferred scope — **not** product copy |
+| `.wireframe-meta` | Below `.frame` | Route, back links, spec refs, state label — file metadata only |
+
+**Markup (in-frame):**
+
+```html
+<aside class="dev-note" role="note" aria-label="Developer note">
+  <div class="dev-note-header">
+    <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
+    <span class="dev-note-label">Dev note</span>
+  </div>
+  <div class="dev-note-body"><p>…</p></div>
+</aside>
+```
+
+Visual tokens: magenta left border + dashed outline + `</>` badge; body text smaller than section copy. **Do not** use `.selection-hint`, `.design-note`, or bare `<code>` in section headers for dev content — move it into `.dev-note`.
+
+Section headers and control subtitles stay **user-facing** only.
+
 ### Linking from specs
 
 When a wireframe is **approved**, add a row to `index.md` and an optional **Wireframe:** link under the matching section in [screens.md](../screens.md).

@@ -340,34 +340,64 @@
       color: var(--text-muted);
     }
 
-    .design-note {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-      padding: 12px 14px;
+    .dev-note {
       margin-bottom: 16px;
+      padding: 10px 12px 10px 10px;
+      border: 1px dashed #d8b4fe;
+      border-left: 3px solid var(--magenta);
+      border-radius: 8px;
+      background: #fdf4ff;
     }
 
-    .design-note h3 {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--blue-900);
+    .dev-note-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       margin-bottom: 6px;
     }
 
-    .design-note p {
+    .dev-note-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--magenta);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+      font-family: ui-monospace, "Cascadia Code", monospace;
+      letter-spacing: -0.04em;
+    }
+
+    .dev-note-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--magenta);
+    }
+
+    .dev-note-body {
       font-size: 11px;
       line-height: 1.45;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+      color: #6b21a8;
     }
 
-    .design-note p:last-child {
-      margin-bottom: 0;
+    .dev-note-body p + p {
+      margin-top: 6px;
     }
 
-    .design-note strong {
-      color: var(--text);
+    .dev-note-body code {
+      font-size: 10px;
+      background: rgba(192, 38, 211, 0.1);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .dev-note-body strong {
+      color: #581c87;
     }
 
     .selection-summary {
@@ -393,13 +423,6 @@
     .selection-summary .is-any {
       color: var(--text-muted);
       font-style: italic;
-    }
-
-    .selection-hint {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 10px;
-      line-height: 1.4;
     }
 
     .wizard-footer {
@@ -443,16 +466,52 @@
       box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
     }
 
-    .wireframe-note {
+    .wireframe-meta {
       max-width: var(--frame-width);
       margin-top: 16px;
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.5;
-      text-align: center;
+      padding: 10px 12px;
+      border: 1px dashed #cbd5e1;
+      border-left: 3px solid #64748b;
+      border-radius: 8px;
+      background: #f1f5f9;
+      text-align: left;
     }
 
-    .wireframe-note a { color: var(--blue-700); }
+    .wireframe-meta-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .wireframe-meta-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: #64748b;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .wireframe-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .wireframe-meta-body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .wireframe-meta-body a { color: var(--blue-700); }
   </style>
 </head>
 <body>
@@ -495,22 +554,27 @@
           <p>Tap W/U/B/R/G to multi-select. Colorless is separate — mutually exclusive.</p>
         </div>
 
-        <div class="design-note" role="note">
-          <h3>Design note — engine impact</h3>
-          <p>
-            Add explicit <strong>Colorless</strong> (void identity) at this step.
-            Commander color identity is either empty (colorless) or one or more of
-            W/U/B/R/G — <strong>no card combines colorless with colored identity</strong>
-            under Commander rules.
-          </p>
-          <p>
-            Selecting Colorless clears colored pips and vice versa. Engine must
-            distinguish <strong>Colorless only</strong> from <strong>Any</strong>
-            (today <code>colors: []</code> is ambiguous until step 6 color-match
-            mode — likely needs <code>colorless_only</code> or filter enum in
-            <code>DeckCriteria</code>).
-          </p>
-        </div>
+        <aside class="dev-note" role="note" aria-label="Developer note">
+          <div class="dev-note-header">
+            <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
+            <span class="dev-note-label">Dev note — engine impact</span>
+          </div>
+          <div class="dev-note-body">
+            <p>
+              Add explicit <strong>Colorless</strong> (void identity) at this step.
+              Commander color identity is either empty (colorless) or one or more of
+              W/U/B/R/G — <strong>no card combines colorless with colored identity</strong>
+              under Commander rules.
+            </p>
+            <p>
+              Selecting Colorless clears colored pips and vice versa. Engine must
+              distinguish <strong>Colorless only</strong> from <strong>Any</strong>
+              (today <code>colors: []</code> is ambiguous until step 6 color-match
+              mode — likely needs <code>colorless_only</code> or filter enum in
+              <code>DeckCriteria</code>).
+            </p>
+          </div>
+        </aside>
 
         <div class="color-grid" role="group" aria-label="Colored commander identity">
           <label class="color-option color-w">
@@ -558,25 +622,40 @@
           <p id="color-summary">Blue, Green</p>
         </div>
 
-        <p class="selection-hint">
-          Three states: colored multi-select, Colorless only, or none selected =
-          Any. Step 6 sets exact vs includes for colored filters. Engine/schema
-          TBD for Colorless vs Any when both map to <code>[]</code> today.
-        </p>
+        <aside class="dev-note" role="note" aria-label="Developer note">
+          <div class="dev-note-header">
+            <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
+            <span class="dev-note-label">Dev note</span>
+          </div>
+          <div class="dev-note-body">
+            <p>
+              Three states: colored multi-select, Colorless only, or none selected =
+              Any. Step 6 sets exact vs includes for colored filters.
+            </p>
+          </div>
+        </aside>
       </section>
     </div>
 
     <footer class="wizard-footer" aria-label="Wizard navigation">
       <a class="btn btn-back" href="build-step-03-synergy.html">Back</a>
-      <a class="btn btn-next" href="#">Next</a>
+      <a class="btn btn-next" href="build-step-05-budget.html">Next</a>
     </footer>
   </div>
 
-  <p class="wireframe-note">
-    Route: <strong>/build/4</strong> — WUBRG multi-select. Back →
-    <a href="build-step-03-synergy.html">step 3</a>.
-    Spec: <code>screens.md</code> § Step 4.
-  </p>
+  <aside class="wireframe-meta" aria-label="Wireframe metadata">
+    <div class="wireframe-meta-header">
+      <span class="wireframe-meta-icon" aria-hidden="true">WF</span>
+      <span class="wireframe-meta-label">Wireframe</span>
+    </div>
+    <div class="wireframe-meta-body">
+      <p>
+        Route: <strong>/build/4</strong> — WUBRG multi-select. Back →
+        <a href="build-step-03-synergy.html">step 3</a>.
+        Spec: <code>screens.md</code> § Step 4.
+      </p>
+    </div>
+  </aside>
 
   <script>
     const COLOR_NAMES = {
