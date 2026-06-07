@@ -155,13 +155,6 @@
       font-size: 15px;
       font-weight: 700;
       color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .section-header p {
-      font-size: 12px;
-      line-height: 1.45;
-      color: var(--text-muted);
     }
 
     .toggle-list {
@@ -196,14 +189,15 @@
       font-size: 14px;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 2px;
+      line-height: 1.2;
     }
 
     .toggle-copy span {
       display: block;
-      font-size: 12px;
-      line-height: 1.4;
+      font-size: 11px;
+      line-height: 1.35;
       color: var(--text-muted);
+      margin-top: 2px;
     }
 
     .toggle-input {
@@ -242,13 +236,6 @@
 
     .toggle-row:has(.toggle-input:checked) .toggle-switch::after {
       transform: translateX(18px);
-    }
-
-    .focus-info-panel {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-      padding: 12px;
     }
 
     .dev-note {
@@ -311,26 +298,64 @@
       color: #581c87;
     }
 
-    .focus-definitions h3 {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--blue-900);
-      margin-bottom: 8px;
+    .focus-help {
+      margin-bottom: 12px;
     }
 
-    .focus-definitions dl {
+    .focus-help-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      min-height: 36px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue-700);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .focus-help-toggle .chevron {
+      margin-left: auto;
+      font-size: 10px;
+      transition: transform 0.15s;
+    }
+
+    .focus-help-toggle[aria-expanded="true"] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .focus-help-panel {
+      display: none;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    .focus-help-panel.is-open {
+      display: block;
+    }
+
+    .focus-help-panel dl {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    .focus-definitions dt {
-      font-size: 12px;
+    .focus-help-panel dt {
+      font-size: 11px;
       font-weight: 700;
       color: var(--text);
     }
 
-    .focus-definitions dd {
+    .focus-help-panel dd {
       font-size: 11px;
       line-height: 1.4;
       color: var(--text-muted);
@@ -339,7 +364,7 @@
     }
 
     .focus-controls {
-      margin-top: 4px;
+      margin-top: 0;
     }
 
     .focus-legend {
@@ -435,7 +460,6 @@
       font-weight: 600;
       color: var(--blue-700);
       line-height: 1.3;
-      margin-top: 2px;
     }
 
     .step-btn {
@@ -600,23 +624,19 @@
 
       <section class="wizard-intro">
         <h1>Synergy &amp; dependencies</h1>
-        <p>
-          Control how strictly the builder enforces card synergies and set
-          optional focus levels for mechanics you activated in steps 1–2.
-        </p>
+        <p>Tune how strictly cards must connect, then dial up each activated mechanic.</p>
       </section>
 
       <section class="section" aria-labelledby="strict-heading">
         <div class="section-header">
-          <h2 id="strict-heading">Dependency strictness</h2>
-          <p>Control how strictly synergies are enforced during the build.</p>
+          <h2 id="strict-heading">Synergy rules</h2>
         </div>
 
         <div class="toggle-list">
           <label class="toggle-row">
             <span class="toggle-copy">
               <strong>Strict dependencies</strong>
-              <span>Block picks with no valid target in the card pool</span>
+              <span>Block picks with no valid targets.</span>
             </span>
             <input class="toggle-input" type="checkbox" checked>
             <span class="toggle-switch" aria-hidden="true"></span>
@@ -624,7 +644,7 @@
           <label class="toggle-row">
             <span class="toggle-copy">
               <strong>Repair dependencies</strong>
-              <span>Run a post-build pass to fix dependency gaps</span>
+              <span>Fix gaps after build.</span>
             </span>
             <input class="toggle-input" type="checkbox">
             <span class="toggle-switch" aria-hidden="true"></span>
@@ -648,41 +668,34 @@
       <section class="section" aria-labelledby="focus-heading">
         <div class="section-header">
           <h2 id="focus-heading">Mechanic focus</h2>
-          <p>Step each activated profile down (−) or up (+) through focus levels.</p>
         </div>
 
-        <div class="focus-info-panel">
-          <div class="focus-definitions">
-            <h3>Focus levels</h3>
+        <div class="focus-help">
+          <button
+            class="focus-help-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="focus-help-panel"
+            id="focus-help-btn"
+          >
+            What do focus levels mean?
+            <span class="chevron" aria-hidden="true">▼</span>
+          </button>
+          <div class="focus-help-panel" id="focus-help-panel" role="region" aria-labelledby="focus-help-btn">
             <dl>
               <dt>Default</dt>
-              <dd>Use theme/mechanic activation only — no extra focus weight.</dd>
+              <dd>Theme/mechanic activation only — no extra weight.</dd>
               <dt>Incidental</dt>
-              <dd>Splash; mechanic appears but is not the main plan.</dd>
+              <dd>Splash; appears but is not the main plan.</dd>
               <dt>Supported</dt>
-              <dd>Typical Commander support package for this mechanic.</dd>
+              <dd>Typical Commander support package.</dd>
               <dt>Focused</dt>
-              <dd>Main secondary plan; higher card counts.</dd>
+              <dd>Main secondary plan; higher counts.</dd>
               <dt>Engine</dt>
               <dd>Deck built around this mechanic.</dd>
             </dl>
           </div>
         </div>
-
-        <aside class="dev-note" role="note" aria-label="Developer note">
-          <div class="dev-note-header">
-            <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
-            <span class="dev-note-label">Dev note</span>
-          </div>
-          <div class="dev-note-body">
-            <p>
-              Activated profiles (demo):
-              <strong>Tokens</strong>, <strong>Landfall</strong> themes;
-              <strong>Equip</strong> include. Server list via
-              <code>POST /api/v1/wizard/synergy-context</code>.
-            </p>
-          </div>
-        </aside>
 
         <div class="focus-controls">
           <div class="focus-legend" aria-hidden="true">
@@ -695,7 +708,7 @@
             <div class="focus-row" role="listitem" data-level="0">
               <div class="profile-cell">
                 <div class="profile-head">
-                  <span class="profile-name">Token focus</span>
+                  <span class="profile-name">Tokens</span>
                   <span class="focus-meter" aria-label="Focus magnitude 1 of 5">
                     <span class="focus-dot is-on"></span>
                     <span class="focus-dot"></span>
@@ -706,13 +719,13 @@
                 </div>
                 <span class="profile-level">Default</span>
               </div>
-              <button class="step-btn step-less" type="button" aria-label="Decrease token focus" disabled><span class="step-mark">−</span></button>
-              <button class="step-btn step-more" type="button" aria-label="Increase token focus"><span class="step-mark">+</span></button>
+              <button class="step-btn step-less" type="button" aria-label="Decrease Tokens focus" disabled><span class="step-mark">−</span></button>
+              <button class="step-btn step-more" type="button" aria-label="Increase Tokens focus"><span class="step-mark">+</span></button>
             </div>
             <div class="focus-row" role="listitem" data-level="3">
               <div class="profile-cell">
                 <div class="profile-head">
-                  <span class="profile-name">Landfall focus</span>
+                  <span class="profile-name">Landfall</span>
                   <span class="focus-meter" aria-label="Focus magnitude 4 of 5">
                     <span class="focus-dot is-on"></span>
                     <span class="focus-dot is-on"></span>
@@ -723,13 +736,13 @@
                 </div>
                 <span class="profile-level">Focused</span>
               </div>
-              <button class="step-btn step-less" type="button" aria-label="Decrease landfall focus"><span class="step-mark">−</span></button>
-              <button class="step-btn step-more" type="button" aria-label="Increase landfall focus"><span class="step-mark">+</span></button>
+              <button class="step-btn step-less" type="button" aria-label="Decrease Landfall focus"><span class="step-mark">−</span></button>
+              <button class="step-btn step-more" type="button" aria-label="Increase Landfall focus"><span class="step-mark">+</span></button>
             </div>
             <div class="focus-row" role="listitem" data-level="0">
               <div class="profile-cell">
                 <div class="profile-head">
-                  <span class="profile-name">Equipment focus</span>
+                  <span class="profile-name">Equip</span>
                   <span class="focus-meter" aria-label="Focus magnitude 1 of 5">
                     <span class="focus-dot is-on"></span>
                     <span class="focus-dot"></span>
@@ -740,8 +753,8 @@
                 </div>
                 <span class="profile-level">Default</span>
               </div>
-              <button class="step-btn step-less" type="button" aria-label="Decrease equipment focus" disabled><span class="step-mark">−</span></button>
-              <button class="step-btn step-more" type="button" aria-label="Increase equipment focus"><span class="step-mark">+</span></button>
+              <button class="step-btn step-less" type="button" aria-label="Decrease Equip focus" disabled><span class="step-mark">−</span></button>
+              <button class="step-btn step-more" type="button" aria-label="Increase Equip focus"><span class="step-mark">+</span></button>
             </div>
           </div>
         </div>
@@ -753,9 +766,11 @@
           </div>
           <div class="dev-note-body">
             <p>
-              Dot meter (right of profile name): 1 filled = Default, 5 filled =
-              Engine. − / + step through levels. When no profiles activate, hide
-              this block.
+              Profile rows from
+              <code>POST /api/v1/wizard/synergy-context</code>. Dot meter: 1
+              filled = Default, 5 = Engine. When no profiles activate, hide
+              stepper + glossary — see
+              <a href="build-step-03-synergy-empty.html">empty state</a>.
             </p>
           </div>
         </aside>
@@ -775,9 +790,10 @@
     </div>
     <div class="wireframe-meta-body">
       <p>
-        Route: <strong>/build/3</strong> — strict/repair toggles + focus stepper
-        (− / +). Back →
-        <a href="build-step-02-mechanics.html">step 2</a>.
+        Route: <strong>/build/3</strong> — synergy toggles + focus stepper
+        (− / +). Collapsed glossary; dot meter + level name per row. Empty state:
+        <a href="build-step-03-synergy-empty.html">no activated profiles</a>.
+        Back → <a href="build-step-02-mechanics.html">step 2</a>.
         Spec: <code>screens.md</code> § Step 3.
       </p>
     </div>
@@ -785,12 +801,21 @@
 
   <script>
     const LEVELS = [
-      { label: "Default", value: "" },
-      { label: "Incidental", value: "incidental" },
-      { label: "Supported", value: "supported" },
-      { label: "Focused", value: "focused" },
-      { label: "Engine", value: "engine" },
+      "Default",
+      "Incidental",
+      "Supported",
+      "Focused",
+      "Engine",
     ];
+
+    const helpBtn = document.getElementById("focus-help-btn");
+    const helpPanel = document.getElementById("focus-help-panel");
+
+    helpBtn.addEventListener("click", () => {
+      const open = helpBtn.getAttribute("aria-expanded") === "true";
+      helpBtn.setAttribute("aria-expanded", String(!open));
+      helpPanel.classList.toggle("is-open", !open);
+    });
 
     document.querySelectorAll(".focus-row").forEach((row) => {
       const levelEl = row.querySelector(".profile-level");
@@ -802,7 +827,8 @@
 
       const sync = () => {
         row.dataset.level = String(index);
-        levelEl.textContent = LEVELS[index].label;
+        const level = LEVELS[index];
+        levelEl.textContent = level;
         lessBtn.disabled = index === 0;
         moreBtn.disabled = index === LEVELS.length - 1;
         dots.forEach((dot, i) => {
@@ -811,6 +837,15 @@
         meterEl.setAttribute(
           "aria-label",
           `Focus magnitude ${index + 1} of ${LEVELS.length}`,
+        );
+        const profileName = row.querySelector(".profile-name").textContent;
+        lessBtn.setAttribute(
+          "aria-label",
+          `Decrease ${profileName} focus (${level})`,
+        );
+        moreBtn.setAttribute(
+          "aria-label",
+          `Increase ${profileName} focus (${level})`,
         );
       };
 

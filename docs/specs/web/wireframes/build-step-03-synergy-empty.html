@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Step 3 · Synergy (no activated profiles)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --frame-width: 375px;
+      --touch-min: 44px;
+      --footer-height: 72px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--blue-900);
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .step-pill {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--blue-100);
+      color: var(--blue-700);
+    }
+
+    .wizard-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(var(--footer-height) + 16px);
+    }
+
+    .wizard-intro {
+      margin-bottom: 18px;
+    }
+
+    .wizard-intro h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .wizard-intro p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .progress-segment {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+    }
+
+    .progress-segment.is-active { background: var(--blue-700); }
+    .progress-segment.is-complete { background: var(--blue-500); }
+
+    .section {
+      margin-bottom: 22px;
+    }
+
+    .section-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .toggle-list {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      min-height: var(--touch-min);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .toggle-row:last-child { border-bottom: none; }
+
+    .toggle-copy {
+      flex: 1;
+    }
+
+    .toggle-copy strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .toggle-copy span {
+      display: block;
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .toggle-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-switch {
+      flex-shrink: 0;
+      width: 46px;
+      height: 28px;
+      border-radius: 999px;
+      background: var(--border);
+      position: relative;
+    }
+
+    .toggle-switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2);
+    }
+
+    .toggle-row:has(.toggle-input:checked) .toggle-switch {
+      background: var(--blue-700);
+    }
+
+    .toggle-row:has(.toggle-input:checked) .toggle-switch::after {
+      transform: translateX(18px);
+    }
+
+    .focus-empty {
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 20px 16px;
+      text-align: center;
+      background: var(--surface);
+    }
+
+    .focus-empty p {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .focus-empty a {
+      color: var(--blue-700);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .wizard-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .btn-back {
+      background: var(--bg);
+      color: var(--blue-700);
+      border: 1.5px solid var(--blue-700);
+    }
+
+    .btn-next {
+      background: var(--blue-700);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .dev-note {
+      margin-top: 10px;
+      padding: 10px 12px 10px 10px;
+      border: 1px dashed #d8b4fe;
+      border-left: 3px solid var(--magenta);
+      border-radius: 8px;
+      background: #fdf4ff;
+    }
+
+    .dev-note-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .dev-note-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--magenta);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+      font-family: ui-monospace, "Cascadia Code", monospace;
+      letter-spacing: -0.04em;
+    }
+
+    .dev-note-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--magenta);
+    }
+
+    .dev-note-body {
+      font-size: 11px;
+      line-height: 1.45;
+      color: #6b21a8;
+    }
+
+    .dev-note-body code {
+      font-size: 10px;
+      background: rgba(192, 38, 211, 0.1);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .wireframe-meta {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      padding: 10px 12px;
+      border: 1px dashed #cbd5e1;
+      border-left: 3px solid #64748b;
+      border-radius: 8px;
+      background: #f1f5f9;
+      text-align: left;
+    }
+
+    .wireframe-meta-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .wireframe-meta-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: #64748b;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .wireframe-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .wireframe-meta-body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .wireframe-meta-body a { color: var(--blue-700); }
+  </style>
+</head>
+<body>
+  <p class="preview-label">Wireframe · 375px · /build/3 · empty focus</p>
+
+  <div class="frame" role="document" aria-label="Wizard step 3 wireframe — no activated profiles">
+    <header class="app-header">
+      <div class="app-brand">
+        <div class="app-mark" aria-hidden="true"></div>
+        <div>
+          <div class="app-title">MTG Deck Tools</div>
+          <div class="app-subtitle">Build wizard</div>
+        </div>
+      </div>
+      <span class="step-pill">Step 3 of 7</span>
+    </header>
+
+    <div class="wizard-scroll">
+      <div class="progress-bar" aria-hidden="true">
+        <div class="progress-segment is-complete"></div>
+        <div class="progress-segment is-complete"></div>
+        <div class="progress-segment is-active"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+      </div>
+
+      <section class="wizard-intro">
+        <h1>Synergy &amp; dependencies</h1>
+        <p>Tune how strictly cards must connect, then dial up each activated mechanic.</p>
+      </section>
+
+      <section class="section" aria-labelledby="strict-heading">
+        <div class="section-header">
+          <h2 id="strict-heading">Synergy rules</h2>
+        </div>
+
+        <div class="toggle-list">
+          <label class="toggle-row">
+            <span class="toggle-copy">
+              <strong>Strict dependencies</strong>
+              <span>Block picks with no valid targets.</span>
+            </span>
+            <input class="toggle-input" type="checkbox" checked>
+            <span class="toggle-switch" aria-hidden="true"></span>
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-copy">
+              <strong>Repair dependencies</strong>
+              <span>Fix gaps after build.</span>
+            </span>
+            <input class="toggle-input" type="checkbox">
+            <span class="toggle-switch" aria-hidden="true"></span>
+          </label>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="focus-heading">
+        <div class="section-header">
+          <h2 id="focus-heading">Mechanic focus</h2>
+        </div>
+
+        <div class="focus-empty" role="status">
+          <p>
+            No themes or include mechanics yet — pick some on
+            <a href="build-step-01-themes.html">step 1</a> or
+            <a href="build-step-02-mechanics.html">step 2</a>.
+          </p>
+        </div>
+
+        <aside class="dev-note" role="note" aria-label="Developer note">
+          <div class="dev-note-header">
+            <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
+            <span class="dev-note-label">Dev note</span>
+          </div>
+          <div class="dev-note-body">
+            <p>
+              Hide glossary and stepper when
+              <code>POST /api/v1/wizard/synergy-context</code> returns no
+              activated profiles.
+            </p>
+          </div>
+        </aside>
+      </section>
+    </div>
+
+    <footer class="wizard-footer" aria-label="Wizard navigation">
+      <a class="btn btn-back" href="build-step-02-mechanics.html">Back</a>
+      <a class="btn btn-next" href="build-step-04-colors.html">Next</a>
+    </footer>
+  </div>
+
+  <aside class="wireframe-meta" aria-label="Wireframe metadata">
+    <div class="wireframe-meta-header">
+      <span class="wireframe-meta-icon" aria-hidden="true">WF</span>
+      <span class="wireframe-meta-label">Wireframe</span>
+    </div>
+    <div class="wireframe-meta-body">
+      <p>
+        Route: <strong>/build/3</strong> — focus block hidden when server returns
+        no activated profiles. Full state:
+        <a href="build-step-03-synergy.html">with profiles</a>.
+      </p>
+    </div>
+  </aside>
+</body>
+</html>
