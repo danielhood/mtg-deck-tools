@@ -1,7 +1,11 @@
 <script lang="ts">
   import WizardChrome from "../components/WizardChrome.svelte";
+  import WizardIntro from "../components/WizardIntro.svelte";
+  import SectionHeader from "../components/SectionHeader.svelte";
+  import ToggleRow from "../components/ToggleRow.svelte";
   import { postSynergyContext, type ActivatedProfile, type WizardMeta } from "../lib/api";
   import { loadDraft, saveDraft, toDeckCriteria, type WizardDraft } from "../lib/criteria";
+  import { navigate } from "../lib/router";
 
   interface Props {
     meta: WizardMeta;
@@ -11,6 +15,7 @@
 
   let draft = $state<WizardDraft>(loadDraft());
   let profiles = $state<ActivatedProfile[]>([]);
+  let helpOpen = $state(false);
 
   $effect(() => {
     saveDraft(draft);
@@ -26,137 +31,150 @@
       });
   });
 
-  function setFocus(profileId: string, level: string | null): void {
-    const focus = { ...draft.mechanic_focus };
-    if (!level) delete focus[profileId];
-    else focus[profileId] = level;
-    draft = { ...draft, mechanic_focus: focus };
-  }
-
   function currentIndex(profile: ActivatedProfile): number {
-    const idx = profile.focus_options.findIndex((opt) => opt.value === (draft.mechanic_focus[profile.profile_id] ?? null));
+    const idx = profile.focus_options.findIndex(
+      (opt) => opt.value === (draft.mechanic_focus[profile.profile_id] ?? null),
+    );
     return idx >= 0 ? idx : 0;
   }
 
   function stepFocus(profile: ActivatedProfile, delta: number): void {
     const idx = currentIndex(profile);
     const next = profile.focus_options[Math.min(Math.max(idx + delta, 0), profile.focus_options.length - 1)];
-    setFocus(profile.profile_id, next.value);
+    const focus = { ...draft.mechanic_focus };
+    if (!next.value) delete focus[profile.profile_id];
+    else focus[profile.profile_id] = next.value;
+    draft = { ...draft, mechanic_focus: focus };
   }
 </script>
 
 <WizardChrome step={3} backRoute="/build/2" nextRoute="/build/4" dbReady={meta.db_ready}>
-  <h2 class="section-title">Synergy &amp; dependencies</h2>
-  <p class="section-lead">Optional strictness toggles and per-mechanic focus levels.</p>
+  <WizardIntro
+    title="Synergy & dependencies"
+    lead="Tune how strictly cards must connect, then dial up each activated mechanic."
+  />
 
-  <div class="toggle-row">
-    <label for="strict-deps">Block picks with no valid targets</label>
-    <input
-      id="strict-deps"
-      type="checkbox"
-      checked={draft.strict_dependencies}
-      onchange={(e) => (draft = { ...draft, strict_dependencies: e.currentTarget.checked })}
-    />
-  </div>
-  <div class="toggle-row">
-    <label for="repair-deps">Fix gaps after build</label>
-    <input
-      id="repair-deps"
-      type="checkbox"
-      checked={draft.repair_dependencies}
-      onchange={(e) => (draft = { ...draft, repair_dependencies: e.currentTarget.checked })}
-    />
-  </div>
+  <section class="wizard-section" aria-labelledby="strict-heading">
+    <SectionHeader id="strict-heading" title="Synergy rules" />
 
-  {#if profiles.length}
-    <div class="focus-list">
-      {#each profiles as profile (profile.profile_id)}
-        {@const idx = currentIndex(profile)}
-        {@const option = profile.focus_options[idx]}
-        <div class="focus-row">
-          <div>
-            <div class="field-label">{profile.prompt_label}</div>
-            <div class="focus-level">{option.label}</div>
-            <div class="dot-meter" aria-hidden="true">
-              {#each Array(5) as _, dotIndex}
-                <span class:filled={dotIndex < option.dots}></span>
-              {/each}
-            </div>
-          </div>
-          <div class="stepper">
-            <button type="button" onclick={() => stepFocus(profile, -1)} aria-label="Lower focus">−</button>
-            <button type="button" onclick={() => stepFocus(profile, 1)} aria-label="Raise focus">+</button>
-          </div>
+    <div class="toggle-list">
+      <ToggleRow
+        title="Strict dependencies"
+        description="Block picks with no valid targets."
+        checked={draft.strict_dependencies}
+        ontoggle={(checked) => (draft = { ...draft, strict_dependencies: checked })}
+      />
+      <ToggleRow
+        title="Repair dependencies"
+        description="Fix gaps after build."
+        checked={draft.repair_dependencies}
+        ontoggle={(checked) => (draft = { ...draft, repair_dependencies: checked })}
+      />
+    </div>
+  </section>
+
+  <section class="wizard-section" aria-labelledby="focus-heading">
+    <SectionHeader id="focus-heading" title="Mechanic focus" />
+
+    {#if profiles.length}
+      <div class="focus-help">
+        <button
+          class="focus-help-toggle"
+          type="button"
+          aria-expanded={helpOpen}
+          onclick={() => (helpOpen = !helpOpen)}
+        >
+          What do focus levels mean?
+          <span class="chevron" aria-hidden="true">{helpOpen ? "▲" : "▼"}</span>
+        </button>
+        <div class="focus-help-panel" class:is-open={helpOpen}>
+          <dl>
+            <dt>Default</dt>
+            <dd>Theme/mechanic activation only — no extra weight.</dd>
+            <dt>Incidental</dt>
+            <dd>Splash; appears but is not the main plan.</dd>
+            <dt>Supported</dt>
+            <dd>Typical Commander support package.</dd>
+            <dt>Focused</dt>
+            <dd>Main secondary plan; higher counts.</dd>
+            <dt>Engine</dt>
+            <dd>Deck built around this mechanic.</dd>
+          </dl>
         </div>
-      {/each}
-    </div>
-  {:else}
-    <div class="empty-panel">
-      No activated synergy profiles yet. Adjust themes or included mechanics on earlier steps.
-    </div>
-  {/if}
+      </div>
+
+      <div class="focus-controls">
+        <div class="focus-legend" aria-hidden="true">
+          <span class="col-profile">Profile</span>
+          <span class="col-less">−</span>
+          <span class="col-more">+</span>
+        </div>
+
+        <div class="focus-list" role="list" aria-label="Mechanic focus levels">
+          {#each profiles as profile (profile.profile_id)}
+            {@const idx = currentIndex(profile)}
+            {@const option = profile.focus_options[idx]}
+            <div class="focus-row" role="listitem">
+              <div class="profile-cell">
+                <div class="profile-head">
+                  <span class="profile-name">{profile.prompt_label}</span>
+                  <span class="focus-meter" aria-label={`Focus magnitude ${option.dots} of 5`}>
+                    {#each Array(5) as _, dotIndex}
+                      <span class="focus-dot" class:is-on={dotIndex < option.dots}></span>
+                    {/each}
+                  </span>
+                </div>
+                <span class="profile-level">{option.label}</span>
+              </div>
+              <button
+                class="step-btn step-less"
+                type="button"
+                aria-label={`Decrease ${profile.prompt_label} focus`}
+                disabled={idx === 0}
+                onclick={() => stepFocus(profile, -1)}
+              >
+                <span class="step-mark">−</span>
+              </button>
+              <button
+                class="step-btn step-more"
+                type="button"
+                aria-label={`Increase ${profile.prompt_label} focus`}
+                disabled={idx >= profile.focus_options.length - 1}
+                onclick={() => stepFocus(profile, 1)}
+              >
+                <span class="step-mark">+</span>
+              </button>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {:else}
+      <div class="empty-panel">
+        No activated synergy profiles yet. Adjust
+        <button type="button" class="link-btn" onclick={() => navigate("/build/1")}>themes</button>
+        or
+        <button type="button" class="link-btn" onclick={() => navigate("/build/2")}>
+          included mechanics
+        </button>
+        on earlier steps.
+      </div>
+    {/if}
+  </section>
 </WizardChrome>
 
 <style>
-  .focus-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .focus-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-  }
-
-  .focus-level {
-    font-size: 12px;
+  .chevron {
+    font-size: 10px;
     color: var(--text-muted);
-    margin-top: 2px;
   }
 
-  .dot-meter {
-    display: flex;
-    gap: 4px;
-    margin-top: 6px;
-  }
-
-  .dot-meter span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border);
-  }
-
-  .dot-meter span.filled {
-    background: var(--blue-700);
-  }
-
-  .stepper {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .stepper button {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    font-size: 22px;
+  .link-btn {
+    border: none;
+    background: none;
+    color: var(--blue-700);
+    font-size: inherit;
     cursor: pointer;
-  }
-
-  .empty-panel {
-    padding: 16px;
-    border: 1px dashed var(--border);
-    border-radius: 10px;
-    font-size: 13px;
-    color: var(--text-muted);
+    padding: 0;
+    text-decoration: underline;
   }
 </style>

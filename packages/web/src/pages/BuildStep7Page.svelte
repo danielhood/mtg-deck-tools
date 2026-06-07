@@ -1,7 +1,10 @@
 <script lang="ts">
   import WizardChrome from "../components/WizardChrome.svelte";
+  import WizardIntro from "../components/WizardIntro.svelte";
+  import SectionHeader from "../components/SectionHeader.svelte";
   import { getRarities, type RarityChoice, type WizardMeta } from "../lib/api";
   import { loadDraft, saveDraft, type WizardDraft } from "../lib/criteria";
+  import { RARITY_HINTS } from "../lib/format";
 
   interface Props {
     meta: WizardMeta;
@@ -27,50 +30,38 @@
   step={7}
   backRoute="/build/6"
   nextRoute="/build/review"
-  nextLabel="Review"
+  nextLabel="Next"
   dbReady={meta.db_ready}
 >
-  <h2 class="section-title">Card rarity</h2>
-  <p class="section-lead">Minimum maindeck rarity (commander exempt).</p>
+  <WizardIntro
+    title="Card rarity"
+    lead="Exclude maindeck cards below this rarity. Commander is not filtered here."
+  />
 
-  <div class="radio-list" role="radiogroup" aria-label="Minimum rarity">
-    {#each rarities as rarity (rarity.id)}
-      <label class="radio-row">
-        <input
-          type="radio"
-          name="min-rarity"
-          value={rarity.id}
-          checked={draft.min_rarity === rarity.id}
-          onchange={() => (draft = { ...draft, min_rarity: rarity.id })}
-        />
-        <span>{rarity.label}</span>
-      </label>
-    {/each}
-  </div>
+  <section aria-labelledby="rarity-heading">
+    <SectionHeader
+      id="rarity-heading"
+      title="Minimum card rarity"
+      description="Choose the lowest rarity allowed in the 99-card maindeck."
+    />
+
+    <div class="rarity-list" role="radiogroup" aria-label="Minimum card rarity">
+      {#each rarities as rarity (rarity.id)}
+        <label class="rarity-option">
+          <input
+            type="radio"
+            name="min_rarity"
+            value={rarity.id}
+            checked={draft.min_rarity === rarity.id}
+            onchange={() => (draft = { ...draft, min_rarity: rarity.id })}
+          />
+          <span class="rarity-gem rarity-{rarity.id}" aria-hidden="true"></span>
+          <span class="rarity-copy">
+            <strong>{rarity.label}</strong>
+            <span>{RARITY_HINTS[rarity.id] ?? ""}</span>
+          </span>
+        </label>
+      {/each}
+    </div>
+  </section>
 </WizardChrome>
-
-<style>
-  .radio-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .radio-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 44px;
-    padding: 8px 10px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: 13px;
-    cursor: pointer;
-  }
-
-  .radio-row input {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--blue-700);
-  }
-</style>

@@ -17,25 +17,65 @@
 <DbBanner {meta} />
 
 <section class="hero">
-  <h1 class="section-title">Build a Commander deck</h1>
-  <p class="section-lead">
-    Walk through themes, mechanics, synergy, colors, budget, commander, and rarity — then generate a
-    tuned 100-card list.
+  <h1>Build a new deck</h1>
+  <p>
+    Walk through the <span class="hero-accent">7-step wizard</span> to generate a Commander deck with
+    dependency-aware card selection.
   </p>
 </section>
 
-<button class="btn btn-primary" type="button" disabled={!meta.db_ready} onclick={startBuild}>
-  Build new deck
-</button>
+<section class="actions">
+  <button class="btn btn-primary" type="button" disabled={!meta.db_ready} onclick={startBuild}>
+    Build new deck
+  </button>
+</section>
 
-{#if meta.db_ready && meta.total_cards}
-  <p class="section-lead">{meta.total_cards.toLocaleString()} cards indexed.</p>
-{/if}
+<section class="future-section">
+  <p class="future-label">Coming later</p>
+  <button class="btn btn-secondary" type="button" disabled>Saved library</button>
+</section>
 
 <style>
-  .hero {
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue-900);
+    margin-bottom: 8px;
+  }
+
+  .hero p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+
+  .actions {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+  }
+
+  .actions .btn-primary {
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  }
+
+  .future-section {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .future-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .future-section .btn-secondary {
+    width: 100%;
   }
 </style>

@@ -1,7 +1,9 @@
 <script lang="ts">
   import WizardChrome from "../components/WizardChrome.svelte";
+  import WizardIntro from "../components/WizardIntro.svelte";
   import { getMechanics, type MechanicChoice, type WizardMeta } from "../lib/api";
   import { loadDraft, saveDraft, type WizardDraft } from "../lib/criteria";
+  import { formatTagLabel } from "../lib/format";
 
   interface Props {
     meta: WizardMeta;
@@ -43,82 +45,63 @@
       include_mechanics: [...include].sort(),
     };
   }
+
+  const avoidCount = $derived(draft.avoid_mechanics.length);
+  const includeCount = $derived(draft.include_mechanics.length);
+  const neutralCount = $derived(
+    Math.max(0, mechanics.length - avoidCount - includeCount),
+  );
 </script>
 
 <WizardChrome step={2} backRoute="/build/1" nextRoute="/build/3" dbReady={meta.db_ready}>
-  <h2 class="section-title">Include / avoid mechanics</h2>
-  <p class="section-lead">Tap × to avoid or + to include. Tap again to clear.</p>
+  <WizardIntro
+    title="Include / avoid mechanics"
+    lead="Choose which mechanics the build engine should include or avoid."
+  />
 
-  <div class="triage-list">
+  <div class="triage-legend" aria-hidden="true">
+    <span class="col-keyword">Keyword</span>
+    <span class="col-avoid">Avoid</span>
+    <span class="col-include">Include</span>
+  </div>
+
+  <div class="triage-list" role="list" aria-label="Keyword mechanics triage">
     {#each mechanics as mechanic (mechanic.id)}
       {@const state = triageFor(mechanic.id)}
-      <div class="triage-row" class:avoid={state === "avoid"} class:include={state === "include"}>
-        <div class="keyword">{mechanic.id}</div>
+      <div
+        class="triage-row"
+        class:is-avoid={state === "avoid"}
+        class:is-include={state === "include"}
+        role="listitem"
+      >
+        <span class="keyword">{formatTagLabel(mechanic.id)}</span>
         <button
           type="button"
-          class="zone avoid-zone"
+          class="zone zone-avoid"
+          class:is-active={state === "avoid"}
           aria-label={`Avoid ${mechanic.id}`}
+          aria-pressed={state === "avoid"}
           onclick={() => setTriage(mechanic.id, state === "avoid" ? "neutral" : "avoid")}
         >
-          ×
+          <span class="zone-mark"></span>
         </button>
         <button
           type="button"
-          class="zone include-zone"
+          class="zone zone-include"
+          class:is-active={state === "include"}
           aria-label={`Include ${mechanic.id}`}
+          aria-pressed={state === "include"}
           onclick={() => setTriage(mechanic.id, state === "include" ? "neutral" : "include")}
         >
-          +
+          <span class="zone-mark"></span>
         </button>
       </div>
     {/each}
   </div>
+
+  <div class="triage-summary" aria-live="polite">
+    <span class="count-avoid"><strong>{avoidCount}</strong> avoided</span>
+    <span class="count-neutral"><strong>{neutralCount}</strong> neutral</span>
+    <span class="count-include"><strong>{includeCount}</strong> included</span>
+  </div>
 </WizardChrome>
-
-<style>
-  .triage-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .triage-row {
-    display: grid;
-    grid-template-columns: 1fr 48px 48px;
-    align-items: center;
-    min-height: 44px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-
-  .triage-row.avoid {
-    background: var(--avoid-100);
-  }
-
-  .triage-row.include {
-    background: var(--include-100);
-  }
-
-  .keyword {
-    padding: 8px 10px;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .zone {
-    min-height: 44px;
-    border: none;
-    background: transparent;
-    font-size: 20px;
-    font-weight: 700;
-    cursor: pointer;
-    color: var(--text-muted);
-  }
-
-  .triage-row.avoid .avoid-zone,
-  .triage-row.include .include-zone {
-    color: var(--blue-900);
-    font-weight: 800;
-  }
-</style>

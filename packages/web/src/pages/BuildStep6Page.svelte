@@ -1,5 +1,7 @@
 <script lang="ts">
   import WizardChrome from "../components/WizardChrome.svelte";
+  import WizardIntro from "../components/WizardIntro.svelte";
+  import SectionHeader from "../components/SectionHeader.svelte";
   import { searchCommanders, type CommanderResult, type WizardMeta } from "../lib/api";
   import {
     commanderSearchColors,
@@ -8,7 +10,7 @@
     toDeckCriteria,
     type WizardDraft,
   } from "../lib/criteria";
-  import { formatPrice } from "../lib/format";
+  import { formatColorListLabel, formatPrice, pipMiniClass, sortColors } from "../lib/format";
 
   interface Props {
     meta: WizardMeta;
@@ -48,7 +50,8 @@
         .then((rows) => {
           results = rows;
           if (draft.commander_oracle_ids[0]) {
-            selected = rows.find((row) => row.oracle_id === draft.commander_oracle_ids[0]) ?? selected;
+            selected =
+              rows.find((row) => row.oracle_id === draft.commander_oracle_ids[0]) ?? selected;
           }
         })
         .catch(() => {
@@ -64,6 +67,19 @@
   }
 
   const nextDisabled = $derived(!draft.commander_oracle_ids.length);
+
+  const filterPips = $derived.by(() => {
+    if (draft.colorFilter === "colorless") return { kind: "colorless" as const, colors: [] as string[] };
+    if (draft.colorFilter === "any" || !draft.colors.length) return { kind: "any" as const, colors: [] as string[] };
+    return { kind: "selected" as const, colors: sortColors(draft.colors) };
+  });
+
+  const filterCopy = $derived.by(() => {
+    if (filterPips.kind === "colorless") return "Colorless only";
+    if (filterPips.kind === "any") return "Any (no color filter)";
+    const label = formatColorListLabel(filterPips.colors);
+    return draft.colorMatch === "exact" ? `${label} only` : `${label} plus others`;
+  });
 </script>
 
 <WizardChrome
@@ -73,145 +89,178 @@
   dbReady={meta.db_ready}
   nextDisabled={nextDisabled}
 >
-  <h2 class="section-title">Commander</h2>
-  <p class="section-lead">Search and pick a commander. Required before continuing.</p>
+  <WizardIntro title="Commander selection" lead="Search for and select your commander." />
 
-  <div class="toggle-row">
-    <label for="color-match">Exact color identity match</label>
-    <input
-      id="color-match"
-      type="checkbox"
-      checked={draft.colorMatch === "exact"}
-      onchange={(e) =>
-        (draft = { ...draft, colorMatch: e.currentTarget.checked ? "exact" : "includes" })}
+  <section class="wizard-section" aria-labelledby="color-match-heading">
+    <SectionHeader
+      id="color-match-heading"
+      title="Color filter"
+      description="How commander identity should match your color picks."
     />
-  </div>
 
-  <input
-    class="search-input"
-    type="search"
-    placeholder="Search commanders"
-    bind:value={query}
-    aria-label="Commander search"
-  />
-
-  <div class="result-list" role="listbox" aria-label="Commander results">
-    {#each results as row (row.oracle_id)}
-      <button
-        type="button"
-        class="result-row"
-        class:selected={draft.commander_oracle_ids[0] === row.oracle_id}
-        onclick={() => pickCommander(row)}
-      >
-        <span class="name">{row.name}</span>
-        <span class="meta">
-          {(row.color_identity.join("") || "C")} · {formatPrice(row.price_known ? row.price_usd : null)}
+    <div class="segmented-control" role="radiogroup" aria-label="Commander color filter mode">
+      <label class="segment-option">
+        <input
+          type="radio"
+          name="color_match"
+          value="includes"
+          checked={draft.colorMatch === "includes"}
+          onchange={() => (draft = { ...draft, colorMatch: "includes" })}
+        />
+        <span class="segment-label">
+          <strong>Includes</strong>
+          <span>Has your colors (may include more)</span>
         </span>
-      </button>
-    {:else}
-      <div class="empty-panel">No commanders match. Try different colors or search text.</div>
-    {/each}
-  </div>
+      </label>
+      <label class="segment-option">
+        <input
+          type="radio"
+          name="color_match"
+          value="exact"
+          checked={draft.colorMatch === "exact"}
+          onchange={() => (draft = { ...draft, colorMatch: "exact" })}
+        />
+        <span class="segment-label">
+          <strong>Exact</strong>
+          <span>Only the colors you selected</span>
+        </span>
+      </label>
+    </div>
 
-  {#if selected?.image_uri}
-    <button type="button" class="art-preview" onclick={() => (showArt = true)}>
-      <img src={selected.image_uri} alt={`Art for ${selected.name}`} />
-    </button>
-  {/if}
+    <div class="filter-context" aria-live="polite">
+      <div class="pip-row" aria-label="Selected colors">
+        {#if filterPips.kind === "selected"}
+          {#each filterPips.colors as color (color)}
+            <span class="mana-pip-mini {pipMiniClass(color)}">{color}</span>
+          {/each}
+        {:else if filterPips.kind === "colorless"}
+          <span class="mana-pip-mini pip-colorless" aria-hidden="true">∅</span>
+        {:else}
+          <span class="mana-pip-mini pip-any" aria-hidden="true">∅</span>
+        {/if}
+      </div>
+      <span class="filter-context-copy">{filterCopy}</span>
+    </div>
+  </section>
+
+  <section class="wizard-section" aria-labelledby="search-heading">
+    <SectionHeader id="search-heading" title="Search commanders" description="Type to filter by name." />
+
+    <div class="search-wrap">
+      <div class="search-field">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="Search commander name…"
+          bind:value={query}
+          aria-label="Search commander name"
+        />
+      </div>
+    </div>
+
+    <div class="commander-results" role="listbox" aria-label="Commander results">
+      {#each results as row (row.oracle_id)}
+        <button
+          type="button"
+          class="commander-row"
+          class:is-selected={draft.commander_oracle_ids[0] === row.oracle_id}
+          onclick={() => pickCommander(row)}
+        >
+          <strong>{row.name}</strong>
+          <span>
+            {(row.color_identity.join("") || "C")} · {formatPrice(row.price_known ? row.price_usd : null)}
+          </span>
+        </button>
+      {:else}
+        <div class="empty-panel">No commanders match. Try different colors or search text.</div>
+      {/each}
+    </div>
+
+    {#if selected?.image_uri}
+      <button type="button" class="art-preview" onclick={() => (showArt = true)}>
+        <img src={selected.image_uri} alt={`Art for ${selected.name}`} />
+      </button>
+    {/if}
+  </section>
 </WizardChrome>
 
 {#if showArt && selected?.image_uri}
-  <div class="lightbox" role="dialog" aria-modal="true" onclick={() => (showArt = false)}>
-    <button type="button" class="close" onclick={() => (showArt = false)}>Close</button>
-    <img src={selected.image_uri} alt={selected.name} />
+  <div class="lightbox" role="dialog" aria-modal="true">
+    <button type="button" class="lightbox-backdrop" aria-label="Close" onclick={() => (showArt = false)}></button>
+    <div class="lightbox-panel">
+      <button type="button" class="lightbox-close" onclick={() => (showArt = false)}>×</button>
+      <img src={selected.image_uri} alt={selected.name} />
+      <p class="lightbox-title">{selected.name}</p>
+    </div>
   </div>
 {/if}
 
 <style>
-  .search-input {
-    width: 100%;
-    min-height: 44px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0 12px;
-  }
-
-  .result-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .result-row {
-    text-align: left;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    cursor: pointer;
-  }
-
-  .result-row.selected {
-    border-color: var(--blue-700);
-    background: var(--blue-100);
-  }
-
-  .name {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .meta {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  .empty-panel {
-    padding: 14px;
-    border: 1px dashed var(--border);
-    border-radius: 10px;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
   .art-preview {
     border: none;
     background: none;
     padding: 0;
     cursor: pointer;
+    width: 100%;
   }
 
   .art-preview img {
     width: 100%;
+    max-width: 220px;
     border-radius: 10px;
+    display: block;
+    margin: 0 auto;
   }
 
   .lightbox {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.7);
+    z-index: 30;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 24px;
-    z-index: 20;
+    padding: 20px 16px;
   }
 
-  .lightbox img {
-    max-width: min(360px, 90vw);
+  .lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    border: none;
+    background: rgba(15, 23, 42, 0.72);
+    cursor: pointer;
+  }
+
+  .lightbox-panel {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 300px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .lightbox-close {
+    align-self: flex-end;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 999px;
+    background: var(--bg);
+    font-size: 22px;
+    cursor: pointer;
+  }
+
+  .lightbox-panel img {
+    width: 100%;
     border-radius: 12px;
   }
 
-  .close {
-    align-self: flex-end;
-    margin-bottom: 12px;
-    min-height: 44px;
-    padding: 0 16px;
-    border-radius: 8px;
-    border: none;
-    background: var(--bg);
-    cursor: pointer;
+  .lightbox-title {
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
   }
 </style>

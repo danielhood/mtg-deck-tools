@@ -1,8 +1,9 @@
 <script lang="ts">
   import WizardChrome from "../components/WizardChrome.svelte";
+  import WizardIntro from "../components/WizardIntro.svelte";
+  import { loadDraft, saveDraft, type WizardDraft } from "../lib/criteria";
   import type { WizardMeta } from "../lib/api";
   import { formatColors } from "../lib/format";
-  import { loadDraft, saveDraft, type ColorFilter, type WizardDraft } from "../lib/criteria";
 
   interface Props {
     meta: WizardMeta;
@@ -20,122 +21,96 @@
     { id: "G", label: "Green" },
   ] as const;
 
+  const COLOR_ORDER = ["W", "U", "B", "R", "G"] as const;
+
   $effect(() => {
     saveDraft(draft);
   });
 
-  function setColorFilter(mode: ColorFilter): void {
-    if (mode === "colorless") {
-      draft = { ...draft, colorFilter: "colorless", colors: [] };
-      return;
-    }
-    if (mode === "any") {
-      draft = { ...draft, colorFilter: "any", colors: [] };
-      return;
-    }
-    draft = { ...draft, colorFilter: "selected" };
+  function isPipChecked(id: string): boolean {
+    return draft.colorFilter === "selected" && draft.colors.includes(id);
   }
 
-  function togglePip(id: string): void {
+  function togglePip(id: string, checked: boolean): void {
     const colors = new Set(draft.colors);
-    if (colors.has(id)) colors.delete(id);
-    else colors.add(id);
+    if (checked) {
+      colors.add(id);
+      draft = {
+        ...draft,
+        colorFilter: "selected",
+        colors: COLOR_ORDER.filter((c) => colors.has(c)),
+      };
+      return;
+    }
+
+    colors.delete(id);
+    const next = COLOR_ORDER.filter((c) => colors.has(c));
     draft = {
       ...draft,
-      colorFilter: "selected",
-      colors: [...colors].sort(),
+      colorFilter: next.length ? "selected" : "any",
+      colors: next,
     };
   }
 
+  function setColorlessOnly(enabled: boolean): void {
+    draft = enabled
+      ? { ...draft, colorFilter: "colorless", colors: [] }
+      : { ...draft, colorFilter: "any", colors: [] };
+  }
+
   function summary(): string {
-    if (draft.colorFilter === "colorless") return "Colorless commanders only";
-    if (draft.colorFilter === "any") return "Any commander colors";
+    if (draft.colorFilter === "colorless") return "Colorless only";
+    if (draft.colorFilter === "any" || !draft.colors.length) return "Any (no color filter)";
     return formatColors(draft.colors);
   }
 </script>
 
 <WizardChrome step={4} backRoute="/build/3" nextRoute="/build/5" dbReady={meta.db_ready}>
-  <h2 class="section-title">Colors</h2>
-  <p class="section-lead">Pick commander color identity constraints.</p>
+  <WizardIntro
+    title="Colors"
+    lead="Choose colors that should be present in the commander's identity."
+  />
 
-  <div class="pip-grid">
-    {#each PIPS as pip (pip.id)}
+  <section class="wizard-section" aria-label="Color identity">
+    <div class="color-grid" role="group" aria-label="Colored commander identity">
+      {#each PIPS as pip (pip.id)}
+        <label class="color-option color-{pip.id.toLowerCase()}">
+          <input
+            type="checkbox"
+            name="color"
+            value={pip.id}
+            checked={isPipChecked(pip.id)}
+            onchange={(e) => togglePip(pip.id, e.currentTarget.checked)}
+          />
+          <span class="pip-slot">
+            <span class="mana-pip" aria-hidden="true">{pip.id}</span>
+          </span>
+          <span class="color-label">{pip.label}</span>
+        </label>
+      {/each}
+    </div>
+
+    <div class="colorless-row">
       <button
         type="button"
-        class="pip"
-        class:selected={draft.colorFilter === "selected" && draft.colors.includes(pip.id)}
-        disabled={draft.colorFilter === "colorless"}
-        onclick={() => togglePip(pip.id)}
-        aria-label={pip.label}
+        class="colorless-option"
+        class:is-selected={draft.colorFilter === "colorless"}
+        aria-pressed={draft.colorFilter === "colorless"}
+        onclick={() => setColorlessOnly(draft.colorFilter !== "colorless")}
       >
-        {pip.id}
+        <span class="colorless-pip-slot">
+          <span class="mana-pip-colorless" aria-hidden="true">∅</span>
+        </span>
+        <span class="colorless-copy">
+          <strong>Colorless only</strong>
+          <span>Commanders with empty color identity (void) — excludes all colored picks.</span>
+        </span>
       </button>
-    {/each}
-  </div>
+    </div>
 
-  <button
-    type="button"
-    class="void-btn"
-    class:selected={draft.colorFilter === "colorless"}
-    onclick={() => setColorFilter(draft.colorFilter === "colorless" ? "any" : "colorless")}
-  >
-    Colorless (void)
-  </button>
-
-  <button type="button" class="linkish" onclick={() => setColorFilter("any")}>Clear to any colors</button>
-
-  <div class="summary-box"><strong>Selection:</strong> {summary()}</div>
+    <div class="selection-summary" aria-live="polite">
+      <h3>Selected identity</h3>
+      <p>{summary()}</p>
+    </div>
+  </section>
 </WizardChrome>
-
-<style>
-  .pip-grid {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .pip {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    background: var(--bg);
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .pip.selected {
-    background: #facc15;
-    border-color: #ca8a04;
-  }
-
-  .pip:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  .void-btn {
-    min-height: var(--touch-min);
-    border-radius: 10px;
-    border: 1px dashed var(--border);
-    background: var(--surface);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .void-btn.selected {
-    border-color: var(--blue-700);
-    background: var(--blue-100);
-  }
-
-  .linkish {
-    border: none;
-    background: none;
-    color: var(--blue-700);
-    font-size: 12px;
-    cursor: pointer;
-    text-align: left;
-    padding: 0;
-  }
-</style>

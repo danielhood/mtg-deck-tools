@@ -1,5 +1,7 @@
 <script lang="ts">
   import WizardChrome from "../components/WizardChrome.svelte";
+  import WizardIntro from "../components/WizardIntro.svelte";
+  import SectionHeader from "../components/SectionHeader.svelte";
   import {
     getSlotTemplateDefaults,
     getThemes,
@@ -8,6 +10,7 @@
     type WizardMeta,
   } from "../lib/api";
   import { loadDraft, saveDraft, type WizardDraft } from "../lib/criteria";
+  import { chunk, formatSlotLabel, formatTagLabel } from "../lib/format";
 
   interface Props {
     meta: WizardMeta;
@@ -19,6 +22,8 @@
   let themes = $state<ThemeChoice[]>([]);
   let slots = $state<SlotTemplateDefaults | null>(null);
   let error = $state("");
+
+  const themeRows = $derived(chunk(themes, 3));
 
   $effect(() => {
     saveDraft(draft);
@@ -38,40 +43,79 @@
       });
   });
 
-  function toggleTheme(id: string): void {
+  function toggleTheme(id: string, checked: boolean): void {
     const selected = new Set(draft.themes);
-    if (selected.has(id)) selected.delete(id);
-    else selected.add(id);
+    if (checked) selected.add(id);
+    else selected.delete(id);
     draft = { ...draft, themes: [...selected].sort() };
   }
 </script>
 
 <WizardChrome step={1} backRoute="/" nextRoute="/build/2" dbReady={meta.db_ready}>
-  <h2 class="section-title">Themes &amp; slot template</h2>
-  <p class="section-lead">Pick archetype themes. Slot template uses project defaults for UX7c.</p>
+  <WizardIntro
+    title="Themes & slot template"
+    lead="Pick archetype tags for synergy cards and confirm deck slot counts."
+  />
 
   {#if error}
     <p class="inline-warning">{error}</p>
   {/if}
 
-  <div class="chip-grid" role="group" aria-label="Theme selection">
-    {#each themes as theme (theme.id)}
-      <button
-        type="button"
-        class="chip"
-        class:selected={draft.themes.includes(theme.id)}
-        onclick={() => toggleTheme(theme.id)}
-      >
-        {theme.id}
-      </button>
-    {/each}
-  </div>
+  <section class="wizard-section" aria-labelledby="themes-heading">
+    <SectionHeader
+      id="themes-heading"
+      title="Deck themes"
+      description="Archetype tags that steer synergy slot picks. Select none or more."
+    />
+
+    <div class="chip-stack">
+      {#each themeRows as row (row.map((t) => t.id).join("-"))}
+        <div class="chip-row">
+          {#each row as theme (theme.id)}
+            <label class="chip">
+              <input
+                type="checkbox"
+                checked={draft.themes.includes(theme.id)}
+                onchange={(e) => toggleTheme(theme.id, e.currentTarget.checked)}
+              />
+              {formatTagLabel(theme.id)}
+            </label>
+          {/each}
+        </div>
+      {/each}
+    </div>
+  </section>
 
   {#if slots}
-    <div class="summary-box">
-      <strong>Commander slots:</strong> {slots.commander_slots}<br />
-      <strong>Maindeck slots:</strong> {slots.maindeck_total}<br />
-      <strong>Total deck:</strong> {slots.deck_total} cards (default template)
-    </div>
+    <section class="wizard-section" aria-labelledby="slots-heading">
+      <SectionHeader
+        id="slots-heading"
+        title="Slot template"
+        description="How many cards per deck role."
+      />
+
+      <div class="slot-panel">
+        <div class="slot-panel-header">
+          <h3>Default Commander template</h3>
+          <p>Standard role counts for a 100-card deck.</p>
+        </div>
+        <div class="slot-grid" role="table" aria-label="Default slot counts">
+          <div class="slot-row" role="row">
+            <span class="slot-name">Commander</span>
+            <span class="slot-count">{slots.commander_slots}</span>
+          </div>
+          {#each slots.order as slotId (slotId)}
+            <div class="slot-row" role="row">
+              <span class="slot-name">{formatSlotLabel(slotId, slots.labels)}</span>
+              <span class="slot-count">{slots.default[slotId]}</span>
+            </div>
+          {/each}
+          <div class="slot-row" role="row">
+            <span class="slot-name">Total deck</span>
+            <span class="slot-count">{slots.deck_total}</span>
+          </div>
+        </div>
+      </div>
+    </section>
   {/if}
 </WizardChrome>

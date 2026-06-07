@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import { navigate } from "../lib/router";
+  import WizardProgress from "./WizardProgress.svelte";
 
   interface Props {
     step: number;
@@ -23,15 +24,22 @@
   }: Props = $props();
 </script>
 
-<div class="step-badge">Step {step} of 7</div>
-{@render children()}
+<div class="wizard-body">
+  <WizardProgress {step} />
+  {@render children()}
+</div>
 
 <div class="wizard-footer">
-  <button class="btn btn-secondary" type="button" disabled={!backRoute} onclick={() => backRoute && navigate(backRoute)}>
+  <button
+    class="btn btn-back"
+    type="button"
+    disabled={!backRoute}
+    onclick={() => backRoute && navigate(backRoute)}
+  >
     Back
   </button>
   <button
-    class="btn btn-primary"
+    class="btn btn-next"
     type="button"
     disabled={!dbReady || !nextRoute || nextDisabled}
     onclick={() => nextRoute && !nextDisabled && navigate(nextRoute)}

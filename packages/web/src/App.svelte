@@ -38,12 +38,17 @@
 
   const route = $derived(matchRoute(path));
 
+  const wizardStep = $derived.by(() => {
+    const match = route.match(/^build-step-(\d)$/);
+    return match ? Number(match[1]) : null;
+  });
+
   $effect(() => {
     if (route === "build-redirect") navigate("/build/1", true);
   });
 </script>
 
-<AppShell {meta}>
+<AppShell {meta} {wizardStep}>
   {#if loadError}
     <p class="inline-warning">{loadError}</p>
   {:else if !meta}

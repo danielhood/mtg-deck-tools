@@ -1,8 +1,23 @@
 <script lang="ts">
   import WizardChrome from "../components/WizardChrome.svelte";
+  import WizardIntro from "../components/WizardIntro.svelte";
+  import SectionHeader from "../components/SectionHeader.svelte";
+  import ToggleRow from "../components/ToggleRow.svelte";
+  import PriceStepperRow from "../components/PriceStepperRow.svelte";
   import type { WizardMeta } from "../lib/api";
-  import { formatMoneyInput, formatPrice, parseMoneyInput } from "../lib/format";
   import { loadDraft, saveDraft, type WizardDraft } from "../lib/criteria";
+  import {
+    BUDGET_MIN,
+    BUDGET_STEP,
+    formatAmount,
+    formatUsd,
+    MAX_CARD_STEP,
+    MIN_CARD_STEP,
+    parseBudgetMoney,
+    parseOptionalMoney,
+    sanitizeMoneyEntry,
+    stepOptional,
+  } from "../lib/money";
 
   interface Props {
     meta: WizardMeta;
@@ -11,161 +26,296 @@
   let { meta }: Props = $props();
 
   let draft = $state<WizardDraft>(loadDraft());
+  let budgetText = $state(formatAmount(draft.budget_usd ?? 150));
+  let minText = $state(formatAmount(draft.card_price_min_usd));
+  let maxText = $state(formatAmount(draft.card_price_max_usd));
 
   $effect(() => {
     saveDraft(draft);
   });
 
-  function adjustBudget(delta: number): void {
-    const current = draft.budget_usd ?? 0;
-    draft = { ...draft, budget_usd: Math.max(0, current + delta) };
-  }
+  const budgetParsed = $derived(parseBudgetMoney(budgetText));
+  const minParsed = $derived(parseOptionalMoney(minText));
+  const maxParsed = $derived(parseOptionalMoney(maxText));
 
-  function adjustMin(delta: number): void {
-    const current = draft.card_price_min_usd ?? 0;
-    draft = { ...draft, card_price_min_usd: Math.max(0, current + delta) };
-  }
-
-  function adjustMax(delta: number): void {
-    const current = draft.card_price_max_usd ?? 5;
-    draft = { ...draft, card_price_max_usd: Math.max(0.01, current + delta) };
-  }
-
-  const rangeWarning = $derived(
+  const rangeInvalid = $derived(
     draft.cardPriceRangeEnabled &&
-      draft.card_price_min_usd != null &&
-      draft.card_price_max_usd != null &&
-      draft.card_price_min_usd > draft.card_price_max_usd,
+      minParsed.valid &&
+      maxParsed.valid &&
+      minParsed.value !== null &&
+      maxParsed.value !== null &&
+      minParsed.value > maxParsed.value,
   );
+
+  const budgetFieldInvalid = $derived(draft.budgetEnabled && !budgetParsed.valid);
+  const minFieldInvalid = $derived(
+    draft.cardPriceRangeEnabled && (!minParsed.valid || rangeInvalid),
+  );
+  const maxFieldInvalid = $derived(
+    draft.cardPriceRangeEnabled && (!maxParsed.valid || rangeInvalid),
+  );
+
+  const budgetLessDisabled = $derived(
+    budgetParsed.valid && budgetParsed.value !== null && budgetParsed.value <= BUDGET_MIN,
+  );
+
+  function handleBudgetInput(raw: string): void {
+    const sanitized = sanitizeMoneyEntry(raw);
+    budgetText = sanitized;
+    const parsed = parseBudgetMoney(sanitized);
+    if (parsed.valid && parsed.value !== null) {
+      draft = { ...draft, budget_usd: parsed.value };
+    }
+  }
+
+  function commitBudgetInput(): void {
+    const parsed = parseBudgetMoney(budgetText, { strict: true });
+    if (!parsed.valid || parsed.value === null) {
+      budgetText = formatAmount(BUDGET_MIN);
+      draft = { ...draft, budget_usd: BUDGET_MIN };
+      return;
+    }
+    budgetText = formatAmount(parsed.value);
+    draft = { ...draft, budget_usd: parsed.value };
+  }
+
+  function handleOptionalInput(raw: string, field: "min" | "max"): void {
+    const sanitized = sanitizeMoneyEntry(raw);
+    if (field === "min") minText = sanitized;
+    else maxText = sanitized;
+  }
+
+  function commitOptionalInput(field: "min" | "max"): void {
+    const text = field === "min" ? minText : maxText;
+    const parsed = parseOptionalMoney(text, { strict: true });
+    if (!parsed.valid) {
+      if (field === "min") {
+        minText = "";
+        draft = { ...draft, card_price_min_usd: null };
+      } else {
+        maxText = "";
+        draft = { ...draft, card_price_max_usd: null };
+      }
+      return;
+    }
+    const formatted = formatAmount(parsed.value);
+    if (field === "min") {
+      minText = formatted;
+      draft = { ...draft, card_price_min_usd: parsed.value };
+    } else {
+      maxText = formatted;
+      draft = { ...draft, card_price_max_usd: parsed.value };
+    }
+  }
+
+  function clearOptional(field: "min" | "max"): void {
+    if (field === "min") {
+      minText = "";
+      draft = { ...draft, card_price_min_usd: null };
+    } else {
+      maxText = "";
+      draft = { ...draft, card_price_max_usd: null };
+    }
+  }
+
+  function stepBudget(direction: "more" | "less"): void {
+    const current =
+      budgetParsed.valid && budgetParsed.value !== null ? budgetParsed.value : BUDGET_MIN;
+    const next =
+      direction === "more" ? current + BUDGET_STEP : Math.max(BUDGET_MIN, current - BUDGET_STEP);
+    budgetText = formatAmount(next);
+    draft = { ...draft, budget_usd: next };
+  }
+
+  function stepMin(direction: "more" | "less"): void {
+    const next = stepOptional(minParsed.valid ? minParsed.value : null, MIN_CARD_STEP, direction);
+    minText = formatAmount(next);
+    draft = { ...draft, card_price_min_usd: next };
+  }
+
+  function stepMax(direction: "more" | "less"): void {
+    const next = stepOptional(maxParsed.valid ? maxParsed.value : null, MAX_CARD_STEP, direction);
+    maxText = formatAmount(next);
+    draft = { ...draft, card_price_max_usd: next };
+  }
+
+  const summaryText = $derived.by(() => {
+    const parts: string[] = [];
+
+    if (draft.budgetEnabled) {
+      const budgetPart =
+        budgetParsed.valid && budgetParsed.value !== null
+          ? `Deck budget: ${formatUsd(budgetParsed.value)}`
+          : "Deck budget: (invalid amount)";
+      const flags: string[] = [];
+      if (draft.strict_budget) flags.push("strict");
+      if (draft.prefer_available) flags.push("prefer available");
+      parts.push(flags.length ? `${budgetPart} · ${flags.join(" · ")}` : budgetPart);
+    } else {
+      parts.push("No total deck budget");
+    }
+
+    if (draft.cardPriceRangeEnabled) {
+      if (minParsed.valid && maxParsed.valid && (minParsed.value !== null || maxParsed.value !== null)) {
+        const minLabel = minParsed.value !== null ? formatUsd(minParsed.value) : "no min";
+        const maxLabel = maxParsed.value !== null ? formatUsd(maxParsed.value) : "no max";
+        parts.push(`Per card: ${minLabel} – ${maxLabel}`);
+      } else if (!minParsed.valid || !maxParsed.valid) {
+        parts.push("Per-card range: invalid amount");
+      } else {
+        parts.push("Per-card range enabled (no bounds set)");
+      }
+      if (rangeInvalid) parts.push("min > max");
+    }
+
+    if (parts.length === 1 && parts[0] === "No total deck budget" && !draft.cardPriceRangeEnabled) {
+      return { text: "No price constraints", muted: true };
+    }
+    return { text: parts.join(" · "), muted: false };
+  });
 </script>
 
 <WizardChrome step={5} backRoute="/build/4" nextRoute="/build/6" dbReady={meta.db_ready}>
-  <h2 class="section-title">Budget &amp; card prices</h2>
-  <p class="section-lead">Optional deck budget and per-card price bounds.</p>
+  <WizardIntro
+    title="Budget & card prices"
+    lead="Optional total deck cap and per-card min/max using Scryfall USD prices."
+  />
 
-  <div class="toggle-row">
-    <label for="budget-enabled">Total deck budget</label>
-    <input
-      id="budget-enabled"
-      type="checkbox"
-      checked={draft.budgetEnabled}
-      onchange={(e) => {
-        const enabled = e.currentTarget.checked;
-        draft = {
-          ...draft,
-          budgetEnabled: enabled,
-          strict_budget: enabled ? draft.strict_budget : false,
-          prefer_available: enabled ? draft.prefer_available : false,
-          budget_usd: enabled ? (draft.budget_usd ?? 150) : null,
-        };
-      }}
+  <section class="wizard-section" aria-labelledby="budget-heading">
+    <SectionHeader
+      id="budget-heading"
+      title="Total deck budget"
+      description="Cap total spend for the full 100-card list."
     />
-  </div>
 
-  {#if draft.budgetEnabled}
-    <div class="money-row">
-      <button type="button" class="step" onclick={() => adjustBudget(-5)}>−</button>
-      <input
-        type="text"
-        inputmode="decimal"
-        value={formatMoneyInput(draft.budget_usd)}
-        oninput={(e) => (draft = { ...draft, budget_usd: parseMoneyInput(e.currentTarget.value) })}
-        aria-label="Deck budget USD"
-      />
-      <button type="button" class="step" onclick={() => adjustBudget(5)}>+</button>
-    </div>
-    <div class="toggle-row">
-      <label for="strict-budget">Exclude cards without USD prices</label>
-      <input
-        id="strict-budget"
-        type="checkbox"
-        checked={draft.strict_budget}
-        onchange={(e) => (draft = { ...draft, strict_budget: e.currentTarget.checked })}
+    <div class="toggle-list">
+      <ToggleRow
+        title="Set a total deck budget"
+        description="Maximum USD spend for the entire deck."
+        checked={draft.budgetEnabled}
+        ontoggle={(enabled) => {
+          draft = {
+            ...draft,
+            budgetEnabled: enabled,
+            strict_budget: enabled ? draft.strict_budget : false,
+            prefer_available: enabled ? draft.prefer_available : false,
+            budget_usd: enabled ? (draft.budget_usd ?? 150) : null,
+          };
+          if (enabled && !budgetText.trim()) {
+            budgetText = formatAmount(draft.budget_usd ?? 150);
+          }
+        }}
       />
     </div>
-    <div class="toggle-row">
-      <label for="prefer-available">Prefer readily available picks</label>
-      <input
-        id="prefer-available"
-        type="checkbox"
-        checked={draft.prefer_available}
-        onchange={(e) => (draft = { ...draft, prefer_available: e.currentTarget.checked })}
-      />
-    </div>
-  {/if}
 
-  <div class="toggle-row">
-    <label for="range-enabled">Per-card price range</label>
-    <input
-      id="range-enabled"
-      type="checkbox"
-      checked={draft.cardPriceRangeEnabled}
-      onchange={(e) => {
-        const enabled = e.currentTarget.checked;
-        draft = {
-          ...draft,
-          cardPriceRangeEnabled: enabled,
-          card_price_min_usd: enabled ? draft.card_price_min_usd : null,
-          card_price_max_usd: enabled ? draft.card_price_max_usd : null,
-        };
-      }}
-    />
-  </div>
+    {#if draft.budgetEnabled}
+      <div class="conditional-panel">
+        <div class="price-stepper-list" aria-label="Deck budget amount">
+          <PriceStepperRow
+            label="Maximum deck budget"
+            inputId="budget-input"
+            text={budgetText}
+            stepHint="$10 per tap."
+            invalid={budgetFieldInvalid}
+            lessDisabled={budgetLessDisabled}
+            ontextinput={handleBudgetInput}
+            onblur={commitBudgetInput}
+            onless={() => stepBudget("less")}
+            onmore={() => stepBudget("more")}
+          />
+        </div>
 
-  {#if draft.cardPriceRangeEnabled}
-    <div class="money-row">
-      <span class="field-label">Max</span>
-      <button type="button" class="step" onclick={() => adjustMax(-5)}>−</button>
-      <input
-        type="text"
-        value={formatMoneyInput(draft.card_price_max_usd)}
-        oninput={(e) => (draft = { ...draft, card_price_max_usd: parseMoneyInput(e.currentTarget.value) })}
-      />
-      <button type="button" class="step" onclick={() => adjustMax(5)}>+</button>
-    </div>
-    <div class="money-row">
-      <span class="field-label">Min</span>
-      <button type="button" class="step" onclick={() => adjustMin(-1)}>−</button>
-      <input
-        type="text"
-        value={formatMoneyInput(draft.card_price_min_usd)}
-        oninput={(e) => (draft = { ...draft, card_price_min_usd: parseMoneyInput(e.currentTarget.value) })}
-      />
-      <button type="button" class="step" onclick={() => adjustMin(1)}>+</button>
-    </div>
-    {#if rangeWarning}
-      <p class="inline-warning">Minimum exceeds maximum — adjust either bound.</p>
+        <div class="nested-toggles" aria-label="Budget enforcement options">
+          <ToggleRow
+            title="Exclude unpriced cards"
+            description="Skip cards without USD prices."
+            checked={draft.strict_budget}
+            ontoggle={(checked) => (draft = { ...draft, strict_budget: checked })}
+          />
+          <ToggleRow
+            title="Prefer readily available"
+            description="Filter obscure / hard-to-find picks."
+            checked={draft.prefer_available}
+            ontoggle={(checked) => (draft = { ...draft, prefer_available: checked })}
+          />
+        </div>
+      </div>
     {/if}
-  {/if}
+  </section>
 
-  <div class="summary-box">
-    Budget: {draft.budgetEnabled ? formatPrice(draft.budget_usd) : "off"} · Per-card range:
-    {draft.cardPriceRangeEnabled ? "on" : "off"}
-  </div>
+  <section class="wizard-section" aria-labelledby="price-range-heading">
+    <SectionHeader
+      id="price-range-heading"
+      title="Per-card price range"
+      description="Optional min and/or max USD per card."
+    />
+
+    <div class="toggle-list">
+      <ToggleRow
+        title="Set per-card price range"
+        description="Limit individual card prices independent of total budget."
+        checked={draft.cardPriceRangeEnabled}
+        ontoggle={(enabled) => {
+          draft = {
+            ...draft,
+            cardPriceRangeEnabled: enabled,
+            card_price_min_usd: enabled ? draft.card_price_min_usd : null,
+            card_price_max_usd: enabled ? draft.card_price_max_usd : null,
+          };
+          if (!enabled) {
+            minText = "";
+            maxText = "";
+          }
+        }}
+      />
+    </div>
+
+    {#if draft.cardPriceRangeEnabled}
+      <div class="conditional-panel">
+        <div class="price-stepper-list" aria-label="Per-card price bounds">
+          <PriceStepperRow
+            label="Maximum per card"
+            inputId="price-max-input"
+            text={maxText}
+            placeholder="None"
+            stepHint="$5 per tap."
+            showClear
+            invalid={maxFieldInvalid}
+            lessDisabled={maxParsed.value === null}
+            ontextinput={(raw) => handleOptionalInput(raw, "max")}
+            onblur={() => commitOptionalInput("max")}
+            onless={() => stepMax("less")}
+            onmore={() => stepMax("more")}
+            onclear={() => clearOptional("max")}
+          />
+          <PriceStepperRow
+            label="Minimum per card"
+            inputId="price-min-input"
+            text={minText}
+            placeholder="None"
+            stepHint="$1 per tap."
+            showClear
+            invalid={minFieldInvalid}
+            lessDisabled={minParsed.value === null}
+            ontextinput={(raw) => handleOptionalInput(raw, "min")}
+            onblur={() => commitOptionalInput("min")}
+            onless={() => stepMin("less")}
+            onmore={() => stepMin("more")}
+            onclear={() => clearOptional("min")}
+          />
+        </div>
+        <p class="range-warning" class:is-visible={rangeInvalid} role="alert">
+          Minimum exceeds maximum — adjust before continuing.
+        </p>
+        <span class="field-hint">Leave blank for no limit.</span>
+      </div>
+    {/if}
+  </section>
+
+  <section aria-labelledby="summary-heading">
+    <div class="selection-summary" aria-live="polite">
+      <h3 id="summary-heading">Price constraints</h3>
+      <p class:is-none={summaryText.muted}>{summaryText.text}</p>
+    </div>
+  </section>
 </WizardChrome>
-
-<style>
-  .money-row {
-    display: grid;
-    grid-template-columns: auto 48px 1fr 48px;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .money-row input {
-    min-height: 44px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0 10px;
-  }
-
-  .step {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    font-size: 22px;
-    cursor: pointer;
-  }
-</style>

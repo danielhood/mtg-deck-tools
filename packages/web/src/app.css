@@ -1,4 +1,7 @@
+@import "./wizard.css";
+
 :root {
+  --zone-width: 48px;
   --bg: #ffffff;
   --surface: #f8fafc;
   --blue-900: #1e3a5f;
@@ -20,6 +23,9 @@
   --frame-max: 480px;
   --touch-min: 44px;
   --footer-height: 72px;
+  --pip-slot: 52px;
+  --pip-mini: 20px;
+  --mana-size-unselected: 34px;
 }
 
 * {
@@ -183,29 +189,6 @@ a {
   border-color: var(--border);
 }
 
-.chip-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.chip {
-  min-height: 36px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.chip.selected {
-  border-color: var(--blue-700);
-  background: var(--blue-100);
-  color: var(--blue-900);
-  font-weight: 600;
-}
-
 .wizard-footer {
   position: fixed;
   bottom: 0;
@@ -225,38 +208,10 @@ a {
   flex: 1;
 }
 
-.step-badge {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
 .field-label {
   font-size: 13px;
   font-weight: 600;
   color: var(--blue-900);
-}
-
-.toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.toggle-row label {
-  font-size: 13px;
-  flex: 1;
-}
-
-.toggle-row input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--blue-700);
 }
 
 .summary-box {
