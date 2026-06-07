@@ -1,6 +1,6 @@
 # Web UI — wireframes and layout review
 
-**Status:** Process documented — HTML mocks not started (next session).  
+**Status:** Home wireframes drafted — review loop open.  
 **Phase:** Planning — no changelog until wireframes ship as part of UX7c implementation prep.
 
 How to mock, review, and iterate on screen layouts **before** Svelte implementation. Behavior and routes remain authoritative in [screens.md](../screens.md), [routes.md](../routes.md), and [navigation.md](../navigation.md).
@@ -96,7 +96,7 @@ Pick from [screens.md](../screens.md) using route. For UX7c, mock **high-layout-
 
 1. `/` — home (DB banner, disabled CTA)
 2. `/build/1` — theme chips + defaults copy
-3. `/build/3` — synergy toggles + horizontal focus chips
+3. `/build/3` — synergy toggles + focus stepper (− / +)
 4. `/build/6` — commander search + color-match toggle
 5. `/build/review` — criteria summary + inline warnings
 6. `/build/result` — MD HTML preview shell

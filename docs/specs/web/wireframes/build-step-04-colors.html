@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Step 4 · Colors</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --frame-width: 375px;
+      --touch-min: 44px;
+      --footer-height: 72px;
+      --mana-size: 52px;
+      --mana-size-unselected: 34px;
+      --pip-slot: 52px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--blue-900);
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .step-pill {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--blue-100);
+      color: var(--blue-700);
+    }
+
+    .wizard-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(var(--footer-height) + 16px);
+    }
+
+    .wizard-intro {
+      margin-bottom: 18px;
+    }
+
+    .wizard-intro h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .wizard-intro p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .progress-segment {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+    }
+
+    .progress-segment.is-active { background: var(--blue-700); }
+    .progress-segment.is-complete { background: var(--blue-500); }
+
+    .section-header {
+      margin-bottom: 12px;
+    }
+
+    .section-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .section-header p {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .color-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .pip-slot {
+      width: var(--pip-slot);
+      height: var(--pip-slot);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .color-option input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .mana-pip {
+      box-sizing: border-box;
+      width: var(--mana-size-unselected);
+      height: var(--mana-size-unselected);
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+      background: var(--bg);
+      color: var(--text-muted);
+      transition:
+        width 0.15s ease,
+        height 0.15s ease,
+        font-size 0.15s ease,
+        border-width 0.15s ease,
+        border-color 0.15s ease,
+        background 0.15s ease,
+        color 0.15s ease;
+    }
+
+    .color-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.2;
+      transition: color 0.15s ease, font-weight 0.15s ease;
+    }
+
+    .color-option:has(input:checked) .mana-pip {
+      width: var(--pip-slot);
+      height: var(--pip-slot);
+      font-size: 20px;
+      border-width: 3px;
+    }
+
+    .color-option:has(input:checked) .color-label {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .color-w .mana-pip { color: #9a8c4a; background: #fdfcf5; border-color: #d4c88a; }
+    .color-u .mana-pip { color: #0e68ab; background: #eef6fc; border-color: #7eb8e0; }
+    .color-b .mana-pip { color: #3d3d3d; background: #f3f3f3; border-color: #888; }
+    .color-r .mana-pip { color: #d3202a; background: #fef2f2; border-color: #f19999; }
+    .color-g .mana-pip { color: #00733e; background: #eef8f2; border-color: #7bc49a; }
+
+    .color-w:has(input:checked) .mana-pip {
+      background: #dcc96a;
+      color: #3d3200;
+      border-color: #8a7420;
+    }
+    .color-u:has(input:checked) .mana-pip { background: #0e68ab; color: #ffffff; border-color: #0e68ab; }
+    .color-b:has(input:checked) .mana-pip { background: #2d2d2d; color: #ffffff; border-color: #2d2d2d; }
+    .color-r:has(input:checked) .mana-pip { background: #d3202a; color: #ffffff; border-color: #d3202a; }
+    .color-g:has(input:checked) .mana-pip { background: #00733e; color: #ffffff; border-color: #00733e; }
+
+    .colorless-row {
+      margin-bottom: 16px;
+    }
+
+    .colorless-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      background: var(--bg);
+    }
+
+    .colorless-pip-slot {
+      width: var(--pip-slot);
+      height: var(--pip-slot);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .colorless-option input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .colorless-option:has(input:checked) {
+      border-color: #888;
+      background: #f3f3f3;
+    }
+
+    .mana-pip-colorless {
+      box-sizing: border-box;
+      width: var(--mana-size-unselected);
+      height: var(--mana-size-unselected);
+      border-radius: 50%;
+      border: 2px dashed #888;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #666;
+      transition:
+        width 0.15s ease,
+        height 0.15s ease,
+        font-size 0.15s ease,
+        border-width 0.15s ease,
+        border-style 0.15s ease,
+        background 0.15s ease,
+        color 0.15s ease;
+    }
+
+    .colorless-option:has(input:checked) .mana-pip-colorless {
+      width: var(--pip-slot);
+      height: var(--pip-slot);
+      font-size: 18px;
+      border-style: solid;
+      border-width: 3px;
+      background: #e8e8e8;
+      color: #333;
+    }
+
+    .colorless-copy strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .colorless-copy span {
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--text-muted);
+    }
+
+    .design-note {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+
+    .design-note h3 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue-900);
+      margin-bottom: 6px;
+    }
+
+    .design-note p {
+      font-size: 11px;
+      line-height: 1.45;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .design-note p:last-child {
+      margin-bottom: 0;
+    }
+
+    .design-note strong {
+      color: var(--text);
+    }
+
+    .selection-summary {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--surface);
+    }
+
+    .selection-summary h3 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue-900);
+      margin-bottom: 6px;
+    }
+
+    .selection-summary p {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .selection-summary .is-any {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .selection-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .wizard-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .btn-back {
+      background: var(--bg);
+      color: var(--blue-700);
+      border: 1.5px solid var(--blue-700);
+    }
+
+    .btn-next {
+      background: var(--blue-700);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .wireframe-note {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .wireframe-note a { color: var(--blue-700); }
+  </style>
+</head>
+<body>
+  <p class="preview-label">Wireframe · 375px · /build/4</p>
+
+  <div class="frame" role="document" aria-label="Wizard step 4 wireframe">
+    <header class="app-header">
+      <div class="app-brand">
+        <div class="app-mark" aria-hidden="true"></div>
+        <div>
+          <div class="app-title">MTG Deck Tools</div>
+          <div class="app-subtitle">Build wizard</div>
+        </div>
+      </div>
+      <span class="step-pill">Step 4 of 7</span>
+    </header>
+
+    <div class="wizard-scroll">
+      <div class="progress-bar" aria-hidden="true">
+        <div class="progress-segment is-complete"></div>
+        <div class="progress-segment is-complete"></div>
+        <div class="progress-segment is-complete"></div>
+        <div class="progress-segment is-active"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+      </div>
+
+      <section class="wizard-intro">
+        <h1>Colors</h1>
+        <p>
+          Pick commander color identity — colored mana, colorless only, or leave
+          all open for any commander.
+        </p>
+      </section>
+
+      <section aria-labelledby="colors-heading">
+        <div class="section-header">
+          <h2 id="colors-heading">Commander color identity</h2>
+          <p>Tap W/U/B/R/G to multi-select. Colorless is separate — mutually exclusive.</p>
+        </div>
+
+        <div class="design-note" role="note">
+          <h3>Design note — engine impact</h3>
+          <p>
+            Add explicit <strong>Colorless</strong> (void identity) at this step.
+            Commander color identity is either empty (colorless) or one or more of
+            W/U/B/R/G — <strong>no card combines colorless with colored identity</strong>
+            under Commander rules.
+          </p>
+          <p>
+            Selecting Colorless clears colored pips and vice versa. Engine must
+            distinguish <strong>Colorless only</strong> from <strong>Any</strong>
+            (today <code>colors: []</code> is ambiguous until step 6 color-match
+            mode — likely needs <code>colorless_only</code> or filter enum in
+            <code>DeckCriteria</code>).
+          </p>
+        </div>
+
+        <div class="color-grid" role="group" aria-label="Colored commander identity">
+          <label class="color-option color-w">
+            <input type="checkbox" name="color" value="W">
+            <span class="pip-slot"><span class="mana-pip" aria-hidden="true">W</span></span>
+            <span class="color-label">White</span>
+          </label>
+          <label class="color-option color-u">
+            <input type="checkbox" name="color" value="U" checked>
+            <span class="pip-slot"><span class="mana-pip" aria-hidden="true">U</span></span>
+            <span class="color-label">Blue</span>
+          </label>
+          <label class="color-option color-b">
+            <input type="checkbox" name="color" value="B">
+            <span class="pip-slot"><span class="mana-pip" aria-hidden="true">B</span></span>
+            <span class="color-label">Black</span>
+          </label>
+          <label class="color-option color-r">
+            <input type="checkbox" name="color" value="R">
+            <span class="pip-slot"><span class="mana-pip" aria-hidden="true">R</span></span>
+            <span class="color-label">Red</span>
+          </label>
+          <label class="color-option color-g">
+            <input type="checkbox" name="color" value="G" checked>
+            <span class="pip-slot"><span class="mana-pip" aria-hidden="true">G</span></span>
+            <span class="color-label">Green</span>
+          </label>
+        </div>
+
+        <div class="colorless-row">
+          <label class="colorless-option">
+            <input type="checkbox" name="colorless" id="colorless-only">
+            <span class="colorless-pip-slot">
+              <span class="mana-pip-colorless" aria-hidden="true">∅</span>
+            </span>
+            <span class="colorless-copy">
+              <strong>Colorless only</strong>
+              <span>Commanders with empty color identity (void) — excludes all colored picks</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="selection-summary" aria-live="polite">
+          <h3>Selected identity</h3>
+          <p id="color-summary">Blue, Green</p>
+        </div>
+
+        <p class="selection-hint">
+          Three states: colored multi-select, Colorless only, or none selected =
+          Any. Step 6 sets exact vs includes for colored filters. Engine/schema
+          TBD for Colorless vs Any when both map to <code>[]</code> today.
+        </p>
+      </section>
+    </div>
+
+    <footer class="wizard-footer" aria-label="Wizard navigation">
+      <a class="btn btn-back" href="build-step-03-synergy.html">Back</a>
+      <a class="btn btn-next" href="#">Next</a>
+    </footer>
+  </div>
+
+  <p class="wireframe-note">
+    Route: <strong>/build/4</strong> — WUBRG multi-select. Back →
+    <a href="build-step-03-synergy.html">step 3</a>.
+    Spec: <code>screens.md</code> § Step 4.
+  </p>
+
+  <script>
+    const COLOR_NAMES = {
+      W: "White",
+      U: "Blue",
+      B: "Black",
+      R: "Red",
+      G: "Green",
+    };
+    const ORDER = ["W", "U", "B", "R", "G"];
+
+    const colorInputs = document.querySelectorAll('.color-grid input[name="color"]');
+    const colorlessInput = document.getElementById("colorless-only");
+    const summaryEl = document.getElementById("color-summary");
+
+    const syncSummary = () => {
+      if (colorlessInput.checked) {
+        summaryEl.textContent = "Colorless only";
+        summaryEl.className = "";
+        return;
+      }
+
+      const selected = ORDER.filter((letter) => {
+        const input = document.querySelector(
+          `.color-grid input[value="${letter}"]`,
+        );
+        return input && input.checked;
+      });
+
+      if (selected.length === 0) {
+        summaryEl.textContent = "Any (no color filter)";
+        summaryEl.className = "is-any";
+        return;
+      }
+
+      summaryEl.className = "";
+      summaryEl.textContent = selected
+        .map((letter) => COLOR_NAMES[letter])
+        .join(", ");
+    };
+
+    colorInputs.forEach((input) => {
+      input.addEventListener("change", () => {
+        if (input.checked) {
+          colorlessInput.checked = false;
+        }
+        syncSummary();
+      });
+    });
+
+    colorlessInput.addEventListener("change", () => {
+      if (colorlessInput.checked) {
+        colorInputs.forEach((input) => {
+          input.checked = false;
+        });
+      }
+      syncSummary();
+    });
+
+    syncSummary();
+  </script>
+</body>
+</html>

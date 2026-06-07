@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Home (DB missing)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --warn-bg: #fff7ed;
+      --warn-border: #fed7aa;
+      --warn-text: #9a3412;
+      --warn-icon: #ea580c;
+      --disabled-bg: #f1f5f9;
+      --disabled-text: #94a3b8;
+      --frame-width: 375px;
+      --touch-min: 44px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--blue-900);
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--warn-bg);
+      color: var(--warn-icon);
+      border: 1px solid var(--warn-border);
+    }
+
+    /* DB gate banner — above hero, full width in main */
+    .db-banner {
+      margin: 16px 16px 0;
+      padding: 14px 14px 14px 12px;
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-radius: 10px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .db-banner-icon {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--warn-icon);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .db-banner-body h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--warn-text);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .db-banner-body p {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--warn-text);
+      margin-bottom: 10px;
+    }
+
+    .db-banner-body code {
+      display: block;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      background: #ffffff;
+      border: 1px solid var(--warn-border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    .db-banner-footnote {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .app-main {
+      flex: 1;
+      padding: 20px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4px 0;
+    }
+
+    .hero h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      width: 100%;
+    }
+
+    .btn-primary-disabled {
+      background: var(--disabled-bg);
+      color: var(--disabled-text);
+      border: 1px solid var(--border);
+      cursor: not-allowed;
+    }
+
+    .btn-hint {
+      font-size: 12px;
+      color: var(--disabled-text);
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .btn-secondary {
+      background: var(--disabled-bg);
+      color: var(--disabled-text);
+      border: 1px solid var(--border);
+      cursor: not-allowed;
+    }
+
+    .future-section {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .future-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .future-note {
+      font-size: 12px;
+      color: var(--disabled-text);
+      text-align: center;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .wireframe-note {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .wireframe-note a {
+      color: var(--blue-700);
+    }
+  </style>
+</head>
+<body>
+  <p class="preview-label">Wireframe · 375px · DB missing</p>
+
+  <div class="frame" role="document" aria-label="Home screen wireframe — database missing">
+    <header class="app-header">
+      <div class="app-brand">
+        <div class="app-mark" aria-hidden="true"></div>
+        <div>
+          <div class="app-title">MTG Deck Tools</div>
+          <div class="app-subtitle">Commander builder</div>
+        </div>
+      </div>
+      <span class="status-pill">No database</span>
+    </header>
+
+    <aside class="db-banner" role="alert">
+      <div class="db-banner-icon" aria-hidden="true">!</div>
+      <div class="db-banner-body">
+        <h2>Card database not found</h2>
+        <p>
+          Import Scryfall oracle data before building decks. Run this in your
+          terminal from the project directory:
+        </p>
+        <code>mtg-deck-tools import</code>
+        <p class="db-banner-footnote">
+          Web-side import is planned for UX7g. Until then, use the CLI.
+        </p>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <section class="hero">
+        <h1>Build a new deck</h1>
+        <p>
+          The build wizard needs a local card database. Import once, then return
+          here to start.
+        </p>
+      </section>
+
+      <section class="actions" aria-label="Primary actions">
+        <button
+          class="btn btn-primary-disabled"
+          type="button"
+          disabled
+          aria-disabled="true"
+        >
+          Build new deck
+        </button>
+        <p class="btn-hint">Unavailable until import completes.</p>
+      </section>
+
+      <section class="future-section" aria-label="Coming soon">
+        <p class="future-label">Coming later</p>
+        <div class="actions">
+          <button class="btn btn-secondary" type="button" disabled aria-disabled="true">
+            Saved library
+          </button>
+          <button class="btn btn-secondary" type="button" disabled aria-disabled="true">
+            Resume active deck
+          </button>
+        </div>
+        <p class="future-note">Library and resume deck ship in UX7f / UX7e.</p>
+      </section>
+    </main>
+  </div>
+
+  <p class="wireframe-note">
+    State: <strong>DB missing</strong> — banner + disabled primary CTA.
+    Compare <a href="home.html">home.html</a> (ready state).
+    Spec: <code>architecture.md</code> § Database gate.
+  </p>
+</body>
+</html>
