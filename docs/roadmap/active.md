@@ -19,7 +19,7 @@ Status as of 2026-06-04.
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX7** | web-ui | Cross-platform web shell (mobile-first); **UX7c-a–UX7c-b** wizard API + steps 1–7 + review/generate/result (**WIP** UX7c-c polish) — then UX7e view, UX7f library, UX7d dashboard — [specs/web/README.md](../specs/web/README.md), [architecture.md](../specs/web/architecture.md) | **Selected — P1** | UX7a–UX7b shipped (`service/`, `api/`, `serve`) | **ENG-MAINT**, doc-only |
+| **UX7** | web-ui | Cross-platform web shell (mobile-first); ~~**UX7c** build wizard~~ **shipped** — **UX7e** deck view, **UX7f** library, **UX7d** dashboard — [specs/web/README.md](../specs/web/README.md), [architecture.md](../specs/web/architecture.md) | **Selected — P1** | UX7c shipped | **ENG-MAINT**, doc-only |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | **UX7** (different paths), dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 

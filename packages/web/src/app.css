@@ -20,7 +20,7 @@
   --avoid-700: #c2410c;
   --disabled-bg: #f1f5f9;
   --disabled-text: #94a3b8;
-  --frame-max: 480px;
+  --frame-max: 375px;
   --touch-min: 44px;
   --footer-height: 72px;
   --pip-slot: 52px;
@@ -62,10 +62,12 @@ a {
   display: flex;
   flex-direction: column;
   max-width: var(--frame-max);
+  width: 100%;
   margin: 0 auto;
   background: var(--bg);
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
+  overflow-x: clip;
 }
 
 .app-header {
@@ -122,10 +124,12 @@ a {
 
 .app-main {
   flex: 1;
+  min-width: 0;
   padding: 20px 16px calc(var(--footer-height) + 16px);
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-x: clip;
 }
 
 .db-banner {
@@ -230,4 +234,52 @@ a {
   background: var(--warn-100);
   color: var(--warn-700);
   font-size: 12px;
+}
+
+.status-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.status-loading {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.status-error {
+  border: 1px solid #fca5a5;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.status-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--blue-700);
+  border-radius: 999px;
+  animation: status-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.status-retry {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+@keyframes status-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -1,5 +1,7 @@
 <script lang="ts">
   import AppShell from "./components/AppShell.svelte";
+  import ErrorState from "./components/ErrorState.svelte";
+  import LoadingState from "./components/LoadingState.svelte";
   import { getWizardMeta, type WizardMeta } from "./lib/api";
   import { getPath, matchRoute, navigate, subscribe } from "./lib/router";
   import HomePage from "./pages/HomePage.svelte";
@@ -16,6 +18,8 @@
   let path = $state(getPath());
   let meta = $state<WizardMeta | null>(null);
   let loadError = $state("");
+  let metaLoading = $state(true);
+  let metaReload = $state(0);
 
   $effect(() => {
     return subscribe(() => {
@@ -24,10 +28,14 @@
   });
 
   $effect(() => {
+    metaLoading = true;
+    loadError = "";
+    void metaReload;
     getWizardMeta()
       .then((response) => {
         meta = response;
         loadError = "";
+        metaLoading = false;
         if (
           !response.db_ready &&
           path.startsWith("/build") &&
@@ -39,6 +47,8 @@
       })
       .catch((err: Error) => {
         loadError = err.message;
+        meta = null;
+        metaLoading = false;
       });
   });
 
@@ -62,9 +72,9 @@
 
 <AppShell {meta} {wizardStep} {phasePill}>
   {#if loadError}
-    <p class="inline-warning">{loadError}</p>
-  {:else if !meta}
-    <p class="section-lead">Loading…</p>
+    <ErrorState message={loadError} onretry={() => (metaReload += 1)} />
+  {:else if metaLoading || !meta}
+    <LoadingState message="Connecting to server…" />
   {:else if route === "home"}
     <HomePage {meta} />
   {:else if route === "build-step-1"}

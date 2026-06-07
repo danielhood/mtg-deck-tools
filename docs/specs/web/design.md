@@ -1,6 +1,6 @@
 # Web UI — visual design
 
-**Status:** Planning — UX7c tokens locked; dark mode deferred.
+**Status:** **UX7c shipped** — tokens locked at 375px baseline; dark mode deferred.
 
 Overall UI design decisions for `packages/web/`. Layout per screen: [screens.md](screens.md). Mock and review process: [wireframes/README.md](wireframes/README.md).
 

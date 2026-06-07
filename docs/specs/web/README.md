@@ -1,6 +1,6 @@
 # Web UI specification (planned)
 
-**Status:** **UX7a–UX7b shipped** — **UX7c-a shipped** (wizard API + Svelte shell + steps 1–7). **UX7c-b shipped** (review, preflight, generate, MD result). **UX7c-c** (polish) next.
+**Status:** **UX7a–UX7c shipped** — build wizard (steps 1–7, review, generate, MD result). **UX7e** enhanced deck view next.
 
 ## Code location
 

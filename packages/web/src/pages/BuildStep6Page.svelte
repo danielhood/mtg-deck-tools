@@ -1,5 +1,7 @@
 <script lang="ts">
   import CardLightbox from "../components/CardLightbox.svelte";
+  import ErrorState from "../components/ErrorState.svelte";
+  import LoadingState from "../components/LoadingState.svelte";
   import WizardChrome from "../components/WizardChrome.svelte";
   import WizardIntro from "../components/WizardIntro.svelte";
   import SectionHeader from "../components/SectionHeader.svelte";
@@ -31,6 +33,8 @@
   let selected = $state<CommanderResult | null>(restoreCommanderSelection(draft));
   let showArt = $state(false);
   let resultsEl = $state<HTMLDivElement | null>(null);
+  let searchLoading = $state(false);
+  let searchError = $state("");
 
   $effect(() => {
     const q = query;
@@ -63,6 +67,9 @@
     const oracleId = draft.commander_oracle_ids[0];
     const fallback = selected ?? restoreCommanderSelection(draft);
 
+    searchLoading = true;
+    searchError = "";
+
     const timer = setTimeout(() => {
       searchCommanders(params)
         .then((rows) => {
@@ -73,8 +80,12 @@
             draft = { ...draft, commander_snapshot: resultToSnapshot(merged.selected) };
           }
         })
-        .catch(() => {
+        .catch((err: Error) => {
           results = [];
+          searchError = err.message;
+        })
+        .finally(() => {
+          searchLoading = false;
         });
     }, 200);
     return () => clearTimeout(timer);
@@ -193,6 +204,12 @@
         />
       </div>
     </div>
+
+    {#if searchError}
+      <ErrorState message={searchError} />
+    {:else if searchLoading && !results.length}
+      <LoadingState message="Searching commanders…" />
+    {/if}
 
     <div class="commander-results" role="listbox" aria-label="Commander results" bind:this={resultsEl}>
       {#each results as row (row.oracle_id)}
