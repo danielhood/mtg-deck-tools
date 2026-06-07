@@ -10,7 +10,8 @@
   import BuildStep5Page from "./pages/BuildStep5Page.svelte";
   import BuildStep6Page from "./pages/BuildStep6Page.svelte";
   import BuildStep7Page from "./pages/BuildStep7Page.svelte";
-  import BuildReviewStubPage from "./pages/BuildReviewStubPage.svelte";
+  import BuildReviewPage from "./pages/BuildReviewPage.svelte";
+  import BuildResultPage from "./pages/BuildResultPage.svelte";
 
   let path = $state(getPath());
   let meta = $state<WizardMeta | null>(null);
@@ -27,7 +28,12 @@
       .then((response) => {
         meta = response;
         loadError = "";
-        if (!response.db_ready && path.startsWith("/build") && path !== "/build/review") {
+        if (
+          !response.db_ready &&
+          path.startsWith("/build") &&
+          path !== "/build/review" &&
+          path !== "/build/result"
+        ) {
           navigate("/", true);
         }
       })
@@ -43,12 +49,18 @@
     return match ? Number(match[1]) : null;
   });
 
+  const phasePill = $derived.by((): "review" | "result" | null => {
+    if (route === "build-review") return "review";
+    if (route === "build-result") return "result";
+    return null;
+  });
+
   $effect(() => {
     if (route === "build-redirect") navigate("/build/1", true);
   });
 </script>
 
-<AppShell {meta} {wizardStep}>
+<AppShell {meta} {wizardStep} {phasePill}>
   {#if loadError}
     <p class="inline-warning">{loadError}</p>
   {:else if !meta}
@@ -70,7 +82,9 @@
   {:else if route === "build-step-7"}
     <BuildStep7Page {meta} />
   {:else if route === "build-review"}
-    <BuildReviewStubPage {meta} />
+    <BuildReviewPage {meta} />
+  {:else if route === "build-result"}
+    <BuildResultPage />
   {:else}
     <h2 class="section-title">Not found</h2>
     <button class="btn btn-primary" type="button" onclick={() => navigate("/")}>Home</button>

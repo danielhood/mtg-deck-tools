@@ -736,6 +736,11 @@ components:
             type: object
           - type: 'null'
           title: Deck
+        markdown:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Markdown
       type: object
       required:
       - json_path

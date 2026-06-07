@@ -9,6 +9,7 @@ export interface WizardDraft {
   colorFilter: ColorFilter;
   colorMatch: ColorMatchMode;
   commander_oracle_ids: string[];
+  commander_label: string | null;
   budget_usd: number | null;
   card_price_min_usd: number | null;
   card_price_max_usd: number | null;
@@ -35,6 +36,7 @@ export function emptyDraft(): WizardDraft {
     colorFilter: "any",
     colorMatch: "includes",
     commander_oracle_ids: [],
+    commander_label: null,
     budget_usd: null,
     card_price_min_usd: null,
     card_price_max_usd: null,

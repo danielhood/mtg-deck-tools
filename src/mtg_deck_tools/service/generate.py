@@ -26,14 +26,31 @@ def _load_deck_dict(json_path: Path) -> dict[str, Any]:
     return json.loads(json_path.read_text(encoding="utf-8"))
 
 
-def _to_response(result: GenerateResult, *, include_deck: bool) -> GenerateResponse:
+def _md_path_for_json(json_path: Path) -> Path:
+    """Companion markdown path for a ``.deck.json`` (or legacy ``.json``) output."""
+    name = json_path.name
+    if name.endswith(".deck.json"):
+        return json_path.with_name(f"{name[: -len('.deck.json')]}.md")
+    return json_path.with_suffix(".md")
+
+
+def _to_response(
+    result: GenerateResult,
+    *,
+    include_deck: bool,
+    include_markdown: bool = False,
+) -> GenerateResponse:
     deck = result.deck
     if include_deck and deck is None:
         deck = _load_deck_dict(result.json_path)
+    markdown = None
+    if include_markdown and result.md_path.is_file():
+        markdown = result.md_path.read_text(encoding="utf-8")
     return GenerateResponse(
         json_path=str(result.json_path),
         md_path=str(result.md_path),
         deck=deck if include_deck else None,
+        markdown=markdown,
     )
 
 
@@ -41,6 +58,7 @@ def generate_deck(
     request: GenerateRequest,
     *,
     include_deck: bool = False,
+    include_markdown: bool = False,
 ) -> GenerateResponse:
     db_path = Path(request.db_path) if request.db_path else None
     output_dir = Path(request.output_dir) if request.output_dir else None
@@ -64,14 +82,15 @@ def generate_deck(
             prefer_available=request.prefer_available,
             commander_names=request.commander_names,
         )
-    result = GenerateResult(json_path=json_path, md_path=json_path.with_suffix(".md"))
-    return _to_response(result, include_deck=include_deck)
+    result = GenerateResult(json_path=json_path, md_path=_md_path_for_json(json_path))
+    return _to_response(result, include_deck=include_deck, include_markdown=include_markdown)
 
 
 def generate_deck_from_saved(
     request: GenerateFromDeckRequest,
     *,
     include_deck: bool = False,
+    include_markdown: bool = False,
 ) -> GenerateResponse:
     deck_path, temp_input = _resolve_deck_path(request)
     db_path = Path(request.db_path) if request.db_path else None
@@ -93,8 +112,8 @@ def generate_deck_from_saved(
         if temp_input:
             deck_path.unlink(missing_ok=True)
 
-    result = GenerateResult(json_path=json_path, md_path=json_path.with_suffix(".md"))
-    return _to_response(result, include_deck=include_deck)
+    result = GenerateResult(json_path=json_path, md_path=_md_path_for_json(json_path))
+    return _to_response(result, include_deck=include_deck, include_markdown=include_markdown)
 
 
 def generate_deck_cli(
@@ -128,9 +147,10 @@ def generate_deck_cli(
         commander_names=commander_names,
     )
     response = generate_deck(request, include_deck=False)
+    json_path = Path(response.json_path)
     return GenerateResult(
-        json_path=Path(response.json_path),
-        md_path=Path(response.md_path),
+        json_path=json_path,
+        md_path=_md_path_for_json(json_path),
     )
 
 

@@ -63,7 +63,11 @@
 
   function pickCommander(row: CommanderResult): void {
     selected = row;
-    draft = { ...draft, commander_oracle_ids: [row.oracle_id] };
+    draft = {
+      ...draft,
+      commander_oracle_ids: [row.oracle_id],
+      commander_label: row.name,
+    };
   }
 
   const nextDisabled = $derived(!draft.commander_oracle_ids.length);

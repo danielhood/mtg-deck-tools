@@ -5,13 +5,16 @@
   interface Props {
     meta: WizardMeta | null;
     wizardStep?: number | null;
+    phasePill?: "review" | "result" | null;
     children: Snippet;
     footer?: Snippet;
   }
 
-  let { meta, wizardStep = null, children, footer }: Props = $props();
+  let { meta, wizardStep = null, phasePill = null, children, footer }: Props = $props();
 
-  const subtitle = $derived(wizardStep != null ? "Build wizard" : "Commander builder");
+  const subtitle = $derived(
+    wizardStep != null || phasePill != null ? "Build wizard" : "Commander builder",
+  );
   const statusLabel = $derived(
     meta == null ? null : meta.db_ready ? "Ready" : "DB missing",
   );
@@ -28,6 +31,10 @@
     </div>
     {#if wizardStep != null}
       <span class="step-pill">Step {wizardStep} of 7</span>
+    {:else if phasePill === "review"}
+      <span class="review-pill">Review</span>
+    {:else if phasePill === "result"}
+      <span class="result-pill">Result</span>
     {:else if statusLabel}
       <span class="status-pill" class:warn={meta && !meta.db_ready}>{statusLabel}</span>
     {/if}

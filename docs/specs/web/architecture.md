@@ -1,7 +1,7 @@
 # Web UI architecture (planned)
 
-**Status:** **UX7a–UX7b implemented** — **UX7c-a** wizard API + Svelte SPA (steps 1–7) in progress — [specs/web/README.md](README.md).  
-**Phase:** UX7 active — UX7c-b (review/generate/result) next.
+**Status:** **UX7a–UX7b implemented** — **UX7c-a–UX7c-b** wizard API + Svelte SPA (steps 1–7, review, result) — [specs/web/README.md](README.md).
+**Phase:** UX7 active — UX7c-c (polish) next.
 
 ## Strategic shift
 
