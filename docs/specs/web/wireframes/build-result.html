@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Build result</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --ok-700: #15803d;
+      --ok-100: #dcfce7;
+      --frame-width: 375px;
+      --touch-min: 44px;
+      --footer-height: 72px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--blue-900);
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .result-pill {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--ok-100);
+      color: var(--ok-700);
+    }
+
+    .result-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(var(--footer-height) + 16px);
+    }
+
+    .result-intro {
+      margin-bottom: 14px;
+    }
+
+    .result-intro h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .result-intro p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .deck-preview {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      padding: 14px 12px 16px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .deck-preview h2.deck-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .deck-preview .deck-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .deck-preview .deck-meta strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .deck-preview h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 14px 0 8px;
+    }
+
+    .deck-preview h3:first-of-type {
+      margin-top: 0;
+    }
+
+    .deck-preview h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue-900);
+      margin: 10px 0 6px;
+    }
+
+    .preview-table-wrap {
+      overflow-x: auto;
+      margin-bottom: 4px;
+    }
+
+    .deck-preview table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .deck-preview th,
+    .deck-preview td {
+      border: 1px solid var(--border);
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    .deck-preview th {
+      background: var(--surface);
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .deck-preview td:last-child {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .deck-preview ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .deck-preview li {
+      font-size: 12px;
+      line-height: 1.45;
+      padding-left: 12px;
+      position: relative;
+    }
+
+    .deck-preview li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--blue-700);
+      font-weight: 700;
+    }
+
+    .deck-preview a {
+      color: var(--blue-700);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .deck-preview .card-detail {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .deck-preview .card-detail:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .deck-preview .card-detail h4 {
+      margin-top: 0;
+    }
+
+    .deck-preview .card-detail p {
+      font-size: 11px;
+      line-height: 1.45;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .preview-fade {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      font-size: 11px;
+      font-style: italic;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .dev-note {
+      margin-top: 14px;
+      padding: 10px 12px 10px 10px;
+      border: 1px dashed #d8b4fe;
+      border-left: 3px solid var(--magenta);
+      border-radius: 8px;
+      background: #fdf4ff;
+    }
+
+    .dev-note-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .dev-note-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--magenta);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+      font-family: ui-monospace, "Cascadia Code", monospace;
+    }
+
+    .dev-note-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--magenta);
+    }
+
+    .dev-note-body {
+      font-size: 11px;
+      line-height: 1.45;
+      color: #6b21a8;
+    }
+
+    .dev-note-body p + p {
+      margin-top: 6px;
+    }
+
+    .dev-note-body code {
+      font-size: 10px;
+      background: rgba(192, 38, 211, 0.1);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .result-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: var(--blue-700);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .wireframe-meta {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      padding: 10px 12px;
+      border: 1px dashed #cbd5e1;
+      border-left: 3px solid #64748b;
+      border-radius: 8px;
+      background: #f1f5f9;
+      text-align: left;
+    }
+
+    .wireframe-meta-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .wireframe-meta-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: #64748b;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .wireframe-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .wireframe-meta-body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .wireframe-meta-body a { color: var(--blue-700); }
+  </style>
+</head>
+<body>
+  <p class="preview-label">Wireframe · 375px · /build/result</p>
+
+  <div class="frame" role="document" aria-label="Build result wireframe">
+    <header class="app-header">
+      <div class="app-brand">
+        <div class="app-mark" aria-hidden="true"></div>
+        <div>
+          <div class="app-title">MTG Deck Tools</div>
+          <div class="app-subtitle">Build wizard</div>
+        </div>
+      </div>
+      <span class="result-pill">Result</span>
+    </header>
+
+    <div class="result-scroll">
+      <section class="result-intro">
+        <h1>Deck generated</h1>
+        <p>Preview of the Markdown deck file returned by generate.</p>
+      </section>
+
+      <article class="deck-preview" aria-label="Rendered deck Markdown">
+        <h2 class="deck-title">Tatyova, Benthic Emissary — Legendary Creature — Merfolk Druid</h2>
+
+        <div class="deck-meta">
+          <p><strong>Commander:</strong> Tatyova, Benthic Emissary — Legendary Creature — Merfolk Druid</p>
+          <p><strong>Color identity:</strong> Blue, Green</p>
+          <p><strong>Budget cap:</strong> $150.00 · <strong>Estimated deck:</strong> $138.40</p>
+          <p><strong>Strict budget:</strong> yes (unpriced cards excluded from pool)</p>
+          <p><strong>Prefer available:</strong> yes (low availability score excluded)</p>
+          <p><strong>Generated:</strong> June 7, 2026 · 2:14 PM</p>
+          <p><strong>Seed:</strong> random</p>
+          <p><strong>Themes:</strong> Token creation, Landfall</p>
+        </div>
+
+        <h3>Summary</h3>
+        <div class="preview-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Slot</th>
+                <th scope="col">Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Ramp</td><td>10</td></tr>
+              <tr><td>Draw</td><td>8</td></tr>
+              <tr><td>Removal</td><td>6</td></tr>
+              <tr><td>Synergy</td><td>24</td></tr>
+              <tr><td>Lands</td><td>38</td></tr>
+              <tr><td>Other</td><td>13</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Commander</h3>
+        <ul>
+          <li>Tatyova, Benthic Emissary — Legendary Creature — Merfolk Druid ($0.45)</li>
+        </ul>
+
+        <h3>Card details</h3>
+
+        <h4>Commander</h4>
+        <div class="card-detail">
+          <h4><a href="#">Tatyova, Benthic Emissary — Legendary Creature — Merfolk Druid</a></h4>
+          <p><strong>Price:</strong> $0.45 · <strong>Rarity:</strong> Rare · <strong>Released:</strong> April 27, 2018</p>
+          <p><strong>Mana cost:</strong> (3)(G)(U) · <strong>Power/Toughness:</strong> 3/4</p>
+        </div>
+
+        <h4>Ramp</h4>
+        <div class="card-detail">
+          <h4><a href="#">Sakura-Tribe Elder — Creature — Snake Shaman</a></h4>
+          <p><strong>Price:</strong> $0.35 · <strong>Rarity:</strong> Common</p>
+        </div>
+        <div class="card-detail">
+          <h4><a href="#">Cultivate — Sorcery</a></h4>
+          <p><strong>Price:</strong> $0.25 · <strong>Rarity:</strong> Common</p>
+        </div>
+
+        <h4>Synergy</h4>
+        <div class="card-detail">
+          <h4><a href="#">Rampaging Baloths — Creature — Beast</a></h4>
+          <p><strong>Price:</strong> $0.80 · <strong>Rarity:</strong> Mythic</p>
+        </div>
+        <div class="card-detail">
+          <h4><a href="#">Scute Swarm — Creature — Scute</a></h4>
+          <p><strong>Price:</strong> $1.20 · <strong>Rarity:</strong> Rare</p>
+        </div>
+
+        <p class="preview-fade">Scroll for remaining slots, validation, and notes…</p>
+      </article>
+
+      <aside class="dev-note" role="note" aria-label="Developer note">
+        <div class="dev-note-header">
+          <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
+          <span class="dev-note-label">Dev note</span>
+        </div>
+        <div class="dev-note-body">
+          <p>
+            Content from <code>POST /api/v1/generate</code> — render CLI
+            <code>.md</code> to HTML in-app (inline body or fetched path TBD UX7c-b).
+          </p>
+          <p>
+            Download JSON deferred <strong>UX7f</strong>. Enhanced deck view deferred
+            <strong>UX7e</strong>. Card art links optional in MD render.
+          </p>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="result-footer" aria-label="Result actions">
+      <a class="btn btn-primary" href="home.html">Build another deck</a>
+    </footer>
+  </div>
+
+  <aside class="wireframe-meta" aria-label="Wireframe metadata">
+    <div class="wireframe-meta-header">
+      <span class="wireframe-meta-icon" aria-hidden="true">WF</span>
+      <span class="wireframe-meta-label">Wireframe</span>
+    </div>
+    <div class="wireframe-meta-body">
+      <p>
+        Route: <strong>/build/result</strong> — MD HTML preview after generate.
+        From <a href="build-review.html">review</a> → Generate.
+        Spec: <code>screens.md</code> § Result.
+      </p>
+    </div>
+  </aside>
+</body>
+</html>
