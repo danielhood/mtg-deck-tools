@@ -2,7 +2,7 @@
 
 **Status:** Planning — UX7c tokens locked; dark mode deferred.
 
-Overall UI design decisions for `packages/web/`. Layout per screen: [screens.md](screens.md).
+Overall UI design decisions for `packages/web/`. Layout per screen: [screens.md](screens.md). Mock and review process: [wireframes/README.md](wireframes/README.md).
 
 ---
 

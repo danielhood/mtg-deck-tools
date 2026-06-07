@@ -33,6 +33,7 @@ Summary:
 | [navigation.md](navigation.md) | Next/Back, review, home flows |
 | [wizard-api.md](wizard-api.md) | Planned wizard HTTP endpoints; screen → API index |
 | [design.md](design.md) | Visual design tokens |
+| [wireframes/README.md](wireframes/README.md) | Layout mock and review process (HTML wireframes) |
 | [openapi.yaml](openapi.yaml) | **Shipped** — health, stats, import, generate |
 | [deployment.md](deployment.md) | **UX7b** — env vars, self-host, PaaS notes |
 

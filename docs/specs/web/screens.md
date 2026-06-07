@@ -2,7 +2,7 @@
 
 **Status:** Planning — UX7c screens locked.
 
-Screen behavior per client route. Routes: [routes.md](routes.md). Navigation: [navigation.md](navigation.md). HTTP calls: [wizard-api.md](wizard-api.md).
+Screen behavior per client route. Routes: [routes.md](routes.md). Navigation: [navigation.md](navigation.md). HTTP calls: [wizard-api.md](wizard-api.md). Layout review: [wireframes/README.md](wireframes/README.md).
 
 CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md) § UX7c and `src/mtg_deck_tools/wizard/`.
 
