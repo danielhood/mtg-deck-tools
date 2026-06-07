@@ -83,3 +83,89 @@ class GenerateResponse(BaseModel):
     json_path: str
     md_path: str
     deck: dict[str, Any] | None = None
+
+
+class WizardBuildStep(BaseModel):
+    number: int
+    route: str
+    label: str
+
+
+class WizardMetaResponse(BaseModel):
+    version: str
+    db_ready: bool
+    db_path: str
+    total_cards: int | None = None
+    steps: list[WizardBuildStep] = Field(default_factory=list)
+    review_route: str = "/build/review"
+    result_route: str = "/build/result"
+
+
+class ThemeChoiceResponse(BaseModel):
+    id: str
+    description: str
+
+
+class MechanicChoiceResponse(BaseModel):
+    id: str
+    description: str
+
+
+class SlotBoundsResponse(BaseModel):
+    min: int
+    max: int
+
+
+class SlotTemplateDefaultsResponse(BaseModel):
+    default: dict[str, int]
+    bounds: dict[str, SlotBoundsResponse]
+    order: list[str]
+    labels: dict[str, str]
+    maindeck_total: int
+    deck_total: int
+    commander_slots: int = 1
+
+
+class FocusLevelOption(BaseModel):
+    value: str | None
+    label: str
+    dots: int
+
+
+class ActivatedProfileResponse(BaseModel):
+    profile_id: str
+    prompt_label: str
+    current_level: str | None = None
+    focus_options: list[FocusLevelOption] = Field(default_factory=list)
+
+
+class SynergyContextResponse(BaseModel):
+    activated_profiles: list[ActivatedProfileResponse] = Field(default_factory=list)
+    focus_levels: list[str] = Field(default_factory=list)
+
+
+class CriteriaWarningResponse(BaseModel):
+    rule_id: str
+    message: str
+
+
+class PreflightResponse(BaseModel):
+    warnings: list[CriteriaWarningResponse] = Field(default_factory=list)
+
+
+class RarityChoiceResponse(BaseModel):
+    id: str
+    label: str
+
+
+class CommanderSearchResult(BaseModel):
+    oracle_id: str
+    name: str
+    type_line: str = ""
+    color_identity: list[str] = Field(default_factory=list)
+    partner_kind: str | None = None
+    edhrec_rank: int | None = None
+    price_usd: float | None = None
+    price_known: bool = False
+    released_at: str | None = None
+    image_uri: str | None = None

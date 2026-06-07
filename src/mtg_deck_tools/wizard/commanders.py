@@ -62,6 +62,7 @@ class CommanderRow:
     price_known: bool = False
     released_at: str | None = None
     type_line: str = ""
+    image_uri: str | None = None
 
 
 def format_commander_choice(cmd: CommanderRow) -> str:
@@ -86,6 +87,7 @@ def _row_to_commander(row: sqlite3.Row) -> CommanderRow:
         price_known=bool(row["price_known"]),
         released_at=row["released_at"],
         type_line=row["type_line"] or "",
+        image_uri=row["image_uri"],
     )
 
 
@@ -110,7 +112,7 @@ def search_commanders(
     """
     sql = """
         SELECT oracle_id, name, type_line, color_identity, partner_kind, edhrec_rank,
-               price_usd, price_known, released_at
+               price_usd, price_known, released_at, image_uri
         FROM cards
         WHERE commander_eligible = 1
     """
@@ -161,7 +163,7 @@ def fetch_commander(conn: sqlite3.Connection, oracle_id: str) -> CommanderRow | 
     row = conn.execute(
         """
         SELECT oracle_id, name, type_line, color_identity, partner_kind, edhrec_rank,
-               price_usd, price_known, released_at
+               price_usd, price_known, released_at, image_uri
         FROM cards
         WHERE oracle_id = ? AND commander_eligible = 1
         """,

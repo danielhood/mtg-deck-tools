@@ -1,44 +1,71 @@
-# Web UI package (planned)
+# Web UI package
 
-**Status:** **UX7a–UX7b shipped** (backend + `mtg-deck-tools serve`) — SPA (**UX7c**) design: [specs/web/README.md](../../specs/web/README.md).
+**Status:** **UX7c-a** — Svelte 5 SPA with app shell, DB gate, home, wizard API client, and build steps 1–7. Review/generate (**UX7c-b**) stubbed at `/build/review`.
 
 ## Stack (locked)
 
 | Piece | Choice |
 | --- | --- |
-| Framework | **Svelte 5** |
+| Framework | **Svelte 5** (runes) |
 | Build | **Vite** SPA (`@sveltejs/vite-plugin-svelte`) |
-| API client | OpenAPI-generated TypeScript |
-| Hosting | Built `dist/` served by `mtg-deck-tools serve` (FastAPI static mount) |
+| Package manager | **pnpm** (`packageManager` in `package.json`) |
+| API client | Hand-written `fetch` wrappers (`src/lib/api.ts`) — OpenAPI types later |
+| Hosting | Built `dist/` served by `mtg-deck-tools serve --with-ui` |
 
 Not **SvelteKit** — Python owns HTTP; frontend is a client-only bundle.
 
-## Intended layout
+## Layout
 
 ```
 packages/web/
-  src/                   # Svelte components, routes (client-side)
-  static/                # Public assets
+  src/
+    App.svelte              # Route switcher
+    app.css                 # Design tokens (wireframe parity)
+    components/             # AppShell, WizardChrome, DbBanner
+    lib/                    # api, criteria draft, router, format
+    pages/                  # Home + build steps 1–7
+  index.html
   package.json
-  vite.config.ts
-  svelte.config.js
-docs/packages/web/       # this file
-docs/specs/web/        # architecture, OpenAPI, routes, deployment
-src/mtg_deck_tools/
-  service/               # Shared facades (CLI + API) — UX7a
-  api/                   # FastAPI app — UX7a
+  pnpm-lock.yaml            # commit after pnpm install
+  vite.config.ts            # Dev proxy → localhost:8000
+docs/packages/web/          # this file
+docs/specs/web/             # architecture, OpenAPI, routes, wireframes
 ```
+
+## One-time: enable pnpm
+
+Node 20+ ships [Corepack](https://nodejs.org/api/corepack.html), which reads `packageManager` from `package.json`:
+
+```bash
+corepack enable
+cd packages/web
+pnpm install   # creates pnpm-lock.yaml — commit with dependency changes
+```
+
+Without Corepack, install pnpm globally: `npm install -g pnpm` (or see [pnpm.io/installation](https://pnpm.io/installation)).
+
+## Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Vite on port 5173; proxies `/api` and `/health` to `mtg-deck-tools serve` |
+| `pnpm build` | Output to `packages/web/dist` |
+| `pnpm check` | `svelte-check` type pass |
+
+## Dev workflow
+
+1. `mtg-deck-tools import` (once) so `GET /api/v1/wizard/meta` reports `db_ready`.
+2. `mtg-deck-tools serve` in one terminal.
+3. `cd packages/web && pnpm install && pnpm dev` in another.
+4. Walk `/` → `/build/1` … `/build/7` → `/build/review` (stub).
+
+Wizard draft state persists in `sessionStorage` (`mtg-wizard-draft`).
 
 ## Principles
 
 - **Cross-platform:** Browser UI on Windows, Linux, macOS, and mobile without native builds.
-- **Mobile-first:** Single-column UX; phone-width layouts are the design baseline.
-- **One engine:** Python core via `service/` + HTTP — no duplicate rules in Svelte.
-- **CLI coexistence:** Terminal wizard remains; web is the rich shell for dashboards, charts, swap/lock.
-- **Local-first:** Default launch is `mtg-deck-tools serve` on localhost; simple self-hosting supported.
+- **Mobile-first:** Single-column UX; 375px baseline per [design.md](../../specs/web/design.md).
+- **One engine:** Python core via wizard HTTP API — no duplicate rules in Svelte.
+- **Local-first:** Default launch is `mtg-deck-tools serve` on localhost.
 
-Architecture: [specs/web/architecture.md](../../specs/web/architecture.md). Routes: [routes.md](../../specs/web/routes.md).
-
-## When implementation begins
-
-Add `package.json` scripts (`dev`, `build`, `check`), document Vite proxy to local API in dev, and how `serve` mounts `dist/`. Add OpenAPI and route docs under `docs/specs/web/`.
+Architecture: [specs/web/architecture.md](../../specs/web/architecture.md). Routes: [routes.md](../../specs/web/routes.md). Wireframes: [wireframes/index.md](../../specs/web/wireframes/index.md).

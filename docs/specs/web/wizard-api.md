@@ -1,6 +1,6 @@
 # Web UI — wizard HTTP API (planned)
 
-**Status:** Planning — not in [openapi.yaml](openapi.yaml) until UX7c implementation.
+**Status:** **UX7c-a shipped** — wizard catalog endpoints in [openapi.yaml](openapi.yaml). Review/generate UI (**UX7c-b**) uses `preflight` + existing `generate`.
 
 Function-specific API for the build wizard. The SPA holds a `DeckCriteria` draft; **validation and wizard logic stay on the server**. Shipped endpoints (health, stats, import, generate) remain in OpenAPI.
 

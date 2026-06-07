@@ -60,7 +60,7 @@ Use the effective date in the filename so updates are obvious. Commander deck co
 mtg-deck-tools/
   docs/                     # Product, architecture, specs, roadmap, history (see docs/README.md)
   src/mtg_deck_tools/       # CLI + engine; service/ + api/ (UX7a)
-  packages/web/             # Web SPA (planned — UX7c; .gitkeep)
+  packages/web/             # Web SPA (Svelte 5 + Vite — UX7c-a wizard)
   scripts/                  # bootstrap-linux.sh (uv-based env on Linux)
   resources/
     scryfall/               # Oracle bulk JSON (local download) + field docs
@@ -168,6 +168,31 @@ uvicorn mtg_deck_tools.api.serve:create_serve_app --factory --host 127.0.0.1 --p
 Bind another host/port with `--host` / `--port` (e.g. `--host 0.0.0.0` only when you intend to expose the machine on the LAN). **v1 has no auth** — keep the default `127.0.0.1` for local use.
 
 Self-hosting notes: [`docs/specs/web/deployment.md`](docs/specs/web/deployment.md).
+
+### Web UI (UX7c-a)
+
+**Requires:** Node.js 20+ with **pnpm** (via [Corepack](https://nodejs.org/api/corepack.html): `corepack enable`), `pip install -e ".[dev,web]"`, and `data/cards.db`.
+
+Development (API + Vite dev server with `/api` proxy):
+
+```bash
+# Terminal 1 — API
+mtg-deck-tools serve
+
+# Terminal 2 — SPA (from repo root)
+cd packages/web
+pnpm install
+pnpm dev
+```
+
+Open http://127.0.0.1:5173 for the wizard (steps 1–7). Production bundle:
+
+```bash
+cd packages/web && pnpm build
+mtg-deck-tools serve --with-ui
+```
+
+Package index: [`docs/packages/web/README.md`](docs/packages/web/README.md).
 
 Regenerate the committed OpenAPI file after API changes:
 

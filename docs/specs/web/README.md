@@ -1,12 +1,12 @@
 # Web UI specification (planned)
 
-**Status:** **UX7a–UX7b shipped** (service layer + OpenAPI + `serve`) — **UX7c** wireframes approved; implementation next.
+**Status:** **UX7a–UX7b shipped** — **UX7c-a** in progress (wizard API + Svelte shell + steps 1–7). **UX7c-b** (review, generate, result) next.
 
 ## Code location
 
 | Artifact | Path |
 | --- | --- |
-| Frontend app | [`packages/web/`](../../../packages/web/) (`.gitkeep` until implementation) |
+| Frontend app | [`packages/web/`](../../../packages/web/) (Svelte 5 + Vite — UX7c-a) |
 | Service + API | `src/mtg_deck_tools/service/`, `src/mtg_deck_tools/api/` |
 | Package index | [packages/web/README.md](../../packages/web/README.md) |
 

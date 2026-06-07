@@ -63,3 +63,7 @@ Tests do **not** need Scryfall bulk JSON. Manual `import` / `generate` do:
 ### Services
 
 **CLI-only:** nothing listens on a port. **With `[web]`:** run `mtg-deck-tools serve` locally (see README → HTTP API). No `docker compose` or background daemons required for dogfood or pytest.
+
+### Web frontend (`packages/web`)
+
+**Package manager:** **pnpm** (not npm). One-time: `corepack enable`. Then `cd packages/web && pnpm install && pnpm dev` with `mtg-deck-tools serve` in another terminal. See README → Web UI (UX7c-a).

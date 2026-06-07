@@ -18,6 +18,16 @@ from mtg_deck_tools.service.generate import (
 from mtg_deck_tools.service.import_ import import_oracle_cards
 from mtg_deck_tools.service.stats import get_database_stats
 from mtg_deck_tools.service.wizard import run_interactive_wizard
+from mtg_deck_tools.service.wizard_catalog import (
+    get_slot_template_defaults,
+    get_synergy_context,
+    get_wizard_mechanics,
+    get_wizard_meta,
+    get_wizard_rarities,
+    get_wizard_themes,
+    run_wizard_preflight,
+    search_wizard_commanders,
+)
 
 __all__ = [
     "DatabaseStatsResponse",
@@ -34,4 +44,12 @@ __all__ = [
     "get_database_stats",
     "import_oracle_cards",
     "run_interactive_wizard",
+    "get_slot_template_defaults",
+    "get_synergy_context",
+    "get_wizard_mechanics",
+    "get_wizard_meta",
+    "get_wizard_rarities",
+    "get_wizard_themes",
+    "run_wizard_preflight",
+    "search_wizard_commanders",
 ]

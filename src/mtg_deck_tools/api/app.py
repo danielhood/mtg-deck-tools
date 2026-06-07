@@ -21,6 +21,7 @@ from mtg_deck_tools.service import (
     get_database_stats,
     import_oracle_cards,
 )
+from mtg_deck_tools.api.wizard import router as wizard_router
 from mtg_deck_tools.service.dto import (
     DatabaseStatsResponse,
     GenerateResponse,
@@ -58,6 +59,7 @@ def create_app(*, static_dir: Path | None = None) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.include_router(wizard_router)
 
     @app.get("/health", response_model=HealthResponse, tags=["meta"])
     def health() -> HealthResponse:
