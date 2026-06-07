@@ -11,5 +11,6 @@ Route → HTML mock map. Populate when the mock-and-review loop starts.
 | `/build/3` | [build-step-03-synergy.html](build-step-03-synergy.html) | draft | Synergy toggles; chip strip + focus stepper; collapsed level help |
 | `/build/3` (no profiles) | [build-step-03-synergy-empty.html](build-step-03-synergy-empty.html) | draft | Toggles only; dashed empty state for mechanic focus |
 | `/build/4` | [build-step-04-colors.html](build-step-04-colors.html) | draft | WUBRG pips + Colorless (void); engine design note |
+| `/build/5` | [build-step-05-budget.html](build-step-05-budget.html) | draft | Steppers + manual $ fields; independent min/max; range warning only |
 
 Process: [README.md](README.md).

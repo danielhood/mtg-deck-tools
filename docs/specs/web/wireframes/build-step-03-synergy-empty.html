@@ -307,16 +307,104 @@
       box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
     }
 
-    .wireframe-note {
-      max-width: var(--frame-width);
-      margin-top: 16px;
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.5;
-      text-align: center;
+    .dev-note {
+      margin-top: 10px;
+      padding: 10px 12px 10px 10px;
+      border: 1px dashed #d8b4fe;
+      border-left: 3px solid var(--magenta);
+      border-radius: 8px;
+      background: #fdf4ff;
     }
 
-    .wireframe-note a { color: var(--blue-700); }
+    .dev-note-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .dev-note-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--magenta);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+      font-family: ui-monospace, "Cascadia Code", monospace;
+      letter-spacing: -0.04em;
+    }
+
+    .dev-note-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--magenta);
+    }
+
+    .dev-note-body {
+      font-size: 11px;
+      line-height: 1.45;
+      color: #6b21a8;
+    }
+
+    .dev-note-body code {
+      font-size: 10px;
+      background: rgba(192, 38, 211, 0.1);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .wireframe-meta {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      padding: 10px 12px;
+      border: 1px dashed #cbd5e1;
+      border-left: 3px solid #64748b;
+      border-radius: 8px;
+      background: #f1f5f9;
+      text-align: left;
+    }
+
+    .wireframe-meta-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .wireframe-meta-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: #64748b;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .wireframe-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .wireframe-meta-body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .wireframe-meta-body a { color: var(--blue-700); }
   </style>
 </head>
 <body>
@@ -393,6 +481,20 @@
             <a href="build-step-02-mechanics.html">step 2</a>.
           </p>
         </div>
+
+        <aside class="dev-note" role="note" aria-label="Developer note">
+          <div class="dev-note-header">
+            <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
+            <span class="dev-note-label">Dev note</span>
+          </div>
+          <div class="dev-note-body">
+            <p>
+              Hide chip strip, glossary, and stepper when
+              <code>POST /api/v1/wizard/synergy-context</code> returns no
+              activated profiles.
+            </p>
+          </div>
+        </aside>
       </section>
     </div>
 
@@ -402,10 +504,18 @@
     </footer>
   </div>
 
-  <p class="wireframe-note">
-    Route: <strong>/build/3</strong> — focus block hidden when server returns no
-    activated profiles. Full state:
-    <a href="build-step-03-synergy.html">with profiles</a>.
-  </p>
+  <aside class="wireframe-meta" aria-label="Wireframe metadata">
+    <div class="wireframe-meta-header">
+      <span class="wireframe-meta-icon" aria-hidden="true">WF</span>
+      <span class="wireframe-meta-label">Wireframe</span>
+    </div>
+    <div class="wireframe-meta-body">
+      <p>
+        Route: <strong>/build/3</strong> — focus block hidden when server returns
+        no activated profiles. Full state:
+        <a href="build-step-03-synergy.html">with profiles</a>.
+      </p>
+    </div>
+  </aside>
 </body>
 </html>
