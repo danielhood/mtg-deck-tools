@@ -375,7 +375,7 @@ Engine requirements for swaps:
 
 ### UX7c — Web build wizard (planned)
 
-**Status:** Design locked — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md). Wireframes **approved** ([wireframes/index.md](../web/wireframes/index.md), 2026-06-07). **UX7c-a–UX7c-b shipped** — wizard HTTP API + Svelte shell + steps 1–7 + review/generate/result ([packages/web/README.md](../../packages/web/README.md)).
+**Status:** **UX7c shipped** — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md). Build wizard in [packages/web/README.md](../../packages/web/README.md). Next: **UX7e** enhanced deck view.
 
 **Product role:** Web is the primary interactive shell. **Build** mode uses the wizard **once** for a new deck. **Iterate** and **View** modes do not re-run the wizard (see **UX7e**, **UX7f**, **UX11**). Modes and flow: [architecture.md](../web/architecture.md) § Product modes.
 
@@ -397,7 +397,7 @@ Engine requirements for swaps:
 | --- | --- |
 | **UX7c-a** | App shell, DB gate, home, wizard API, steps 1–7 (Next/Back; optional back-swipe) — **shipped** |
 | **UX7c-b** | Review screen (inline preflight warnings), generate, MD→HTML result — **shipped** |
-| **UX7c-c** | Loading/error polish, 375px layout pass |
+| **UX7c-c** | Loading/error polish, 375px layout pass — **shipped** |
 
 Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 

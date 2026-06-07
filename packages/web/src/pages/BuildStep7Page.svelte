@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ErrorState from "../components/ErrorState.svelte";
+  import LoadingState from "../components/LoadingState.svelte";
   import WizardChrome from "../components/WizardChrome.svelte";
   import WizardIntro from "../components/WizardIntro.svelte";
   import SectionHeader from "../components/SectionHeader.svelte";
@@ -14,15 +16,28 @@
 
   let draft = $state<WizardDraft>(loadDraft());
   let rarities = $state<RarityChoice[]>([]);
+  let loading = $state(true);
+  let error = $state("");
+  let reload = $state(0);
 
   $effect(() => {
     saveDraft(draft);
   });
 
   $effect(() => {
-    getRarities().then((rows) => {
-      rarities = rows;
-    });
+    loading = true;
+    error = "";
+    void reload;
+    getRarities()
+      .then((rows) => {
+        rarities = rows;
+      })
+      .catch((err: Error) => {
+        error = err.message;
+      })
+      .finally(() => {
+        loading = false;
+      });
   });
 </script>
 
@@ -45,8 +60,14 @@
       description="Choose the lowest rarity allowed in the 99-card maindeck."
     />
 
+    {#if error}
+      <ErrorState message={error} onretry={() => (reload += 1)} />
+    {:else if loading}
+      <LoadingState message="Loading rarity options…" />
+    {/if}
+
     <div class="rarity-list" role="radiogroup" aria-label="Minimum card rarity">
-      {#each rarities as rarity (rarity.id)}
+      {#each loading ? [] : rarities as rarity (rarity.id)}
         <label class="rarity-option">
           <input
             type="radio"

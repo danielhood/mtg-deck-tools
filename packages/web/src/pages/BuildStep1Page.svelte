@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ErrorState from "../components/ErrorState.svelte";
+  import LoadingState from "../components/LoadingState.svelte";
   import WizardChrome from "../components/WizardChrome.svelte";
   import WizardIntro from "../components/WizardIntro.svelte";
   import SectionHeader from "../components/SectionHeader.svelte";
@@ -21,7 +23,9 @@
   let draft = $state<WizardDraft>(loadDraft());
   let themes = $state<ThemeChoice[]>([]);
   let slots = $state<SlotTemplateDefaults | null>(null);
+  let loading = $state(true);
   let error = $state("");
+  let reload = $state(0);
 
   const themeRows = $derived(chunk(themes, 3));
 
@@ -30,6 +34,9 @@
   });
 
   $effect(() => {
+    loading = true;
+    error = "";
+    void reload;
     Promise.all([getThemes(), getSlotTemplateDefaults()])
       .then(([themeRows, slotDefaults]) => {
         themes = themeRows;
@@ -40,6 +47,9 @@
       })
       .catch((err: Error) => {
         error = err.message;
+      })
+      .finally(() => {
+        loading = false;
       });
   });
 
@@ -58,7 +68,9 @@
   />
 
   {#if error}
-    <p class="inline-warning">{error}</p>
+    <ErrorState message={error} onretry={() => (reload += 1)} />
+  {:else if loading}
+    <LoadingState message="Loading themes and slot template…" />
   {/if}
 
   <section class="wizard-section" aria-labelledby="themes-heading">
@@ -69,7 +81,7 @@
     />
 
     <div class="chip-stack">
-      {#each themeRows as row (row.map((t) => t.id).join("-"))}
+      {#each loading ? [] : themeRows as row (row.map((t) => t.id).join("-"))}
         <div class="chip-row">
           {#each row as theme (theme.id)}
             <label class="chip">

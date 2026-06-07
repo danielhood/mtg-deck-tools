@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ErrorState from "../components/ErrorState.svelte";
+  import LoadingState from "../components/LoadingState.svelte";
   import WizardChrome from "../components/WizardChrome.svelte";
   import WizardIntro from "../components/WizardIntro.svelte";
   import { getMechanics, type MechanicChoice, type WizardMeta } from "../lib/api";
@@ -13,15 +15,28 @@
 
   let draft = $state<WizardDraft>(loadDraft());
   let mechanics = $state<MechanicChoice[]>([]);
+  let loading = $state(true);
+  let error = $state("");
+  let reload = $state(0);
 
   $effect(() => {
     saveDraft(draft);
   });
 
   $effect(() => {
-    getMechanics().then((rows) => {
-      mechanics = rows;
-    });
+    loading = true;
+    error = "";
+    void reload;
+    getMechanics()
+      .then((rows) => {
+        mechanics = rows;
+      })
+      .catch((err: Error) => {
+        error = err.message;
+      })
+      .finally(() => {
+        loading = false;
+      });
   });
 
   type Triage = "neutral" | "avoid" | "include";
@@ -59,6 +74,12 @@
     lead="Choose which mechanics the build engine should include or avoid."
   />
 
+  {#if error}
+    <ErrorState message={error} onretry={() => (reload += 1)} />
+  {:else if loading}
+    <LoadingState message="Loading mechanic options…" />
+  {/if}
+
   <div class="triage-legend" aria-hidden="true">
     <span class="col-keyword">Keyword</span>
     <span class="col-avoid">Avoid</span>
@@ -66,7 +87,7 @@
   </div>
 
   <div class="triage-list" role="list" aria-label="Keyword mechanics triage">
-    {#each mechanics as mechanic (mechanic.id)}
+    {#each loading ? [] : mechanics as mechanic (mechanic.id)}
       {@const state = triageFor(mechanic.id)}
       <div
         class="triage-row"

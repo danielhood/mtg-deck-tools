@@ -1,6 +1,6 @@
 # Web UI package
 
-**Status:** **UX7c-a–UX7c-b** — Svelte 5 SPA with app shell, DB gate, home, wizard API client, build steps 1–7, review/preflight/generate, and MD result at `/build/result`.
+**Status:** **UX7c shipped** — Svelte 5 SPA with app shell, DB gate, home, wizard (steps 1–7), review/preflight/generate, MD result, 375px layout, and shared loading/error states.
 
 ## Stack (locked)
 
@@ -21,7 +21,7 @@ packages/web/
   src/
     App.svelte              # Route switcher
     app.css                 # Design tokens (wireframe parity)
-    components/             # AppShell, WizardChrome, DbBanner
+    components/             # AppShell, WizardChrome, LoadingState, ErrorState, CardLightbox
     lib/                    # api, criteria draft, router, format
     pages/                  # Home, build steps 1–7, review, result
   index.html

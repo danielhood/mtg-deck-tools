@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ErrorState from "../components/ErrorState.svelte";
+  import LoadingState from "../components/LoadingState.svelte";
   import WizardChrome from "../components/WizardChrome.svelte";
   import WizardIntro from "../components/WizardIntro.svelte";
   import SectionHeader from "../components/SectionHeader.svelte";
@@ -16,18 +18,26 @@
   let draft = $state<WizardDraft>(loadDraft());
   let profiles = $state<ActivatedProfile[]>([]);
   let helpOpen = $state(false);
+  let loading = $state(true);
+  let error = $state("");
 
   $effect(() => {
     saveDraft(draft);
   });
 
   $effect(() => {
+    loading = true;
+    error = "";
     postSynergyContext(toDeckCriteria(draft))
       .then((ctx) => {
         profiles = ctx.activated_profiles;
       })
-      .catch(() => {
+      .catch((err: Error) => {
         profiles = [];
+        error = err.message;
+      })
+      .finally(() => {
+        loading = false;
       });
   });
 
@@ -76,7 +86,11 @@
   <section class="wizard-section" aria-labelledby="focus-heading">
     <SectionHeader id="focus-heading" title="Mechanic focus" />
 
-    {#if profiles.length}
+    {#if error}
+      <ErrorState message={error} />
+    {:else if loading}
+      <LoadingState message="Loading synergy profiles…" />
+    {:else if profiles.length}
       <div class="focus-help">
         <button
           class="focus-help-toggle"

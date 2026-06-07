@@ -1,6 +1,6 @@
 # Web UI — client routes
 
-**Status:** **UX7c-a–UX7c-b** — home, `/build/1`–`/build/7`, `/build/review`, and `/build/result` implemented in `packages/web/`.
+**Status:** **UX7c shipped** — home, `/build/1`–`/build/7`, `/build/review`, and `/build/result` in `packages/web/`.
 
 SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Navigation: [navigation.md](navigation.md).
 

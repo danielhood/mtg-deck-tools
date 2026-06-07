@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ErrorState from "../components/ErrorState.svelte";
+  import LoadingState from "../components/LoadingState.svelte";
   import SectionHeader from "../components/SectionHeader.svelte";
   import WizardIntro from "../components/WizardIntro.svelte";
   import WizardProgress from "../components/WizardProgress.svelte";
@@ -54,7 +56,7 @@
   const slotRows = $derived(slotTemplateEntries(draft, slotLabels, slotOrder));
 
   const generateDisabled = $derived(
-    !meta.db_ready || generating || !draft.commander_oracle_ids.length,
+    !meta.db_ready || generating || preflightLoading || !draft.commander_oracle_ids.length,
   );
 
   $effect(() => {
@@ -128,9 +130,9 @@
     <SectionHeader id="warnings-heading" title="Preflight warnings" />
 
     {#if preflightLoading}
-      <p class="section-lead">Checking criteria…</p>
+      <LoadingState message="Checking criteria…" />
     {:else if preflightError}
-      <p class="inline-warning">{preflightError}</p>
+      <ErrorState message={preflightError} />
     {:else if warnings.length}
       <div class="warnings-panel" role="region" aria-label="Preflight warnings">
         <div class="warnings-panel-header">
@@ -192,7 +194,7 @@
   </section>
 
   {#if generateError}
-    <p class="inline-warning">{generateError}</p>
+    <ErrorState message={generateError} />
   {/if}
 </div>
 

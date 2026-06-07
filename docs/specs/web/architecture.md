@@ -1,7 +1,7 @@
 # Web UI architecture (planned)
 
-**Status:** **UX7a–UX7b implemented** — **UX7c-a–UX7c-b** wizard API + Svelte SPA (steps 1–7, review, result) — [specs/web/README.md](README.md).
-**Phase:** UX7 active — UX7c-c (polish) next.
+**Status:** **UX7a–UX7c implemented** — wizard API + Svelte SPA (steps 1–7, review, result) — [specs/web/README.md](README.md).
+**Phase:** UX7 active — **UX7e** enhanced deck view next.
 
 ## Strategic shift
 
@@ -287,7 +287,7 @@ Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `p
 - [x] `service/` facades used by at least `generate`, `stats`, and wizard-equivalent criteria build.
 - [x] OpenAPI document describes request/response shapes aligned with `.deck.json` and `DeckCriteria`.
 - [x] Web SPA runs against local `serve` on Linux, macOS, and Windows (UX7c-a — `packages/web` + wizard API).
-- [ ] Layout usable on phone-width viewport (375px) without horizontal scroll on wizard steps.
+- [x] Layout usable on phone-width viewport (375px) without horizontal scroll on wizard steps (UX7c-c).
 - [ ] CLI dogfood gate unchanged: `analyze run --fail-on-expect` without starting a server.
 - [x] Documented path to self-host with persistent `cards.db` ([deployment.md](deployment.md)).
 
