@@ -1,6 +1,6 @@
 # Web UI — wizard HTTP API (planned)
 
-**Status:** **UX7c-a shipped** — wizard catalog endpoints in [openapi.yaml](openapi.yaml). Review/generate UI (**UX7c-b**) uses `preflight` + existing `generate`.
+**Status:** **UX7c-a–UX7c-b shipped** — wizard catalog endpoints in [openapi.yaml](openapi.yaml). Review/generate UI uses `preflight` + `generate` (inline `markdown` in `GenerateResponse`).
 
 Function-specific API for the build wizard. The SPA holds a `DeckCriteria` draft; **validation and wizard logic stay on the server**. Shipped endpoints (health, stats, import, generate) remain in OpenAPI.
 
@@ -52,7 +52,7 @@ Forward mapping (route → endpoints consumed). Screen behavior: [screens.md](sc
 - **`commanders/search`** — query: `q`, `colors`, `color_match=includes|exact`, budget fields from criteria.
 - **`generate`** — server assigns random `seed` when absent; stored in `.deck.json` when **UX7f** persists decks.
 
-Implementation may extend `GenerateResponse` with inline markdown/HTML, or add a follow-up GET for MD content — decide in UX7c-b.
+`GenerateResponse` includes inline `markdown` (CLI `.md` body) for the web result screen; `md_path` remains the server filesystem path.
 
 ---
 

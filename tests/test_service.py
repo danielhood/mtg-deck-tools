@@ -14,7 +14,7 @@ from mtg_deck_tools.service import (
     generate_deck,
     get_database_stats,
 )
-from mtg_deck_tools.service.generate import _resolve_deck_path
+from mtg_deck_tools.service.generate import _md_path_for_json, _resolve_deck_path
 
 
 def test_get_database_stats(tmp_path: Path, monkeypatch) -> None:
@@ -26,6 +26,11 @@ def test_get_database_stats(tmp_path: Path, monkeypatch) -> None:
     assert not db.exists()
     with pytest.raises(FileNotFoundError):
         get_database_stats(db)
+
+
+def test_md_path_for_json_deck_suffix() -> None:
+    json_path = Path("/tmp/out/my-deck-20260101120000.deck.json")
+    assert _md_path_for_json(json_path) == Path("/tmp/out/my-deck-20260101120000.md")
 
 
 def test_resolve_deck_path_requires_source() -> None:

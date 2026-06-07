@@ -70,10 +70,36 @@ export interface RarityChoice {
   label: string;
 }
 
+export interface CriteriaWarning {
+  rule_id: string;
+  message: string;
+}
+
+export interface PreflightResponse {
+  warnings: CriteriaWarning[];
+}
+
+export interface GenerateResponse {
+  json_path: string;
+  md_path: string;
+  deck: Record<string, unknown> | null;
+  markdown: string | null;
+}
+
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, init);
   if (!response.ok) {
-    const detail = await response.text();
+    const raw = await response.text();
+    let detail = raw;
+    try {
+      const parsed = JSON.parse(raw) as { detail?: string | { msg: string }[] };
+      if (typeof parsed.detail === "string") detail = parsed.detail;
+      else if (Array.isArray(parsed.detail) && parsed.detail[0]?.msg) {
+        detail = parsed.detail.map((row) => row.msg).join("; ");
+      }
+    } catch {
+      /* use raw body */
+    }
     throw new Error(detail || `Request failed (${response.status})`);
   }
   return response.json() as Promise<T>;
@@ -109,4 +135,20 @@ export function searchCommanders(params: URLSearchParams): Promise<CommanderResu
 
 export function getRarities(): Promise<RarityChoice[]> {
   return fetchJson<RarityChoice[]>("/api/v1/wizard/rarities");
+}
+
+export function postPreflight(criteria: Record<string, unknown>): Promise<PreflightResponse> {
+  return fetchJson<PreflightResponse>("/api/v1/wizard/preflight", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(criteria),
+  });
+}
+
+export function postGenerate(criteria: Record<string, unknown>): Promise<GenerateResponse> {
+  return fetchJson<GenerateResponse>("/api/v1/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ criteria }),
+  });
 }

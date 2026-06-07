@@ -1,6 +1,6 @@
 # Web UI package
 
-**Status:** **UX7c-a** — Svelte 5 SPA with app shell, DB gate, home, wizard API client, and build steps 1–7. Review/generate (**UX7c-b**) stubbed at `/build/review`.
+**Status:** **UX7c-a–UX7c-b** — Svelte 5 SPA with app shell, DB gate, home, wizard API client, build steps 1–7, review/preflight/generate, and MD result at `/build/result`.
 
 ## Stack (locked)
 
@@ -23,7 +23,7 @@ packages/web/
     app.css                 # Design tokens (wireframe parity)
     components/             # AppShell, WizardChrome, DbBanner
     lib/                    # api, criteria draft, router, format
-    pages/                  # Home + build steps 1–7
+    pages/                  # Home, build steps 1–7, review, result
   index.html
   package.json
   pnpm-lock.yaml            # commit after pnpm install
@@ -57,9 +57,9 @@ Without Corepack, install pnpm globally: `npm install -g pnpm` (or see [pnpm.io/
 1. `mtg-deck-tools import` (once) so `GET /api/v1/wizard/meta` reports `db_ready`.
 2. `mtg-deck-tools serve` in one terminal.
 3. `cd packages/web && pnpm install && pnpm dev` in another.
-4. Walk `/` → `/build/1` … `/build/7` → `/build/review` (stub).
+4. Walk `/` → `/build/1` … `/build/7` → `/build/review` → Generate → `/build/result`.
 
-Wizard draft state persists in `sessionStorage` (`mtg-wizard-draft`).
+Wizard draft state persists in `sessionStorage` (`mtg-wizard-draft`). Last generate result: `mtg-wizard-result`.
 
 ## Principles
 

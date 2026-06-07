@@ -130,6 +130,26 @@ def test_wizard_commanders_search(client: TestClient, wizard_db) -> None:
     assert rows[0]["image_uri"].startswith("https://")
 
 
+def test_generate_returns_markdown(client: TestClient, wizard_db) -> None:
+    response = client.post(
+        "/api/v1/generate",
+        json={
+            "stub": True,
+            "db_path": str(wizard_db),
+            "criteria": {
+                "themes": [],
+                "commander_oracle_ids": ["cmd-1"],
+                "seed": 42,
+            },
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["markdown"]
+    assert "Test Commander" in body["markdown"]
+    assert body["deck"] is not None
+
+
 def test_openapi_includes_wizard_paths(client: TestClient) -> None:
     schema = client.get("/openapi.json").json()
     paths = schema["paths"]

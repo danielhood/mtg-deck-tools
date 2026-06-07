@@ -99,7 +99,7 @@ def create_app(*, static_dir: Path | None = None) -> FastAPI:
     )
     def generate(body: GenerateRequest) -> GenerateResponse:
         try:
-            return generate_deck(body, include_deck=True)
+            return generate_deck(body, include_deck=True, include_markdown=True)
         except (FileNotFoundError, RuntimeError, ValueError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -110,7 +110,7 @@ def create_app(*, static_dir: Path | None = None) -> FastAPI:
     )
     def generate_from_deck(body: GenerateFromDeckRequest) -> GenerateResponse:
         try:
-            return generate_deck_from_saved(body, include_deck=True)
+            return generate_deck_from_saved(body, include_deck=True, include_markdown=True)
         except (FileNotFoundError, RuntimeError, ValueError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 

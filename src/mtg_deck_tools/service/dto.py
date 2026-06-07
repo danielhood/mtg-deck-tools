@@ -83,6 +83,7 @@ class GenerateResponse(BaseModel):
     json_path: str
     md_path: str
     deck: dict[str, Any] | None = None
+    markdown: str | None = None
 
 
 class WizardBuildStep(BaseModel):

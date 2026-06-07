@@ -1,6 +1,6 @@
 # Web UI specification (planned)
 
-**Status:** **UX7a–UX7b shipped** — **UX7c-a** in progress (wizard API + Svelte shell + steps 1–7). **UX7c-b** (review, generate, result) next.
+**Status:** **UX7a–UX7b shipped** — **UX7c-a shipped** (wizard API + Svelte shell + steps 1–7). **UX7c-b shipped** (review, preflight, generate, MD result). **UX7c-c** (polish) next.
 
 ## Code location
 

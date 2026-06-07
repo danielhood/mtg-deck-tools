@@ -171,7 +171,7 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 | Download JSON | Deferred (**UX7f**) |
 | Next steps | “Build another”; enhanced view deferred (**UX7e**) |
 
-**API:** Uses `POST /api/v1/generate` response (`md_path`, optional inline `deck` / rendered markdown — TBD in UX7c-b).
+**API:** Uses `POST /api/v1/generate` response — inline `markdown` rendered to HTML in-app; `deck` optional for later UX7f.
 
 ---
 
