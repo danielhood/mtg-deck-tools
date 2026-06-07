@@ -42,7 +42,7 @@ If no doc updates apply: PR body must say *No doc changes — [reason]*.
 | **Dogfood matrix or analyze semantics** | [deck-analysis.md](specs/deck-analysis.md); [config/dogfood-matrix.yaml](../config/dogfood-matrix.yaml) |
 | **Effect extraction contract** | [overview.md](specs/dependency-engine/overview.md); [effect-extraction-policy.md](specs/dependency-engine/effect-extraction-policy.md); golden fixtures |
 | **Architecture / data layout** | `docs/architecture/` or `docs/product/`; [oracle-bulk-contract.md](specs/data/oracle-bulk-contract.md) if import fields change |
-| **UX / web design (pre-code)** | [user-experience.md](specs/dependency-engine/user-experience.md), [specs/web/README.md](specs/web/README.md) — *planning* |
+| **UX / web design (pre-code)** | [user-experience.md](specs/dependency-engine/user-experience.md), [specs/web/README.md](specs/web/README.md), [specs/web/wireframes/README.md](specs/web/wireframes/README.md) — *planning* |
 | **Locked v1 dependency decisions** | [decisions.md](specs/dependency-engine/decisions.md) |
 | **Major milestone (rare)** | [milestones.md](history/milestones.md) |
 
