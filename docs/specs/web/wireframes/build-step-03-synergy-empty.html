@@ -174,24 +174,7 @@
     .toggle-row:last-child { border-bottom: none; }
 
     .toggle-copy {
-      display: flex;
-      align-items: center;
-      gap: 10px;
       flex: 1;
-    }
-
-    .toggle-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      flex-shrink: 0;
-      color: var(--blue-700);
     }
 
     .toggle-copy strong {
@@ -446,22 +429,16 @@
         <div class="toggle-list">
           <label class="toggle-row">
             <span class="toggle-copy">
-              <span class="toggle-icon" aria-hidden="true">⊘</span>
-              <span>
-                <strong>Strict dependencies</strong>
-                <span>Block orphan picks</span>
-              </span>
+              <strong>Strict dependencies</strong>
+              <span>Block picks with no valid targets.</span>
             </span>
             <input class="toggle-input" type="checkbox" checked>
             <span class="toggle-switch" aria-hidden="true"></span>
           </label>
           <label class="toggle-row">
             <span class="toggle-copy">
-              <span class="toggle-icon" aria-hidden="true">⚙</span>
-              <span>
-                <strong>Repair dependencies</strong>
-                <span>Fix gaps after build</span>
-              </span>
+              <strong>Repair dependencies</strong>
+              <span>Fix gaps after build</span>
             </span>
             <input class="toggle-input" type="checkbox">
             <span class="toggle-switch" aria-hidden="true"></span>
@@ -489,7 +466,7 @@
           </div>
           <div class="dev-note-body">
             <p>
-              Hide chip strip, glossary, and stepper when
+              Hide glossary and stepper when
               <code>POST /api/v1/wizard/synergy-context</code> returns no
               activated profiles.
             </p>
