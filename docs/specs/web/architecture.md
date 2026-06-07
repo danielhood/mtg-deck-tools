@@ -1,7 +1,7 @@
 # Web UI architecture (planned)
 
-**Status:** **UX7a–UX7b implemented** — service + OpenAPI + `mtg-deck-tools serve`; **UX7c** (SPA wizard) in planning — [specs/web/README.md](README.md).  
-**Phase:** UX7 active — UX7c design locked; SPA implementation next.
+**Status:** **UX7a–UX7b implemented** — **UX7c-a** wizard API + Svelte SPA (steps 1–7) in progress — [specs/web/README.md](README.md).  
+**Phase:** UX7 active — UX7c-b (review/generate/result) next.
 
 ## Strategic shift
 
@@ -263,7 +263,7 @@ mtg-deck-tools/
 ### New dependencies (implementation phase)
 
 - `fastapi`, `uvicorn` — HTTP server (optional extra e.g. `[web]` in `pyproject.toml`)
-- Frontend toolchain in `packages/web/package.json`
+- Frontend toolchain in `packages/web/package.json` (**pnpm**; see [packages/web/README.md](../../packages/web/README.md))
 
 Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `pip install -e ".[web]"` for serve + dev.
 
@@ -286,7 +286,7 @@ Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `p
 
 - [x] `service/` facades used by at least `generate`, `stats`, and wizard-equivalent criteria build.
 - [x] OpenAPI document describes request/response shapes aligned with `.deck.json` and `DeckCriteria`.
-- [ ] Web SPA runs against local `serve` on Linux, macOS, and Windows.
+- [x] Web SPA runs against local `serve` on Linux, macOS, and Windows (UX7c-a — `packages/web` + wizard API).
 - [ ] Layout usable on phone-width viewport (375px) without horizontal scroll on wizard steps.
 - [ ] CLI dogfood gate unchanged: `analyze run --fail-on-expect` without starting a server.
 - [x] Documented path to self-host with persistent `cards.db` ([deployment.md](deployment.md)).

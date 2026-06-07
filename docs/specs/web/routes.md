@@ -1,6 +1,6 @@
 # Web UI — client routes
 
-**Status:** Planning — UX7c routes locked; implementation not started.
+**Status:** **UX7c-a** — home and `/build/1`–`/build/7` implemented in `packages/web/`; `/build/review` stub (UX7c-b).
 
 SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Navigation: [navigation.md](navigation.md).
 

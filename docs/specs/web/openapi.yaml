@@ -1,15 +1,258 @@
 openapi: 3.1.0
 info:
   title: MTG Deck Tools API
+  description: HTTP surface for the MTG Deck Tools engine. Validation and deck rules
+    run server-side; clients send DeckCriteria and receive .deck.json-shaped documents.
   version: 0.1.0
-  description: >-
-    HTTP surface for the MTG Deck Tools engine. Validation and deck rules run
-    server-side; clients send DeckCriteria and receive .deck.json-shaped documents.
 paths:
+  /api/v1/wizard/meta:
+    get:
+      tags:
+      - wizard
+      summary: Wizard Meta
+      operationId: wizard_meta_api_v1_wizard_meta_get
+      parameters:
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WizardMetaResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/wizard/themes:
+    get:
+      tags:
+      - wizard
+      summary: Wizard Themes
+      operationId: wizard_themes_api_v1_wizard_themes_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ThemeChoiceResponse'
+                type: array
+                title: Response Wizard Themes Api V1 Wizard Themes Get
+  /api/v1/wizard/slot-template/defaults:
+    get:
+      tags:
+      - wizard
+      summary: Wizard Slot Template Defaults
+      operationId: wizard_slot_template_defaults_api_v1_wizard_slot_template_defaults_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlotTemplateDefaultsResponse'
+  /api/v1/wizard/mechanics:
+    get:
+      tags:
+      - wizard
+      summary: Wizard Mechanics
+      operationId: wizard_mechanics_api_v1_wizard_mechanics_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/MechanicChoiceResponse'
+                type: array
+                title: Response Wizard Mechanics Api V1 Wizard Mechanics Get
+  /api/v1/wizard/synergy-context:
+    post:
+      tags:
+      - wizard
+      summary: Wizard Synergy Context
+      operationId: wizard_synergy_context_api_v1_wizard_synergy_context_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeckCriteria'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SynergyContextResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/wizard/preflight:
+    post:
+      tags:
+      - wizard
+      summary: Wizard Preflight
+      operationId: wizard_preflight_api_v1_wizard_preflight_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeckCriteria'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreflightResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/wizard/commanders/search:
+    get:
+      tags:
+      - wizard
+      summary: Wizard Commanders Search
+      operationId: wizard_commanders_search_api_v1_wizard_commanders_search_get
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+          description: Commander name substring
+          default: ''
+          title: Q
+        description: Commander name substring
+      - name: colors
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          description: WUBRG color filter
+          default: []
+          title: Colors
+        description: WUBRG color filter
+      - name: color_match
+        in: query
+        required: false
+        schema:
+          type: string
+          description: includes or exact
+          default: includes
+          title: Color Match
+        description: includes or exact
+      - name: card_price_min_usd
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Card Price Min Usd
+      - name: card_price_max_usd
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Card Price Max Usd
+      - name: budget_usd
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Budget Usd
+      - name: strict_budget
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Strict Budget
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 50
+          minimum: 1
+          default: 15
+          title: Limit
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommanderSearchResult'
+                title: Response Wizard Commanders Search Api V1 Wizard Commanders
+                  Search Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/wizard/rarities:
+    get:
+      tags:
+      - wizard
+      summary: Wizard Rarities
+      operationId: wizard_rarities_api_v1_wizard_rarities_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RarityChoiceResponse'
+                type: array
+                title: Response Wizard Rarities Api V1 Wizard Rarities Get
   /health:
     get:
       tags:
-        - meta
+      - meta
       summary: Health
       operationId: health_health_get
       responses:
@@ -22,17 +265,20 @@ paths:
   /api/v1/stats:
     get:
       tags:
-        - database
+      - database
       summary: Stats
       operationId: stats_api_v1_stats_get
       parameters:
-        - name: db
-          in: query
-          required: false
-          schema:
-            type: string
-            nullable: true
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
           description: SQLite database path
+          title: Db
+        description: SQLite database path
       responses:
         '200':
           description: Successful Response
@@ -40,20 +286,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DatabaseStatsResponse'
-        '404':
-          description: Database not found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/import:
     post:
       tags:
-        - database
+      - database
       summary: Import Cards
       operationId: import_cards_api_v1_import_post
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ImportRequest'
+        required: true
       responses:
         '200':
           description: Successful Response
@@ -61,20 +311,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ImportResponse'
-        '404':
-          description: Source JSON or paths not found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/generate:
     post:
       tags:
-        - deck
+      - deck
       summary: Generate
       operationId: generate_api_v1_generate_post
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/GenerateRequest'
+        required: true
       responses:
         '200':
           description: Successful Response
@@ -82,20 +336,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenerateResponse'
-        '400':
-          description: Build failed
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/generate/from-deck:
     post:
       tags:
-        - deck
+      - deck
       summary: Generate From Deck
       operationId: generate_from_deck_api_v1_generate_from_deck_post
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/GenerateFromDeckRequest'
+        required: true
       responses:
         '200':
           description: Successful Response
@@ -103,12 +361,149 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenerateResponse'
-        '400':
-          description: Build failed
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    ActivatedProfileResponse:
+      properties:
+        profile_id:
+          type: string
+          title: Profile Id
+        prompt_label:
+          type: string
+          title: Prompt Label
+        current_level:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Current Level
+        focus_options:
+          items:
+            $ref: '#/components/schemas/FocusLevelOption'
+          type: array
+          title: Focus Options
+      type: object
+      required:
+      - profile_id
+      - prompt_label
+      title: ActivatedProfileResponse
+    CommanderSearchResult:
+      properties:
+        oracle_id:
+          type: string
+          title: Oracle Id
+        name:
+          type: string
+          title: Name
+        type_line:
+          type: string
+          title: Type Line
+          default: ''
+        color_identity:
+          items:
+            type: string
+          type: array
+          title: Color Identity
+        partner_kind:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Partner Kind
+        edhrec_rank:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Edhrec Rank
+        price_usd:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Price Usd
+        price_known:
+          type: boolean
+          title: Price Known
+          default: false
+        released_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Released At
+        image_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Uri
+      type: object
+      required:
+      - oracle_id
+      - name
+      title: CommanderSearchResult
+    CriteriaWarningResponse:
+      properties:
+        rule_id:
+          type: string
+          title: Rule Id
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - rule_id
+      - message
+      title: CriteriaWarningResponse
+    DatabaseStatsResponse:
+      properties:
+        db_path:
+          type: string
+          title: Db Path
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+          title: Metadata
+        total_cards:
+          type: integer
+          title: Total Cards
+        commander_eligible:
+          type: integer
+          title: Commander Eligible
+        with_partner:
+          type: integer
+          title: With Partner
+        tag_assignments:
+          type: integer
+          title: Tag Assignments
+        distinct_tags:
+          type: integer
+          title: Distinct Tags
+        effect_rows:
+          type: integer
+          title: Effect Rows
+          default: 0
+        distinct_effect_kinds:
+          type: integer
+          title: Distinct Effect Kinds
+          default: 0
+        top_tags:
+          items:
+            $ref: '#/components/schemas/TopTagRow'
+          type: array
+          title: Top Tags
+      type: object
+      required:
+      - db_path
+      - total_cards
+      - commander_eligible
+      - with_partner
+      - tag_assignments
+      - distinct_tags
+      title: DatabaseStatsResponse
     DeckCriteria:
-      description: User selections from the deck wizard — consumed by the builder.
       properties:
         themes:
           items:
@@ -137,31 +532,31 @@ components:
           title: Commander Oracle Ids
         budget_usd:
           anyOf:
-            - type: number
-            - type: 'null'
+          - type: number
+          - type: 'null'
           title: Budget Usd
         card_price_min_usd:
           anyOf:
-            - type: number
-            - type: 'null'
+          - type: number
+          - type: 'null'
           title: Card Price Min Usd
         card_price_max_usd:
           anyOf:
-            - type: number
-            - type: 'null'
+          - type: number
+          - type: 'null'
           title: Card Price Max Usd
         strict_budget:
           type: boolean
-          default: false
           title: Strict Budget
+          default: false
         strict_dependencies:
           type: boolean
-          default: false
           title: Strict Dependencies
+          default: false
         repair_dependencies:
           type: boolean
-          default: false
           title: Repair Dependencies
+          default: false
         mechanic_focus:
           additionalProperties:
             type: string
@@ -169,12 +564,12 @@ components:
           title: Mechanic Focus
         prefer_available:
           type: boolean
-          default: false
           title: Prefer Available
+          default: false
         min_rarity:
           type: string
-          default: common
           title: Min Rarity
+          default: common
         slot_template:
           additionalProperties:
             type: integer
@@ -182,99 +577,203 @@ components:
           title: Slot Template
         seed:
           anyOf:
-            - type: integer
-            - type: 'null'
+          - type: integer
+          - type: 'null'
           title: Seed
       type: object
       title: DeckCriteria
+      description: "User selections from the deck wizard \u2014 consumed by the builder\
+        \ (Phase 2+)."
+    FocusLevelOption:
+      properties:
+        value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Value
+        label:
+          type: string
+          title: Label
+        dots:
+          type: integer
+          title: Dots
+      type: object
+      required:
+      - value
+      - label
+      - dots
+      title: FocusLevelOption
+    GenerateFromDeckRequest:
+      properties:
+        deck_path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Deck Path
+        deck:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Deck
+        seed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Seed
+        db_path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Db Path
+        output_dir:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Output Dir
+        refill_slot:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Refill Slot
+        strict_budget:
+          type: boolean
+          title: Strict Budget
+          default: false
+        strict_dependencies:
+          type: boolean
+          title: Strict Dependencies
+          default: false
+        repair_dependencies:
+          type: boolean
+          title: Repair Dependencies
+          default: false
+        prefer_available:
+          type: boolean
+          title: Prefer Available
+          default: false
+      type: object
+      title: GenerateFromDeckRequest
+      description: Regenerate from an existing .deck.json document (API) or server
+        path (CLI).
+    GenerateRequest:
+      properties:
+        criteria:
+          anyOf:
+          - $ref: '#/components/schemas/DeckCriteria'
+          - type: 'null'
+        colors:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Colors
+        themes:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Themes
+        seed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Seed
+        db_path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Db Path
+        output_dir:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Output Dir
+        stub:
+          type: boolean
+          title: Stub
+          default: false
+        strict_budget:
+          type: boolean
+          title: Strict Budget
+          default: false
+        strict_dependencies:
+          type: boolean
+          title: Strict Dependencies
+          default: false
+        repair_dependencies:
+          type: boolean
+          title: Repair Dependencies
+          default: false
+        prefer_available:
+          type: boolean
+          title: Prefer Available
+          default: false
+        commander_names:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Commander Names
+      type: object
+      title: GenerateRequest
+      description: Criteria-based deck generation (wizard-equivalent when criteria
+        is complete).
+    GenerateResponse:
+      properties:
+        json_path:
+          type: string
+          title: Json Path
+        md_path:
+          type: string
+          title: Md Path
+        deck:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Deck
+      type: object
+      required:
+      - json_path
+      - md_path
+      title: GenerateResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
     HealthResponse:
       properties:
         status:
           type: string
-          default: ok
           title: Status
+          default: ok
         version:
           type: string
           title: Version
-      required:
-        - version
       type: object
+      required:
+      - version
       title: HealthResponse
-    TopTagRow:
-      properties:
-        tag:
-          type: string
-          title: Tag
-        layer:
-          type: string
-          title: Layer
-        n:
-          type: integer
-          title: N
-      required:
-        - tag
-        - layer
-        - n
-      type: object
-      title: TopTagRow
-    DatabaseStatsResponse:
-      properties:
-        db_path:
-          type: string
-          title: Db Path
-        metadata:
-          additionalProperties:
-            type: string
-          type: object
-          title: Metadata
-        total_cards:
-          type: integer
-          title: Total Cards
-        commander_eligible:
-          type: integer
-          title: Commander Eligible
-        with_partner:
-          type: integer
-          title: With Partner
-        tag_assignments:
-          type: integer
-          title: Tag Assignments
-        distinct_tags:
-          type: integer
-          title: Distinct Tags
-        effect_rows:
-          type: integer
-          default: 0
-          title: Effect Rows
-        distinct_effect_kinds:
-          type: integer
-          default: 0
-          title: Distinct Effect Kinds
-        top_tags:
-          items:
-            $ref: '#/components/schemas/TopTagRow'
-          type: array
-          title: Top Tags
-      required:
-        - db_path
-        - total_cards
-        - commander_eligible
-        - with_partner
-        - tag_assignments
-        - distinct_tags
-      type: object
-      title: DatabaseStatsResponse
     ImportRequest:
       properties:
         json_path:
           anyOf:
-            - type: string
-            - type: 'null'
+          - type: string
+          - type: 'null'
           title: Json Path
         db_path:
           anyOf:
-            - type: string
-            - type: 'null'
+          - type: string
+          - type: 'null'
           title: Db Path
       type: object
       title: ImportRequest
@@ -298,144 +797,223 @@ components:
         db_path:
           type: string
           title: Db Path
-      required:
-        - source_file
-        - source_count
-        - playable_count
-        - tag_count
-        - effect_count
-        - db_path
       type: object
+      required:
+      - source_file
+      - source_count
+      - playable_count
+      - tag_count
+      - effect_count
+      - db_path
       title: ImportResponse
-    GenerateRequest:
+    MechanicChoiceResponse:
       properties:
-        criteria:
-          anyOf:
-            - $ref: '#/components/schemas/DeckCriteria'
-            - type: 'null'
-        colors:
-          anyOf:
-            - items:
-                type: string
-              type: array
-            - type: 'null'
-          title: Colors
-        themes:
-          anyOf:
-            - items:
-                type: string
-              type: array
-            - type: 'null'
-          title: Themes
-        seed:
-          anyOf:
-            - type: integer
-            - type: 'null'
-          title: Seed
-        db_path:
-          anyOf:
-            - type: string
-            - type: 'null'
-          title: Db Path
-        output_dir:
-          anyOf:
-            - type: string
-            - type: 'null'
-          title: Output Dir
-        stub:
-          type: boolean
-          default: false
-          title: Stub
-        strict_budget:
-          type: boolean
-          default: false
-          title: Strict Budget
-        strict_dependencies:
-          type: boolean
-          default: false
-          title: Strict Dependencies
-        repair_dependencies:
-          type: boolean
-          default: false
-          title: Repair Dependencies
-        prefer_available:
-          type: boolean
-          default: false
-          title: Prefer Available
-        commander_names:
-          anyOf:
-            - items:
-                type: string
-              type: array
-            - type: 'null'
-          title: Commander Names
-      type: object
-      title: GenerateRequest
-    GenerateFromDeckRequest:
-      properties:
-        deck_path:
-          anyOf:
-            - type: string
-            - type: 'null'
-          title: Deck Path
-        deck:
-          anyOf:
-            - type: object
-            - type: 'null'
-          title: Deck
-        seed:
-          anyOf:
-            - type: integer
-            - type: 'null'
-          title: Seed
-        db_path:
-          anyOf:
-            - type: string
-            - type: 'null'
-          title: Db Path
-        output_dir:
-          anyOf:
-            - type: string
-            - type: 'null'
-          title: Output Dir
-        refill_slot:
-          anyOf:
-            - type: string
-            - type: 'null'
-          title: Refill Slot
-        strict_budget:
-          type: boolean
-          default: false
-          title: Strict Budget
-        strict_dependencies:
-          type: boolean
-          default: false
-          title: Strict Dependencies
-        repair_dependencies:
-          type: boolean
-          default: false
-          title: Repair Dependencies
-        prefer_available:
-          type: boolean
-          default: false
-          title: Prefer Available
-      type: object
-      title: GenerateFromDeckRequest
-    GenerateResponse:
-      properties:
-        json_path:
+        id:
           type: string
-          title: Json Path
-        md_path:
+          title: Id
+        description:
           type: string
-          title: Md Path
-        deck:
-          anyOf:
-            - type: object
-            - type: 'null'
-          title: Deck
+          title: Description
+      type: object
       required:
-        - json_path
-        - md_path
+      - id
+      - description
+      title: MechanicChoiceResponse
+    PreflightResponse:
+      properties:
+        warnings:
+          items:
+            $ref: '#/components/schemas/CriteriaWarningResponse'
+          type: array
+          title: Warnings
       type: object
-      title: GenerateResponse
+      title: PreflightResponse
+    RarityChoiceResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        label:
+          type: string
+          title: Label
+      type: object
+      required:
+      - id
+      - label
+      title: RarityChoiceResponse
+    SlotBoundsResponse:
+      properties:
+        min:
+          type: integer
+          title: Min
+        max:
+          type: integer
+          title: Max
+      type: object
+      required:
+      - min
+      - max
+      title: SlotBoundsResponse
+    SlotTemplateDefaultsResponse:
+      properties:
+        default:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Default
+        bounds:
+          additionalProperties:
+            $ref: '#/components/schemas/SlotBoundsResponse'
+          type: object
+          title: Bounds
+        order:
+          items:
+            type: string
+          type: array
+          title: Order
+        labels:
+          additionalProperties:
+            type: string
+          type: object
+          title: Labels
+        maindeck_total:
+          type: integer
+          title: Maindeck Total
+        deck_total:
+          type: integer
+          title: Deck Total
+        commander_slots:
+          type: integer
+          title: Commander Slots
+          default: 1
+      type: object
+      required:
+      - default
+      - bounds
+      - order
+      - labels
+      - maindeck_total
+      - deck_total
+      title: SlotTemplateDefaultsResponse
+    SynergyContextResponse:
+      properties:
+        activated_profiles:
+          items:
+            $ref: '#/components/schemas/ActivatedProfileResponse'
+          type: array
+          title: Activated Profiles
+        focus_levels:
+          items:
+            type: string
+          type: array
+          title: Focus Levels
+      type: object
+      title: SynergyContextResponse
+    ThemeChoiceResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        description:
+          type: string
+          title: Description
+      type: object
+      required:
+      - id
+      - description
+      title: ThemeChoiceResponse
+    TopTagRow:
+      properties:
+        tag:
+          type: string
+          title: Tag
+        layer:
+          type: string
+          title: Layer
+        n:
+          type: integer
+          title: N
+      type: object
+      required:
+      - tag
+      - layer
+      - n
+      title: TopTagRow
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    WizardBuildStep:
+      properties:
+        number:
+          type: integer
+          title: Number
+        route:
+          type: string
+          title: Route
+        label:
+          type: string
+          title: Label
+      type: object
+      required:
+      - number
+      - route
+      - label
+      title: WizardBuildStep
+    WizardMetaResponse:
+      properties:
+        version:
+          type: string
+          title: Version
+        db_ready:
+          type: boolean
+          title: Db Ready
+        db_path:
+          type: string
+          title: Db Path
+        total_cards:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Total Cards
+        steps:
+          items:
+            $ref: '#/components/schemas/WizardBuildStep'
+          type: array
+          title: Steps
+        review_route:
+          type: string
+          title: Review Route
+          default: /build/review
+        result_route:
+          type: string
+          title: Result Route
+          default: /build/result
+      type: object
+      required:
+      - version
+      - db_ready
+      - db_path
+      title: WizardMetaResponse
