@@ -1,6 +1,6 @@
 # Web UI specification (planned)
 
-**Status:** **UX7a–UX7b shipped** (service layer + OpenAPI + `serve`) — **UX7c** design in progress.
+**Status:** **UX7a–UX7b shipped** (service layer + OpenAPI + `serve`) — **UX7c** wireframes approved; implementation next.
 
 ## Code location
 

@@ -375,7 +375,7 @@ Engine requirements for swaps:
 
 ### UX7c — Web build wizard (planned)
 
-**Status:** Design locked — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md). Implementation not started.
+**Status:** Design locked — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md). Wireframes **approved** ([wireframes/index.md](../web/wireframes/index.md), 2026-06-07). Implementation not started.
 
 **Product role:** Web is the primary interactive shell. **Build** mode uses the wizard **once** for a new deck. **Iterate** and **View** modes do not re-run the wizard (see **UX7e**, **UX7f**, **UX11**). Modes and flow: [architecture.md](../web/architecture.md) § Product modes.
 

@@ -1,7 +1,7 @@
 # Web UI — wireframes and layout review
 
-**Status:** Home wireframes drafted — review loop open.  
-**Phase:** Planning — no changelog until wireframes ship as part of UX7c implementation prep.
+**Status:** All UX7c wireframes **approved** (2026-06-07).  
+**Phase:** Planning complete for layout — next step is UX7c Svelte implementation (no changelog until UX7c ships).
 
 How to mock, review, and iterate on screen layouts **before** Svelte implementation. Behavior and routes remain authoritative in [screens.md](../screens.md), [routes.md](../routes.md), and [navigation.md](../navigation.md).
 
