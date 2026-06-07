@@ -1,5 +1,6 @@
 # Node / web frontend
 node_modules/
+.vite/
 
 # Python
 __pycache__/
