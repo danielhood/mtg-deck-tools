@@ -37,7 +37,7 @@ MVP tracked as **UX7** in [active.md](../active.md).
 | --- | --- | --- |
 | ~~**UX7a**~~ | ~~`service/` extraction + OpenAPI~~ | **Shipped** |
 | ~~**UX7b**~~ | ~~`mtg-deck-tools serve`~~ | **Shipped** |
-| **UX7c** | Build wizard + result | **Active design** — slices c-a / c-b / c-c; [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX7c |
+| **UX7c** | Build wizard + result | Wireframes **approved** — implementation slices c-a / c-b / c-c; [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX7c |
 | **UX7e** | Enhanced deck view | Filters (slot, type, color); summaries (balance, distribution, cost); analysis hooks; Scryfall art; route `/deck/:id` — [screens.md](../../specs/web/screens.md) | UX7c |
 | **UX7f** | Saved deck library | Save/load/organize `.deck.json` (single-user, not multi-tenant); JSON download; load → deck view → iterate/regen without wizard; slot/full regen preserving locks ties to **UX11**; route `/library` | UX7e |
 | **UX7d** | Dependency dashboard | Drill-down on `dependency_report` (D5); after library so persisted decks can be inspected | UX7f, D5 |
