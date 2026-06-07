@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Step 5 · Budget &amp; card prices</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --frame-width: 375px;
+      --touch-min: 44px;
+      --footer-height: 72px;
+      --zone-width: 48px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--blue-900);
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .step-pill {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--blue-100);
+      color: var(--blue-700);
+    }
+
+    .wizard-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(var(--footer-height) + 16px);
+    }
+
+    .wizard-intro {
+      margin-bottom: 18px;
+    }
+
+    .wizard-intro h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .wizard-intro p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .progress-segment {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+    }
+
+    .progress-segment.is-active { background: var(--blue-700); }
+    .progress-segment.is-complete { background: var(--blue-500); }
+
+    .section {
+      margin-bottom: 22px;
+    }
+
+    .section-header {
+      margin-bottom: 10px;
+    }
+
+    .section-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .section-header p {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .toggle-list {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      min-height: var(--touch-min);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .toggle-row:last-child {
+      border-bottom: none;
+    }
+
+    .toggle-copy {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toggle-copy strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .toggle-copy span {
+      display: block;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--text-muted);
+    }
+
+    .toggle-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-switch {
+      flex-shrink: 0;
+      width: 46px;
+      height: 28px;
+      border-radius: 999px;
+      background: var(--border);
+      position: relative;
+      transition: background 0.15s;
+    }
+
+    .toggle-switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2);
+      transition: transform 0.15s;
+    }
+
+    .toggle-row:has(.toggle-input:checked) .toggle-switch {
+      background: var(--blue-700);
+    }
+
+    .toggle-row:has(.toggle-input:checked) .toggle-switch::after {
+      transform: translateX(18px);
+    }
+
+    .conditional-panel {
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 12px 14px;
+    }
+
+    .conditional-panel.is-hidden {
+      display: none;
+    }
+
+    .field-hint {
+      display: block;
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .price-stepper-list {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .price-stepper-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: stretch;
+      min-height: var(--touch-min);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .price-stepper-row:last-child {
+      border-bottom: none;
+    }
+
+    .price-cell {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      padding: 8px 12px;
+      border-right: 1px solid var(--border);
+      min-width: 0;
+    }
+
+    .price-cell-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      line-height: 1.2;
+    }
+
+    .money-field {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      overflow: hidden;
+      min-height: 36px;
+      margin-top: 2px;
+    }
+
+    .money-field.is-invalid {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .money-prefix {
+      flex-shrink: 0;
+      padding: 0 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+    }
+
+    .money-input {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      border: none;
+      outline: none;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .money-input::placeholder {
+      font-size: 14px;
+      font-weight: 600;
+      font-style: italic;
+      color: #94a3b8;
+    }
+
+    .money-clear {
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
+      margin-right: 2px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1;
+      border-radius: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+    }
+
+    .money-field.has-value .money-clear {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .money-clear:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .stepper-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 4px 8px;
+      border-left: 1px solid var(--border);
+      min-width: calc(var(--zone-width) * 2);
+    }
+
+    .stepper-btns {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .stepper-step-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.2;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .range-warning {
+      display: none;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #b91c1c;
+    }
+
+    .range-warning.is-visible {
+      display: block;
+    }
+
+    .step-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      min-height: var(--touch-min);
+      padding: 0;
+    }
+
+    .step-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .step-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+      color: rgba(100, 116, 139, 0.45);
+    }
+
+    .step-btn:not(:disabled):hover .step-mark {
+      border-color: var(--blue-700);
+      color: var(--blue-700);
+    }
+
+    .step-btn.step-more:not(:disabled):hover .step-mark {
+      background: var(--blue-100);
+    }
+
+    .step-btn.step-less:not(:disabled):hover .step-mark {
+      border-color: var(--text-muted);
+      color: var(--text-muted);
+    }
+
+    .nested-toggles {
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .nested-toggles .toggle-row {
+      padding: 10px 12px;
+      min-height: 40px;
+    }
+
+    .nested-toggles .toggle-copy strong {
+      font-size: 13px;
+    }
+
+    .nested-toggles .toggle-copy span {
+      font-size: 11px;
+    }
+
+    .selection-summary {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--surface);
+    }
+
+    .selection-summary h3 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue-900);
+      margin-bottom: 6px;
+    }
+
+    .selection-summary p {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .selection-summary .is-none {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .dev-note {
+      margin-top: 10px;
+      padding: 10px 12px 10px 10px;
+      border: 1px dashed #d8b4fe;
+      border-left: 3px solid var(--magenta);
+      border-radius: 8px;
+      background: #fdf4ff;
+    }
+
+    .dev-note-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .dev-note-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--magenta);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+      font-family: ui-monospace, "Cascadia Code", monospace;
+      letter-spacing: -0.04em;
+    }
+
+    .dev-note-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--magenta);
+    }
+
+    .dev-note-body {
+      font-size: 11px;
+      line-height: 1.45;
+      color: #6b21a8;
+    }
+
+    .dev-note-body p + p {
+      margin-top: 6px;
+    }
+
+    .dev-note-body code {
+      font-size: 10px;
+      background: rgba(192, 38, 211, 0.1);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .wizard-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .btn-back {
+      background: var(--bg);
+      color: var(--blue-700);
+      border: 1.5px solid var(--blue-700);
+    }
+
+    .btn-next {
+      background: var(--blue-700);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .wireframe-meta {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      padding: 10px 12px;
+      border: 1px dashed #cbd5e1;
+      border-left: 3px solid #64748b;
+      border-radius: 8px;
+      background: #f1f5f9;
+      text-align: left;
+    }
+
+    .wireframe-meta-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .wireframe-meta-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: #64748b;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .wireframe-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .wireframe-meta-body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .wireframe-meta-body a { color: var(--blue-700); }
+  </style>
+</head>
+<body>
+  <p class="preview-label">Wireframe · 375px · /build/5</p>
+
+  <div class="frame" role="document" aria-label="Wizard step 5 wireframe">
+    <header class="app-header">
+      <div class="app-brand">
+        <div class="app-mark" aria-hidden="true"></div>
+        <div>
+          <div class="app-title">MTG Deck Tools</div>
+          <div class="app-subtitle">Build wizard</div>
+        </div>
+      </div>
+      <span class="step-pill">Step 5 of 7</span>
+    </header>
+
+    <div class="wizard-scroll">
+      <div class="progress-bar" aria-hidden="true">
+        <div class="progress-segment is-complete"></div>
+        <div class="progress-segment is-complete"></div>
+        <div class="progress-segment is-complete"></div>
+        <div class="progress-segment is-complete"></div>
+        <div class="progress-segment is-active"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+      </div>
+
+      <section class="wizard-intro">
+        <h1>Budget &amp; card prices</h1>
+        <p>
+          Optional total deck cap and per-card min/max using Scryfall USD prices.
+          Per-card limits also filter commander search on step 6.
+        </p>
+      </section>
+
+      <section class="section" aria-labelledby="budget-heading">
+        <div class="section-header">
+          <h2 id="budget-heading">Total deck budget</h2>
+          <p>Cap total spend for the full 100-card list.</p>
+        </div>
+
+        <div class="toggle-list">
+          <label class="toggle-row">
+            <span class="toggle-copy">
+              <strong>Set a total deck budget</strong>
+              <span>Enable a maximum USD spend for the whole deck</span>
+            </span>
+            <input class="toggle-input" type="checkbox" id="budget-enabled" checked>
+            <span class="toggle-switch" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <div class="conditional-panel" id="budget-panel">
+          <div class="price-stepper-list" aria-label="Deck budget amount">
+            <div class="price-stepper-row" id="budget-stepper">
+              <div class="price-cell">
+                <label class="price-cell-label" for="budget-input">Maximum deck budget</label>
+                <div class="money-field" id="budget-field">
+                  <span class="money-prefix" aria-hidden="true">$</span>
+                  <input
+                    class="money-input"
+                    type="text"
+                    id="budget-input"
+                    name="budget_usd"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="150"
+                    aria-label="Maximum deck budget in US dollars"
+                  >
+                </div>
+              </div>
+              <div class="stepper-controls">
+                <div class="stepper-btns">
+                  <button
+                    class="step-btn step-less"
+                    type="button"
+                    id="budget-less"
+                    aria-label="Decrease deck budget by $10"
+                  ><span class="step-mark">−</span></button>
+                  <button
+                    class="step-btn step-more"
+                    type="button"
+                    id="budget-more"
+                    aria-label="Increase deck budget by $10"
+                  ><span class="step-mark">+</span></button>
+                </div>
+                <span class="stepper-step-hint">$10 per tap</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="nested-toggles" aria-label="Budget enforcement options">
+            <label class="toggle-row">
+              <span class="toggle-copy">
+                <strong>Exclude unpriced cards</strong>
+                <span>Skip cards without USD prices</span>
+              </span>
+              <input class="toggle-input" type="checkbox" id="strict-budget" checked>
+              <span class="toggle-switch" aria-hidden="true"></span>
+            </label>
+            <label class="toggle-row">
+              <span class="toggle-copy">
+                <strong>Prefer readily available</strong>
+                <span>Filter obscure / hard-to-find picks</span>
+              </span>
+              <input class="toggle-input" type="checkbox" id="prefer-available" checked>
+              <span class="toggle-switch" aria-hidden="true"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="price-range-heading">
+        <div class="section-header">
+          <h2 id="price-range-heading">Per-card price range</h2>
+          <p>Optional min and/or max USD per card. Filters commander search on step 6.</p>
+        </div>
+
+        <div class="toggle-list">
+          <label class="toggle-row">
+            <span class="toggle-copy">
+              <strong>Set per-card price range</strong>
+              <span>Limit individual card prices independent of total budget</span>
+            </span>
+            <input class="toggle-input" type="checkbox" id="price-range-enabled">
+            <span class="toggle-switch" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <div class="conditional-panel is-hidden" id="price-range-panel">
+          <div class="price-stepper-list" aria-label="Per-card price bounds">
+            <div class="price-stepper-row" id="price-max-stepper">
+              <div class="price-cell">
+                <label class="price-cell-label" for="price-max-input">Maximum per card</label>
+                <div class="money-field" id="price-max-field">
+                  <span class="money-prefix" aria-hidden="true">$</span>
+                  <input
+                    class="money-input"
+                    type="text"
+                    id="price-max-input"
+                    name="card_price_max_usd"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="None"
+                    aria-label="Maximum per-card price in US dollars"
+                  >
+                  <button
+                    class="money-clear"
+                    type="button"
+                    id="price-max-clear"
+                    aria-label="Clear maximum per-card price"
+                  >×</button>
+                </div>
+              </div>
+              <div class="stepper-controls">
+                <div class="stepper-btns">
+                  <button
+                    class="step-btn step-less"
+                    type="button"
+                    id="price-max-less"
+                    aria-label="Decrease maximum per-card price by $5"
+                    disabled
+                  ><span class="step-mark">−</span></button>
+                  <button
+                    class="step-btn step-more"
+                    type="button"
+                    id="price-max-more"
+                    aria-label="Increase maximum per-card price by $5"
+                  ><span class="step-mark">+</span></button>
+                </div>
+                <span class="stepper-step-hint">$5 per tap</span>
+              </div>
+            </div>
+            <div class="price-stepper-row" id="price-min-stepper">
+              <div class="price-cell">
+                <label class="price-cell-label" for="price-min-input">Minimum per card</label>
+                <div class="money-field" id="price-min-field">
+                  <span class="money-prefix" aria-hidden="true">$</span>
+                  <input
+                    class="money-input"
+                    type="text"
+                    id="price-min-input"
+                    name="card_price_min_usd"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="None"
+                    aria-label="Minimum per-card price in US dollars"
+                  >
+                  <button
+                    class="money-clear"
+                    type="button"
+                    id="price-min-clear"
+                    aria-label="Clear minimum per-card price"
+                  >×</button>
+                </div>
+              </div>
+              <div class="stepper-controls">
+                <div class="stepper-btns">
+                  <button
+                    class="step-btn step-less"
+                    type="button"
+                    id="price-min-less"
+                    aria-label="Decrease minimum per-card price by $1"
+                    disabled
+                  ><span class="step-mark">−</span></button>
+                  <button
+                    class="step-btn step-more"
+                    type="button"
+                    id="price-min-more"
+                    aria-label="Increase minimum per-card price by $1"
+                  ><span class="step-mark">+</span></button>
+                </div>
+                <span class="stepper-step-hint">$1 per tap</span>
+              </div>
+            </div>
+          </div>
+          <p class="range-warning" id="range-warning" role="alert">
+            Minimum exceeds maximum — adjust before continuing.
+          </p>
+          <span class="field-hint">Leave blank for no limit.</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="summary-heading">
+        <div class="selection-summary" aria-live="polite">
+          <h3 id="summary-heading">Price constraints</h3>
+          <p id="budget-summary">Deck budget: $150 · strict · prefer available</p>
+        </div>
+
+        <aside class="dev-note" role="note" aria-label="Developer note">
+          <div class="dev-note-header">
+            <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
+            <span class="dev-note-label">Dev note</span>
+          </div>
+          <div class="dev-note-body">
+            <p>
+              CLI parity: disabling total budget clears <code>strict_budget</code> and
+              <code>prefer_available</code>. Maps to <code>--budget</code>,
+              <code>--strict-budget</code>, <code>--prefer-available</code>.
+            </p>
+            <p>
+              All fields optional — stored in client <code>DeckCriteria</code> draft;
+              no catalog API on this step.
+            </p>
+          </div>
+        </aside>
+      </section>
+    </div>
+
+    <footer class="wizard-footer" aria-label="Wizard navigation">
+      <a class="btn btn-back" href="build-step-04-colors.html">Back</a>
+      <a class="btn btn-next" href="#">Next</a>
+    </footer>
+  </div>
+
+  <aside class="wireframe-meta" aria-label="Wireframe metadata">
+    <div class="wireframe-meta-header">
+      <span class="wireframe-meta-icon" aria-hidden="true">WF</span>
+      <span class="wireframe-meta-label">Wireframe</span>
+    </div>
+    <div class="wireframe-meta-body">
+      <p>
+        Route: <strong>/build/5</strong> — optional budget + per-card range. Back →
+        <a href="build-step-04-colors.html">step 4</a>.
+        Spec: <code>screens.md</code> § Step 5.
+      </p>
+    </div>
+  </aside>
+
+  <script>
+    const BUDGET_STEP = 10;
+    const BUDGET_MIN = 10;
+    const MIN_CARD_STEP = 1;
+    const MAX_CARD_STEP = 5;
+
+    const budgetEnabled = document.getElementById("budget-enabled");
+    const budgetPanel = document.getElementById("budget-panel");
+    const budgetInput = document.getElementById("budget-input");
+    const budgetField = document.getElementById("budget-field");
+    const budgetLess = document.getElementById("budget-less");
+    const budgetMore = document.getElementById("budget-more");
+    const strictBudget = document.getElementById("strict-budget");
+    const preferAvailable = document.getElementById("prefer-available");
+
+    const priceRangeEnabled = document.getElementById("price-range-enabled");
+    const priceRangePanel = document.getElementById("price-range-panel");
+    const priceMinInput = document.getElementById("price-min-input");
+    const priceMaxInput = document.getElementById("price-max-input");
+    const priceMinField = document.getElementById("price-min-field");
+    const priceMaxField = document.getElementById("price-max-field");
+    const priceMinLess = document.getElementById("price-min-less");
+    const priceMinMore = document.getElementById("price-min-more");
+    const priceMinClear = document.getElementById("price-min-clear");
+    const priceMaxLess = document.getElementById("price-max-less");
+    const priceMaxMore = document.getElementById("price-max-more");
+    const priceMaxClear = document.getElementById("price-max-clear");
+    const rangeWarning = document.getElementById("range-warning");
+
+    const summaryEl = document.getElementById("budget-summary");
+
+    const formatUsd = (amount) => `$${formatAmount(amount)}`;
+
+    const COMMITTED_MONEY_PATTERN = /^\d+(\.\d{1,2})?$/;
+
+    const formatAmount = (amount) => {
+      if (amount === null) {
+        return "";
+      }
+      const fixed = amount.toFixed(2);
+      const [whole, frac] = fixed.split(".");
+      if (frac === "00") {
+        return whole;
+      }
+      return `${whole}.${frac}`;
+    };
+
+    const sanitizeMoneyEntry = (text) => {
+      let raw = text.replace(/^\$/, "").replace(/[^\d.]/g, "");
+      const dotIndex = raw.indexOf(".");
+      if (dotIndex === -1) {
+        return raw;
+      }
+      const whole = raw.slice(0, dotIndex);
+      const frac = raw.slice(dotIndex + 1).replace(/\./g, "").slice(0, 2);
+      return `${whole}.${frac}`;
+    };
+
+    const parseOptionalMoney = (text, { strict = false } = {}) => {
+      const trimmed = text.trim();
+      if (!trimmed) {
+        return { value: null, valid: true };
+      }
+      const normalized = trimmed.replace(/^\$/, "");
+      if (strict && !COMMITTED_MONEY_PATTERN.test(normalized)) {
+        return { value: null, valid: false };
+      }
+      if (!strict && !/^\d*\.?\d{0,2}$/.test(normalized)) {
+        return { value: null, valid: false };
+      }
+      if (normalized.endsWith(".")) {
+        return { value: null, valid: !strict };
+      }
+      const num = Number.parseFloat(normalized);
+      if (!Number.isFinite(num) || num < 0) {
+        return { value: null, valid: false };
+      }
+      return { value: Math.round(num * 100) / 100, valid: true };
+    };
+
+    const parseBudgetMoney = (text, { strict = false } = {}) => {
+      const trimmed = text.trim();
+      if (!trimmed) {
+        return { value: null, valid: false };
+      }
+      const normalized = trimmed.replace(/^\$/, "");
+      if (strict && !COMMITTED_MONEY_PATTERN.test(normalized)) {
+        return { value: null, valid: false };
+      }
+      if (!strict && !/^\d*\.?\d{0,2}$/.test(normalized)) {
+        return { value: null, valid: false };
+      }
+      if (normalized.endsWith(".")) {
+        return { value: null, valid: !strict };
+      }
+      const num = Number.parseFloat(normalized);
+      if (!Number.isFinite(num) || num <= 0) {
+        return { value: null, valid: false };
+      }
+      return { value: Math.round(num * 100) / 100, valid: true };
+    };
+
+    const handleMoneyInput = (input) => {
+      const sanitized = sanitizeMoneyEntry(input.value);
+      if (input.value !== sanitized) {
+        input.value = sanitized;
+      }
+    };
+
+    const readBudget = () => parseBudgetMoney(budgetInput.value);
+
+    const readOptional = (input) => parseOptionalMoney(input.value);
+
+    const writeInput = (input, amount) => {
+      input.value = formatAmount(amount);
+    };
+
+    const stepOptional = (current, step, direction) => {
+      if (direction === "more") {
+        if (current === null) {
+          return step;
+        }
+        return Math.round((current + step) * 100) / 100;
+      }
+      if (current === null) {
+        return null;
+      }
+      const next = Math.round((current - step) * 100) / 100;
+      return next < step ? null : next;
+    };
+
+    const rangeInvalid = () => {
+      const min = readOptional(priceMinInput);
+      const max = readOptional(priceMaxInput);
+      return min.valid
+        && max.valid
+        && min.value !== null
+        && max.value !== null
+        && min.value > max.value;
+    };
+
+    const syncBudgetControls = () => {
+      const parsed = readBudget();
+      budgetField.classList.toggle("is-invalid", budgetEnabled.checked && !parsed.valid);
+      budgetLess.disabled = parsed.valid && parsed.value !== null && parsed.value <= BUDGET_MIN;
+    };
+
+    const syncOptionalField = (input, field) => {
+      const parsed = readOptional(input);
+      const hasValue = parsed.valid && parsed.value !== null && input.value.trim() !== "";
+      field.classList.toggle("has-value", hasValue);
+      return parsed;
+    };
+
+    const syncOptionalControls = () => {
+      const min = syncOptionalField(priceMinInput, priceMinField);
+      const max = syncOptionalField(priceMaxInput, priceMaxField);
+      const invalidRange = rangeInvalid();
+
+      priceMinLess.disabled = min.value === null;
+      priceMaxLess.disabled = max.value === null;
+      rangeWarning.classList.toggle("is-visible", priceRangeEnabled.checked && invalidRange);
+      priceMinField.classList.toggle("is-invalid", !min.valid || invalidRange);
+      priceMaxField.classList.toggle("is-invalid", !max.valid || invalidRange);
+    };
+
+    const clearOptionalInput = (input) => {
+      input.value = "";
+      refresh();
+    };
+
+    const syncPanels = () => {
+      budgetPanel.classList.toggle("is-hidden", !budgetEnabled.checked);
+      priceRangePanel.classList.toggle("is-hidden", !priceRangeEnabled.checked);
+
+      if (!budgetEnabled.checked) {
+        strictBudget.checked = false;
+        preferAvailable.checked = false;
+      }
+    };
+
+    const syncSummary = () => {
+      const parts = [];
+      const budget = readBudget();
+
+      if (budgetEnabled.checked) {
+        const budgetPart = budget.valid && budget.value !== null
+          ? `Deck budget: ${formatUsd(budget.value)}`
+          : "Deck budget: (invalid amount)";
+        const flags = [];
+        if (strictBudget.checked) {
+          flags.push("strict");
+        }
+        if (preferAvailable.checked) {
+          flags.push("prefer available");
+        }
+        parts.push(flags.length ? `${budgetPart} · ${flags.join(" · ")}` : budgetPart);
+      } else {
+        parts.push("No total deck budget");
+      }
+
+      if (priceRangeEnabled.checked) {
+        const min = readOptional(priceMinInput);
+        const max = readOptional(priceMaxInput);
+        if (min.valid && max.valid && (min.value !== null || max.value !== null)) {
+          const minLabel = min.value !== null ? formatUsd(min.value) : "no min";
+          const maxLabel = max.value !== null ? formatUsd(max.value) : "no max";
+          parts.push(`Per card: ${minLabel} – ${maxLabel}`);
+        } else if (!min.valid || !max.valid) {
+          parts.push("Per-card range: invalid amount");
+        } else {
+          parts.push("Per-card range enabled (no bounds set)");
+        }
+        if (rangeInvalid()) {
+          parts.push("min > max");
+        }
+      }
+
+      if (parts.length === 1 && parts[0] === "No total deck budget") {
+        summaryEl.textContent = "No price constraints";
+        summaryEl.className = "is-none";
+        return;
+      }
+
+      summaryEl.className = "";
+      summaryEl.textContent = parts.join(" · ");
+    };
+
+    const refresh = () => {
+      syncBudgetControls();
+      syncOptionalControls();
+      syncSummary();
+    };
+
+    const commitBudgetInput = () => {
+      const parsed = parseBudgetMoney(budgetInput.value, { strict: true });
+      if (!parsed.valid || parsed.value === null) {
+        writeInput(budgetInput, BUDGET_MIN);
+      } else {
+        writeInput(budgetInput, parsed.value);
+      }
+      refresh();
+    };
+
+    const commitOptionalInput = (input) => {
+      const parsed = parseOptionalMoney(input.value, { strict: true });
+      if (!parsed.valid) {
+        input.value = "";
+      } else {
+        writeInput(input, parsed.value);
+      }
+      refresh();
+    };
+
+    budgetLess.addEventListener("click", () => {
+      const parsed = readBudget();
+      const current = parsed.valid && parsed.value !== null ? parsed.value : BUDGET_MIN;
+      writeInput(budgetInput, Math.max(BUDGET_MIN, current - BUDGET_STEP));
+      refresh();
+    });
+
+    budgetMore.addEventListener("click", () => {
+      const parsed = readBudget();
+      const current = parsed.valid && parsed.value !== null ? parsed.value : BUDGET_MIN;
+      writeInput(budgetInput, current + BUDGET_STEP);
+      refresh();
+    });
+
+    priceMinLess.addEventListener("click", () => {
+      const parsed = readOptional(priceMinInput);
+      writeInput(priceMinInput, stepOptional(parsed.value, MIN_CARD_STEP, "less"));
+      refresh();
+    });
+
+    priceMinMore.addEventListener("click", () => {
+      const parsed = readOptional(priceMinInput);
+      writeInput(priceMinInput, stepOptional(parsed.value, MIN_CARD_STEP, "more"));
+      refresh();
+    });
+
+    priceMaxLess.addEventListener("click", () => {
+      const parsed = readOptional(priceMaxInput);
+      writeInput(priceMaxInput, stepOptional(parsed.value, MAX_CARD_STEP, "less"));
+      refresh();
+    });
+
+    priceMaxMore.addEventListener("click", () => {
+      const parsed = readOptional(priceMaxInput);
+      writeInput(priceMaxInput, stepOptional(parsed.value, MAX_CARD_STEP, "more"));
+      refresh();
+    });
+
+    priceMinClear.addEventListener("click", () => clearOptionalInput(priceMinInput));
+    priceMaxClear.addEventListener("click", () => clearOptionalInput(priceMaxInput));
+
+    budgetInput.addEventListener("input", () => {
+      handleMoneyInput(budgetInput);
+      refresh();
+    });
+    budgetInput.addEventListener("blur", commitBudgetInput);
+    priceMinInput.addEventListener("input", () => {
+      handleMoneyInput(priceMinInput);
+      refresh();
+    });
+    priceMinInput.addEventListener("blur", () => commitOptionalInput(priceMinInput));
+    priceMaxInput.addEventListener("input", () => {
+      handleMoneyInput(priceMaxInput);
+      refresh();
+    });
+    priceMaxInput.addEventListener("blur", () => commitOptionalInput(priceMaxInput));
+
+    [budgetEnabled, priceRangeEnabled].forEach((el) => {
+      el.addEventListener("change", () => {
+        syncPanels();
+        refresh();
+      });
+    });
+
+    [strictBudget, preferAvailable].forEach((el) => {
+      el.addEventListener("change", syncSummary);
+    });
+
+    syncPanels();
+    refresh();
+  </script>
+</body>
+</html>
