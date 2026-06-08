@@ -1,6 +1,6 @@
 # Web UI specification (planned)
 
-**Status:** **UX7a–UX7c shipped** — build wizard (steps 1–7, review, generate, MD result). **UX7e** enhanced deck view next.
+**Status:** **UX7a–UX7c shipped** — build wizard (steps 1–7, review, generate, MD result). **UX7e** enhanced deck view — design locked; wireframes draft.
 
 ## Code location
 

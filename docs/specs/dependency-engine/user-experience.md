@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-05):** Engine **D0–D5 shipped**. UX1 (Markdown/JSON report + `--strict-dependencies` / `--repair-dependencies` on CLI) is done. **UX2 shipped** — wizard step 3 (synergy strictness + `mechanic_focus` presets for all profiles activated by user selections). **UX3 shipped** — end-of-wizard criteria linter (`rules/criteria_linter.py`, wizard preflight). **UX4 shipped** — wizard step back-navigation (`wizard/navigation.py`, orchestration in `wizard/run.py`). **UX5 shipped** — wizard prepopulate on regen. **UX7a shipped** — `service/` + FastAPI + OpenAPI (CLI unchanged). **UX7b shipped** — `mtg-deck-tools serve`. **UX7c** web build wizard — design locked ([specs/web/](../web/)). Next implementation: UX7c → UX7e deck view → UX7f library → UX7d dashboard — [architecture.md](../web/architecture.md), [active.md](../../roadmap/active.md).
+**Status (2026-06-07):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c shipped** (CLI wizard + web build wizard). **UX7e** enhanced deck view — design locked; wireframes draft. Next implementation: UX7e → UX7f library → UX7d dashboard — [architecture.md](../web/architecture.md), [active.md](../../roadmap/active.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -375,7 +375,7 @@ Engine requirements for swaps:
 
 ### UX7c — Web build wizard (planned)
 
-**Status:** **UX7c shipped** — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md). Build wizard in [packages/web/README.md](../../packages/web/README.md). Next: **UX7e** enhanced deck view.
+**Status:** **UX7c shipped** — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md). **UX7e** design locked — § UX7e below. Build wizard in [packages/web/README.md](../../packages/web/README.md).
 
 **Product role:** Web is the primary interactive shell. **Build** mode uses the wizard **once** for a new deck. **Iterate** and **View** modes do not re-run the wizard (see **UX7e**, **UX7f**, **UX11**). Modes and flow: [architecture.md](../web/architecture.md) § Product modes.
 
@@ -414,6 +414,57 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | Result | HTML render of output Markdown |
 | DB missing | Hard block; home banner; CLI `import` until **UX7g** |
 | Visual design | [design.md](../web/design.md) |
+
+### UX7e — Enhanced deck view (design locked)
+
+**Status:** Planning complete — decisions locked; wireframes **draft** ([screens.md](../web/screens.md) § Enhanced deck view, [wireframes/README.md](../web/wireframes/README.md) § UX7e scope).
+
+**Goal:** Replace the raw MD result as the primary post-build surface. Inspect the generated `.deck.json` with filters, summaries, dependency notes, and card art — without re-running the wizard.
+
+#### Scope
+
+**In scope (UX7e):**
+
+- Route `/deck/:id` for the session-active deck (and future library loads in **UX7f**).
+- Generate success → navigate to `/deck/:id` (see decisions).
+- Commander header, filterable card list, summary panel, compact analysis, Scryfall thumbnails + lightbox.
+- Collapsible Markdown preview (same MD→HTML path as UX7c result).
+- Home **View last deck** when a session deck exists.
+
+**Out of scope (UX7e):** saved library (**UX7f**); JSON download; swap / lock / regen (**UX11**); dependency drill-down dashboard (**UX7d**); CMC histogram charts (**UX10**); new analyze HTTP endpoints; server-side deck persistence.
+
+**Slices:**
+
+| Slice | Deliverable |
+| --- | --- |
+| **UX7e-a** | Session deck store (UUID + payload); `/deck/:id` route; redirect guards; commander header + read-only card list |
+| **UX7e-b** | Filter chips (slot, type, color); summary panel (counts, price, avg CMC) |
+| **UX7e-c** | Analysis section (`dependency_report` + strengths heuristic); row thumbs + lightbox; collapsible MD preview; home resume CTA; generate → deck redirect |
+
+Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
+
+#### UX7e decisions
+
+| Topic | Decision |
+| --- | --- |
+| Persistence / `:id` | **Client UUID** assigned at generate; full `GenerateResponse` (including `deck`) stored in `sessionStorage` keyed by id. **No server store** until **UX7f**. Same id shape reused when library lands. |
+| Generate handoff | **Primary:** review Generate success → `/deck/:id`. **`/build/result`:** redirect to active deck id when session has one (compat); otherwise `/`. |
+| Data source | **Client-only** — render from inline `GenerateResponse.deck` already returned by `POST /api/v1/generate`. **No new HTTP endpoints** in UX7e. |
+| Routing | **Path-based** (existing SPA router in `packages/web/`). |
+| Unknown `/deck/:id` | Redirect to `/` — no placeholder page. |
+| UX7d boundary | Show **compact list** of `dependency_report.issues` (rule id + message). **No** profile drill-down dashboard or repair actions. |
+| UX10 boundary | Slot counts, type breakdown, and `stats.*` from JSON only. **No** CMC histogram or interactive charts. |
+| UX11 boundary | Card rows **read-only**. **No** swap, lock, slot regen, or selection chrome. |
+| Filters | Three **chip groups** (multi-select within group, AND across groups): **Slot**, **Type** (Creature, Instant, … from `type_line`), **Color** (W/U/B/R/G/C from card colors). Clear-all per group. |
+| Summaries | **Collapsible** panel below commander: slot table, estimated price, unpriced count, `avg_cmc_nonland`, type counts. |
+| Analysis | **Areas to review:** warn-level `dependency_report.issues`. **Looks good:** `dependency_report.passed` or no warn issues (one-line positive copy). No new server rubric in UX7e. |
+| Card art | Commander **hero** image + **row thumbnail** per card (`image_uri`); tap → lightbox (reuse UX7c `CardLightbox` pattern). |
+| MD preview | **Collapsed** `<details>` at bottom — "Markdown preview"; same renderer as UX7c result. |
+| Home | **View last deck** secondary CTA when session has active deck id; **Library** hidden until **UX7f**. |
+| Build another | Footer action clears wizard draft + session deck → `/` or `/build/1`. |
+| Visual design | [design.md](../web/design.md) — light theme, 375px baseline. |
+
+Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7e wireframe scope.
 
 ### UX11 — GUI deck editor: swap and lock (parked)
 

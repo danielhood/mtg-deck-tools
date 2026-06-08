@@ -1,6 +1,6 @@
 # Web UI — client routes
 
-**Status:** **UX7c shipped** — home, `/build/1`–`/build/7`, `/build/review`, and `/build/result` in `packages/web/`.
+**Status:** **UX7c shipped** — build wizard routes in `packages/web/`. **UX7e** `/deck/:id` design locked; implementation next.
 
 SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Navigation: [navigation.md](navigation.md).
 
@@ -8,7 +8,7 @@ SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Na
 
 ## Routing mechanism
 
-Path-based or hash-based routing — **choose at implementation**. Logical paths below are stable either way.
+**Path-based** routing (existing SPA router in `packages/web/`).
 
 ---
 
@@ -39,7 +39,8 @@ Path-based or hash-based routing — **choose at implementation**. Logical paths
 | `/build` with no in-progress wizard | Redirect to `/build/1` |
 | `/build` with saved wizard progress | Redirect to last completed step + 1, or `/build/review` if steps 1–7 done |
 | DB not ready | `/` renders; `/build/*` redirect to `/` or show blocked state (see [architecture.md](architecture.md) § Database gate) |
-| `/deck/:id`, `/library` before phase ships | 404 or placeholder — TBD at UX7e / UX7f implementation |
+| `/deck/:id` unknown id | Redirect to `/` |
+| `/library` before UX7f ships | Redirect to `/` |
 
 ---
 
@@ -47,7 +48,7 @@ Path-based or hash-based routing — **choose at implementation**. Logical paths
 
 | Param | Route | Meaning |
 | --- | --- | --- |
-| `:id` | `/deck/:id` | Saved deck identifier (**UX7f** persistence model TBD) |
+| `:id` | `/deck/:id` | Client UUID at generate (**UX7e**); same id reused when **UX7f** library persists decks server-side |
 
 ---
 
@@ -57,7 +58,8 @@ Path-based or hash-based routing — **choose at implementation**. Logical paths
 | --- | --- |
 | `/build/*` | Partial `DeckCriteria` draft in client memory; optional `sessionStorage` for refresh survival (implementation detail) |
 | `/build/result` | Last `GenerateResponse` (or rendered markdown) for display |
-| `/deck/:id`, `/library` | Loaded from server/local store — spec in **UX7e** / **UX7f** |
+| `/deck/:id` | `GenerateResponse` in `sessionStorage` keyed by id (**UX7e**); server/local library store (**UX7f**) |
+| `/library` | Server or indexed local store — **UX7f** |
 
 ---
 

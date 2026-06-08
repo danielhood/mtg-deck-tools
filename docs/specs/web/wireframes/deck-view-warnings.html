@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Deck view with warnings (UX7e draft)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --warn-700: #b45309;
+      --warn-100: #fef3c7;
+      --frame-width: 375px;
+      --footer-height: 72px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+    .preview-label { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .app-brand { display: flex; align-items: center; gap: 10px; }
+    .app-mark {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+    }
+    .app-title { font-size: 15px; font-weight: 700; color: var(--blue-900); }
+    .app-subtitle { font-size: 11px; color: var(--text-muted); }
+    .deck-pill {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 4px 8px; border-radius: 999px; background: var(--blue-100); color: var(--blue-700);
+    }
+    .deck-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(var(--footer-height) + 16px);
+    }
+    .commander-block { display: flex; gap: 12px; margin-bottom: 16px; }
+    .commander-art {
+      width: 88px; height: 123px; border-radius: 8px;
+      background: linear-gradient(160deg, #334155, #64748b); flex-shrink: 0;
+    }
+    .commander-meta h1 { font-size: 18px; color: var(--blue-900); margin-bottom: 4px; }
+    .commander-meta p { font-size: 12px; color: var(--text-muted); }
+    details.panel {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 12px;
+      background: var(--surface);
+    }
+    details.panel[open] summary { border-bottom: 1px solid var(--border); }
+    details.panel summary {
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      list-style: none;
+    }
+    details.panel summary::-webkit-details-marker { display: none; }
+    .panel-body { padding: 14px; font-size: 12px; color: var(--text-muted); }
+    .analysis-warn {
+      border-radius: 10px;
+      background: var(--warn-100);
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .analysis-warn h2 { font-size: 13px; color: var(--warn-700); margin-bottom: 8px; }
+    .analysis-warn ul { padding-left: 18px; font-size: 12px; color: var(--text); line-height: 1.45; }
+    .filter-group { margin-bottom: 10px; }
+    .filter-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      font-size: 12px; padding: 6px 10px; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--bg);
+    }
+    .chip.active { background: var(--blue-100); border-color: var(--blue-700); color: var(--blue-900); }
+    .slot-heading { font-size: 12px; font-weight: 700; color: var(--blue-900); margin: 14px 0 8px; text-transform: uppercase; }
+    .card-row { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .card-thumb { width: 40px; height: 56px; border-radius: 4px; background: #94a3b8; flex-shrink: 0; }
+    .card-name { font-size: 13px; font-weight: 600; }
+    .card-sub { font-size: 11px; color: var(--text-muted); }
+    .deck-footer { padding: 12px 16px; border-top: 1px solid var(--border); }
+    .btn-primary {
+      display: block; width: 100%; min-height: 44px; border: none; border-radius: 10px;
+      background: var(--blue-700); color: #fff; font-size: 15px; font-weight: 600; font-family: inherit;
+    }
+    .wireframe-meta { width: var(--frame-width); margin-top: 16px; font-size: 11px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <p class="preview-label">375px · UX7e draft · warnings state</p>
+  <div class="frame">
+    <header class="app-header">
+      <div class="app-brand">
+        <div class="app-mark" aria-hidden="true"></div>
+        <div>
+          <div class="app-title">MTG Deck Tools</div>
+          <div class="app-subtitle">Commander builder</div>
+        </div>
+      </div>
+      <span class="deck-pill">Deck</span>
+    </header>
+
+    <div class="deck-scroll">
+      <section class="commander-block">
+        <div class="commander-art" aria-hidden="true"></div>
+        <div class="commander-meta">
+          <h1>Tatyova, Benthic Emissary</h1>
+          <p>Legendary Creature — Merfolk Druid</p>
+        </div>
+      </section>
+
+      <details class="panel" open>
+        <summary>Summary</summary>
+        <div class="panel-body">
+          <p>Estimated $142.30 · 3 unpriced · avg CMC 3.2</p>
+          <p style="margin-top:8px">Creatures 28 · Instants 8 · Lands 36</p>
+        </div>
+      </details>
+
+      <section class="analysis-warn" aria-label="Areas to review">
+        <h2>Areas to review</h2>
+        <ul>
+          <li><strong>TOKEN_BALANCE</strong> — Producers without payoffs (Nest Invader, …)</li>
+          <li><strong>ENERGY_BALANCE</strong> — Energy producers with no payers</li>
+        </ul>
+      </section>
+
+      <section aria-label="Filters">
+        <div class="filter-group">
+          <div class="filter-label">Slot</div>
+          <div class="chips">
+            <span class="chip active">Synergy</span>
+            <span class="chip">Ramp</span>
+            <span class="chip">Draw</span>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Type</div>
+          <div class="chips"><span class="chip">Creature</span><span class="chip">Instant</span></div>
+        </div>
+      </section>
+
+      <h2 class="slot-heading">Synergy (filtered)</h2>
+      <div class="card-row">
+        <div class="card-thumb" aria-hidden="true"></div>
+        <div>
+          <div class="card-name">Nest Invader</div>
+          <div class="card-sub">{1}{G} · Creature</div>
+        </div>
+      </div>
+
+      <details class="panel" style="margin-top:16px">
+        <summary>Markdown preview</summary>
+        <div class="panel-body"><p>Collapsed by default in primary state; same renderer as UX7c.</p></div>
+      </details>
+    </div>
+
+    <footer class="deck-footer">
+      <button class="btn-primary" type="button">Build another deck</button>
+    </footer>
+  </div>
+
+  <aside class="wireframe-meta">
+    Route: <code>/deck/:id</code> · State: dependency warnings ·
+    <a href="deck-view.html">clean variant</a>
+  </aside>
+</body>
+</html>
