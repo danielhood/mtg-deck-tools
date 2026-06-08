@@ -18,8 +18,15 @@ Route → HTML mock map. **Approved 2026-06-07** — ready for UX7c Svelte imple
 | `/build/review` | [build-review.html](build-review.html) | approved | Preflight warnings panel + criteria recap; Back / Generate |
 | `/build/review` (clean) | [build-review-clean.html](build-review-clean.html) | approved | Empty preflight success state |
 | `/build/result` | [build-result.html](build-result.html) | approved | MD HTML preview shell; **UX7e:** becomes redirect — keep for compat reference |
-| `/deck/:id` | [deck-view.html](deck-view.html) | draft | Commander hero, filters, card list, summary, MD preview |
+| `/deck/:id` | [deck-view.html](deck-view.html) | draft | Default entry from library; footer Back + Home |
+| `/deck/:id` (from home) | [deck-view-from-home.html](deck-view-from-home.html) | draft | Back → home |
+| `/deck/:id` (post-generate) | [deck-view-from-generate.html](deck-view-from-generate.html) | draft | Back → library after wizard |
 | `/deck/:id` (warnings) | [deck-view-warnings.html](deck-view-warnings.html) | draft | Expanded summary + dependency warn analysis |
-| `/` (resume deck) | [home-resume-deck.html](home-resume-deck.html) | draft | Secondary **View last deck** CTA |
+| `/deck/:id` (delete) | [deck-view-delete.html](deck-view-delete.html) | draft | Delete confirm modal (**UX7f**) |
+| `/` (resume deck) | [home-resume-deck.html](home-resume-deck.html) | draft | Secondary **View last deck** CTA (UX7e session) |
+| `/` (library ready) | [home-library-ready.html](home-library-ready.html) | draft | **View last deck** + **Saved library** enabled (**UX7f**) |
+| `/library` | [library.html](library.html) | draft | Tappable card grid, search, sort |
+| `/library` (empty) | [library-empty.html](library-empty.html) | draft | Empty state + **Build new deck** CTA |
+| `/deck/:id` (rename) | [deck-view-rename.html](deck-view-rename.html) | draft | Rename modal (**UX7f**) |
 
 Process: [README.md](README.md).
