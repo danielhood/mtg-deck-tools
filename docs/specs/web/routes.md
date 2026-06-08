@@ -1,6 +1,6 @@
 # Web UI — client routes
 
-**Status:** **UX7c + UX7e shipped** — build wizard and enhanced deck view routes in `packages/web/`.
+**Status:** **UX7c + UX7e + UX7f shipped** — build wizard, enhanced deck view, and saved library routes in `packages/web/`.
 
 SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Navigation: [navigation.md](navigation.md).
 
@@ -40,8 +40,7 @@ SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Na
 | `/build` with saved wizard progress | Redirect to last completed step + 1, or `/build/review` if steps 1–7 done |
 | DB not ready | `/` renders with banner; `/build/*`, `/library`, `/deck/*` blocked (see [architecture.md](architecture.md) § Database gate) |
 | `/deck/:id` unknown id | Redirect to `/` |
-| `/library` before UX7f ships | Redirect to `/` |
-| `/library` when DB missing | Blocked — redirect `/` or disabled like wizard |
+| `/library` when DB missing | Redirect to `/` |
 
 ---
 

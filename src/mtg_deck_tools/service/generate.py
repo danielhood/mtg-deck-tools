@@ -13,6 +13,7 @@ from mtg_deck_tools.builder.reload import run_generate_from_deck
 from mtg_deck_tools.builder.stub import run_generate_stub
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.service.dto import GenerateFromDeckRequest, GenerateRequest, GenerateResponse
+from mtg_deck_tools.service.library import require_cards_db, save_deck_to_library
 
 
 @dataclass(frozen=True)
@@ -59,6 +60,7 @@ def generate_deck(
     *,
     include_deck: bool = False,
     include_markdown: bool = False,
+    save_to_library: bool = False,
 ) -> GenerateResponse:
     db_path = Path(request.db_path) if request.db_path else None
     output_dir = Path(request.output_dir) if request.output_dir else None
@@ -83,7 +85,24 @@ def generate_deck(
             commander_names=request.commander_names,
         )
     result = GenerateResult(json_path=json_path, md_path=_md_path_for_json(json_path))
-    return _to_response(result, include_deck=include_deck, include_markdown=include_markdown)
+    response = _to_response(result, include_deck=include_deck, include_markdown=include_markdown)
+    if save_to_library:
+        require_cards_db(db_path)
+        if response.deck is None:
+            response = GenerateResponse(
+                id=response.id,
+                json_path=response.json_path,
+                md_path=response.md_path,
+                deck=_load_deck_dict(result.json_path),
+                markdown=response.markdown,
+            )
+        saved = save_deck_to_library(response.deck)
+        return GenerateResponse(
+            id=saved.id,
+            deck=saved.deck,
+            markdown=response.markdown if include_markdown else None,
+        )
+    return response
 
 
 def generate_deck_from_saved(

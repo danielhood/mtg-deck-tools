@@ -194,11 +194,12 @@
         description="Maximum USD spend for the entire deck."
         checked={draft.budgetEnabled}
         ontoggle={(enabled) => {
+          const turningOn = enabled && !draft.budgetEnabled;
           draft = {
             ...draft,
             budgetEnabled: enabled,
-            strict_budget: enabled ? draft.strict_budget : false,
-            prefer_available: enabled ? draft.prefer_available : false,
+            strict_budget: enabled ? (turningOn ? true : draft.strict_budget) : false,
+            prefer_available: enabled ? (turningOn ? true : draft.prefer_available) : false,
             budget_usd: enabled ? (draft.budget_usd ?? 150) : null,
           };
           if (enabled && !budgetText.trim()) {

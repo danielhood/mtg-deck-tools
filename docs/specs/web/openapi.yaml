@@ -249,6 +249,215 @@ paths:
                   $ref: '#/components/schemas/RarityChoiceResponse'
                 type: array
                 title: Response Wizard Rarities Api V1 Wizard Rarities Get
+  /api/v1/decks:
+    get:
+      tags:
+      - library
+      summary: List Decks
+      operationId: list_decks_api_v1_decks_get
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Search name, commander, or themes
+          title: Q
+        description: Search name, commander, or themes
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+          description: saved_at, name, or commander
+          default: saved_at
+          title: Sort
+        description: saved_at, name, or commander
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+          default: 100
+          title: Limit
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      - name: decks
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Saved deck library path
+          title: Decks
+        description: Saved deck library path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeckLibraryEntry'
+                title: Response List Decks Api V1 Decks Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/decks/{deck_id}:
+    get:
+      tags:
+      - library
+      summary: Get Deck
+      operationId: get_deck_api_v1_decks__deck_id__get
+      parameters:
+      - name: deck_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Deck Id
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      - name: decks
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Saved deck library path
+          title: Decks
+        description: Saved deck library path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeckLibraryDetailResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - library
+      summary: Patch Deck
+      operationId: patch_deck_api_v1_decks__deck_id__patch
+      parameters:
+      - name: deck_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Deck Id
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      - name: decks
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Saved deck library path
+          title: Decks
+        description: Saved deck library path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchDeckRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeckLibraryDetailResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - library
+      summary: Delete Deck
+      operationId: delete_deck_api_v1_decks__deck_id__delete
+      parameters:
+      - name: deck_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Deck Id
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      - name: decks
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Saved deck library path
+          title: Decks
+        description: Saved deck library path
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /health:
     get:
       tags:
@@ -323,12 +532,22 @@ paths:
       - deck
       summary: Generate
       operationId: generate_api_v1_generate_post
+      parameters:
+      - name: include_markdown
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Include markdown in response (CLI/export; not persisted)
+          default: false
+          title: Include Markdown
+        description: Include markdown in response (CLI/export; not persisted)
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/GenerateRequest'
-        required: true
       responses:
         '200':
           description: Successful Response
@@ -584,6 +803,70 @@ components:
       title: DeckCriteria
       description: "User selections from the deck wizard \u2014 consumed by the builder\
         \ (Phase 2+)."
+    DeckLibraryDetailResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        saved_at:
+          type: string
+          title: Saved At
+        deck:
+          additionalProperties: true
+          type: object
+          title: Deck
+      type: object
+      required:
+      - id
+      - name
+      - saved_at
+      - deck
+      title: DeckLibraryDetailResponse
+    DeckLibraryEntry:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        saved_at:
+          type: string
+          title: Saved At
+        commander_names:
+          items:
+            type: string
+          type: array
+          title: Commander Names
+        commander_image_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Commander Image Uri
+        colors:
+          items:
+            type: string
+          type: array
+          title: Colors
+        themes:
+          items:
+            type: string
+          type: array
+          title: Themes
+        estimated_price_usd:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Estimated Price Usd
+      type: object
+      required:
+      - id
+      - name
+      - saved_at
+      title: DeckLibraryEntry
     FocusLevelOption:
       properties:
         value:
@@ -724,11 +1007,20 @@ components:
         is complete).
     GenerateResponse:
       properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
         json_path:
-          type: string
+          anyOf:
+          - type: string
+          - type: 'null'
           title: Json Path
         md_path:
-          type: string
+          anyOf:
+          - type: string
+          - type: 'null'
           title: Md Path
         deck:
           anyOf:
@@ -742,10 +1034,9 @@ components:
           - type: 'null'
           title: Markdown
       type: object
-      required:
-      - json_path
-      - md_path
       title: GenerateResponse
+      description: Web generate returns ``id`` + ``deck``; CLI / legacy callers may
+        include path fields.
     HTTPValidationError:
       properties:
         detail:
@@ -824,6 +1115,15 @@ components:
       - id
       - description
       title: MechanicChoiceResponse
+    PatchDeckRequest:
+      properties:
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - name
+      title: PatchDeckRequest
     PreflightResponse:
       properties:
         warnings:

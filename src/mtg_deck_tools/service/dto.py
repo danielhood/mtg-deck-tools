@@ -80,10 +80,35 @@ class GenerateFromDeckRequest(BaseModel):
 
 
 class GenerateResponse(BaseModel):
-    json_path: str
-    md_path: str
+    """Web generate returns ``id`` + ``deck``; CLI / legacy callers may include path fields."""
+
+    id: str | None = None
+    json_path: str | None = None
+    md_path: str | None = None
     deck: dict[str, Any] | None = None
     markdown: str | None = None
+
+
+class DeckLibraryEntry(BaseModel):
+    id: str
+    name: str
+    saved_at: str
+    commander_names: list[str] = Field(default_factory=list)
+    commander_image_uri: str | None = None
+    colors: list[str] = Field(default_factory=list)
+    themes: list[str] = Field(default_factory=list)
+    estimated_price_usd: float | None = None
+
+
+class DeckLibraryDetailResponse(BaseModel):
+    id: str
+    name: str
+    saved_at: str
+    deck: dict[str, Any]
+
+
+class PatchDeckRequest(BaseModel):
+    name: str
 
 
 class WizardBuildStep(BaseModel):

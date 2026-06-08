@@ -21,6 +21,7 @@ from mtg_deck_tools.service import (
     get_database_stats,
     import_oracle_cards,
 )
+from mtg_deck_tools.api.library import router as library_router
 from mtg_deck_tools.api.wizard import router as wizard_router
 from mtg_deck_tools.service.dto import (
     DatabaseStatsResponse,
@@ -60,6 +61,7 @@ def create_app(*, static_dir: Path | None = None) -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(wizard_router)
+    app.include_router(library_router)
 
     @app.get("/health", response_model=HealthResponse, tags=["meta"])
     def health() -> HealthResponse:
@@ -97,10 +99,23 @@ def create_app(*, static_dir: Path | None = None) -> FastAPI:
         response_model=GenerateResponse,
         tags=["deck"],
     )
-    def generate(body: GenerateRequest) -> GenerateResponse:
+    def generate(
+        body: GenerateRequest,
+        include_markdown: Annotated[
+            bool,
+            Query(description="Include markdown in response (CLI/export; not persisted)"),
+        ] = False,
+    ) -> GenerateResponse:
         try:
-            return generate_deck(body, include_deck=True, include_markdown=True)
-        except (FileNotFoundError, RuntimeError, ValueError) as exc:
+            return generate_deck(
+                body,
+                include_deck=True,
+                include_markdown=include_markdown,
+                save_to_library=True,
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except (RuntimeError, ValueError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     @app.post(

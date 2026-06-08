@@ -24,12 +24,13 @@
   }: Props = $props();
 </script>
 
-<div class="wizard-body">
-  <WizardProgress {step} />
-  {@render children()}
-</div>
+<div class="wizard-layout">
+  <div class="wizard-scroll">
+    <WizardProgress {step} />
+    {@render children()}
+  </div>
 
-<div class="wizard-footer">
+  <div class="wizard-footer">
   <button
     class="btn btn-back"
     type="button"
@@ -46,4 +47,5 @@
   >
     {nextLabel}
   </button>
+  </div>
 </div>

@@ -1,6 +1,6 @@
 # Web UI — navigation patterns
 
-**Status:** UX7c + **UX7e** shipped; **UX7f** library navigation planned (decisions locked).
+**Status:** UX7c + **UX7e** + **UX7f** shipped.
 
 How users move between routes. Route map: [routes.md](routes.md). Screen details: [screens.md](screens.md).
 

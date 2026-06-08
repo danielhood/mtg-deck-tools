@@ -203,7 +203,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 
 ## Saved deck library (`/library`) — UX7f
 
-**Status:** Planned — decisions locked. API: [library-api.md](library-api.md). UX: [user-experience.md](../dependency-engine/user-experience.md) § UX7f.
+**Status:** Shipped. API: [library-api.md](library-api.md). UX: [user-experience.md](../dependency-engine/user-experience.md) § UX7f.
 
 **Wireframe:** [library.html](wireframes/library.html) (populated grid) · [library-empty.html](wireframes/library-empty.html) (empty)
 

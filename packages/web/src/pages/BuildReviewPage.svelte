@@ -17,7 +17,8 @@
   } from "../lib/api";
   import { loadDraft, toDeckCriteria, type WizardDraft } from "../lib/criteria";
   import { buildSummaryRows, slotTemplateEntries } from "../lib/review-summary";
-  import { saveResult } from "../lib/result";
+  import { cacheDeck } from "../lib/deck-cache";
+  import { defaultDeckName } from "../lib/deck-view";
   import { navigate } from "../lib/router";
 
   interface Props {
@@ -101,16 +102,16 @@
     generateError = "";
     try {
       const response = await postGenerate(criteria);
-      if (!response.markdown) {
-        throw new Error("Generate succeeded but no markdown was returned.");
+      if (!response.id || !response.deck) {
+        throw new Error("Generate succeeded but no deck was returned.");
       }
-      const deckId = saveResult({
-        markdown: response.markdown,
-        json_path: response.json_path,
-        md_path: response.md_path,
+      cacheDeck({
+        id: response.id,
+        name: defaultDeckName(response.deck),
         deck: response.deck,
+        returnTo: "/library",
       });
-      navigate(`/deck/${deckId}`);
+      navigate(`/deck/${response.id}`);
     } catch (err) {
       generateError = err instanceof Error ? err.message : "Generate failed.";
     } finally {
@@ -119,7 +120,8 @@
   }
 </script>
 
-<div class="wizard-body">
+<div class="wizard-layout">
+  <div class="wizard-scroll">
   <WizardProgress step={7} complete />
   <WizardIntro
     title="Review & generate"
@@ -196,9 +198,9 @@
   {#if generateError}
     <ErrorState message={generateError} />
   {/if}
-</div>
+  </div>
 
-<div class="wizard-footer">
+  <div class="wizard-footer">
   <button class="btn btn-back" type="button" onclick={() => navigate("/build/7")}>Back</button>
   <button
     class="btn btn-generate"
@@ -208,4 +210,5 @@
   >
     {generating ? "Generating…" : "Generate"}
   </button>
+  </div>
 </div>

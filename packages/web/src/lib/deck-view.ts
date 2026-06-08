@@ -292,6 +292,18 @@ function parseAnalysis(deck: Record<string, unknown>): DeckAnalysis {
   };
 }
 
+export function defaultDeckName(deck: Record<string, unknown>): string {
+  const commanders = Array.isArray(deck.commanders) ? deck.commanders : [];
+  const names = commanders
+    .map((entry) =>
+      entry && typeof entry === "object" && typeof (entry as { name?: unknown }).name === "string"
+        ? (entry as { name: string }).name.trim()
+        : "",
+    )
+    .filter(Boolean);
+  return names.length ? names.join(" / ") : "Untitled deck";
+}
+
 export function parseDeck(deck: Record<string, unknown> | null): ParsedDeck | null {
   if (!deck) return null;
 

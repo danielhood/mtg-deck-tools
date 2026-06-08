@@ -1,6 +1,6 @@
 # Web UI specification (planned)
 
-**Status:** **UX7a–UX7c + UX7e shipped** — build wizard and enhanced deck view. **UX7f** saved deck library — **decisions locked** (planning); implementation next.
+**Status:** **UX7a–UX7c + UX7e + UX7f shipped** — build wizard, enhanced deck view, and saved deck library. **UX7d** dependency dashboard next.
 
 ## Code location
 
@@ -32,10 +32,10 @@ Summary:
 | [screens.md](screens.md) | Screen behavior per route; **API consumed per screen** |
 | [navigation.md](navigation.md) | Next/Back, review, home flows |
 | [wizard-api.md](wizard-api.md) | Wizard HTTP endpoints; screen → API index |
-| [library-api.md](library-api.md) | **UX7f** — saved deck library HTTP API (planned) |
+| [library-api.md](library-api.md) | **UX7f shipped** — saved deck library HTTP API |
 | [design.md](design.md) | Visual design tokens |
 | [wireframes/README.md](wireframes/README.md) | Layout mock and review process (HTML wireframes) |
-| [openapi.yaml](openapi.yaml) | **Shipped** — health, stats, import, generate |
+| [openapi.yaml](openapi.yaml) | **Shipped** — health, stats, import, generate, library |
 | [deployment.md](deployment.md) | **UX7b** — env vars, self-host, PaaS notes |
 
 ## Shared contracts

@@ -23,6 +23,8 @@
   --frame-max: 375px;
   --touch-min: 44px;
   --footer-height: 72px;
+  --deck-footer-stack-height: 176px;
+  --library-footer-stack-height: 120px;
   --pip-slot: 52px;
   --pip-mini: 20px;
   --mana-size-unselected: 34px;
@@ -59,6 +61,7 @@ a {
 
 .app-root {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   max-width: var(--frame-max);
@@ -68,6 +71,12 @@ a {
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
   overflow-x: clip;
+}
+
+.app-root-wizard {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
 }
 
 .app-header {
@@ -122,14 +131,39 @@ a {
   color: var(--warn-700);
 }
 
+.library-pill {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--blue-100);
+  color: var(--blue-700);
+  flex-shrink: 0;
+}
+
 .app-main {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   min-width: 0;
   padding: 20px 16px calc(var(--footer-height) + 16px);
   display: flex;
   flex-direction: column;
   gap: 16px;
   overflow-x: clip;
+}
+
+.app-main-wizard {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+.app-main-wizard > * {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
 }
 
 .db-banner {
@@ -206,6 +240,14 @@ a {
   border-top: 1px solid var(--border);
   background: var(--bg);
   z-index: 10;
+}
+
+.wizard-layout .wizard-footer {
+  position: static;
+  transform: none;
+  left: auto;
+  flex-shrink: 0;
+  box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
 }
 
 .wizard-footer .btn {

@@ -35,6 +35,8 @@
   let resultsEl = $state<HTMLDivElement | null>(null);
   let searchLoading = $state(false);
   let searchError = $state("");
+  /** Avoid re-running scrollIntoView — it was snapping scroll back to the selected row. */
+  let initialSelectionScrollDone = $state(false);
 
   $effect(() => {
     const q = query;
@@ -93,14 +95,19 @@
 
   $effect(() => {
     const oracleId = draft.commander_oracle_ids[0];
-    if (!oracleId || !results.length || !resultsEl) return;
+    if (initialSelectionScrollDone || !oracleId || !results.length || !resultsEl) return;
 
     queueMicrotask(() => {
-      resultsEl
-        ?.querySelector(`[data-commander-id="${oracleId}"]`)
-        ?.scrollIntoView({ block: "nearest" });
+      const row = resultsEl?.querySelector(`[data-commander-id="${oracleId}"]`);
+      if (!row) return;
+      row.scrollIntoView({ block: "nearest" });
+      initialSelectionScrollDone = true;
     });
   });
+
+  function clearSearch(): void {
+    query = "";
+  }
 
   function pickCommander(row: CommanderResult): void {
     selected = row;
@@ -193,7 +200,7 @@
     <SectionHeader id="search-heading" title="Search commanders" description="Type to filter by name." />
 
     <div class="search-wrap">
-      <div class="search-field">
+      <div class="search-field" class:has-query={query.trim().length > 0}>
         <span class="search-icon" aria-hidden="true">⌕</span>
         <input
           class="search-input"
@@ -202,6 +209,14 @@
           bind:value={query}
           aria-label="Search commander name"
         />
+        <button
+          type="button"
+          class="search-clear"
+          aria-label="Clear search"
+          onclick={clearSearch}
+        >
+          ×
+        </button>
       </div>
     </div>
 

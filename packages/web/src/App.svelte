@@ -15,6 +15,7 @@
   import BuildReviewPage from "./pages/BuildReviewPage.svelte";
   import BuildResultPage from "./pages/BuildResultPage.svelte";
   import DeckViewPage from "./pages/DeckViewPage.svelte";
+  import LibraryPage from "./pages/LibraryPage.svelte";
 
   let path = $state(getPath());
   let meta = $state<WizardMeta | null>(null);
@@ -39,9 +40,9 @@
         metaLoading = false;
         if (
           !response.db_ready &&
-          path.startsWith("/build") &&
-          path !== "/build/review" &&
-          path !== "/build/result"
+          (path.startsWith("/build") ||
+            path.startsWith("/deck/") ||
+            path === "/library")
         ) {
           navigate("/", true);
         }
@@ -62,10 +63,11 @@
 
   const deckId = $derived(parseDeckId(path));
 
-  const phasePill = $derived.by((): "review" | "result" | "deck" | null => {
+  const phasePill = $derived.by((): "review" | "result" | "deck" | "library" | null => {
     if (route === "build-review") return "review";
     if (route === "build-result") return "result";
     if (route === "deck-view") return "deck";
+    if (route === "library") return "library";
     return null;
   });
 
@@ -99,6 +101,8 @@
     <BuildReviewPage {meta} />
   {:else if route === "build-result"}
     <BuildResultPage />
+  {:else if route === "library"}
+    <LibraryPage {meta} />
   {:else if route === "deck-view" && deckId}
     <DeckViewPage {deckId} />
   {:else}
