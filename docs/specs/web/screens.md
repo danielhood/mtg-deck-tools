@@ -10,7 +10,7 @@ CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md)
 
 ## Home (`/`)
 
-**Wireframe:** [home.html](wireframes/home.html) (DB ready) · [home-db-missing.html](wireframes/home-db-missing.html) (DB gate) · [home-resume-deck.html](wireframes/home-resume-deck.html) (session deck — **UX7e** draft)
+**Wireframe:** [home.html](wireframes/home.html) (DB ready) · [home-db-missing.html](wireframes/home-db-missing.html) (DB gate) · [home-resume-deck.html](wireframes/home-resume-deck.html) (session deck — **UX7e** draft) · [home-library-ready.html](wireframes/home-library-ready.html) (library CTAs — **UX7f** draft)
 
 | Element | Behavior |
 | --- | --- |
@@ -178,13 +178,14 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 
 ## Enhanced deck view (`/deck/:id`) — UX7e
 
-**Wireframe:** [deck-view.html](wireframes/deck-view.html) (draft) · [deck-view-warnings.html](wireframes/deck-view-warnings.html) (draft — dependency warns)
+**Wireframe:** [deck-view.html](wireframes/deck-view.html) (draft — from library) · [deck-view-from-home.html](wireframes/deck-view-from-home.html) (draft — from home) · [deck-view-from-generate.html](wireframes/deck-view-from-generate.html) (draft — post-generate) · [deck-view-warnings.html](wireframes/deck-view-warnings.html) (draft) · [deck-view-rename.html](wireframes/deck-view-rename.html) (draft) · [deck-view-delete.html](wireframes/deck-view-delete.html) (draft)
 
 Decisions and slices: [user-experience.md](../dependency-engine/user-experience.md) § UX7e.
 
 | Region | Behavior |
 | --- | --- |
 | Guard | Unknown `:id` (not in session cache and not in library) → redirect `/` |
+| Deck label | User `name` with pencil icon → rename modal (`PATCH`) — **UX7f** |
 | Commander header | Name, type line, color identity, hero `image_uri`; tap opens lightbox |
 | Summary panel | Always visible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
 | Analysis | **Looks good** one-liner when `dependency_report.passed` or no warn issues; else **Areas to review** list from `dependency_report.issues` (rule id + message) |
@@ -192,7 +193,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters |
 | Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
 | MD preview | **Removed in UX7f** — deck view renders from JSON only; markdown is CLI/export derivative |
-| Footer | **Build another deck** — clears wizard draft + session cache → `/` |
+| Footer | **Build another deck** → `/`; **Delete deck** (destructive) → confirm modal; bottom row: **Back** (context-sensitive — see [navigation.md](navigation.md) § Deck view) + **Home** → `/` |
 
 **Deferred on this screen:** swap / lock (**UX11**); JSON download; dependency drill-down (**UX7d**); CMC charts (**UX10**); regen / refill (**UX11**).
 
@@ -204,13 +205,17 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 
 **Status:** Planned — decisions locked. API: [library-api.md](library-api.md). UX: [user-experience.md](../dependency-engine/user-experience.md) § UX7f.
 
+**Wireframe:** [library.html](wireframes/library.html) (populated grid) · [library-empty.html](wireframes/library-empty.html) (empty)
+
 | Element | Behavior |
 | --- | --- |
 | DB gate | Route blocked when DB missing — same hard block as wizard |
 | Layout | **Card grid** — commander art, name, colors, themes, price, saved date |
 | Search | Filter by user label, commander name, themes |
 | Sort | `saved_at` (default newest), name, commander |
-| Row actions | **Open** → `/deck/:id`; **Rename** (inline or modal); **Delete** (confirm) — **no Download** in UX7f |
+| Open | Tap entire library card → load deck into session cache → `/deck/:id` |
+| Rename | **Deck view only** — pencil beside deck label → modal; `PATCH /api/v1/decks/{id}` |
+| Delete | **Deck view only** — footer **Delete deck** → confirm modal — **no actions on library cards** |
 | Empty state | CTA to **Build new deck** when library empty |
 | Auto-save | Generate from wizard creates library entry automatically (new UUID) |
 

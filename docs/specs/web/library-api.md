@@ -37,8 +37,9 @@ Service facades live in `src/mtg_deck_tools/service/`; handlers in `src/mtg_deck
 | `/` | `GET /api/v1/decks?limit=1` (or dedicated “latest”) for **View last deck** |
 | `/build/review` | `POST /api/v1/generate` — auto-persists new library entry |
 | `/library` | `GET /api/v1/decks` (list, search, sort) |
-| `/library` | `PATCH /api/v1/decks/{id}` (rename) |
+| `/library` | `PATCH /api/v1/decks/{id}` (rename — invoked from deck view only) |
 | `/library` | `DELETE /api/v1/decks/{id}` |
+| `/deck/:id` | `DELETE /api/v1/decks/{id}` (delete from deck view footer only) |
 | `/deck/:id` | `GET /api/v1/decks/{id}` on cache miss; session cache on load |
 
 **DB gate:** All library and deck routes require `db_ready`; when the database is missing, library endpoints return `404` / blocked state consistent with wizard routes.

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Saved library (UX7f draft)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --frame-width: 375px;
+      --touch-min: 44px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+    .preview-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .app-brand { display: flex; align-items: center; gap: 10px; }
+    .app-mark {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+    }
+    .app-title { font-size: 15px; font-weight: 700; color: var(--blue-900); }
+    .app-subtitle { font-size: 11px; color: var(--text-muted); }
+    .library-pill {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 4px 8px; border-radius: 999px; background: var(--blue-100); color: var(--blue-700);
+    }
+    .library-toolbar {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--surface);
+    }
+    .search-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: var(--touch-min);
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+    }
+    .search-field input {
+      flex: 1;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: transparent;
+      outline: none;
+    }
+    .search-icon { font-size: 14px; color: var(--text-muted); }
+    .sort-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .sort-label { font-size: 12px; color: var(--text-muted); }
+    .sort-select {
+      flex: 1;
+      max-width: 200px;
+      min-height: 36px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .library-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px 16px;
+    }
+    .deck-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    a.deck-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    a.deck-card:active {
+      box-shadow: inset 0 0 0 2px var(--blue-700);
+    }
+    .deck-card-art {
+      width: 100%;
+      aspect-ratio: 5 / 7;
+      background: linear-gradient(160deg, #334155, #64748b);
+      border-bottom: 1px solid var(--border);
+    }
+    .deck-card-art.simic { background: linear-gradient(160deg, #14532d, #2563eb); }
+    .deck-card-art.golgari { background: linear-gradient(160deg, #14532d, #374151); }
+    .deck-card-art.izzet { background: linear-gradient(160deg, #2563eb, #dc2626); }
+    .deck-card-body { padding: 10px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .deck-card-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.25;
+    }
+    .deck-card-commander { font-size: 10px; color: var(--text-muted); }
+    .ci-pips { display: flex; gap: 3px; flex-wrap: wrap; }
+    .ci-pip {
+      width: 14px; height: 14px; border-radius: 50%; font-size: 8px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; color: #fff;
+    }
+    .ci-pip.g { background: #15803d; }
+    .ci-pip.u { background: #2563eb; }
+    .ci-pip.b { background: #374151; }
+    .ci-pip.r { background: #dc2626; }
+    .theme-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .theme-tag {
+      font-size: 9px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .deck-card-meta {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: auto;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+    .library-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .btn-outline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      width: 100%;
+      border-radius: 10px;
+      border: 2px solid var(--blue-700);
+      background: var(--bg);
+      color: var(--blue-700);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .dev-note {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px dashed var(--magenta);
+      border-left: 4px solid var(--magenta);
+      border-radius: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .dev-note-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      color: var(--magenta);
+      margin-bottom: 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+    .wireframe-meta {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .wireframe-meta a { color: var(--blue-700); }
+  </style>
+</head>
+<body>
+  <p class="preview-label">375px · UX7f draft · library populated</p>
+  <div class="frame">
+    <header class="app-header">
+      <div class="app-brand">
+        <div class="app-mark" aria-hidden="true"></div>
+        <div>
+          <div class="app-title">MTG Deck Tools</div>
+          <div class="app-subtitle">Saved decks</div>
+        </div>
+      </div>
+      <span class="library-pill">Library</span>
+    </header>
+
+    <div class="library-toolbar" aria-label="Search and sort">
+      <label class="search-field">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input type="search" placeholder="Search name, commander, themes…" aria-label="Search saved decks">
+      </label>
+      <div class="sort-row">
+        <span class="sort-label">Sort</span>
+        <select class="sort-select" aria-label="Sort saved decks">
+          <option selected>Saved (newest)</option>
+          <option>Name</option>
+          <option>Commander</option>
+        </select>
+      </div>
+    </div>
+
+    <main class="library-scroll">
+      <div class="deck-grid" aria-label="Saved deck cards">
+        <a class="deck-card" href="deck-view.html">
+          <div class="deck-card-art simic" role="img" aria-label="Commander art placeholder"></div>
+          <div class="deck-card-body">
+            <h2 class="deck-card-name">Simic tokens</h2>
+            <p class="deck-card-commander">Tatyova, Benthic Emissary</p>
+            <div class="ci-pips" aria-label="Color identity">
+              <span class="ci-pip g">G</span>
+              <span class="ci-pip u">U</span>
+            </div>
+            <div class="theme-tags">
+              <span class="theme-tag">tokens</span>
+              <span class="theme-tag">ramp</span>
+            </div>
+            <p class="deck-card-meta">$142 · Jun 7, 2026</p>
+          </div>
+        </a>
+
+        <a class="deck-card" href="deck-view.html">
+          <div class="deck-card-art golgari" role="img" aria-label="Commander art placeholder"></div>
+          <div class="deck-card-body">
+            <h2 class="deck-card-name">Golgari graveyard</h2>
+            <p class="deck-card-commander">Meren of Clan Nel Toth</p>
+            <div class="ci-pips" aria-label="Color identity">
+              <span class="ci-pip b">B</span>
+              <span class="ci-pip g">G</span>
+            </div>
+            <div class="theme-tags">
+              <span class="theme-tag">graveyard</span>
+            </div>
+            <p class="deck-card-meta">$98 · Jun 5, 2026</p>
+          </div>
+        </a>
+
+        <a class="deck-card" href="deck-view.html">
+          <div class="deck-card-art izzet" role="img" aria-label="Commander art placeholder"></div>
+          <div class="deck-card-body">
+            <h2 class="deck-card-name">Izzet spells</h2>
+            <p class="deck-card-commander">Mizzix of the Izmagnus</p>
+            <div class="ci-pips" aria-label="Color identity">
+              <span class="ci-pip u">U</span>
+              <span class="ci-pip r">R</span>
+            </div>
+            <div class="theme-tags">
+              <span class="theme-tag">spells</span>
+              <span class="theme-tag">artifacts</span>
+            </div>
+            <p class="deck-card-meta">$210 · May 28, 2026</p>
+          </div>
+        </a>
+
+        <a class="deck-card" href="deck-view.html">
+          <div class="deck-card-art simic" role="img" aria-label="Commander art placeholder"></div>
+          <div class="deck-card-body">
+            <h2 class="deck-card-name">Budget simic</h2>
+            <p class="deck-card-commander">Tatyova, Benthic Emissary</p>
+            <div class="ci-pips" aria-label="Color identity">
+              <span class="ci-pip g">G</span>
+              <span class="ci-pip u">U</span>
+            </div>
+            <div class="theme-tags">
+              <span class="theme-tag">budget</span>
+            </div>
+            <p class="deck-card-meta">$45 · May 12, 2026</p>
+          </div>
+        </a>
+      </div>
+
+      <aside class="dev-note" role="note" aria-label="Developer note">
+        <div class="dev-note-header">
+          <span aria-hidden="true">&lt;/&gt;</span>
+          <span>Dev note</span>
+        </div>
+        <p>
+          <code>GET /api/v1/decks?q=&amp;sort=saved_at</code> — summary rows only.
+          Tap card → cache full deck → <code>/deck/:id</code>.
+          Rename and delete on deck view only.
+        </p>
+      </aside>
+    </main>
+
+    <footer class="library-footer">
+      <a class="btn-outline" href="home-library-ready.html">← Home</a>
+    </footer>
+  </div>
+  <aside class="wireframe-meta">
+    Route: <code>/library</code> · State: populated grid ·
+    <a href="library-empty.html">empty state</a> · Spec: screens.md § Saved deck library
+  </aside>
+</body>
+</html>

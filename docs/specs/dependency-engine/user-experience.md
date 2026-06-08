@@ -476,7 +476,7 @@ Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7e wir
 
 **In scope (UX7f):**
 
-- Route `/library` — card grid, search, sort, rename, delete.
+- Route `/library` — card grid, search, sort; tap card to open deck view.
 - Server persistence via new library API (`GET/PATCH/DELETE /api/v1/decks`, extended `POST /api/v1/generate`).
 - **Auto-save on generate** — new wizard build creates a new library entry (new UUID).
 - Load library entry → write deck to **session cache** → `/deck/:id`.
@@ -492,7 +492,7 @@ Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7e wir
 | Slice | Deliverable |
 | --- | --- |
 | **UX7f-a** | `service/` library store + HTTP API; `generate` auto-save; `GenerateResponse` web shape (`id` + `deck`; no path fields) |
-| **UX7f-b** | `/library` screen — card grid, search, sort, rename, delete (no per-row Download) |
+| **UX7f-b** | `/library` screen — tappable card grid, search, sort (rename/delete on deck view) |
 | **UX7f-c** | Deck view + home wired to library API; session cache on load; drop UX7e session deck persistence |
 
 Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
@@ -517,11 +517,12 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | Unknown `/deck/:id` | Redirect to `/` |
 | DB gate | **Hard block** — library, deck view, and wizard all unavailable when DB missing (same as UX7c) |
 | Library layout | **Card grid** — commander art/metadata cards |
-| Row actions | Open, rename, delete — **no Download** in UX7f |
+| Row actions | Library: tap card to open; deck view: pencil rename + footer delete + Back/Home — **no Download** in UX7f |
+| Deck view Back | Footer bottom row — context-sensitive: library entry → `/library`; home **View last deck** → `/`; post-generate → `/library`. **Home** always → `/`. Store `returnTo` at navigation time |
 | Regen / refill | **UX11** — no library UI wiring to `from-deck` in UX7f |
 | CLI alignment | Target: CLI uses same API/service DTOs; stop depending on path fields inside persisted JSON (refactor may trail UX7f web ship) |
 
-Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7f wireframe scope (to be added).
+Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7f wireframe scope — [library.html](../web/wireframes/library.html), [deck-view.html](../web/wireframes/deck-view.html), [deck-view-from-home.html](../web/wireframes/deck-view-from-home.html), [deck-view-from-generate.html](../web/wireframes/deck-view-from-generate.html), [deck-view-rename.html](../web/wireframes/deck-view-rename.html), [deck-view-delete.html](../web/wireframes/deck-view-delete.html), [home-library-ready.html](../web/wireframes/home-library-ready.html).
 
 ### UX11 — GUI deck editor: swap and lock (parked)
 

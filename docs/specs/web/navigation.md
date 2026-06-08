@@ -69,7 +69,20 @@ Applies to `/deck/:id`.
 | Entry | After generate (auto-saved); home **View last deck**; library **Open** (**UX7f**) |
 | Unknown id | → `/` |
 | Build another | Footer — clear wizard draft + session cache → `/` |
-| Back | Browser back from deck view → prior route (library, review, or home); no wizard step chrome |
+| Delete deck | Footer — confirm modal → `DELETE /api/v1/decks/{id}` → `/` (**UX7f**) |
+| Rename | Pencil beside deck label — confirm modal → `PATCH /api/v1/decks/{id}` (**UX7f**) |
+| Back | Footer bottom row — **context-sensitive** label and target (see below); wizard-style outline button |
+| Home | Footer bottom row — always → `/` |
+
+**Back targets by entry** (store `returnTo` or equivalent at navigation time):
+
+| Arrived from | Back label | Target |
+| --- | --- | --- |
+| Library (tap card) | ← Library | `/library` |
+| Home **View last deck** | ← Home | `/` |
+| Wizard **Generate** | ← Library | `/library` |
+
+Navigation may be revised later; browser history alone is not the primary back affordance.
 
 **Deferred:** swap, slot regen — **UX11**; regen via `from-deck` — **UX11**.
 
@@ -83,9 +96,9 @@ Applies to `/library` (**UX7f**).
 | --- | --- |
 | Entry | Home **Saved library**; deck view back navigation |
 | DB missing | Blocked — same gate as wizard |
-| Open card | Load deck into session cache → `/deck/:id` |
-| Rename | `PATCH /api/v1/decks/{id}` — in-place update |
-| Delete | `DELETE /api/v1/decks/{id}` — confirm; stay on library |
+| Open card | Tap library card → load deck into session cache → `/deck/:id` |
+| Rename | Deck view — pencil beside deck label → modal; `PATCH /api/v1/decks/{id}` |
+| Delete | **Deck view only** — footer **Delete deck** → confirm modal; `DELETE /api/v1/decks/{id}` → redirect `/` (not on library grid) |
 | Search / sort | Client or query params on `GET /api/v1/decks` |
 
 ---

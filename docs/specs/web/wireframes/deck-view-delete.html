@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Deck view delete confirm (UX7f draft)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --blue-900: #1e3a5f;
+      --blue-700: #2563eb;
+      --blue-100: #dbeafe;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --magenta: #c026d3;
+      --danger: #dc2626;
+      --frame-width: 375px;
+      --touch-min: 44px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+    .preview-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .frame {
+      width: var(--frame-width);
+      min-height: 667px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .frame-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      filter: blur(1px);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .app-brand { display: flex; align-items: center; gap: 10px; }
+    .app-mark {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-700), var(--magenta));
+    }
+    .app-title { font-size: 15px; font-weight: 700; color: var(--blue-900); }
+    .deck-pill {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      padding: 4px 8px; border-radius: 999px; background: var(--blue-100); color: var(--blue-700);
+    }
+    .deck-scroll { flex: 1; padding: 16px; }
+    .commander-block { display: flex; gap: 12px; margin-bottom: 16px; }
+    .commander-art {
+      width: 88px; height: 123px; border-radius: 8px;
+      background: linear-gradient(160deg, #334155, #64748b);
+    }
+    .commander-meta h1 { font-size: 18px; color: var(--blue-900); }
+    .placeholder-block {
+      height: 48px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .deck-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-primary {
+      min-height: 44px; border-radius: 10px; background: var(--blue-700);
+    }
+    .btn-delete-bar {
+      min-height: 44px; border-radius: 10px; background: var(--danger);
+    }
+    .nav-row { display: flex; gap: 10px; }
+    .footer-nav-bar {
+      flex: 1;
+      min-height: 44px;
+      border-radius: 10px;
+      border: 1.5px solid var(--blue-700);
+      background: var(--bg);
+    }
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+    .modal-dialog {
+      width: 100%;
+      max-width: 320px;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 48px rgba(15, 23, 42, 0.2);
+      overflow: hidden;
+    }
+    .modal-header { padding: 16px 16px 0; }
+    .modal-header h2 {
+      font-size: 17px;
+      color: var(--blue-900);
+      margin-bottom: 8px;
+    }
+    .modal-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .modal-header .deck-label {
+      font-weight: 700;
+      color: var(--text);
+    }
+    .modal-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+    }
+    .modal-footer a,
+    .modal-footer button {
+      min-height: var(--touch-min);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    .btn-cancel {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+    }
+    .btn-confirm-delete {
+      border: none;
+      background: var(--danger);
+      color: #fff;
+    }
+    .dev-note {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      padding: 10px;
+      border: 1px dashed var(--magenta);
+      border-left: 4px solid var(--magenta);
+      border-radius: 8px;
+      font-size: 10px;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.95);
+    }
+    .wireframe-meta {
+      max-width: var(--frame-width);
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .wireframe-meta a { color: var(--blue-700); }
+  </style>
+</head>
+<body>
+  <p class="preview-label">375px · UX7f draft · delete confirmation</p>
+  <div class="frame">
+    <div class="frame-content" aria-hidden="true">
+      <header class="app-header">
+        <div class="app-brand">
+          <div class="app-mark"></div>
+          <div class="app-title">MTG Deck Tools</div>
+        </div>
+        <span class="deck-pill">Deck</span>
+      </header>
+      <div class="deck-scroll">
+        <section class="commander-block">
+          <div class="commander-art"></div>
+          <div class="commander-meta">
+            <h1>Tatyova, Benthic Emissary</h1>
+          </div>
+        </section>
+        <div class="placeholder-block"></div>
+        <div class="placeholder-block"></div>
+      </div>
+      <footer class="deck-footer">
+        <div class="btn-primary"></div>
+        <div class="btn-delete-bar"></div>
+        <div class="nav-row">
+          <div class="footer-nav-bar"></div>
+          <div class="footer-nav-bar"></div>
+        </div>
+      </footer>
+    </div>
+
+    <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+      <div class="modal-dialog">
+        <header class="modal-header">
+          <h2 id="delete-title">Delete this deck?</h2>
+          <p>
+            <span class="deck-label">Simic tokens</span> (Tatyova, Benthic Emissary) will be
+            removed from your saved library. This cannot be undone.
+          </p>
+        </header>
+        <footer class="modal-footer">
+          <a class="btn-cancel" href="deck-view.html">Cancel</a>
+          <a class="btn-confirm-delete" href="home-library-ready.html">Delete deck</a>
+        </footer>
+      </div>
+    </div>
+
+    <aside class="dev-note" role="note" aria-label="Developer note">
+      <strong>Dev note:</strong> <code>DELETE /api/v1/decks/{id}</code> on confirm.
+      Clear session cache for id → redirect <code>/</code>.
+      Delete only from deck view — user sees full deck before deciding.
+    </aside>
+  </div>
+  <aside class="wireframe-meta">
+    Route: <code>/deck/:id</code> · State: delete confirm modal ·
+    <a href="deck-view.html">deck view</a> · Spec: screens.md § Enhanced deck view
+  </aside>
+</body>
+</html>

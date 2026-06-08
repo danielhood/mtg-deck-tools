@@ -221,7 +221,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | Filters | Three horizontal chip rows (Slot · Type · Color); wrap on 375px |
 | Card list | Thumb 40×56, name, slot badge, mana + price; grouped by slot heading |
 | MD preview | `<details>` default **closed** at bottom of scroll |
-| Footer | Fixed **Build another deck** (primary) |
+| Footer | Fixed **Build another deck** (primary); **Delete deck**; bottom row **Back** + **Home** (**UX7f**) |
 
 **Dev notes only (`.dev-note`):** sessionStorage id; no API; UX11/UX7f/UX10 deferred.
 
@@ -231,17 +231,19 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 ---
 
-## UX7f wireframe scope (planned)
+## UX7f wireframe scope
 
-**Status:** Decisions locked — [user-experience.md](../../dependency-engine/user-experience.md) § UX7f, [screens.md](../screens.md) § Saved deck library.
-
-**Target files (to add):**
+**Status:** **Draft** (2026-06-08) — decisions locked — [user-experience.md](../../dependency-engine/user-experience.md) § UX7f, [screens.md](../screens.md) § Saved deck library.
 
 | Priority | File | Route | Notes |
 | --- | --- | --- | --- |
-| **P0** | `library.html` | `/library` | Card grid, search field, sort control, empty state |
-| **P0** | `library-rename.html` | `/library` | Rename modal/inline state |
-| **P1** | `home-library-ready.html` | `/` | Enabled **Saved library** + **View last deck** |
+| **P0** | [library.html](library.html) | `/library` | Tappable card grid, search, sort |
+| **P0** | [library-empty.html](library-empty.html) | `/library` | Empty state + **Build new deck** CTA |
+| **P0** | [deck-view-rename.html](deck-view-rename.html) | `/deck/:id` | Rename modal (pencil on deck label) |
+| **P0** | [deck-view-delete.html](deck-view-delete.html) | `/deck/:id` | Delete confirm modal |
+| **P1** | [deck-view-from-home.html](deck-view-from-home.html) | `/deck/:id` | Back → home entry context |
+| **P1** | [deck-view-from-generate.html](deck-view-from-generate.html) | `/deck/:id` | Back → library after generate |
+| **P1** | [home-library-ready.html](home-library-ready.html) | `/` | Enabled **Saved library** + **View last deck** |
 
 **In frame (product UI):**
 
@@ -250,7 +252,9 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | Search | Top field — filters commander name, user label, themes |
 | Sort | Control for `saved_at` (default), name, commander |
 | Card grid | Commander art, label, CI, themes, price, saved date — **always cards** (not list rows) |
-| Card actions | Open, rename, delete — **no Download** in UX7f |
+| Library card | Entire card tappable → `/deck/:id` — no footer actions on grid |
+| Deck view header | User deck label + pencil → rename modal |
+| Deck view footer | **Build another deck** then **Delete deck**; bottom row **Back** (context) + **Home** — wizard-style outline buttons |
 | Empty state | Illustration + **Build new deck** CTA |
 
 **Out of scope for UX7f wireframes:** folders; import; download; save-as; regen controls.

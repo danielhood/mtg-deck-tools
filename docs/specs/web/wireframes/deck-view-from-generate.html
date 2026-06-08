@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wireframe — Deck view (UX7e draft)</title>
+  <title>Wireframe — Deck view post-generate (UX7f draft)</title>
   <style>
     :root {
       --bg: #ffffff;
@@ -271,7 +271,7 @@
   </style>
 </head>
 <body>
-  <p class="preview-label">375px · UX7f draft · entry from library</p>
+  <p class="preview-label">375px · UX7f draft · entry after wizard generate</p>
   <div class="frame">
     <header class="app-header">
       <div class="app-brand">
@@ -376,11 +376,8 @@
       <aside class="dev-note" role="note" aria-label="Developer note">
         <div class="dev-note-header">&lt;/&gt; Dev note</div>
         <p>
-          Entry context sets footer <strong>Back</strong> target (see
-          <a href="deck-view-from-home.html">from home</a>,
-          <a href="deck-view-from-generate.html">post-generate</a>).
-          <code>returnTo</code>: <code>library</code> · <code>home</code> · <code>generate</code>.
-          Delete → confirm → <code>DELETE</code> → <code>/</code>.
+          <code>returnTo=generate</code> → Back label <strong>← Library</strong> (not review).
+          Same destination as library entry; differs from home entry.
         </p>
       </aside>
     </div>
@@ -396,12 +393,9 @@
   </div>
 
   <aside class="wireframe-meta" aria-label="Wireframe metadata">
-    Route: <code>/deck/:id</code> · Entry: library · State: clean analysis ·
-    <a href="deck-view-from-home.html">from home</a> ·
-    <a href="deck-view-from-generate.html">post-generate</a> ·
-    <a href="deck-view-warnings.html">warnings</a> ·
-    <a href="deck-view-rename.html">rename</a> ·
-    <a href="deck-view-delete.html">delete</a>
+    Route: <code>/deck/:id</code> · Entry: wizard generate · Back → <code>/library</code> ·
+    <a href="deck-view.html">from library</a> ·
+    <a href="deck-view-from-home.html">from home</a>
   </aside>
 </body>
 </html>
