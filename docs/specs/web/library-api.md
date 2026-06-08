@@ -1,10 +1,10 @@
 # Web UI — saved deck library HTTP API (planned)
 
-**Status:** **Planning locked** — implementation follows [user-experience.md](../dependency-engine/user-experience.md) § UX7f.
+**Status:** **UX7f shipped** — see [user-experience.md](../dependency-engine/user-experience.md) § UX7f.
 
 Server-side persistence for saved decks. The SPA does **not** own the canonical store; it caches loaded decks in session for the active `/deck/:id` view only.
 
-Contract ships in [openapi.yaml](openapi.yaml) in the UX7f implementation PR.
+Contract: [openapi.yaml](openapi.yaml).
 
 ---
 

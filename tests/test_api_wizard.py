@@ -130,7 +130,8 @@ def test_wizard_commanders_search(client: TestClient, wizard_db) -> None:
     assert rows[0]["image_uri"].startswith("https://")
 
 
-def test_generate_returns_markdown(client: TestClient, wizard_db) -> None:
+def test_generate_returns_library_entry(client: TestClient, wizard_db, tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("MTG_DECKS_PATH", str(tmp_path / "decks.db"))
     response = client.post(
         "/api/v1/generate",
         json={
@@ -145,9 +146,29 @@ def test_generate_returns_markdown(client: TestClient, wizard_db) -> None:
     )
     assert response.status_code == 200
     body = response.json()
+    assert body["id"]
+    assert body["deck"] is not None
+    assert body["deck"]["commanders"][0]["name"] == "Test Commander"
+
+
+def test_generate_can_include_markdown(client: TestClient, wizard_db, tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("MTG_DECKS_PATH", str(tmp_path / "decks.db"))
+    response = client.post(
+        "/api/v1/generate?include_markdown=true",
+        json={
+            "stub": True,
+            "db_path": str(wizard_db),
+            "criteria": {
+                "themes": [],
+                "commander_oracle_ids": ["cmd-1"],
+                "seed": 42,
+            },
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
     assert body["markdown"]
     assert "Test Commander" in body["markdown"]
-    assert body["deck"] is not None
 
 
 def test_openapi_includes_wizard_paths(client: TestClient) -> None:

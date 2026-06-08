@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-07):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e shipped** (CLI wizard + web build wizard + enhanced deck view). **UX7f** library — decisions locked (planning); implementation next → **UX7d** dashboard — [architecture.md](../web/architecture.md), [library-api.md](../web/library-api.md), [active.md](../../roadmap/active.md).
+**Status (2026-06-08):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e + UX7f shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library). **UX7d** dashboard next — [architecture.md](../web/architecture.md), [library-api.md](../web/library-api.md), [active.md](../../roadmap/active.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -466,9 +466,9 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7e wireframe scope.
 
-### UX7f — Saved deck library (planned)
+### UX7f — Saved deck library (shipped)
 
-**Status:** **Decisions locked** — [library-api.md](../web/library-api.md), [screens.md](../web/screens.md) § Saved deck library. Implementation PR follows this planning PR.
+**Status:** **Shipped (2026-06-08)** — [library-api.md](../web/library-api.md), [screens.md](../web/screens.md) § Saved deck library.
 
 **Goal:** Server-side saved deck library so decks survive browser restarts and self-hosted deployments. `.deck.json` is the sole persisted payload; the web UI renders from JSON, not stored Markdown.
 

@@ -40,4 +40,5 @@ def test_openapi_schema(client: TestClient) -> None:
     paths = schema["paths"]
     assert "/health" in paths
     assert "/api/v1/generate" in paths
+    assert "/api/v1/decks" in paths
     assert "DeckCriteria" in schema["components"]["schemas"]

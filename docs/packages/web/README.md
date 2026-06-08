@@ -1,6 +1,6 @@
 # Web UI package
 
-**Status:** **UX7c + UX7e shipped**. **UX7f** (server saved deck library) — decisions locked; implementation will add `/library`, library API client, and JSON-first deck view — see [library-api.md](../specs/web/library-api.md).
+**Status:** **UX7c + UX7e + UX7f shipped** — build wizard, enhanced deck view, and saved deck library (`/library`, library API client, JSON-first deck view). **UX7d** dashboard next — see [library-api.md](../specs/web/library-api.md).
 
 ## Stack (locked)
 

@@ -12,6 +12,7 @@ DATA_DIR = PROJECT_ROOT / "data"
 RESOURCES_DIR = PROJECT_ROOT / "resources"
 SCRYFALL_DIR = RESOURCES_DIR / "scryfall"
 DEFAULT_DB_PATH = DATA_DIR / "cards.db"
+DEFAULT_DECKS_PATH = DATA_DIR / "decks.db"
 WEB_UI_DIST_DIR = PROJECT_ROOT / "packages" / "web" / "dist"
 TAXONOMY_PATH = CONFIG_DIR / "mechanic-taxonomy.yaml"
 EFFECT_PATTERNS_PATH = CONFIG_DIR / "effect-patterns.yaml"
@@ -32,6 +33,16 @@ NON_DECKABLE_LAYOUTS = frozenset(
         "vanguard",
     }
 )
+
+
+def resolve_decks_path(decks_path: Path | None = None) -> Path:
+    """Resolve saved-deck library SQLite path: arg, then ``MTG_DECKS_PATH``, then default."""
+    if decks_path is not None:
+        return decks_path
+    env = os.environ.get("MTG_DECKS_PATH")
+    if env:
+        return Path(env)
+    return DEFAULT_DECKS_PATH
 
 
 def resolve_db_path(db_path: Path | None = None) -> Path:

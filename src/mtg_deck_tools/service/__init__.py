@@ -2,12 +2,15 @@
 
 from mtg_deck_tools.service.dto import (
     DatabaseStatsResponse,
+    DeckLibraryDetailResponse,
+    DeckLibraryEntry,
     GenerateFromDeckRequest,
     GenerateRequest,
     GenerateResponse,
     HealthResponse,
     ImportRequest,
     ImportResponse,
+    PatchDeckRequest,
 )
 from mtg_deck_tools.service.generate import (
     GenerateResult,
@@ -16,6 +19,13 @@ from mtg_deck_tools.service.generate import (
     generate_deck_from_saved,
 )
 from mtg_deck_tools.service.import_ import import_oracle_cards
+from mtg_deck_tools.service.library import (
+    delete_library_deck,
+    get_library_deck,
+    list_library_decks,
+    patch_library_deck,
+    save_deck_to_library,
+)
 from mtg_deck_tools.service.stats import get_database_stats
 from mtg_deck_tools.service.wizard import run_interactive_wizard
 from mtg_deck_tools.service.wizard_catalog import (
@@ -31,6 +41,8 @@ from mtg_deck_tools.service.wizard_catalog import (
 
 __all__ = [
     "DatabaseStatsResponse",
+    "DeckLibraryDetailResponse",
+    "DeckLibraryEntry",
     "GenerateFromDeckRequest",
     "GenerateRequest",
     "GenerateResponse",
@@ -38,11 +50,17 @@ __all__ = [
     "HealthResponse",
     "ImportRequest",
     "ImportResponse",
+    "PatchDeckRequest",
+    "delete_library_deck",
     "generate_deck",
     "generate_deck_cli",
     "generate_deck_from_saved",
     "get_database_stats",
+    "get_library_deck",
     "import_oracle_cards",
+    "list_library_decks",
+    "patch_library_deck",
+    "save_deck_to_library",
     "run_interactive_wizard",
     "get_slot_template_defaults",
     "get_synergy_context",

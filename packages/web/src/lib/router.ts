@@ -34,6 +34,7 @@ export function parseDeckId(path: string): string | null {
 
 export function matchRoute(path: string): string {
   if (path === "/") return "home";
+  if (path === "/library") return "library";
   if (path === "/build") return "build-redirect";
   if (path === "/build/review") return "build-review";
   if (path === "/build/result") return "build-result";

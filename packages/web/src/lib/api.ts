@@ -80,11 +80,30 @@ export interface PreflightResponse {
 }
 
 export interface GenerateResponse {
-  json_path: string;
-  md_path: string;
-  deck: Record<string, unknown> | null;
-  markdown: string | null;
+  id: string;
+  deck: Record<string, unknown>;
+  markdown?: string | null;
 }
+
+export interface DeckLibraryEntry {
+  id: string;
+  name: string;
+  saved_at: string;
+  commander_names: string[];
+  commander_image_uri: string | null;
+  colors: string[];
+  themes: string[];
+  estimated_price_usd: number | null;
+}
+
+export interface DeckLibraryDetail {
+  id: string;
+  name: string;
+  saved_at: string;
+  deck: Record<string, unknown>;
+}
+
+export type LibrarySort = "saved_at" | "name" | "commander";
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, init);
@@ -151,4 +170,39 @@ export function postGenerate(criteria: Record<string, unknown>): Promise<Generat
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ criteria }),
   });
+}
+
+export function listDecks(params: {
+  q?: string;
+  sort?: LibrarySort;
+  limit?: number;
+}): Promise<DeckLibraryEntry[]> {
+  const search = new URLSearchParams();
+  if (params.q) search.set("q", params.q);
+  if (params.sort) search.set("sort", params.sort);
+  if (params.limit != null) search.set("limit", String(params.limit));
+  const query = search.toString();
+  return fetchJson<DeckLibraryEntry[]>(`/api/v1/decks${query ? `?${query}` : ""}`);
+}
+
+export function getDeck(id: string): Promise<DeckLibraryDetail> {
+  return fetchJson<DeckLibraryDetail>(`/api/v1/decks/${encodeURIComponent(id)}`);
+}
+
+export function patchDeck(id: string, name: string): Promise<DeckLibraryDetail> {
+  return fetchJson<DeckLibraryDetail>(`/api/v1/decks/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function deleteDeck(id: string): Promise<void> {
+  const response = await fetch(`/api/v1/decks/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    const raw = await response.text();
+    throw new Error(raw || `Request failed (${response.status})`);
+  }
 }
