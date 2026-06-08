@@ -62,7 +62,8 @@ For reload, modification, image lookup, and future UI versions. Versioned schema
     "include_mechanics": ["scry", "deathtouch"],
     "avoid_mechanics": ["flying"],
     "budget_usd": 150,
-    "slot_template": { "ramp": 10, "draw": 8, "lands": 36 }
+    "slot_template": { "ramp": 10, "draw": 8, "lands": 36 },
+    "seed": 42
   },
   "commanders": [
     {
@@ -142,10 +143,22 @@ Markdown output includes a **Deck dependencies** section (and dependency lines u
 | `oracle_id` | Stable identity across printings; DB joins |
 | `scryfall_uri` / `image_uri` | Online image lookup without re-querying API |
 | `criteria` | Re-run generator with tweaks; audit why card was picked |
+| `criteria.seed` | Reproducible regeneration — persisted when assigned (**UX7f** server library) |
 | `slot` | Which template slot the card filled |
 | `quantity` | 1 for singleton; >1 only for basic lands |
 | `price_known` | Budget transparency when `prices.usd` was null |
 | `schema_version` | Forward-compatible migrations |
+
+### Web library persistence (UX7f)
+
+**Status:** Planned — [library-api.md](../specs/web/library-api.md).
+
+| Rule | Detail |
+| --- | --- |
+| Canonical payload | This `.deck.json` document — **sole** persisted record in the server library |
+| Included | `criteria` (with `seed`), `dependency_report`, `commanders`, `cards`, `stats`, generator metadata |
+| Excluded | `json_path`, `md_path`, markdown text — filesystem paths are not stored in library JSON |
+| Markdown | Human-readable `.md` remains a **CLI/export derivative** generated from this JSON when needed |
 
 ### Related token cards (planned — acquisition companion list)
 

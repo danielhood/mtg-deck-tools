@@ -20,6 +20,7 @@ Default bind: `127.0.0.1:8000`. **v1 has no auth** — use the default host for 
 | `MTG_SERVE_HOST` | `127.0.0.1` | Bind address |
 | `MTG_SERVE_PORT` | `8000` | Listen port |
 | `MTG_DB_PATH` | `data/cards.db` | Default SQLite for API when `?db=` is omitted |
+| `MTG_DECKS_PATH` | `data/decks` | Saved deck library store (**UX7f** — implementation may use this path or a table; persist on same volume as `cards.db`) |
 | `MTG_SERVE_STATIC_DIR` | *(unset)* | SPA static root (set by `serve --with-ui` / `--ui-dir`) |
 
 CLI flags override env for the current process (`--host`, `--port`, `--db`, `--ui-dir`).
@@ -42,7 +43,7 @@ mtg-deck-tools serve --host 0.0.0.0 --port 8000
 ## Simple PaaS (Fly.io, Railway, Render)
 
 - One web service running `mtg-deck-tools serve --host 0.0.0.0 --port $PORT`.
-- Persistent disk/volume for `MTG_DB_PATH` (import on deploy or bake a snapshot in the image).
+- Persistent disk/volume for `MTG_DB_PATH` and **`MTG_DECKS_PATH`** (import on deploy or bake a snapshot in the image; library survives redeploys).
 - No secrets required for Scryfall (bulk JSON only).
 
 Docker is not shipped in-repo; wrap the same command in your own image if needed.

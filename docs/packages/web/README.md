@@ -1,6 +1,6 @@
 # Web UI package
 
-**Status:** **UX7c + UX7e shipped** — Svelte 5 SPA with app shell, DB gate, home, wizard (steps 1–7), review/preflight/generate, enhanced deck view (`/deck/:id`), and shared loading/error states.
+**Status:** **UX7c + UX7e shipped**. **UX7f** (server saved deck library) — decisions locked; implementation will add `/library`, library API client, and JSON-first deck view — see [library-api.md](../specs/web/library-api.md).
 
 ## Stack (locked)
 
