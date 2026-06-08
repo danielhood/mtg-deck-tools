@@ -16,8 +16,8 @@ CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md)
 | --- | --- |
 | DB banner | Visible when DB missing; explains CLI `mtg-deck-tools import` |
 | Build new deck | → `/build/1` when DB ready; disabled when blocked |
-| View last deck | → `/deck/:id` when session has active deck (**UX7e**); hidden when none |
-| Future | Library (**UX7f**) — hidden until shipped |
+| View last deck | → `/deck/:id` for most recently saved library deck (**UX7f**); hidden when library empty |
+| Saved library | → `/library` when DB ready (**UX7f**) |
 
 **API:** `GET /health`, `GET /api/v1/wizard/meta` (or `GET /api/v1/stats` for DB probe). See [wizard-api.md](wizard-api.md).
 
@@ -169,10 +169,10 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 | Element | UX7c |
 | --- | --- |
 | Deck output | HTML rendering of generated Markdown (CLI `.md` equivalent) |
-| Download JSON | Deferred (**UX7f**) |
-| Next steps | **UX7e:** redirect to `/deck/:id` after generate; this route redirects when session has active deck |
+| Download JSON | Deferred (post-UX7f) |
+| Next steps | Redirect to `/deck/:id` after generate; compat redirect when active deck id exists |
 
-**API:** Uses `POST /api/v1/generate` response — inline `markdown` and `deck` stored in session for deck view.
+**API:** Uses `POST /api/v1/generate` — **UX7f:** returns `id` + `deck`; auto-saves to library. Markdown optional (CLI); not used for web deck view.
 
 ---
 
@@ -184,32 +184,45 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 
 | Region | Behavior |
 | --- | --- |
-| Guard | Unknown or missing `:id` in session → redirect `/` |
+| Guard | Unknown `:id` (not in session cache and not in library) → redirect `/` |
 | Commander header | Name, type line, color identity, hero `image_uri`; tap opens lightbox |
 | Summary panel | Always visible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
 | Analysis | **Looks good** one-liner when `dependency_report.passed` or no warn issues; else **Areas to review** list from `dependency_report.issues` (rule id + message) |
 | Filters | Chip groups: **Slot** (multi), **Type** (multi), **Color** (multi); AND across groups; empty state when filter matches nothing |
 | Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters |
 | Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
-| MD preview | Collapsed `<details>` — MD→HTML of generate `markdown` |
-| Footer | **Build another deck** — clears wizard draft + session deck → `/` |
+| MD preview | **Removed in UX7f** — deck view renders from JSON only; markdown is CLI/export derivative |
+| Footer | **Build another deck** — clears wizard draft + session cache → `/` |
 
-**Deferred on this screen:** swap / lock (**UX11**); JSON download (**UX7f**); dependency drill-down (**UX7d**); CMC charts (**UX10**).
+**Deferred on this screen:** swap / lock (**UX11**); JSON download; dependency drill-down (**UX7d**); CMC charts (**UX10**); regen / refill (**UX11**).
 
-**API:** None — client renders stored `GenerateResponse.deck` from `sessionStorage`. Same payload shape as [deck-output-format.md](../../product/deck-output-format.md).
+**API:** **UX7f:** `GET /api/v1/decks/{id}` on cache miss; primary render from JSON `deck` in session cache after load or generate. Shape: [deck-output-format.md](../../product/deck-output-format.md).
 
 ---
 
-## Planned screens (UX7f+)
+## Saved deck library (`/library`) — UX7f
+
+**Status:** Planned — decisions locked. API: [library-api.md](library-api.md). UX: [user-experience.md](../dependency-engine/user-experience.md) § UX7f.
+
+| Element | Behavior |
+| --- | --- |
+| DB gate | Route blocked when DB missing — same hard block as wizard |
+| Layout | **Card grid** — commander art, name, colors, themes, price, saved date |
+| Search | Filter by user label, commander name, themes |
+| Sort | `saved_at` (default newest), name, commander |
+| Row actions | **Open** → `/deck/:id`; **Rename** (inline or modal); **Delete** (confirm) — **no Download** in UX7f |
+| Empty state | CTA to **Build new deck** when library empty |
+| Auto-save | Generate from wizard creates library entry automatically (new UUID) |
+
+**API:** `GET /api/v1/decks`, `PATCH /api/v1/decks/{id}`, `DELETE /api/v1/decks/{id}`.
+
+**Deferred:** folders; import; JSON download; save-as / clone; regen (**UX11**).
+
+---
+
+## Planned screens (UX7d+)
 
 Feature specs and backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md), [user-experience.md](../dependency-engine/user-experience.md).
-
-### Saved deck library (`/library`) — UX7f
-
-- Save, load, organize `.deck.json` locally (single-user, not multi-tenant).
-- Load deck → **UX7e** view → iterate/regen without wizard.
-- JSON download from result/history.
-- Regen flows (slot regen, full regen preserving locks) tie to **UX11**.
 
 ### Dependency dashboard — UX7d
 

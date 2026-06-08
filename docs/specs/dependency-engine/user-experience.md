@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-07):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e shipped** (CLI wizard + web build wizard + enhanced deck view). Next implementation: **UX7f** library → **UX7d** dashboard — [architecture.md](../web/architecture.md), [active.md](../../roadmap/active.md).
+**Status (2026-06-07):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e shipped** (CLI wizard + web build wizard + enhanced deck view). **UX7f** library — decisions locked (planning); implementation next → **UX7d** dashboard — [architecture.md](../web/architecture.md), [library-api.md](../web/library-api.md), [active.md](../../roadmap/active.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -465,6 +465,63 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | Visual design | [design.md](../web/design.md) — light theme, 375px baseline. |
 
 Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7e wireframe scope.
+
+### UX7f — Saved deck library (planned)
+
+**Status:** **Decisions locked** — [library-api.md](../web/library-api.md), [screens.md](../web/screens.md) § Saved deck library. Implementation PR follows this planning PR.
+
+**Goal:** Server-side saved deck library so decks survive browser restarts and self-hosted deployments. `.deck.json` is the sole persisted payload; the web UI renders from JSON, not stored Markdown.
+
+#### Scope
+
+**In scope (UX7f):**
+
+- Route `/library` — card grid, search, sort, rename, delete.
+- Server persistence via new library API (`GET/PATCH/DELETE /api/v1/decks`, extended `POST /api/v1/generate`).
+- **Auto-save on generate** — new wizard build creates a new library entry (new UUID).
+- Load library entry → write deck to **session cache** → `/deck/:id`.
+- Home **View last deck** → most recently saved library deck.
+- Home **Saved library** CTA enabled when DB ready.
+- Deck view renders from **JSON deck payload** (replaces UX7e `sessionStorage` + markdown dependency).
+- Persist `criteria.seed` and `dependency_report` in deck JSON.
+
+**Out of scope (UX7f):** JSON download; import uploaded `.deck.json`; folders/collections; save-as / clone / duplicate; regen / refill UI (**UX11**); wiring library → `POST /api/v1/generate/from-deck`; migration from legacy `sessionStorage` deck stores.
+
+**Slices:**
+
+| Slice | Deliverable |
+| --- | --- |
+| **UX7f-a** | `service/` library store + HTTP API; `generate` auto-save; `GenerateResponse` web shape (`id` + `deck`; no path fields) |
+| **UX7f-b** | `/library` screen — card grid, search, sort, rename, delete (no per-row Download) |
+| **UX7f-c** | Deck view + home wired to library API; session cache on load; drop UX7e session deck persistence |
+
+Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
+
+#### UX7f decisions
+
+| Topic | Decision |
+| --- | --- |
+| Persistence tier | **Server-side** — canonical store on deployment; client session cache only for active `/deck/:id` |
+| Persisted payload | **`.deck.json` document only** — no `json_path`, `md_path`, or markdown in the library record |
+| Markdown | **Derivative / CLI export** — not persisted; web deck view does not depend on stored markdown (collapsible MD preview removed or on-demand export only — implementation detail) |
+| Seed | Stored in `deck.criteria.seed` when assigned at generate |
+| `dependency_report` | Stored in deck JSON when present |
+| Save model | **Auto-save on generate**; updates to an existing entry are **in-place** (same `id`) |
+| New UUID | Only when user starts a **new** deck through the wizard |
+| Save-as / clone | **Deferred** — no duplicate action in UX7f |
+| Organize | **List/sort, rename, delete, search** in v1 |
+| Folders / import | **Deferred** |
+| Load handoff | `GET /api/v1/decks/{id}` → session cache → `/deck/:id` |
+| View last deck | **Most recent library deck** by `saved_at` (not session-only) |
+| Session migration | **None** — drop UX7e `sessionStorage` deck persistence; no import of old session data |
+| Unknown `/deck/:id` | Redirect to `/` |
+| DB gate | **Hard block** — library, deck view, and wizard all unavailable when DB missing (same as UX7c) |
+| Library layout | **Card grid** — commander art/metadata cards |
+| Row actions | Open, rename, delete — **no Download** in UX7f |
+| Regen / refill | **UX11** — no library UI wiring to `from-deck` in UX7f |
+| CLI alignment | Target: CLI uses same API/service DTOs; stop depending on path fields inside persisted JSON (refactor may trail UX7f web ship) |
+
+Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7f wireframe scope (to be added).
 
 ### UX11 — GUI deck editor: swap and lock (parked)
 

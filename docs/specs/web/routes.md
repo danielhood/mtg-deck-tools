@@ -38,9 +38,10 @@ SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Na
 | --- | --- |
 | `/build` with no in-progress wizard | Redirect to `/build/1` |
 | `/build` with saved wizard progress | Redirect to last completed step + 1, or `/build/review` if steps 1–7 done |
-| DB not ready | `/` renders; `/build/*` redirect to `/` or show blocked state (see [architecture.md](architecture.md) § Database gate) |
+| DB not ready | `/` renders with banner; `/build/*`, `/library`, `/deck/*` blocked (see [architecture.md](architecture.md) § Database gate) |
 | `/deck/:id` unknown id | Redirect to `/` |
 | `/library` before UX7f ships | Redirect to `/` |
+| `/library` when DB missing | Blocked — redirect `/` or disabled like wizard |
 
 ---
 
@@ -56,10 +57,10 @@ SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Na
 
 | Route group | State |
 | --- | --- |
-| `/build/*` | Partial `DeckCriteria` draft in client memory; optional `sessionStorage` for refresh survival (implementation detail) |
-| `/build/result` | Last `GenerateResponse` (or rendered markdown) for display |
-| `/deck/:id` | `GenerateResponse` in `sessionStorage` keyed by id (**UX7e**); server/local library store (**UX7f**) |
-| `/library` | Server or indexed local store — **UX7f** |
+| `/build/*` | Partial `DeckCriteria` draft in client memory; optional `sessionStorage` for wizard refresh survival |
+| `/build/result` | Compat redirect — deck lives in server library (**UX7f**) |
+| `/deck/:id` | Session **cache** of loaded deck JSON keyed by id; canonical store is server library (**UX7f**) |
+| `/library` | Server library index via `GET /api/v1/decks` (**UX7f**) |
 
 ---
 

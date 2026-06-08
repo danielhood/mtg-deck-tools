@@ -1,7 +1,7 @@
 # Web UI architecture (planned)
 
 **Status:** **UX7a–UX7c implemented** — wizard API + Svelte SPA (steps 1–7, review, result) — [specs/web/README.md](README.md).
-**Phase:** UX7 active — **UX7f** saved deck library next.
+**Phase:** UX7 active — **UX7f** saved deck library (decisions locked; implementation next).
 
 ## Strategic shift
 
@@ -146,7 +146,7 @@ The web app is the **primary interactive shell**. The CLI remains for automation
 | **Iterate** | Swap, slot regen, param changes → partial/full rebuild | No | **UX11** + **UX7f** |
 | **View** | Inspect active deck (filters, balance, analysis) | No | **UX7e** → **UX7d** / **UX10** |
 
-Routes: [routes.md](routes.md). Screens: [screens.md](screens.md). Navigation: [navigation.md](navigation.md). Wizard API: [wizard-api.md](wizard-api.md). Visual design: [design.md](design.md).
+Routes: [routes.md](routes.md). Screens: [screens.md](screens.md). Navigation: [navigation.md](navigation.md). Wizard API: [wizard-api.md](wizard-api.md). Library API: [library-api.md](library-api.md). Visual design: [design.md](design.md).
 
 ```mermaid
 flowchart LR
@@ -177,14 +177,26 @@ Delivery priority and backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.
 - Reuse wizard **semantics** from [user-experience.md](../dependency-engine/user-experience.md) (UX2–UX5 shipped in CLI).
 - Visual tokens: [design.md](design.md).
 
-### Database gate (UX7c)
+### Database gate (UX7c; extended UX7f)
 
 When `cards.db` is missing (`GET /api/v1/stats` → 404 or wizard meta reports not ready):
 
-- **Hard block** — no wizard or deck functionality.
-- **Home** (`/`) still renders with a **banner**; **Build new deck** disabled.
+- **Hard block** — no wizard, **library**, or deck view functionality.
+- **Home** (`/`) still renders with a **banner**; **Build new deck** and **Saved library** disabled.
 - Copy directs user to CLI: `mtg-deck-tools import`.
 - **UX7g** (backlog): web-side init / Scryfall refresh when online.
+
+### Saved deck library (UX7f)
+
+Server-side persistence is the canonical store for built decks. See [library-api.md](library-api.md) and [user-experience.md](../dependency-engine/user-experience.md) § UX7f.
+
+| Topic | Decision |
+| --- | --- |
+| Store | Server library (service + API) — not browser `localStorage` / IndexedDB |
+| Payload | `.deck.json` document only — no markdown or filesystem paths in persisted records |
+| Client cache | Session cache for active `/deck/:id` after load or generate |
+| Generate | Auto-save on `POST /api/v1/generate`; new UUID per wizard build |
+| CLI target | Same API/service DTOs; markdown as export derivative only |
 
 ### Technical choices (proposed — confirm at UX7 implementation)
 

@@ -1,6 +1,6 @@
 # Web UI — navigation patterns
 
-**Status:** UX7c + **UX7e** deck view navigation shipped.
+**Status:** UX7c + **UX7e** shipped; **UX7f** library navigation planned (decisions locked).
 
 How users move between routes. Route map: [routes.md](routes.md). Screen details: [screens.md](screens.md).
 
@@ -44,8 +44,8 @@ Applies to `/`.
 | --- | --- |
 | Primary action | **Build new deck** → `/build/1` when DB ready |
 | DB missing | Build disabled; banner on home — see [architecture.md](architecture.md) § Database gate |
-| View last deck | → `/deck/:id` when session has active deck (**UX7e**) |
-| Future | Library → `/library` (**UX7f**) — hidden until shipped |
+| View last deck | → `/deck/:id` for most recently saved library deck (**UX7f**) |
+| Saved library | → `/library` when DB ready (**UX7f**) |
 
 ---
 
@@ -66,12 +66,27 @@ Applies to `/deck/:id`.
 
 | Pattern | Rule |
 | --- | --- |
-| Entry | After generate; home **View last deck**; future library load (**UX7f**) |
+| Entry | After generate (auto-saved); home **View last deck**; library **Open** (**UX7f**) |
 | Unknown id | → `/` |
-| Build another | Footer — clear wizard draft + session deck → `/` |
-| Back | Browser back from deck view → prior route (review or home); no wizard step chrome |
+| Build another | Footer — clear wizard draft + session cache → `/` |
+| Back | Browser back from deck view → prior route (library, review, or home); no wizard step chrome |
 
-**Deferred:** swap, slot regen, library picker — **UX11** / **UX7f** in [user-experience.md](../dependency-engine/user-experience.md).
+**Deferred:** swap, slot regen — **UX11**; regen via `from-deck` — **UX11**.
+
+---
+
+## Library
+
+Applies to `/library` (**UX7f**).
+
+| Pattern | Rule |
+| --- | --- |
+| Entry | Home **Saved library**; deck view back navigation |
+| DB missing | Blocked — same gate as wizard |
+| Open card | Load deck into session cache → `/deck/:id` |
+| Rename | `PATCH /api/v1/decks/{id}` — in-place update |
+| Delete | `DELETE /api/v1/decks/{id}` — confirm; stay on library |
+| Search / sort | Client or query params on `GET /api/v1/decks` |
 
 ---
 

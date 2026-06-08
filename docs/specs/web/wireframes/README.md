@@ -231,6 +231,34 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 ---
 
+## UX7f wireframe scope (planned)
+
+**Status:** Decisions locked — [user-experience.md](../../dependency-engine/user-experience.md) § UX7f, [screens.md](../screens.md) § Saved deck library.
+
+**Target files (to add):**
+
+| Priority | File | Route | Notes |
+| --- | --- | --- | --- |
+| **P0** | `library.html` | `/library` | Card grid, search field, sort control, empty state |
+| **P0** | `library-rename.html` | `/library` | Rename modal/inline state |
+| **P1** | `home-library-ready.html` | `/` | Enabled **Saved library** + **View last deck** |
+
+**In frame (product UI):**
+
+| Region | Layout notes |
+| --- | --- |
+| Search | Top field — filters commander name, user label, themes |
+| Sort | Control for `saved_at` (default), name, commander |
+| Card grid | Commander art, label, CI, themes, price, saved date — **always cards** (not list rows) |
+| Card actions | Open, rename, delete — **no Download** in UX7f |
+| Empty state | Illustration + **Build new deck** CTA |
+
+**Out of scope for UX7f wireframes:** folders; import; download; save-as; regen controls.
+
+**Approval gate:** Mark P0 library wireframes `approved` before UX7f-b Svelte work.
+
+---
+
 ## Out of scope for wireframes
 
 - Real API integration or `DeckCriteria` persistence
