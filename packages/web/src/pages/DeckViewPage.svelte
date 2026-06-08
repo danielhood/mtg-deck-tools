@@ -1,13 +1,13 @@
 <script lang="ts">
   import CardLightbox from "../components/CardLightbox.svelte";
   import ColorPipPicker from "../components/ColorPipPicker.svelte";
+  import ManaCost from "../components/ManaCost.svelte";
   import { clearDraft } from "../lib/criteria";
   import type { DeckCardPreview } from "../lib/deck-cards";
   import {
     displayCardName,
     emptyFilters,
     filteredCards,
-    formatCardMana,
     formatCardPrice,
     formatSlotCountLine,
     formatSummaryLine,
@@ -245,7 +245,11 @@
             </button>
             <div class="card-info">
               <div class="card-name">{displayCardName(card)}</div>
-              <div class="card-sub">{formatCardMana(card)} · {formatCardPrice(card)}</div>
+              <div class="card-sub">
+                <ManaCost cost={card.mana_cost} />
+                <span class="card-sub-sep" aria-hidden="true">·</span>
+                {formatCardPrice(card)}
+              </div>
             </div>
             <span class="slot-badge">{group.label}</span>
           </div>

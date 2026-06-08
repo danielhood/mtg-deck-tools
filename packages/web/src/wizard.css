@@ -2005,9 +2005,17 @@
 }
 
 .card-sub {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
   font-size: 11px;
   color: var(--text-muted);
   margin-top: 2px;
+}
+
+.card-sub-sep {
+  opacity: 0.7;
 }
 
 .slot-badge {
