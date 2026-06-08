@@ -9,6 +9,8 @@ from mtg_deck_tools.builder.pool import CardCandidate
 LAND_RAMP_ORACLE = re.compile(r"(?i)search your library for .{0,60} land")
 MANA_ROCK_TYPES = ("Artifact",)
 COLORED_MANA = re.compile(r"\{([WUBRG])\}")
+MANA_SYMBOL = re.compile(r"\{[^}]+\}")
+WUBRG = frozenset("WUBRG")
 
 DEFAULT_MIN_LANDS = 30
 DEFAULT_MAX_LANDS = 40
@@ -59,10 +61,21 @@ class ManaSourceCounts:
     nonland_producers: dict[str, int]
 
 
+def _colors_in_mana_symbol(symbol: str) -> list[str]:
+    """WUBRG letters in one braced mana token (hybrid, phyrexian, monocolor)."""
+    inner = symbol[1:-1]
+    if "/" in inner:
+        return [part for part in inner.split("/") if part in WUBRG]
+    if inner in WUBRG:
+        return [inner]
+    return []
+
+
 def parse_pips_from_cost(mana_cost: str) -> dict[str, int]:
     counts: dict[str, int] = {}
-    for color in COLORED_MANA.findall(mana_cost or ""):
-        counts[color] = counts.get(color, 0) + 1
+    for symbol in MANA_SYMBOL.findall(mana_cost or ""):
+        for color in _colors_in_mana_symbol(symbol):
+            counts[color] = counts.get(color, 0) + 1
     return counts
 
 

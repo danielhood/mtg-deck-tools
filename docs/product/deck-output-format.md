@@ -85,7 +85,9 @@ For reload, modification, image lookup, and future UI versions. Versioned schema
       "price_known": true,
       "scryfall_uri": "https://scryfall.com/card/...",
       "image_uri": "https://cards.scryfall.io/normal/front/...jpg",
-      "mechanic_tags": ["aristocrats", "sacrifice"]
+      "mechanic_tags": ["aristocrats", "sacrifice"],
+      "color_identity": ["B"],
+      "produced_mana": []
     }
   ],
   "stats": {

@@ -42,6 +42,7 @@ def _deck_card_from_saved(entry: dict) -> DeckCard:
         image_uri=entry.get("image_uri"),
         mechanic_tags=list(entry.get("mechanic_tags") or []),
         oracle_text=entry.get("oracle_text") or "",
+        color_identity=list(entry.get("color_identity") or []),
         produced_mana=list(entry.get("produced_mana") or []),
         released_at=entry.get("released_at"),
         rarity=entry.get("rarity"),

@@ -2,6 +2,7 @@
   import type { WizardMeta } from "../lib/api";
   import DbBanner from "../components/DbBanner.svelte";
   import { resetDraft } from "../lib/criteria";
+  import { getActiveDeckId } from "../lib/result";
   import { navigate } from "../lib/router";
 
   interface Props {
@@ -10,10 +11,17 @@
 
   let { meta }: Props = $props();
 
+  const activeDeckId = $derived(getActiveDeckId());
+
   function startBuild(): void {
     if (!meta.db_ready) return;
     resetDraft();
     navigate("/build/1");
+  }
+
+  function viewLastDeck(): void {
+    const id = getActiveDeckId();
+    if (id) navigate(`/deck/${id}`);
   }
 </script>
 
@@ -31,6 +39,9 @@
   <button class="btn btn-primary" type="button" disabled={!meta.db_ready} onclick={startBuild}>
     Build new deck
   </button>
+  {#if activeDeckId}
+    <button class="btn btn-secondary" type="button" onclick={viewLastDeck}>View last deck</button>
+  {/if}
 </section>
 
 <section class="future-section">

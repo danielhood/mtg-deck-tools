@@ -1,6 +1,6 @@
 # Web UI — navigation patterns
 
-**Status:** UX7c patterns locked; **UX7e** deck view navigation locked.
+**Status:** UX7c + **UX7e** deck view navigation shipped.
 
 How users move between routes. Route map: [routes.md](routes.md). Screen details: [screens.md](screens.md).
 

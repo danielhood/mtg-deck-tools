@@ -29,6 +29,7 @@ class DeckCard:
     image_uri: str | None
     mechanic_tags: list[str] = field(default_factory=list)
     oracle_text: str = ""
+    color_identity: list[str] = field(default_factory=list)
     produced_mana: list[str] = field(default_factory=list)
     released_at: str | None = None
     power: str | None = None
