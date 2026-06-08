@@ -1,6 +1,6 @@
 # Web UI — navigation patterns
 
-**Status:** Planning — UX7c patterns locked.
+**Status:** UX7c patterns locked; **UX7e** deck view navigation locked.
 
 How users move between routes. Route map: [routes.md](routes.md). Screen details: [screens.md](screens.md).
 
@@ -32,7 +32,7 @@ Applies to `/build/review`.
 | Generate | Enabled even when warnings present (warn-only, same as CLI) |
 | Jump to step N | **Not in UX7c** — no fix links from review |
 
-**Forward:** Generate → `/build/result` on success.
+**Forward:** Generate → `/deck/:id` on success (**UX7e**). `/build/result` redirects to active deck id when session has one.
 
 ---
 
@@ -44,24 +44,34 @@ Applies to `/`.
 | --- | --- |
 | Primary action | **Build new deck** → `/build/1` when DB ready |
 | DB missing | Build disabled; banner on home — see [architecture.md](architecture.md) § Database gate |
-| Future | Library → `/library` (**UX7f**); resume deck → `/deck/:id` (**UX7e**) — disabled or hidden until shipped |
+| View last deck | → `/deck/:id` when session has active deck (**UX7e**) |
+| Future | Library → `/library` (**UX7f**) — hidden until shipped |
 
 ---
 
-## Result
+## Result (compat)
 
 Applies to `/build/result`.
 
 | Pattern | Rule |
 | --- | --- |
-| Build another | → `/` or `/build/1` |
-| Enhanced deck view | Deferred (**UX7e**) |
+| Redirect | → `/deck/:id` when session has active deck id; else → `/` |
+| Build another | Handled on deck view footer — clears session → `/` |
 
 ---
 
-## Future routes (UX7e+)
+## Deck view
 
-Detailed iterate/view navigation (swap, slot regen, library load) is specified with **UX11** and **UX7f** in [user-experience.md](../dependency-engine/user-experience.md).
+Applies to `/deck/:id`.
+
+| Pattern | Rule |
+| --- | --- |
+| Entry | After generate; home **View last deck**; future library load (**UX7f**) |
+| Unknown id | → `/` |
+| Build another | Footer — clear wizard draft + session deck → `/` |
+| Back | Browser back from deck view → prior route (review or home); no wizard step chrome |
+
+**Deferred:** swap, slot regen, library picker — **UX11** / **UX7f** in [user-experience.md](../dependency-engine/user-experience.md).
 
 ---
 

@@ -1,6 +1,6 @@
 # Web UI — screens
 
-**Status:** Planning — UX7c screens locked.
+**Status:** UX7c screens locked; **UX7e** enhanced deck view design locked (wireframes draft).
 
 Screen behavior per client route. Routes: [routes.md](routes.md). Navigation: [navigation.md](navigation.md). HTTP calls: [wizard-api.md](wizard-api.md). Layout review: [wireframes/README.md](wireframes/README.md).
 
@@ -10,13 +10,14 @@ CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md)
 
 ## Home (`/`)
 
-**Wireframe:** [home.html](wireframes/home.html) (DB ready) · [home-db-missing.html](wireframes/home-db-missing.html) (DB gate)
+**Wireframe:** [home.html](wireframes/home.html) (DB ready) · [home-db-missing.html](wireframes/home-db-missing.html) (DB gate) · [home-resume-deck.html](wireframes/home-resume-deck.html) (session deck — **UX7e** draft)
 
 | Element | Behavior |
 | --- | --- |
 | DB banner | Visible when DB missing; explains CLI `mtg-deck-tools import` |
 | Build new deck | → `/build/1` when DB ready; disabled when blocked |
-| Future | Library (**UX7f**), resume active deck (**UX7e**) — hidden or disabled until shipped |
+| View last deck | → `/deck/:id` when session has active deck (**UX7e**); hidden when none |
+| Future | Library (**UX7f**) — hidden until shipped |
 
 **API:** `GET /health`, `GET /api/v1/wizard/meta` (or `GET /api/v1/stats` for DB probe). See [wizard-api.md](wizard-api.md).
 
@@ -169,23 +170,39 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 | --- | --- |
 | Deck output | HTML rendering of generated Markdown (CLI `.md` equivalent) |
 | Download JSON | Deferred (**UX7f**) |
-| Next steps | “Build another”; enhanced view deferred (**UX7e**) |
+| Next steps | **UX7e:** redirect to `/deck/:id` after generate; this route redirects when session has active deck |
 
-**API:** Uses `POST /api/v1/generate` response — inline `markdown` rendered to HTML in-app; `deck` optional for later UX7f.
+**API:** Uses `POST /api/v1/generate` response — inline `markdown` and `deck` stored in session for deck view.
 
 ---
 
-## Planned screens (UX7e+)
+## Enhanced deck view (`/deck/:id`) — UX7e
+
+**Wireframe:** [deck-view.html](wireframes/deck-view.html) (draft) · [deck-view-warnings.html](wireframes/deck-view-warnings.html) (draft — dependency warns)
+
+Decisions and slices: [user-experience.md](../dependency-engine/user-experience.md) § UX7e.
+
+| Region | Behavior |
+| --- | --- |
+| Guard | Unknown or missing `:id` in session → redirect `/` |
+| Commander header | Name, type line, color identity, hero `image_uri`; tap opens lightbox |
+| Summary panel | Collapsible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
+| Analysis | **Looks good** one-liner when `dependency_report.passed` or no warn issues; else **Areas to review** list from `dependency_report.issues` (rule id + message) |
+| Filters | Chip groups: **Slot** (multi), **Type** (multi), **Color** (multi); AND across groups; empty state when filter matches nothing |
+| Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters |
+| Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
+| MD preview | Collapsed `<details>` — MD→HTML of generate `markdown` |
+| Footer | **Build another deck** — clears wizard draft + session deck → `/` |
+
+**Deferred on this screen:** swap / lock (**UX11**); JSON download (**UX7f**); dependency drill-down (**UX7d**); CMC charts (**UX10**).
+
+**API:** None — client renders stored `GenerateResponse.deck` from `sessionStorage`. Same payload shape as [deck-output-format.md](../../product/deck-output-format.md).
+
+---
+
+## Planned screens (UX7f+)
 
 Feature specs and backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md), [user-experience.md](../dependency-engine/user-experience.md).
-
-### Enhanced deck view (`/deck/:id`) — UX7e
-
-- Filters (slot, type, color).
-- Summaries: balance, distribution, counts, deck cost.
-- Analysis hooks (strengths, areas for improvement).
-- Scryfall card art where useful.
-- Entry point for **UX11** iterate controls.
 
 ### Saved deck library (`/library`) — UX7f
 

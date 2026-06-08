@@ -17,6 +17,9 @@ Route → HTML mock map. **Approved 2026-06-07** — ready for UX7c Svelte imple
 | `/build/7` | [build-step-07-rarity.html](build-step-07-rarity.html) | approved | Min rarity radio list (common → mythic); commander exempt |
 | `/build/review` | [build-review.html](build-review.html) | approved | Preflight warnings panel + criteria recap; Back / Generate |
 | `/build/review` (clean) | [build-review-clean.html](build-review-clean.html) | approved | Empty preflight success state |
-| `/build/result` | [build-result.html](build-result.html) | approved | MD HTML preview shell; Build another deck CTA |
+| `/build/result` | [build-result.html](build-result.html) | approved | MD HTML preview shell; **UX7e:** becomes redirect — keep for compat reference |
+| `/deck/:id` | [deck-view.html](deck-view.html) | draft | Commander hero, filters, card list, summary, MD preview |
+| `/deck/:id` (warnings) | [deck-view-warnings.html](deck-view-warnings.html) | draft | Expanded summary + dependency warn analysis |
+| `/` (resume deck) | [home-resume-deck.html](home-resume-deck.html) | draft | Secondary **View last deck** CTA |
 
 Process: [README.md](README.md).

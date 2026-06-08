@@ -1,7 +1,6 @@
 # Web UI — wireframes and layout review
 
-**Status:** All UX7c wireframes **approved** (2026-06-07).  
-**Phase:** Planning complete for layout — next step is UX7c Svelte implementation (no changelog until UX7c ships).
+**Status:** UX7c wireframes **approved** (2026-06-07). **UX7e** deck view wireframes **draft** — see [§ UX7e wireframe scope](#ux7e-wireframe-scope).
 
 How to mock, review, and iterate on screen layouts **before** Svelte implementation. Behavior and routes remain authoritative in [screens.md](../screens.md), [routes.md](../routes.md), and [navigation.md](../navigation.md).
 
@@ -126,6 +125,14 @@ Pick from [screens.md](../screens.md) using route. For UX7c, mock **high-layout-
 5. `/build/review` — criteria summary + inline warnings
 6. `/build/result` — MD HTML preview shell
 
+**UX7e** (deck view — draft wireframes):
+
+1. `/deck/:id` — [deck-view.html](deck-view.html) primary (clean analysis)
+2. `/deck/:id` — [deck-view-warnings.html](deck-view-warnings.html) dependency warn state
+3. `/` — [home-resume-deck.html](home-resume-deck.html) secondary **View last deck** CTA
+
+See [§ UX7e wireframe scope](#ux7e-wireframe-scope).
+
 ### Step 2 — Draft wireframe
 
 - Agent creates `wireframes/<name>.html` on branch.
@@ -192,10 +199,42 @@ PR body must include **Phase: planning** and list docs touched per [DOC-MAP.md](
 
 ---
 
+## UX7e wireframe scope
+
+Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](../screens.md) § Enhanced deck view; decisions: [user-experience.md](../../dependency-engine/user-experience.md) § UX7e.
+
+| Priority | File | Route | States to show |
+| --- | --- | --- | --- |
+| **P0** | `deck-view.html` | `/deck/:id` | Commander hero; collapsed summary; filter chips (none active); card list with thumbs; collapsed MD preview; footer **Build another deck** |
+| **P0** | `deck-view-warnings.html` | `/deck/:id` | Same shell; summary **expanded**; **Areas to review** list (2–3 placeholder issues); one filter chip active |
+| **P1** | `home-resume-deck.html` | `/` | Same as [home.html](home.html) plus secondary **View last deck** below primary CTA |
+| **P2** | `deck-view-filtered-empty.html` | `/deck/:id` | Optional — filters active, zero matches, empty-state copy |
+
+**In frame (product UI):**
+
+| Region | Layout notes |
+| --- | --- |
+| App header | Brand + **Deck** phase pill (distinct from wizard **Result** pill) |
+| Commander block | Hero art (tap affordance), name, type, CI pips |
+| Summary | `<details>` default **closed** — slot table + price + avg CMC |
+| Analysis | One panel: green **Looks good** *or* warn list — not both |
+| Filters | Three horizontal chip rows (Slot · Type · Color); wrap on 375px |
+| Card list | Thumb 40×56, name, slot badge, mana + price; grouped by slot heading |
+| MD preview | `<details>` default **closed** at bottom of scroll |
+| Footer | Fixed **Build another deck** (primary) |
+
+**Dev notes only (`.dev-note`):** sessionStorage id; no API; UX11/UX7f/UX10 deferred.
+
+**Out of scope for UX7e wireframes:** swap/lock selection; library grid; CMC chart; dependency dashboard drill-down; dark mode.
+
+**Approval gate:** Mark P0 files `approved` in [index.md](index.md) before UX7e-a Svelte work.
+
+---
+
 ## Out of scope for wireframes
 
 - Real API integration or `DeckCriteria` persistence
-- Scryfall card art (UX7c result is MD HTML; art deferred to **UX7e**)
+- Scryfall card art (UX7c result is MD HTML; art deferred to **UX7e** — **in scope** for UX7e wireframes)
 - Dark mode variants (light only until GUI stabilizes)
 - Desktop-only multi-column layouts (mobile baseline first; desktop may add max-width wrapper at implementation)
 
