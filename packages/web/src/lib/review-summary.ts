@@ -8,9 +8,15 @@ export interface SummaryRow {
   muted?: boolean;
 }
 
+function displayLabel(id: string, labels: Record<string, string>): string {
+  const label = labels[id];
+  if (label?.trim()) return label;
+  return formatTagLabel(id);
+}
+
 function labelList(ids: string[], labels: Record<string, string>): string[] {
   if (!ids.length) return [];
-  return ids.map((id) => labels[id] ?? formatTagLabel(id));
+  return ids.map((id) => displayLabel(id, labels));
 }
 
 function noneLine(): string[] {
