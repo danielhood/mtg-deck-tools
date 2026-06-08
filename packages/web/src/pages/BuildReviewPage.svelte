@@ -104,13 +104,13 @@
       if (!response.markdown) {
         throw new Error("Generate succeeded but no markdown was returned.");
       }
-      saveResult({
+      const deckId = saveResult({
         markdown: response.markdown,
         json_path: response.json_path,
         md_path: response.md_path,
         deck: response.deck,
       });
-      navigate("/build/result");
+      navigate(`/deck/${deckId}`);
     } catch (err) {
       generateError = err instanceof Error ? err.message : "Generate failed.";
     } finally {

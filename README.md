@@ -60,7 +60,7 @@ Use the effective date in the filename so updates are obvious. Commander deck co
 mtg-deck-tools/
   docs/                     # Product, architecture, specs, roadmap, history (see docs/README.md)
   src/mtg_deck_tools/       # CLI + engine; service/ + api/ (UX7a)
-  packages/web/             # Web SPA (Svelte 5 + Vite — UX7c build wizard)
+  packages/web/             # Web SPA (Svelte 5 + Vite — UX7c wizard + UX7e deck view)
   scripts/                  # bootstrap-linux.sh (uv-based env on Linux)
   resources/
     scryfall/               # Oracle bulk JSON (local download) + field docs
@@ -169,7 +169,7 @@ Bind another host/port with `--host` / `--port` (e.g. `--host 0.0.0.0` only when
 
 Self-hosting notes: [`docs/specs/web/deployment.md`](docs/specs/web/deployment.md).
 
-### Web UI (UX7c)
+### Web UI (UX7c + UX7e)
 
 **Requires:** Node.js 20+ with **pnpm** (via [Corepack](https://nodejs.org/api/corepack.html): `corepack enable`), `pip install -e ".[dev,web]"`, and `data/cards.db`.
 
@@ -185,7 +185,7 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:5173 — home → build wizard (steps 1–7) → review → generate → result. Production bundle:
+Open http://127.0.0.1:5173 — home → build wizard (steps 1–7) → review → generate → deck view (`/deck/:id`). Production bundle:
 
 ```bash
 cd packages/web && pnpm build

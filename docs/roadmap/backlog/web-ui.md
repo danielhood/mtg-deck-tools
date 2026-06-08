@@ -1,6 +1,6 @@
 # Backlog — Web UI
 
-Planned app: `packages/web/`. Active work: **UX7c** (wizard) under **UX7** in [active.md](../active.md).
+Planned app: `packages/web/`. Active work: **UX7f** (library) under **UX7** in [active.md](../active.md). **UX7c** wizard and **UX7e** deck view shipped.
 
 Spec: [specs/web/README.md](../../specs/web/README.md) · [architecture.md](../../specs/web/architecture.md) · Package index: [packages/web/README.md](../../packages/web/README.md).
 

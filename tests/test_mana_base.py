@@ -8,6 +8,7 @@ from mtg_deck_tools.builder.mana_base import (
     allocate_basics,
     compute_pip_weights,
     compute_suggested_land_count,
+    parse_pips_from_cost,
     plan_mana_base,
     score_land_candidate,
     split_land_mix,
@@ -39,6 +40,21 @@ def _card(
         mechanic_tags=mechanic_tags or [],
         oracle_text=oracle_text,
     )
+
+
+def test_parse_pips_from_cost_hybrid_and_phyrexian():
+    assert parse_pips_from_cost("{W/U}") == {"W": 1, "U": 1}
+    assert parse_pips_from_cost("{2/W}{W/U}") == {"W": 2, "U": 1}
+    assert parse_pips_from_cost("{W/P}{U}") == {"W": 1, "U": 1}
+    assert parse_pips_from_cost("{1}{C}") == {}
+    assert parse_pips_from_cost("{W}{U}") == {"W": 1, "U": 1}
+
+
+def test_compute_pip_weights_hybrid_mana():
+    cards = [_card(mana_cost="{W/U}", quantity=2)]
+    weights = compute_pip_weights(cards, ["W", "U"])
+    assert weights["W"] >= 3
+    assert weights["U"] >= 3
 
 
 def test_compute_pip_weights():

@@ -1,6 +1,6 @@
 # Web UI — screens
 
-**Status:** UX7c screens locked; **UX7e** enhanced deck view design locked (wireframes draft).
+**Status:** UX7c + **UX7e** enhanced deck view shipped.
 
 Screen behavior per client route. Routes: [routes.md](routes.md). Navigation: [navigation.md](navigation.md). HTTP calls: [wizard-api.md](wizard-api.md). Layout review: [wireframes/README.md](wireframes/README.md).
 
@@ -186,7 +186,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | --- | --- |
 | Guard | Unknown or missing `:id` in session → redirect `/` |
 | Commander header | Name, type line, color identity, hero `image_uri`; tap opens lightbox |
-| Summary panel | Collapsible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
+| Summary panel | Always visible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
 | Analysis | **Looks good** one-liner when `dependency_report.passed` or no warn issues; else **Areas to review** list from `dependency_report.issues` (rule id + message) |
 | Filters | Chip groups: **Slot** (multi), **Type** (multi), **Color** (multi); AND across groups; empty state when filter matches nothing |
 | Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters |

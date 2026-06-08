@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-07):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c shipped** (CLI wizard + web build wizard). **UX7e** enhanced deck view — design locked; wireframes draft. Next implementation: UX7e → UX7f library → UX7d dashboard — [architecture.md](../web/architecture.md), [active.md](../../roadmap/active.md).
+**Status (2026-06-07):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e shipped** (CLI wizard + web build wizard + enhanced deck view). Next implementation: **UX7f** library → **UX7d** dashboard — [architecture.md](../web/architecture.md), [active.md](../../roadmap/active.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -367,7 +367,7 @@ Engine requirements for swaps:
 | ~~**UX4**~~ | ~~**Wizard step back-navigation** — return to earlier steps to revise selections~~ — **Shipped 2026-06-04** | None (wizard orchestration) |
 | ~~**UX5**~~ | ~~Wizard prepopulate on regen~~ — **Shipped 2026-06-04** | `.deck.json` criteria round-trip |
 | **UX6** | `.deck.json` per-card `dependency_roles` | D2 |
-| **UX7** | Cross-platform web (mobile-first): ~~`service/` + FastAPI~~ **UX7a shipped**; ~~`serve`~~ **UX7b shipped**; build wizard **UX7c** (design); deck view **UX7e**; library **UX7f**; dashboard **UX7d**; iterate **UX11** | D5 + [specs/web/](../web/) |
+| **UX7** | Cross-platform web (mobile-first): ~~`service/` + FastAPI~~ **UX7a shipped**; ~~`serve`~~ **UX7b shipped**; ~~build wizard **UX7c**~~ **shipped**; ~~deck view **UX7e**~~ **shipped**; library **UX7f**; dashboard **UX7d**; iterate **UX11** | D5 + [specs/web/](../web/) |
 | **UX8** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
 | **UX9** | Web constraint panel + pick preview (interactive build) | D3–D4 + UX7 shell |
 | **UX10** | **Deck composition metrics** — CMC distribution report (+ optional curve advisories); CLI MD/JSON first, charts in UX7 | Build result / `output.py`; no new `card_effects` |
@@ -375,7 +375,7 @@ Engine requirements for swaps:
 
 ### UX7c — Web build wizard (planned)
 
-**Status:** **UX7c shipped** — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md). **UX7e** design locked — § UX7e below. Build wizard in [packages/web/README.md](../../packages/web/README.md).
+**Status:** **UX7c + UX7e shipped** — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md), [packages/web/README.md](../../packages/web/README.md).
 
 **Product role:** Web is the primary interactive shell. **Build** mode uses the wizard **once** for a new deck. **Iterate** and **View** modes do not re-run the wizard (see **UX7e**, **UX7f**, **UX11**). Modes and flow: [architecture.md](../web/architecture.md) § Product modes.
 
@@ -415,9 +415,9 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | DB missing | Hard block; home banner; CLI `import` until **UX7g** |
 | Visual design | [design.md](../web/design.md) |
 
-### UX7e — Enhanced deck view (design locked)
+### UX7e — Enhanced deck view (shipped)
 
-**Status:** Planning complete — decisions locked; wireframes **draft** ([screens.md](../web/screens.md) § Enhanced deck view, [wireframes/README.md](../web/wireframes/README.md) § UX7e scope).
+**Status:** **Shipped** — [screens.md](../web/screens.md) § Enhanced deck view, [packages/web/README.md](../../packages/web/README.md).
 
 **Goal:** Replace the raw MD result as the primary post-build surface. Inspect the generated `.deck.json` with filters, summaries, dependency notes, and card art — without re-running the wizard.
 
@@ -455,8 +455,8 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | UX7d boundary | Show **compact list** of `dependency_report.issues` (rule id + message). **No** profile drill-down dashboard or repair actions. |
 | UX10 boundary | Slot counts, type breakdown, and `stats.*` from JSON only. **No** CMC histogram or interactive charts. |
 | UX11 boundary | Card rows **read-only**. **No** swap, lock, slot regen, or selection chrome. |
-| Filters | Three **chip groups** (multi-select within group, AND across groups): **Slot**, **Type** (Creature, Instant, … from `type_line`), **Color** (W/U/B/R/G/C from card colors). Clear-all per group. |
-| Summaries | **Collapsible** panel below commander: slot table, estimated price, unpriced count, `avg_cmc_nonland`, type counts. |
+| Filters | **Slot** and **Type** chip groups; **Color** uses wizard WUBRG pip controls + void (∅). Nonlands: casting-cost pips; lands: `produced_mana` → basic land type names → `color_identity` — lands are never void. Multi-select within group, AND across groups. Clear-all per group. |
+| Summaries | Always-visible panel below commander: slot table, estimated price, unpriced count, `avg_cmc_nonland`, type counts. |
 | Analysis | **Areas to review:** warn-level `dependency_report.issues`. **Looks good:** `dependency_report.passed` or no warn issues (one-line positive copy). No new server rubric in UX7e. |
 | Card art | Commander **hero** image + **row thumbnail** per card (`image_uri`); tap → lightbox (reuse UX7c `CardLightbox` pattern). |
 | MD preview | **Collapsed** `<details>` at bottom — "Markdown preview"; same renderer as UX7c result. |

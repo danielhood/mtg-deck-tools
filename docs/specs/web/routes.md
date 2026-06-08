@@ -1,6 +1,6 @@
 # Web UI — client routes
 
-**Status:** **UX7c shipped** — build wizard routes in `packages/web/`. **UX7e** `/deck/:id` design locked; implementation next.
+**Status:** **UX7c + UX7e shipped** — build wizard and enhanced deck view routes in `packages/web/`.
 
 SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Navigation: [navigation.md](navigation.md).
 

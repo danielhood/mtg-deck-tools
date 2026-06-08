@@ -5,7 +5,7 @@
   interface Props {
     meta: WizardMeta | null;
     wizardStep?: number | null;
-    phasePill?: "review" | "result" | null;
+    phasePill?: "review" | "result" | "deck" | null;
     children: Snippet;
     footer?: Snippet;
   }
@@ -35,6 +35,8 @@
       <span class="review-pill">Review</span>
     {:else if phasePill === "result"}
       <span class="result-pill">Result</span>
+    {:else if phasePill === "deck"}
+      <span class="deck-pill">Deck</span>
     {:else if statusLabel}
       <span class="status-pill" class:warn={meta && !meta.db_ready}>{statusLabel}</span>
     {/if}

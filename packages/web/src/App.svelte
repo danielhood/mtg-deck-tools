@@ -3,7 +3,7 @@
   import ErrorState from "./components/ErrorState.svelte";
   import LoadingState from "./components/LoadingState.svelte";
   import { getWizardMeta, type WizardMeta } from "./lib/api";
-  import { getPath, matchRoute, navigate, subscribe } from "./lib/router";
+  import { getPath, matchRoute, navigate, parseDeckId, subscribe } from "./lib/router";
   import HomePage from "./pages/HomePage.svelte";
   import BuildStep1Page from "./pages/BuildStep1Page.svelte";
   import BuildStep2Page from "./pages/BuildStep2Page.svelte";
@@ -14,6 +14,7 @@
   import BuildStep7Page from "./pages/BuildStep7Page.svelte";
   import BuildReviewPage from "./pages/BuildReviewPage.svelte";
   import BuildResultPage from "./pages/BuildResultPage.svelte";
+  import DeckViewPage from "./pages/DeckViewPage.svelte";
 
   let path = $state(getPath());
   let meta = $state<WizardMeta | null>(null);
@@ -59,9 +60,12 @@
     return match ? Number(match[1]) : null;
   });
 
-  const phasePill = $derived.by((): "review" | "result" | null => {
+  const deckId = $derived(parseDeckId(path));
+
+  const phasePill = $derived.by((): "review" | "result" | "deck" | null => {
     if (route === "build-review") return "review";
     if (route === "build-result") return "result";
+    if (route === "deck-view") return "deck";
     return null;
   });
 
@@ -95,6 +99,8 @@
     <BuildReviewPage {meta} />
   {:else if route === "build-result"}
     <BuildResultPage />
+  {:else if route === "deck-view" && deckId}
+    <DeckViewPage {deckId} />
   {:else}
     <h2 class="section-title">Not found</h2>
     <button class="btn btn-primary" type="button" onclick={() => navigate("/")}>Home</button>

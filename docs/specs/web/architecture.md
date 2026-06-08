@@ -1,7 +1,7 @@
 # Web UI architecture (planned)
 
 **Status:** **UX7a–UX7c implemented** — wizard API + Svelte SPA (steps 1–7, review, result) — [specs/web/README.md](README.md).
-**Phase:** UX7 active — **UX7e** enhanced deck view next.
+**Phase:** UX7 active — **UX7f** saved deck library next.
 
 ## Strategic shift
 

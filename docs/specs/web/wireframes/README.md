@@ -1,6 +1,6 @@
 # Web UI — wireframes and layout review
 
-**Status:** UX7c wireframes **approved** (2026-06-07). **UX7e** deck view wireframes **draft** — see [§ UX7e wireframe scope](#ux7e-wireframe-scope).
+**Status:** UX7c wireframes **approved** (2026-06-07). **UX7e** deck view wireframes **draft** (implementation shipped 2026-06-07) — see [§ UX7e wireframe scope](#ux7e-wireframe-scope).
 
 How to mock, review, and iterate on screen layouts **before** Svelte implementation. Behavior and routes remain authoritative in [screens.md](../screens.md), [routes.md](../routes.md), and [navigation.md](../navigation.md).
 

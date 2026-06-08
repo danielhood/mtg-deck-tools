@@ -52,6 +52,7 @@ def _deck_card_from_candidate(
         image_uri=candidate.image_uri,
         mechanic_tags=tags,
         oracle_text=candidate.oracle_text,
+        color_identity=list(candidate.color_identity),
         produced_mana=list(candidate.produced_mana),
         released_at=candidate.released_at,
         power=candidate.power,
