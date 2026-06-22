@@ -10,6 +10,8 @@ oracle-cards-YYYYMMDDhhmmss.json
 
 Place the newest file in this directory. `mtg-deck-tools import` picks the lexicographically latest `oracle-cards-*.json` match.
 
+If no file is present, `import` and `serve` download the current oracle bulk from Scryfall automatically (see `MTG_AUTO_DOWNLOAD` in the root README).
+
 ## Download (maintainer refresh)
 
 ```bash

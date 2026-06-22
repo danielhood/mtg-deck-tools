@@ -6,6 +6,7 @@ How external data enters the MTG Deck Tools monorepo. Field-level import contrac
 
 - **Location:** `resources/scryfall/oracle-cards-<date>.json` (user or maintainer download; see root [README.md](../../README.md))
 - **Role:** Canonical playable card library for import → `data/cards.db`
+- **First run:** When no local JSON exists, `mtg-deck-tools import` and `mtg-deck-tools serve` fetch the latest oracle bulk from Scryfall automatically (`MTG_AUTO_DOWNLOAD=0` or `import --no-download` to disable)
 - **Contract:** [oracle-bulk-contract.md](../specs/data/oracle-bulk-contract.md)
 
 ## Comprehensive Rules
@@ -35,7 +36,7 @@ The card library is a **versioned snapshot**, not a live feed. Aligns with [goal
 
 ### Out of scope
 
-- Background Scryfall sync or launch-time update checks
+- Background Scryfall sync or launch-time **update** checks when a snapshot already exists
 - Per-deck API calls for oracle or price
 
 ## Related product docs

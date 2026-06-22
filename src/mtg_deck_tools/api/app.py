@@ -93,6 +93,8 @@ def create_app(*, static_dir: Path | None = None) -> FastAPI:
             )
         except FileNotFoundError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except RuntimeError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
 
     @app.post(
         "/api/v1/generate",

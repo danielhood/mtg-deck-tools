@@ -21,13 +21,14 @@ from mtg_deck_tools.api.serve import (
     run_server,
     serve_config_from_options,
 )
-from mtg_deck_tools.paths import DEFAULT_DB_PATH, DEPENDENCY_RESOURCES_DIR
+from mtg_deck_tools.paths import DEFAULT_DB_PATH, DEPENDENCY_RESOURCES_DIR, resolve_db_path
 from mtg_deck_tools.service import (
     GenerateFromDeckRequest,
     generate_deck_cli,
     generate_deck_from_saved,
     get_database_stats,
     import_oracle_cards,
+    ensure_cards_database,
     run_interactive_wizard,
 )
 
@@ -118,6 +119,22 @@ def serve_cmd(
         )
         raise typer.Exit(1)
 
+    db = config.db_path or resolve_db_path()
+    if not db.exists():
+        console.print("[yellow]Card database missing — downloading and importing...[/yellow]")
+        try:
+            ensure_cards_database(
+                db_path=config.db_path,
+                progress=lambda msg: console.print(msg),
+            )
+        except (FileNotFoundError, RuntimeError) as exc:
+            console.print(f"[red]Bootstrap failed:[/red] {exc}")
+            console.print(
+                "[dim]Set MTG_AUTO_DOWNLOAD=0 to skip automatic download, "
+                "or run `mtg-deck-tools import` manually.[/dim]"
+            )
+            raise typer.Exit(1) from exc
+
     console.print(
         f"[green]Starting API[/green] http://{config.host}:{config.port}/health"
     )
@@ -152,6 +169,13 @@ def import_cmd(
         Optional[Path],
         typer.Option("--db", help="SQLite database output path"),
     ] = None,
+    no_download: Annotated[
+        bool,
+        typer.Option(
+            "--no-download",
+            help="Do not download oracle bulk data from Scryfall when no local JSON exists",
+        ),
+    ] = False,
 ) -> None:
     """Import Scryfall oracle cards and apply mechanic tags."""
     def progress(msg: str) -> None:
@@ -159,10 +183,16 @@ def import_cmd(
 
     try:
         result = import_oracle_cards(
-            json_path=json_path, db_path=db_path, progress=progress
+            json_path=json_path,
+            db_path=db_path,
+            progress=progress,
+            auto_download=False if no_download else None,
         )
     except FileNotFoundError as exc:
         console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
+    except RuntimeError as exc:
+        console.print(f"[red]Download failed:[/red] {exc}")
         raise typer.Exit(1) from exc
 
     table = Table(title="Import summary")
