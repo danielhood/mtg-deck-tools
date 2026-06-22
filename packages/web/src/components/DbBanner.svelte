@@ -10,7 +10,8 @@
 
 {#if !meta.db_ready}
   <div class="db-banner" role="alert">
-    Card database not found at <code>{meta.db_path}</code>. Import once with
-    <code>mtg-deck-tools import</code> before building decks.
+    Card database not found at <code>{meta.db_path}</code>. Run
+    <code>mtg-deck-tools import</code> or restart the server (automatic download on
+    <code>serve</code> when <code>MTG_AUTO_DOWNLOAD=1</code>).
   </div>
 {/if}

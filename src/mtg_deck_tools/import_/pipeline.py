@@ -12,7 +12,8 @@ from mtg_deck_tools.availability.score import record_availability_percentile
 from mtg_deck_tools.db.schema import SCHEMA_VERSION, apply_schema
 from mtg_deck_tools.import_.normalize import normalize_card
 from mtg_deck_tools.effects.extract import EffectExtractor
-from mtg_deck_tools.paths import DEFAULT_DB_PATH, EFFECT_PATTERNS_PATH, TAXONOMY_PATH, find_oracle_cards_json
+from mtg_deck_tools.import_.scryfall_bulk import ensure_oracle_cards_json
+from mtg_deck_tools.paths import DEFAULT_DB_PATH, EFFECT_PATTERNS_PATH, TAXONOMY_PATH
 from mtg_deck_tools.tags.tagger import Tagger, load_taxonomy
 
 CARD_INSERT_SQL = """
@@ -49,10 +50,14 @@ def run_import(
     db_path: Path | None = None,
     taxonomy_path: Path | None = None,
     progress: Callable[[str], None] | None = None,
+    auto_download: bool | None = None,
 ) -> dict[str, int | str]:
     """Load oracle bulk JSON, populate cards, and tag playable cards."""
     log = progress or (lambda _msg: None)
-    source = json_path or find_oracle_cards_json()
+    if json_path is None:
+        source = ensure_oracle_cards_json(auto_download=auto_download, progress=log)
+    else:
+        source = json_path
     db = db_path or DEFAULT_DB_PATH
     taxonomy = taxonomy_path or TAXONOMY_PATH
 

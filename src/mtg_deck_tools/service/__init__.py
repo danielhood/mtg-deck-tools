@@ -18,7 +18,7 @@ from mtg_deck_tools.service.generate import (
     generate_deck_cli,
     generate_deck_from_saved,
 )
-from mtg_deck_tools.service.import_ import import_oracle_cards
+from mtg_deck_tools.service.import_ import ensure_cards_database, import_oracle_cards
 from mtg_deck_tools.service.library import (
     delete_library_deck,
     get_library_deck,
@@ -56,6 +56,7 @@ __all__ = [
     "generate_deck_cli",
     "generate_deck_from_saved",
     "get_database_stats",
+    "ensure_cards_database",
     "get_library_deck",
     "import_oracle_cards",
     "list_library_decks",

@@ -21,6 +21,7 @@ These files are **copyrighted by their respective owners** and are **not** commi
 | **Source** | [Scryfall Bulk Data — Oracle Cards](https://scryfall.com/docs/api/bulk-data) |
 | **Download** | Use the **Oracle Cards** row → Download, or fetch the current `download_uri` from `GET https://api.scryfall.com/bulk-data/oracle-cards` |
 | **Place in repo** | `resources/scryfall/oracle-cards-<timestamp>.json` |
+| **Automatic** | If no local JSON exists, `mtg-deck-tools import` and `mtg-deck-tools serve` download the latest oracle bulk from Scryfall (disable with `MTG_AUTO_DOWNLOAD=0` or `import --no-download`) |
 
 Example (filename will match the bulk export date):
 
@@ -148,6 +149,7 @@ mtg-deck-tools serve
 | `--host` / `MTG_SERVE_HOST` | Bind address (default `127.0.0.1`) |
 | `--port` / `MTG_SERVE_PORT` | Listen port (default `8000`) |
 | `--db` / `MTG_DB_PATH` | Default SQLite path for API requests without `?db=` |
+| `MTG_AUTO_DOWNLOAD` | When `cards.db` is missing at startup, download oracle bulk + import (default `1`; set `0` to skip) |
 | `--with-ui` | Mount built SPA from `packages/web/dist` |
 | `--ui-dir` | Override static UI directory |
 | `--reload` | Auto-restart on code changes (development) |
@@ -264,7 +266,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 
 | Command | Description |
 | --- | --- |
-| `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms |
+| `import` | Load `resources/scryfall/oracle-cards-*.json` → `data/cards.db`, mechanic tags, and `card_effects` atoms (downloads oracle bulk from Scryfall when no local JSON exists) |
 | `stats` | Row counts, import metadata, top tags, effect counts |
 | `serve` | Start HTTP API (`--with-ui` mounts built SPA); see [HTTP API (local)](#http-api-local) |
 | `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
