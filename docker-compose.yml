@@ -1,0 +1,21 @@
+# MTG Deck Tools — API + web UI in one container.
+# First start downloads Scryfall oracle bulk and imports cards.db (several minutes).
+# LAN clients: http://<docker-host-ip>:8000
+
+services:
+  mtg-deck-tools:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - mtg-data:/data
+    environment:
+      MTG_SERVE_HOST: "0.0.0.0"
+      MTG_SERVE_PORT: "8000"
+      MTG_DB_PATH: /data/cards.db
+      MTG_DECKS_PATH: /data/decks.db
+      MTG_AUTO_DOWNLOAD: "1"
+    restart: unless-stopped
+
+volumes:
+  mtg-data:
