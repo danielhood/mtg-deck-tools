@@ -114,7 +114,7 @@ The **common layer** is `service/`, not HTTP itself. HTTP is the wire format the
 | **Local dev** | `mtg-deck-tools serve` + Vite dev server proxying `/api` | Developers |
 | **Local app** | `serve --with-ui` (API + static `packages/web/dist`) | Desktop users — open `http://127.0.0.1:PORT` |
 | **CLI-only** | No server; existing workflow | Scripts, dogfood, automation |
-| **Self-hosted** | Single container/process; volume for `data/cards.db` | Friends / small group |
+| **Self-hosted** | `docker compose up` or `serve --with-ui` on `0.0.0.0`; volume for `/data` | Friends / small group / LAN |
 | **Simple PaaS** | Fly.io, Railway, Render — one web service + persistent disk | Low-traffic public demo |
 
 ### Local-first constraints (unchanged)

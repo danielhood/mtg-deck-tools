@@ -63,6 +63,8 @@ mtg-deck-tools/
   src/mtg_deck_tools/       # CLI + engine; service/ + api/ (UX7a)
   packages/web/             # Web SPA (Svelte 5 + Vite — UX7c wizard + UX7e deck view)
   scripts/                  # bootstrap-linux.sh (uv-based env on Linux)
+  Dockerfile                # Production image (API + built SPA)
+  docker-compose.yml        # Single-service LAN/self-host stack
   resources/
     scryfall/               # Oracle bulk JSON (local download) + field docs
     mtg/                    # Comprehensive Rules (local download)
@@ -170,6 +172,32 @@ uvicorn mtg_deck_tools.api.serve:create_serve_app --factory --host 127.0.0.1 --p
 Bind another host/port with `--host` / `--port` (e.g. `--host 0.0.0.0` only when you intend to expose the machine on the LAN). **v1 has no auth** — keep the default `127.0.0.1` for local use.
 
 Self-hosting notes: [`docs/specs/web/deployment.md`](docs/specs/web/deployment.md).
+
+### Docker (LAN / self-host)
+
+**Requires:** Docker Engine with Compose v2.
+
+Build and run on the host (API + web UI on port 8000):
+
+```bash
+docker compose up --build
+```
+
+Open http://127.0.0.1:8000 on the host, or `http://<docker-host-ip>:8000` from another machine on the LAN.
+
+| Detail | Value |
+| --- | --- |
+| **Persistent data** | Named volume `mtg-data` → `/data/cards.db` and `/data/decks.db` |
+| **First start** | Downloads Scryfall oracle bulk and runs `import` when `/data/cards.db` is missing (may take several minutes) |
+| **Disable auto-download** | Set `MTG_AUTO_DOWNLOAD=0` in `docker-compose.yml` and mount a pre-built `cards.db` |
+| **Auth** | None in v1 — do not expose port 8000 to the public internet without a reverse proxy |
+
+Equivalent one-off:
+
+```bash
+docker build -t mtg-deck-tools .
+docker run --rm -p 8000:8000 -v mtg-data:/data mtg-deck-tools
+```
 
 ### Web UI (UX7c + UX7e)
 

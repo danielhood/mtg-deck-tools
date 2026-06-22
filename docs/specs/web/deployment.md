@@ -1,6 +1,6 @@
 # Web deployment (local and self-host)
 
-**Status:** UX7b — `mtg-deck-tools serve` with env defaults and optional static UI mount.
+**Status:** UX7b — `mtg-deck-tools serve` with env defaults and optional static UI mount; **Docker** — `Dockerfile` + `docker-compose.yml`.
 
 ## Local development
 
@@ -21,7 +21,7 @@ Default bind: `127.0.0.1:8000`. **v1 has no auth** — use the default host for 
 | `MTG_SERVE_PORT` | `8000` | Listen port |
 | `MTG_DB_PATH` | `data/cards.db` | Default SQLite for API when `?db=` is omitted |
 | `MTG_AUTO_DOWNLOAD` | `1` | When `MTG_DB_PATH` is missing at `serve` startup, download oracle bulk + import (`0` to skip) |
-| `MTG_DECKS_PATH` | `data/decks` | Saved deck library store (**UX7f** — implementation may use this path or a table; persist on same volume as `cards.db`) |
+| `MTG_DECKS_PATH` | `data/decks.db` | Saved deck library SQLite (persist on same volume as `cards.db`) |
 | `MTG_SERVE_STATIC_DIR` | *(unset)* | SPA static root (set by `serve --with-ui` / `--ui-dir`) |
 
 CLI flags override env for the current process (`--host`, `--port`, `--db`, `--ui-dir`).
@@ -34,18 +34,38 @@ CLI flags override env for the current process (`--host`, `--port`, `--db`, `--u
 
 ```bash
 export MTG_DB_PATH=/data/cards.db
+export MTG_DECKS_PATH=/data/decks.db
 mtg-deck-tools serve --host 0.0.0.0 --port 8000 --with-ui
 ```
 
 **Constraints (v1):** one deployment = one user; single-writer SQLite; no built-in login. Operators exposing a public URL should add reverse-proxy auth (out of product scope).
 
+## Docker
+
+Production image: multi-stage build (pnpm → `packages/web/dist`, pip → `mtg-deck-tools serve --with-ui`). Runtime data lives on a volume at `/data`.
+
+```bash
+docker compose up --build
+```
+
+| Topic | Policy |
+| --- | --- |
+| **Port** | `8000` published to the host (LAN: `http://<host-ip>:8000`) |
+| **Volume** | `mtg-data:/data` — `cards.db`, `decks.db`, survives container recreate |
+| **First boot** | Empty volume → Scryfall download + import (same as `MTG_AUTO_DOWNLOAD=1`) |
+| **Health** | `GET /health` (Docker `HEALTHCHECK`; long `start-period` for first import) |
+| **Scale** | One container instance — SQLite single-writer |
+
+Air-gapped: set `MTG_AUTO_DOWNLOAD=0`, bind-mount a host directory with `cards.db` (and optional `decks.db`) to `/data`.
+
+Files: [`Dockerfile`](../../../Dockerfile), [`docker-compose.yml`](../../../docker-compose.yml), [`.dockerignore`](../../../.dockerignore).
+
 ## Simple PaaS (Fly.io, Railway, Render)
 
-- One web service running `mtg-deck-tools serve --host 0.0.0.0 --port $PORT`.
+- One web service running `mtg-deck-tools serve --host 0.0.0.0 --port $PORT --with-ui --db /data/cards.db`.
 - Persistent disk/volume for `MTG_DB_PATH` and **`MTG_DECKS_PATH`** (import on deploy or bake a snapshot in the image; library survives redeploys).
 - No secrets required for Scryfall (bulk JSON only).
-
-Docker is not shipped in-repo; wrap the same command in your own image if needed.
+- Same container image as Docker self-host; point the platform at the repo `Dockerfile`.
 
 ## References
 
