@@ -37,7 +37,7 @@ def serve_config_from_options(
 
     static_dir: Path | None = None
     if with_ui or ui_dir is not None:
-        static_dir = ui_dir or WEB_UI_DIST_DIR
+        static_dir = ui_dir or resolve_static_ui_dir() or WEB_UI_DIST_DIR
 
     return ServeConfig(
         host=resolved_host,

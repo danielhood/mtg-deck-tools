@@ -6,7 +6,17 @@ import os
 from pathlib import Path
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
-PROJECT_ROOT = PACKAGE_ROOT.parent.parent
+
+
+def _resolve_project_root() -> Path:
+    """Resolve repo root: ``MTG_PROJECT_ROOT`` env, else editable/source layout."""
+    env = os.environ.get("MTG_PROJECT_ROOT")
+    if env:
+        return Path(env)
+    return PACKAGE_ROOT.parent.parent
+
+
+PROJECT_ROOT = _resolve_project_root()
 CONFIG_DIR = PROJECT_ROOT / "config"
 DATA_DIR = PROJECT_ROOT / "data"
 RESOURCES_DIR = PROJECT_ROOT / "resources"
