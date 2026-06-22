@@ -45,6 +45,14 @@ def test_serve_config_with_ui(tmp_path: Path) -> None:
     assert config.static_dir == dist
 
 
+def test_serve_config_with_ui_static_dir_env(monkeypatch, tmp_path: Path) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    monkeypatch.setenv("MTG_SERVE_STATIC_DIR", str(dist))
+    config = serve_config_from_options(with_ui=True)
+    assert config.static_dir == dist
+
+
 def test_mtg_db_path_env(monkeypatch, tmp_path: Path) -> None:
     db = tmp_path / "cards.db"
     db.touch()

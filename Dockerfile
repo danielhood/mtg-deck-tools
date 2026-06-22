@@ -19,6 +19,7 @@ FROM python:3.12-slim-bookworm
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \
+    MTG_PROJECT_ROOT=/app \
     MTG_SERVE_HOST=0.0.0.0 \
     MTG_SERVE_PORT=8000 \
     MTG_DB_PATH=/data/cards.db \

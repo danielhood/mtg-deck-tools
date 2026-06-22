@@ -22,6 +22,7 @@ Default bind: `127.0.0.1:8000`. **v1 has no auth** — use the default host for 
 | `MTG_DB_PATH` | `data/cards.db` | Default SQLite for API when `?db=` is omitted |
 | `MTG_AUTO_DOWNLOAD` | `1` | When `MTG_DB_PATH` is missing at `serve` startup, download oracle bulk + import (`0` to skip) |
 | `MTG_DECKS_PATH` | `data/decks.db` | Saved deck library SQLite (persist on same volume as `cards.db`) |
+| `MTG_PROJECT_ROOT` | *(source layout)* | Repo root for `config/`, `resources/`, and `packages/web/dist` when the package is pip-installed outside a checkout |
 | `MTG_SERVE_STATIC_DIR` | *(unset)* | SPA static root (set by `serve --with-ui` / `--ui-dir`) |
 
 CLI flags override env for the current process (`--host`, `--port`, `--db`, `--ui-dir`).
