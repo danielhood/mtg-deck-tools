@@ -62,7 +62,7 @@ Tests do **not** need Scryfall bulk JSON. Manual `import` / `generate` do:
 
 ### Services
 
-**CLI-only:** nothing listens on a port. **With `[web]`:** run `mtg-deck-tools serve` locally (see README → HTTP API). **Docker:** `docker compose up --build` (see README → Docker) — API + SPA on port 8000 with a persistent `/data` volume. No background daemons required for dogfood or pytest.
+**CLI-only:** nothing listens on a port. **With `[web]`:** run `mtg-deck-tools serve` locally (see README → HTTP API). **Docker:** `docker compose up --build` (see README → Docker) — API + SPA behind Traefik at `http://mtg-deck-tools.deck-build.lan` with a persistent `/data` volume. No background daemons required for dogfood or pytest.
 
 ### Web frontend (`packages/web`)
 
