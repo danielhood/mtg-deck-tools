@@ -15,7 +15,7 @@ services:
       - proxy
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mtg-deck-tools.rule=Host(`mtg-deck-tools.deck-build.lan`)
+      - traefik.http.routers.mtg-deck-tools.rule=Host(`deck-build.lan`)
       - traefik.http.routers.mtg-deck-tools.entrypoints=web
       - traefik.http.services.mtg-deck-tools.loadbalancer.server.port=8000
     volumes:
