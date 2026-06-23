@@ -175,22 +175,23 @@ Self-hosting notes: [`docs/specs/web/deployment.md`](docs/specs/web/deployment.m
 
 ### Docker (LAN / self-host)
 
-**Requires:** Docker Engine with Compose v2.
+**Requires:** Docker Engine with Compose v2. **Traefik:** external `proxy` network from [docker-reverse-proxy](https://github.com/danielhood/docker-reverse-proxy) (start Traefik first).
 
-Build and run on the host (API + web UI on port 8000):
+Build and run (API + web UI behind Traefik on port 80):
 
 ```bash
 docker compose up --build
 ```
 
-Open http://127.0.0.1:8000 on the host, or `http://<docker-host-ip>:8000` from another machine on the LAN.
+Open `http://mtg-deck-tools.deck-build.lan` when DNS points that hostname at the Traefik host. Without Traefik, uncomment `ports` in `docker-compose.yml` and use `http://<docker-host-ip>:8000`.
 
 | Detail | Value |
 | --- | --- |
+| **Routing** | Traefik `Host(`mtg-deck-tools.deck-build.lan`)` → container `:8000` |
 | **Persistent data** | Named volume `mtg-data` → `/data/cards.db` and `/data/decks.db` |
 | **First start** | Downloads Scryfall oracle bulk and runs `import` when `/data/cards.db` is missing (may take several minutes) |
 | **Disable auto-download** | Set `MTG_AUTO_DOWNLOAD=0` in `docker-compose.yml` and mount a pre-built `cards.db` |
-| **Auth** | None in v1 — do not expose port 8000 to the public internet without a reverse proxy |
+| **Auth** | None in v1 — do not expose to the public internet without reverse-proxy auth |
 
 Equivalent one-off:
 

@@ -45,13 +45,25 @@ mtg-deck-tools serve --host 0.0.0.0 --port 8000 --with-ui
 
 Production image: multi-stage build (pnpm → `packages/web/dist`, pip → `mtg-deck-tools serve --with-ui`). Runtime data lives on a volume at `/data`.
 
+### Traefik (LAN reverse proxy)
+
+`docker-compose.yml` joins the external Docker network `proxy` and registers Traefik labels (same pattern as [docker-reverse-proxy](https://github.com/danielhood/docker-reverse-proxy)). Traefik listens on host port **80**; this stack does not publish `8000` by default.
+
+1. Start Traefik once on the Docker host (`docker-reverse-proxy`: `docker compose up -d`).
+2. Ensure `mtg-deck-tools.deck-build.lan` resolves to that host (LAN DNS or `/etc/hosts`).
+3. Start this stack:
+
 ```bash
 docker compose up --build
 ```
 
+Open `http://mtg-deck-tools.deck-build.lan`. Traefik forwards plain HTTP to container port `8000`.
+
+Standalone (no Traefik): uncomment the `ports` mapping in `docker-compose.yml` and use `http://<host-ip>:8000`.
+
 | Topic | Policy |
 | --- | --- |
-| **Port** | `8000` published to the host (LAN: `http://<host-ip>:8000`) |
+| **Routing** | Traefik `Host(`mtg-deck-tools.deck-build.lan`)` → container `:8000` on network `proxy` |
 | **Volume** | `mtg-data:/data` — `cards.db`, `decks.db`, survives container recreate |
 | **First boot** | Empty volume → Scryfall download + import (same as `MTG_AUTO_DOWNLOAD=1`) |
 | **Health** | `GET /health` (Docker `HEALTHCHECK`; long `start-period` for first import) |
