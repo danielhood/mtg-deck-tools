@@ -21,7 +21,7 @@ from mtg_deck_tools.api.serve import (
     run_server,
     serve_config_from_options,
 )
-from mtg_deck_tools.paths import DEFAULT_DB_PATH, DEPENDENCY_RESOURCES_DIR, resolve_db_path
+from mtg_deck_tools.paths import DEPENDENCY_RESOURCES_DIR, resolve_db_path
 from mtg_deck_tools.service import (
     GenerateFromDeckRequest,
     generate_deck_cli,
@@ -211,7 +211,7 @@ def stats_cmd(
     ] = None,
 ) -> None:
     """Show database statistics."""
-    path = db_path or DEFAULT_DB_PATH
+    path = resolve_db_path(db_path)
 
     try:
         stats = get_database_stats(path)
@@ -259,7 +259,7 @@ def dependency_audit_cmd(
     ] = None,
 ) -> None:
     """Scan cards.db and write dependency inventory reports (D0.5)."""
-    path = db_path or DEFAULT_DB_PATH
+    path = resolve_db_path(db_path)
     if not path.exists():
         console.print(f"[red]Database not found:[/red] {path}\nRun: mtg-deck-tools import")
         raise typer.Exit(1)

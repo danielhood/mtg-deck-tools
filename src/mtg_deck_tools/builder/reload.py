@@ -18,7 +18,7 @@ from mtg_deck_tools.builder.commander_resolve import (
 )
 from mtg_deck_tools.builder.output import write_deck_outputs
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.paths import DEFAULT_DB_PATH, OUTPUT_DIR
+from mtg_deck_tools.paths import OUTPUT_DIR, resolve_db_path
 from mtg_deck_tools.rules.dependencies import dependency_messages, validate_dependencies
 from mtg_deck_tools.rules.validate import validate_commander_deck, validation_messages
 from mtg_deck_tools.wizard.commanders import CommanderRow, combined_color_identity
@@ -91,7 +91,7 @@ def run_generate_from_deck(
 ) -> Path:
     """Regenerate a deck from a .deck.json file (full rebuild or single-slot refill)."""
     loaded = load_deck_json(deck_path)
-    db = db_path or DEFAULT_DB_PATH
+    db = resolve_db_path(db_path)
     conn = require_db(db)
     slot_config = load_slot_template_config()
 

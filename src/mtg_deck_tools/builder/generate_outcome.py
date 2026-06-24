@@ -21,7 +21,7 @@ from mtg_deck_tools.builder.dependency_scoring import card_effects_enabled
 from mtg_deck_tools.builder.filler import fill_deck
 from mtg_deck_tools.builder.mechanic_packages import ensure_included_mechanic_packages
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.paths import DEFAULT_DB_PATH
+from mtg_deck_tools.paths import resolve_db_path
 from mtg_deck_tools.rules.dependencies import (
     DependencyReport,
     dependency_messages,
@@ -79,7 +79,7 @@ def build_generate_outcome(
     Pass ``criteria`` or CLI-style ``colors`` / ``themes``. Optional ``commander_names``
     pins commanders for repeatable analysis runs.
     """
-    db = db_path or DEFAULT_DB_PATH
+    db = resolve_db_path(db_path)
     conn = require_db(db)
     slot_config = load_slot_template_config()
 

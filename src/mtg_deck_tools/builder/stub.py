@@ -10,7 +10,7 @@ from pathlib import Path
 
 from mtg_deck_tools.db.connection import connect
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.paths import DEFAULT_DB_PATH, OUTPUT_DIR
+from mtg_deck_tools.paths import OUTPUT_DIR, resolve_db_path
 from mtg_deck_tools.wizard.commanders import CommanderRow, combined_color_identity
 
 
@@ -83,7 +83,7 @@ def run_generate_stub(
     Phase 1 stub: sample a commander and cards matching optional filters.
     Full 100-card slot filling arrives in Phase 2.
     """
-    db = db_path or DEFAULT_DB_PATH
+    db = resolve_db_path(db_path)
     conn = _require_db(db)
     rng = random.Random(seed)
 

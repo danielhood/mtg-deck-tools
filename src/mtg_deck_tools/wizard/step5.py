@@ -10,7 +10,7 @@ from rich.panel import Panel
 
 from mtg_deck_tools.formatting import format_card_name_with_type
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.paths import DEFAULT_DB_PATH
+from mtg_deck_tools.paths import resolve_db_path
 from mtg_deck_tools.wizard.commanders import (
     ColorMatchMode,
     CommanderRow,
@@ -128,7 +128,7 @@ def run_step5(
 ) -> DeckCriteria:
     """Interactive step 5: pick commander (and optional partner)."""
     require_tty()
-    path = db_path or DEFAULT_DB_PATH
+    path = resolve_db_path(db_path)
     conn = _require_db(path)
 
     try:
