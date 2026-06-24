@@ -89,7 +89,7 @@ PY
     echo "Need curl or python3 with urllib to download uv." >&2
     exit 1
   fi
-  tar -xzf "$TMP_TAR" -C "${ROOT}/.tools" --strip-components=1 uv
+  tar -xzf "$TMP_TAR" -C "${ROOT}/.tools" --strip-components=1
   rm -f "$TMP_TAR"
   chmod +x "$UV_BIN"
 fi
