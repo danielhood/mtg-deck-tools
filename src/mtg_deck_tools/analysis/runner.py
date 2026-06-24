@@ -16,7 +16,7 @@ from mtg_deck_tools.analysis.report import SuiteSummary, build_suite_summary, wr
 from mtg_deck_tools.analysis.serialize import case_result_to_dict
 from mtg_deck_tools.builder.generate_outcome import build_generate_outcome
 from mtg_deck_tools.builder.output import write_deck_outputs
-from mtg_deck_tools.paths import DEFAULT_DB_PATH, OUTPUT_DIR
+from mtg_deck_tools.paths import OUTPUT_DIR, resolve_db_path
 
 
 @dataclass
@@ -42,7 +42,7 @@ def run_analysis_suite(
     repeatable runs.
     """
     matrix = load_analysis_matrix(matrix_path)
-    db = db_path or DEFAULT_DB_PATH
+    db = resolve_db_path(db_path)
     if not db.exists():
         raise FileNotFoundError(f"Database not found at {db}. Run: mtg-deck-tools import")
 

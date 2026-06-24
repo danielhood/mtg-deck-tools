@@ -8,7 +8,7 @@ Format: `- **YYYY-MM-DD** — Short title — optional PR/issue`
 
 ## 2026-06
 
-- **2026-06-08** — UX7f saved deck library shipped (server SQLite store, `GET/PATCH/DELETE /api/v1/decks`, generate auto-save; `/library` grid; deck view rename/delete; JSON-first deck view; home library CTAs)
+- **2026-06-24** — Fix Docker generate ignoring `MTG_DB_PATH` (deck builder used `/app/data/cards.db` instead of `/data/cards.db`) (server SQLite store, `GET/PATCH/DELETE /api/v1/decks`, generate auto-save; `/library` grid; deck view rename/delete; JSON-first deck view; home library CTAs)
 - **2026-06-07** — UX7e enhanced deck view shipped (`/deck/:id` — filters, summaries, dependency notes, Scryfall art, MD preview; session deck store; home resume CTA)
 - **2026-06-07** — UX7c web build wizard shipped (`packages/web` — 7 steps, review, generate, MD result; 375px layout; loading/error states)
 - **2026-06-04** — UX7b `mtg-deck-tools serve` (uvicorn launcher, `MTG_*` env defaults, `--with-ui` static mount)

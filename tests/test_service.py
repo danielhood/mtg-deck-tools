@@ -17,12 +17,8 @@ from mtg_deck_tools.service import (
 from mtg_deck_tools.service.generate import _md_path_for_json, _resolve_deck_path
 
 
-def test_get_database_stats(tmp_path: Path, monkeypatch) -> None:
+def test_get_database_stats(tmp_path: Path) -> None:
     db = tmp_path / "cards.db"
-    monkeypatch.setattr(
-        "mtg_deck_tools.service.stats.DEFAULT_DB_PATH",
-        db,
-    )
     assert not db.exists()
     with pytest.raises(FileNotFoundError):
         get_database_stats(db)

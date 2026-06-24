@@ -130,6 +130,26 @@ def test_wizard_commanders_search(client: TestClient, wizard_db) -> None:
     assert rows[0]["image_uri"].startswith("https://")
 
 
+def test_generate_uses_mtg_db_path_env(client: TestClient, wizard_db, tmp_path, monkeypatch) -> None:
+    """Regression: generate must honor MTG_DB_PATH when request omits db_path (Docker)."""
+    monkeypatch.setenv("MTG_DECKS_PATH", str(tmp_path / "decks.db"))
+    response = client.post(
+        "/api/v1/generate",
+        json={
+            "stub": True,
+            "criteria": {
+                "themes": [],
+                "commander_oracle_ids": ["cmd-1"],
+                "seed": 42,
+            },
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"]
+    assert body["deck"]["commanders"][0]["name"] == "Test Commander"
+
+
 def test_generate_returns_library_entry(client: TestClient, wizard_db, tmp_path, monkeypatch) -> None:
     monkeypatch.setenv("MTG_DECKS_PATH", str(tmp_path / "decks.db"))
     response = client.post(
