@@ -93,6 +93,14 @@ export function resetDraft(): void {
   clearDraft();
 }
 
+/** Stable key for synergy profile activation (themes + include mechanics only). */
+export function synergyActivationKey(draft: WizardDraft): string {
+  return JSON.stringify({
+    themes: draft.themes,
+    include_mechanics: draft.include_mechanics,
+  });
+}
+
 /** Partial criteria for synergy profile activation (themes + include mechanics only). */
 export function toSynergyContextCriteria(draft: WizardDraft): Record<string, unknown> {
   return {

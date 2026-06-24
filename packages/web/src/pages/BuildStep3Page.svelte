@@ -6,7 +6,7 @@
   import SectionHeader from "../components/SectionHeader.svelte";
   import ToggleRow from "../components/ToggleRow.svelte";
   import { postSynergyContext, type ActivatedProfile, type WizardMeta } from "../lib/api";
-  import { loadDraft, saveDraft, toSynergyContextCriteria, type WizardDraft } from "../lib/criteria";
+  import { loadDraft, saveDraft, synergyActivationKey, type WizardDraft } from "../lib/criteria";
   import { navigate } from "../lib/router";
 
   interface Props {
@@ -21,12 +21,15 @@
   let loading = $state(true);
   let error = $state("");
 
+  const activationKey = $derived.by(() => synergyActivationKey(draft));
+
   $effect(() => {
     saveDraft(draft);
   });
 
   $effect(() => {
-    const criteria = toSynergyContextCriteria(draft);
+    const key = activationKey;
+    const criteria = JSON.parse(key) as Record<string, unknown>;
     loading = true;
     error = "";
     postSynergyContext(criteria)
@@ -55,7 +58,7 @@
     const focus = { ...draft.mechanic_focus };
     if (!next.value) delete focus[profile.profile_id];
     else focus[profile.profile_id] = next.value;
-    draft = { ...draft, mechanic_focus: focus };
+    draft.mechanic_focus = focus;
   }
 </script>
 
@@ -89,7 +92,7 @@
 
     {#if error}
       <ErrorState message={error} />
-    {:else if loading}
+    {:else if loading && profiles.length === 0}
       <LoadingState message="Loading synergy profiles…" />
     {:else if profiles.length}
       <div class="focus-help">
