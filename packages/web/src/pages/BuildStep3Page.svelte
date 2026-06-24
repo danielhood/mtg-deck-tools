@@ -6,7 +6,7 @@
   import SectionHeader from "../components/SectionHeader.svelte";
   import ToggleRow from "../components/ToggleRow.svelte";
   import { postSynergyContext, type ActivatedProfile, type WizardMeta } from "../lib/api";
-  import { loadDraft, saveDraft, toDeckCriteria, type WizardDraft } from "../lib/criteria";
+  import { loadDraft, saveDraft, toSynergyContextCriteria, type WizardDraft } from "../lib/criteria";
   import { navigate } from "../lib/router";
 
   interface Props {
@@ -26,9 +26,10 @@
   });
 
   $effect(() => {
+    const criteria = toSynergyContextCriteria(draft);
     loading = true;
     error = "";
-    postSynergyContext(toDeckCriteria(draft))
+    postSynergyContext(criteria)
       .then((ctx) => {
         profiles = ctx.activated_profiles;
       })
