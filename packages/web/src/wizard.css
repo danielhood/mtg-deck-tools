@@ -1379,6 +1379,7 @@
 
 .wizard-footer .btn-next:disabled {
   background: #94a3b8;
+  color: #fff;
   box-shadow: none;
 }
 
@@ -1390,7 +1391,24 @@
 
 .wizard-footer .btn-generate:disabled {
   background: #94a3b8;
+  color: #fff;
   box-shadow: none;
+}
+
+.wizard-footer .btn-generate.is-loading:disabled {
+  background: var(--blue-700);
+  cursor: wait;
+  gap: 8px;
+}
+
+.wizard-footer .btn-generate .btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 999px;
+  animation: status-spin 0.8s linear infinite;
+  flex-shrink: 0;
 }
 
 .review-pill {
