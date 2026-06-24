@@ -93,6 +93,14 @@ export function resetDraft(): void {
   clearDraft();
 }
 
+/** Partial criteria for synergy profile activation (themes + include mechanics only). */
+export function toSynergyContextCriteria(draft: WizardDraft): Record<string, unknown> {
+  return {
+    themes: draft.themes,
+    include_mechanics: draft.include_mechanics,
+  };
+}
+
 export function toDeckCriteria(draft: WizardDraft): Record<string, unknown> {
   const colors =
     draft.colorFilter === "selected" ? [...draft.colors].sort() : [];

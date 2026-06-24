@@ -204,11 +204,18 @@
   <button class="btn btn-back" type="button" onclick={() => navigate("/build/7")}>Back</button>
   <button
     class="btn btn-generate"
+    class:is-loading={generating}
     type="button"
     disabled={generateDisabled}
+    aria-busy={generating}
     onclick={handleGenerate}
   >
-    {generating ? "Generating…" : "Generate"}
+    {#if generating}
+      <span class="btn-spinner" aria-hidden="true"></span>
+      Generating…
+    {:else}
+      Generate
+    {/if}
   </button>
   </div>
 </div>
