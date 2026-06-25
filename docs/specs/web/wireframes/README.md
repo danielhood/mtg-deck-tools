@@ -263,6 +263,36 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 ---
 
+## UX7d wireframe scope
+
+**Status:** **Approved (2026-06-25)** — decisions locked — [user-experience.md](../../dependency-engine/user-experience.md) § UX7d, [screens.md](../screens.md) § Dependency dashboard.
+
+| Priority | File | Route | States to show |
+| --- | --- | --- | --- |
+| **P0** | `deck-view-dependencies.html` | `/deck/:id` | Dependencies `<details>` **open**; 2–3 profile rows (mixed warn/pass); collapsed issue rows |
+| **P0** | `deck-view-dependencies-issue.html` | `/deck/:id` | Same shell; one issue **expanded** — `detail` lists + **Show in deck** link |
+| **P1** | `deck-view-dependencies-good.html` | `/deck/:id` | Passed deck — Dependencies **closed**; summary **Looks good** |
+
+**In frame (product UI):**
+
+| Region | Layout notes |
+| --- | --- |
+| Panel chrome | `<details>` **Dependencies** — replaces standalone **Areas to review** banner when UX7d ships |
+| Closed summary | One line: green **Looks good** or amber **N areas to review** |
+| Profile row | Label (wizard prompt), status pill (pass/warn/fail), horizontal count chips |
+| Issue row | `rule_id` + chevron; expanded: message, profile label, bullet lists from `detail` |
+| Card link | Text button **Show in deck** — wireframe shows affordance only (no scroll in HTML mock) |
+| Position | Below Summary `<details>`, above Filter chip rows |
+| Footer | Same as UX7f — Build another, Delete, Library, Home |
+
+**Dev notes only (`.dev-note`):** data from `deck.dependency_report`; profile labels align with `WIZARD_FOCUS_PROMPT_LABELS`; no new API; UX11 repair deferred.
+
+**Out of scope for UX7d wireframes:** repair/regen buttons; profile package swap; CMC chart; swap/lock selection; dark mode.
+
+**Approval gate:** P0 files **approved 2026-06-25** in [index.md](index.md) — UX7d-a Svelte work may start.
+
+---
+
 ## Out of scope for wireframes
 
 - Real API integration or `DeckCriteria` persistence

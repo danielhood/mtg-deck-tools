@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-25):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e + UX7f shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library). **UX7d** dashboard next — [architecture.md](../web/architecture.md), [screens.md](../web/screens.md) § Planned screens, [active.md](../../roadmap/active.md).
+**Status (2026-06-25):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e + UX7f shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library). **UX7d** dashboard — planned (spec + wireframes in § UX7d below) — [architecture.md](../web/architecture.md), [screens.md](../web/screens.md) § Dependency dashboard, [active.md](../../roadmap/active.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -524,6 +524,57 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | CLI alignment | Target: CLI uses same API/service DTOs; stop depending on path fields inside persisted JSON (refactor may trail UX7f web ship) |
 
 Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7f wireframe scope — [library.html](../web/wireframes/library.html), [deck-view.html](../web/wireframes/deck-view.html), [deck-view-from-home.html](../web/wireframes/deck-view-from-home.html), [deck-view-from-generate.html](../web/wireframes/deck-view-from-generate.html), [deck-view-rename.html](../web/wireframes/deck-view-rename.html), [deck-view-delete.html](../web/wireframes/deck-view-delete.html), [home-library-ready.html](../web/wireframes/home-library-ready.html).
+
+### UX7d — Dependency dashboard (planned)
+
+**Status:** **Planned — P1 active** — [screens.md](../web/screens.md) § Dependency dashboard, [active.md](../../roadmap/active.md). Closes UX7 MVP.
+
+**Goal:** Drill down on persisted `dependency_report` for library decks so users can see **per-profile balance** and **rule-level detail** without re-running the wizard or duplicating engine logic in the browser.
+
+#### Scope
+
+**In scope (UX7d):**
+
+- **In-place panel** on `/deck/:id` — no new top-level route; progressive disclosure from the existing analysis region.
+- **Profile summary** rows from `dependency_report.profiles[]` — `profile_id`, `counts`, `status`, `messages`.
+- **Issue list** from `dependency_report.issues[]` — expandable rows with `rule_id`, `status`, `message`, optional `card_name` / `card_oracle_id`, `profile_id`, `detail`.
+- **Card attribution** — when `card_oracle_id` is set, **Show in deck** scrolls to the matching card row and applies a brief highlight (read-only; does not change filters permanently).
+- **Human-readable profile labels** — reuse wizard step 3 prompt labels (`WIZARD_FOCUS_PROMPT_LABELS` / `GET /api/v1/wizard/synergy` `prompt_label`) with fallback to title-cased `profile_id`.
+- **Data source** — client render from deck JSON already in session cache or library payload; **no new HTTP endpoints**.
+
+**Out of scope (UX7d):** repair / regen (`--repair-dependencies`, D5); profile package swap; card swap / lock (**UX11**); CMC charts (**UX10**); JSON download; re-validation on demand; duplicating dependency rules in TypeScript; new analyze API.
+
+**Slices:**
+
+| Slice | Deliverable |
+| --- | --- |
+| **UX7d-a** | Refactor analysis region into collapsible **Dependencies** panel; compact summary preserved; profile summary cards when expanded |
+| **UX7d-b** | Expandable issue rows; `detail` rendering (producer/consumer lists, counts); **Show in deck** scroll + highlight |
+| **UX7d-c** | `fail` vs `warn` styling; missing-report empty state; 375px layout + a11y pass |
+
+Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) (after UX7f — shipped).
+
+#### UX7d decisions
+
+| Topic | Decision |
+| --- | --- |
+| Placement | **Same route** `/deck/:id` — inline `<details>` panel titled **Dependencies**, below Summary, above Filters |
+| Entry / default open | **Closed** when `dependency_report.passed` or no non-pass issues; **open** when any `warn` or `fail` issue exists |
+| Compact summary (closed) | **Looks good** — one line when passed or no warn/fail issues. **N areas to review** — count of `warn` + `fail` issues (not profile count) |
+| UX7e compact list | **Replaced** by Dependencies panel summary — no duplicate **Areas to review** banner once UX7d ships |
+| Profile list | Render **only** entries in `dependency_report.profiles[]` (engine-scoped). Sort: `fail` → `warn` → `pass`; then label A–Z |
+| Profile counts | Display `counts` key-value pairs as labeled chips (e.g. `producer: 2`, `consumer: 0`) — keys are profile-specific; no client-side reinterpretation |
+| Issue visibility | Dashboard shows all issues with `status` **`warn`** or **`fail`**; `pass` issues omitted |
+| Issue expand | Tap issue row → expand message, linked profile label, `detail` lists, optional **Show in deck** |
+| `detail` rendering | Known keys: `producers`, `consumers`, `aura_count`, `minimum`, etc. → bullet lists or `key: value` lines; unknown keys → JSON pretty-print in monospace block |
+| Card link | Match `card_oracle_id` to deck `cards[].oracle_id`; scroll into view; 2s highlight ring — **no** auto-filter of card list |
+| Missing report | Panel shows muted copy: *No dependency report in this deck.* — hide profile/issue sections |
+| Data source | Session cache / `GET /api/v1/decks/{id}` deck JSON only — same as UX7e/UX7f |
+| UX11 boundary | Read-only — no repair, swap, or regen controls |
+| UX10 boundary | No histograms — profile `counts` only |
+| Visual design | [design.md](../web/design.md) — warn amber, fail red accent, pass green check; 375px baseline |
+
+Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7d wireframe scope — [deck-view-dependencies.html](../web/wireframes/deck-view-dependencies.html), [deck-view-dependencies-issue.html](../web/wireframes/deck-view-dependencies-issue.html), [deck-view-dependencies-good.html](../web/wireframes/deck-view-dependencies-good.html).
 
 ### UX11 — GUI deck editor: swap and lock (parked)
 
