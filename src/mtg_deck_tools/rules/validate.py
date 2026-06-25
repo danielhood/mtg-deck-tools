@@ -364,3 +364,19 @@ def validation_messages(result: ValidationResult) -> list[str]:
         name = f" ({issue.card_name})" if issue.card_name else ""
         lines.append(f"{prefix}{name} {issue.message}")
     return lines
+
+
+def format_validation_failure(result: ValidationResult) -> str:
+    """User-facing summary when a generated deck fails Commander validation."""
+    if result.passed:
+        return ""
+    if result.errors:
+        detail = "; ".join(issue.message for issue in result.errors)
+        return f"Generation failed to produce a valid deck: {detail}"
+    return "Generation failed to produce a valid deck."
+
+
+def require_valid_deck(result: ValidationResult) -> None:
+    """Raise when validation failed so callers do not persist or return invalid decks."""
+    if not result.passed:
+        raise RuntimeError(format_validation_failure(result))

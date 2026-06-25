@@ -1,4 +1,5 @@
 import { VOID_COLOR_ID } from "./color-pips";
+import { parseDependencyReport, type ParsedDependencyReport } from "./dependency-report";
 import { formatPrice, formatTagLabel, sortColors } from "./format";
 
 const MANA_COLORS = ["W", "U", "B", "R", "G"] as const;
@@ -45,18 +46,6 @@ export interface DeckStats {
   avg_cmc_nonland: number | null;
 }
 
-export interface DependencyIssue {
-  rule_id: string;
-  status: string;
-  message: string;
-}
-
-export interface DeckAnalysis {
-  looksGood: boolean;
-  message: string;
-  warnings: DependencyIssue[];
-}
-
 export interface DeckFilters {
   slots: Set<string>;
   types: Set<string>;
@@ -76,7 +65,7 @@ export interface ParsedDeck {
   slotCounts: Record<string, number>;
   stats: DeckStats;
   typeCounts: Record<string, number>;
-  analysis: DeckAnalysis;
+  dependencyReport: ParsedDependencyReport;
   filterOptions: {
     slots: string[];
     types: string[];
@@ -254,44 +243,6 @@ function parseStats(deck: Record<string, unknown>): DeckStats {
   };
 }
 
-function parseAnalysis(deck: Record<string, unknown>): DeckAnalysis {
-  const report = asRecord(deck.dependency_report);
-  if (!report) {
-    return {
-      looksGood: true,
-      message: "Looks good — no dependency report in this deck.",
-      warnings: [],
-    };
-  }
-
-  const issues = Array.isArray(report.issues) ? report.issues : [];
-  const warnings = issues
-    .map((issue) => {
-      const row = asRecord(issue);
-      if (!row || row.status !== "warn") return null;
-      const ruleId = asString(row.rule_id);
-      const message = asString(row.message);
-      if (!ruleId || !message) return null;
-      return { rule_id: ruleId, status: "warn", message };
-    })
-    .filter((issue): issue is DependencyIssue => issue != null);
-
-  const passed = report.passed === true;
-  if (passed || warnings.length === 0) {
-    return {
-      looksGood: true,
-      message: "Looks good — no dependency warnings.",
-      warnings: [],
-    };
-  }
-
-  return {
-    looksGood: false,
-    message: "",
-    warnings,
-  };
-}
-
 export function defaultDeckName(deck: Record<string, unknown>): string {
   const commanders = Array.isArray(deck.commanders) ? deck.commanders : [];
   const names = commanders
@@ -347,7 +298,7 @@ export function parseDeck(deck: Record<string, unknown> | null): ParsedDeck | nu
     slotCounts,
     stats: parseStats(deck),
     typeCounts,
-    analysis: parseAnalysis(deck),
+    dependencyReport: parseDependencyReport(deck),
     filterOptions: { slots, types, colors },
   };
 }

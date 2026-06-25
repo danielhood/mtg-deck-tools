@@ -233,7 +233,9 @@ def test_refill_deck_slot_keeps_other_slots(reload_db: sqlite3.Connection) -> No
     assert any("Refilled slot 'synergy'" in w for w in result.warnings)
 
 
-def test_run_generate_from_deck_full_regen(tmp_path, reload_db: sqlite3.Connection, monkeypatch) -> None:
+def test_run_generate_from_deck_rejects_incomplete_regen(
+    tmp_path, reload_db: sqlite3.Connection, monkeypatch
+) -> None:
     deck_path = tmp_path / "deck.deck.json"
     deck_path.write_text(json.dumps(_minimal_deck_json()), encoding="utf-8")
 
@@ -242,16 +244,9 @@ def test_run_generate_from_deck_full_regen(tmp_path, reload_db: sqlite3.Connecti
 
     monkeypatch.setattr("mtg_deck_tools.builder.reload.require_db", fake_require_db)
 
-    out = run_generate_from_deck(
-        deck_path,
-        output_dir=tmp_path / "out",
-        seed=1,
-    )
-    assert out.exists()
-    md_path = out.with_name(out.name.replace(".deck.json", ".md"))
-    assert md_path.exists()
-    data = json.loads(out.read_text(encoding="utf-8"))
-    assert data["criteria"]["themes"] == ["voltron"]
-    assert data["criteria"]["seed"] == 1
-    # Tiny fixture DB cannot fill all slots; regen still runs fill_deck and writes outputs.
-    assert sum(c["quantity"] for c in data["cards"]) > 3
+    with pytest.raises(RuntimeError, match="valid deck"):
+        run_generate_from_deck(
+            deck_path,
+            output_dir=tmp_path / "out",
+            seed=1,
+        )

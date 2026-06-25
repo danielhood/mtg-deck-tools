@@ -33,6 +33,7 @@
   let preflightError = $state("");
   let generating = $state(false);
   let generateError = $state("");
+  let scrollEl = $state<HTMLDivElement | null>(null);
 
   let themeLabels = $state<Record<string, string>>({});
   let mechanicLabels = $state<Record<string, string>>({});
@@ -96,6 +97,18 @@
       });
   });
 
+  $effect(() => {
+    if (!generateError || !scrollEl) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollEl?.scrollTo({
+          top: scrollEl.scrollHeight - scrollEl.clientHeight,
+          behavior: "smooth",
+        });
+      });
+    });
+  });
+
   async function handleGenerate(): Promise<void> {
     if (generateDisabled) return;
     generating = true;
@@ -121,7 +134,7 @@
 </script>
 
 <div class="wizard-layout">
-  <div class="wizard-scroll">
+  <div class="wizard-scroll" bind:this={scrollEl}>
   <WizardProgress step={7} complete />
   <WizardIntro
     title="Review & generate"

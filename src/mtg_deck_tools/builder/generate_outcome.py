@@ -27,7 +27,11 @@ from mtg_deck_tools.rules.dependencies import (
     dependency_messages,
     validate_dependencies,
 )
-from mtg_deck_tools.rules.validate import ValidationResult, validate_commander_deck, validation_messages
+from mtg_deck_tools.rules.validate import (
+    ValidationResult,
+    validate_commander_deck,
+    validation_messages,
+)
 from mtg_deck_tools.wizard.commanders import CommanderRow, combined_color_identity
 from mtg_deck_tools.wizard.slots import load_slot_template_config, validate_slot_template
 
@@ -226,6 +230,7 @@ def build_generate_outcome(
             strict=output_criteria.strict_dependencies,
         )
         maindeck.warnings.extend(dependency_messages(dependency_report))
+        maindeck.dependency_report = dependency_report
 
         return GenerateOutcome(
             criteria=output_criteria,
