@@ -235,3 +235,28 @@ def test_validation_messages_format():
     lines = validation_messages(result)
     assert any("[903.5b]" in line for line in lines)
     assert any("[budget]" in line for line in lines)
+
+
+def test_format_validation_failure_includes_errors():
+    from mtg_deck_tools.rules.validate import (
+        ValidationIssue,
+        ValidationResult,
+        format_validation_failure,
+        require_valid_deck,
+    )
+
+    result = ValidationResult(
+        passed=False,
+        errors=[
+            ValidationIssue(
+                "903.5a",
+                "Deck has 45 cards (44 maindeck + 1 commander(s)); must be 100.",
+            )
+        ],
+    )
+    message = format_validation_failure(result)
+    assert "valid deck" in message
+    assert "45 cards" in message
+
+    with pytest.raises(RuntimeError, match="valid deck"):
+        require_valid_deck(result)

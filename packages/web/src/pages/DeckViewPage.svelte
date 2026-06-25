@@ -1,5 +1,6 @@
 <script lang="ts">
   import CardLightbox from "../components/CardLightbox.svelte";
+  import DependenciesPanel from "../components/DependenciesPanel.svelte";
   import ColorPipPicker from "../components/ColorPipPicker.svelte";
   import ErrorState from "../components/ErrorState.svelte";
   import LoadingState from "../components/LoadingState.svelte";
@@ -50,6 +51,8 @@
   let showDelete = $state(false);
   let deleteBusy = $state(false);
   let deleteError = $state("");
+  let highlightedOracleId = $state<string | null>(null);
+  let highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
   $effect(() => {
     loading = true;
@@ -156,6 +159,21 @@
     resetDraft();
     navigate("/build/1");
   }
+
+  function showInDeck(oracleId: string): void {
+    if (highlightTimer) clearTimeout(highlightTimer);
+    highlightedOracleId = oracleId;
+    requestAnimationFrame(() => {
+      document.getElementById(`deck-card-${oracleId}`)?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
+    highlightTimer = setTimeout(() => {
+      highlightedOracleId = null;
+      highlightTimer = null;
+    }, 2000);
+  }
 </script>
 
 {#if loading}
@@ -222,18 +240,10 @@
       </div>
     </section>
 
-    {#if parsed.analysis.looksGood}
-      <div class="analysis-ok" role="status">{parsed.analysis.message}</div>
-    {:else}
-      <section class="analysis-warn" aria-label="Areas to review">
-        <h2>Areas to review</h2>
-        <ul>
-          {#each parsed.analysis.warnings as issue (issue.rule_id + issue.message)}
-            <li><strong>{issue.rule_id}</strong> — {issue.message}</li>
-          {/each}
-        </ul>
-      </section>
-    {/if}
+    <DependenciesPanel
+      report={parsed.dependencyReport}
+      onShowInDeck={(oracleId) => showInDeck(oracleId)}
+    />
 
     <section class="deck-filters" aria-label="Filters">
       <div class="filter-group">
@@ -305,7 +315,11 @@
       {#each slotGroups as group (group.slot)}
         <h2 class="slot-heading">{group.label}</h2>
         {#each group.cards as card (card.oracle_id)}
-          <div class="card-row">
+          <div
+            id="deck-card-{card.oracle_id}"
+            class="card-row"
+            class:card-row-highlight={highlightedOracleId === card.oracle_id}
+          >
             <button
               type="button"
               class="card-thumb-btn"

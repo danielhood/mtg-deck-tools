@@ -8,6 +8,7 @@ from mtg_deck_tools.builder.generate_outcome import build_generate_outcome
 from mtg_deck_tools.builder.output import write_deck_outputs
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import OUTPUT_DIR
+from mtg_deck_tools.rules.validate import require_valid_deck
 
 # Re-export for tests and analysis that pin commanders by name.
 from mtg_deck_tools.builder.commander_resolve import (  # noqa: F401
@@ -48,6 +49,8 @@ def run_generate(
         prefer_available=prefer_available,
         commander_names=commander_names,
     )
+
+    require_valid_deck(outcome.validation)
 
     out_dir = output_dir or OUTPUT_DIR
     out_dir.mkdir(parents=True, exist_ok=True)

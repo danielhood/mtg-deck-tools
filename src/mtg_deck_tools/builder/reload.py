@@ -20,7 +20,7 @@ from mtg_deck_tools.builder.output import write_deck_outputs
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import OUTPUT_DIR, resolve_db_path
 from mtg_deck_tools.rules.dependencies import dependency_messages, validate_dependencies
-from mtg_deck_tools.rules.validate import validate_commander_deck, validation_messages
+from mtg_deck_tools.rules.validate import require_valid_deck, validate_commander_deck, validation_messages
 from mtg_deck_tools.wizard.commanders import CommanderRow, combined_color_identity
 from mtg_deck_tools.wizard.slots import load_slot_template_config, validate_slot_template
 
@@ -183,6 +183,8 @@ def run_generate_from_deck(
             strict=output_criteria.strict_dependencies,
         )
         maindeck.warnings.extend(dependency_messages(maindeck.dependency_report))
+
+        require_valid_deck(validation)
 
         out_dir = output_dir or OUTPUT_DIR
         out_dir.mkdir(parents=True, exist_ok=True)
