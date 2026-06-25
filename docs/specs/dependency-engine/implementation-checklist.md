@@ -148,13 +148,13 @@ Agree the **first validator rules** to implement (suggest 4–6, not the full ca
 
 ---
 
-## Dogfood acceptance (after D2) — **open**
+## Dogfood acceptance (after D2) — **complete**
 
-Before UX2 / default strict mode, manually review generated decks:
+Manual scenarios below are covered by automated tests and/or the **30/30** dogfood matrix (`analyze run --fail-on-expect`). See [deck-analysis.md](../specs/deck-analysis.md).
 
-| ☐ | Scenario | Pass? |
+| Status | Scenario | Coverage |
 | --- | --- | --- |
-| ☑ | Land tutor deck — no “no land” false warn | Automated: `test_land_tutor_with_basics_passes` |
+| ☑ | Land tutor deck — no “no land” false warn | `test_land_tutor_with_basics_passes` |
 | ☑ | Energy producers, zero consumers — clear Energy note with names | When `include_mechanics` has `energy` |
 | ☑ | Elf lord, &lt;5 elves — warning with suggested minimum | Card-driven `TYPE_SYNERGY_MIN` |
 | ☑ | Enchantress / low aura count + aura tutor | Payoff / tutor triggers `AURA_SUPPORT_MIN` |

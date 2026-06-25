@@ -241,17 +241,17 @@ Comparison retained for context (Vue was the alternative):
 
 ### Screens (phased)
 
-| Phase | Screen / feature | Depends on |
+| Phase | Screen / feature | Status |
 | --- | --- | --- |
-| UX7a | Service extraction + OpenAPI | Engine stable |
-| UX7b | `serve` + health / stats | UX7a |
-| UX7c | Build wizard (7 steps + review + MD HTML result) | UX7b — [routes.md](routes.md), [screens.md](screens.md) |
-| UX7e | Enhanced deck view (filters, summaries, art) | UX7c |
-| UX7f | Saved deck library | UX7e |
-| UX7d | Dependency dashboard | UX7f, D5 |
-| UX10b | CMC / composition charts | UX7e+ |
-| UX11 | Deck editor (swap / lock / iterate) | UX7e, `.deck.json` contract |
-| UX7g | Web DB init / Scryfall refresh | UX7b — backlog |
+| UX7a | Service extraction + OpenAPI | Shipped |
+| UX7b | `serve` + health / stats | Shipped |
+| UX7c | Build wizard (7 steps + review + generate) | Shipped — [routes.md](routes.md), [screens.md](screens.md) |
+| UX7e | Enhanced deck view (filters, summaries, art) | Shipped |
+| UX7f | Saved deck library | Shipped |
+| **UX7d** | Dependency dashboard | **Active** — [active.md](../../roadmap/active.md) |
+| UX10b | CMC / composition charts | Backlog |
+| UX11 | Deck editor (swap / lock / iterate) | Backlog |
+| UX7g | Web DB init / Scryfall refresh | Backlog |
 
 ---
 

@@ -59,7 +59,7 @@ Without Corepack, install pnpm globally: `npm install -g pnpm` (or see [pnpm.io/
 3. `cd packages/web && pnpm install && pnpm dev` in another.
 4. Walk `/` → `/build/1` … `/build/7` → `/build/review` → Generate → `/deck/:id`.
 
-Wizard draft state persists in `sessionStorage` (`mtg-wizard-draft`). Last generate result: `mtg-active-deck-id` + `mtg-deck-{uuid}` (legacy `mtg-wizard-result` migrated on read).
+Wizard draft persists in `sessionStorage` (`mtg-wizard-draft`). Loaded decks cache in `sessionStorage` as `mtg-deck-cache-{uuid}` (includes `returnTo` for delete redirect). Canonical deck store is the server library API.
 
 ## Principles
 

@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-08):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e + UX7f shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library). **UX7d** dashboard next — [architecture.md](../web/architecture.md), [library-api.md](../web/library-api.md), [active.md](../../roadmap/active.md).
+**Status (2026-06-25):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e + UX7f shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library). **UX7d** dashboard next — [architecture.md](../web/architecture.md), [screens.md](../web/screens.md) § Planned screens, [active.md](../../roadmap/active.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -367,15 +367,15 @@ Engine requirements for swaps:
 | ~~**UX4**~~ | ~~**Wizard step back-navigation** — return to earlier steps to revise selections~~ — **Shipped 2026-06-04** | None (wizard orchestration) |
 | ~~**UX5**~~ | ~~Wizard prepopulate on regen~~ — **Shipped 2026-06-04** | `.deck.json` criteria round-trip |
 | **UX6** | `.deck.json` per-card `dependency_roles` | D2 |
-| **UX7** | Cross-platform web (mobile-first): ~~`service/` + FastAPI~~ **UX7a shipped**; ~~`serve`~~ **UX7b shipped**; ~~build wizard **UX7c**~~ **shipped**; ~~deck view **UX7e**~~ **shipped**; library **UX7f**; dashboard **UX7d**; iterate **UX11** | D5 + [specs/web/](../web/) |
+| **UX7** | Cross-platform web (mobile-first): ~~`service/` + FastAPI~~ **UX7a shipped**; ~~`serve`~~ **UX7b shipped**; ~~build wizard **UX7c**~~ **shipped**; ~~deck view **UX7e**~~ **shipped**; ~~library **UX7f**~~ **shipped**; dashboard **UX7d**; iterate **UX11** | D5 + [specs/web/](../web/) |
 | **UX8** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
 | **UX9** | Web constraint panel + pick preview (interactive build) | D3–D4 + UX7 shell |
 | **UX10** | **Deck composition metrics** — CMC distribution report (+ optional curve advisories); CLI MD/JSON first, charts in UX7 | Build result / `output.py`; no new `card_effects` |
 | **UX11** | **GUI deck editor** — per-card **lock** + **swap** selection; refill/swap respect `DeckCriteria` and validation | `reload.py`, `filler.py`, `.deck.json` schema; **UX7e** deck view |
 
-### UX7c — Web build wizard (planned)
+### UX7c — Web build wizard (shipped)
 
-**Status:** **UX7c + UX7e shipped** — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md), [packages/web/README.md](../../packages/web/README.md).
+**Status:** **Shipped** — [routes.md](../web/routes.md), [screens.md](../web/screens.md), [navigation.md](../web/navigation.md), [packages/web/README.md](../../packages/web/README.md).
 
 **Product role:** Web is the primary interactive shell. **Build** mode uses the wizard **once** for a new deck. **Iterate** and **View** modes do not re-run the wizard (see **UX7e**, **UX7f**, **UX11**). Modes and flow: [architecture.md](../web/architecture.md) § Product modes.
 
@@ -384,10 +384,9 @@ Engine requirements for swaps:
 **In scope (UX7c):**
 
 - Home with **Build new deck** (disabled when DB missing).
-- Linear wizard: CLI steps 1–7 + **review** (preflight) + **generate** + **result**.
-- Server-side wizard helpers ([wizard-api.md](../web/wizard-api.md)); SPA holds `DeckCriteria` draft only.
-- Result: HTML render of generated `output.md` (no card art grid in UX7c).
-- Random **seed** at generate; stored in `.deck.json` when **UX7f** lands. User-visible seed deferred.
+- Linear wizard: CLI steps 1–7 + **review** (preflight) + **generate** → `/deck/:id` (no standalone MD result screen).
+- Server-side wizard helpers ([wizard-api.md](../web/wizard-api.md)); SPA holds `DeckCriteria` draft only (`sessionStorage` key `mtg-wizard-draft`).
+- Random **seed** at generate; stored in `deck.criteria.seed` when auto-saved to library (**UX7f**).
 
 **Out of scope (UX7c):** partner commander picker; custom slot editor; JSON download; enhanced deck view; saved decks; iterate; dependency dashboard; charts; dark mode; web DB import (**UX7g**).
 
@@ -466,9 +465,11 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7e wireframe scope.
 
+**Implementation notes (post-UX7f):** Deck view footer shows fixed **Library** and **Home** buttons (not a single context-sensitive **Back** label). `returnTo` in session cache (`mtg-deck-cache-{id}`) is used for **delete** redirect only. Markdown preview removed — render from JSON only. Canonical store is server library; cache is a read-through helper.
+
 ### UX7f — Saved deck library (shipped)
 
-**Status:** **Shipped (2026-06-08)** — [library-api.md](../web/library-api.md), [screens.md](../web/screens.md) § Saved deck library.
+**Status:** **Shipped (2026-06-24)** — [library-api.md](../web/library-api.md), [screens.md](../web/screens.md) § Saved deck library.
 
 **Goal:** Server-side saved deck library so decks survive browser restarts and self-hosted deployments. `.deck.json` is the sole persisted payload; the web UI renders from JSON, not stored Markdown.
 
@@ -518,7 +519,7 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | DB gate | **Hard block** — library, deck view, and wizard all unavailable when DB missing (same as UX7c) |
 | Library layout | **Card grid** — commander art/metadata cards |
 | Row actions | Library: tap card to open; deck view: pencil rename + footer delete + Back/Home — **no Download** in UX7f |
-| Deck view Back | Footer bottom row — context-sensitive: library entry → `/library`; home **View last deck** → `/`; post-generate → `/library`. **Home** always → `/`. Store `returnTo` at navigation time |
+| Deck view Back | Footer bottom row — **Library** + **Home** (fixed labels). `returnTo` in session cache used for delete redirect, not footer Back label |
 | Regen / refill | **UX11** — no library UI wiring to `from-deck` in UX7f |
 | CLI alignment | Target: CLI uses same API/service DTOs; stop depending on path fields inside persisted JSON (refactor may trail UX7f web ship) |
 

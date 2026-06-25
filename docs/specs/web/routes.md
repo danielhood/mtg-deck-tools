@@ -17,7 +17,7 @@ SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Na
 | Route | Screen | Phase |
 | --- | --- | --- |
 | `/` | Home | UX7c |
-| `/build` | Build wizard — redirect to in-progress step (default `/build/1`) | UX7c |
+| `/build` | Build wizard — redirect to `/build/1` | UX7c |
 | `/build/1` | Wizard step 1 — themes & slot template | UX7c |
 | `/build/2` | Wizard step 2 — include / avoid mechanics | UX7c |
 | `/build/3` | Wizard step 3 — synergy & dependencies | UX7c |
@@ -26,7 +26,7 @@ SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Na
 | `/build/6` | Wizard step 6 — commander | UX7c |
 | `/build/7` | Wizard step 7 — card rarity | UX7c |
 | `/build/review` | Criteria review & preflight | UX7c |
-| `/build/result` | Generated deck (MD HTML) | UX7c |
+| `/build/result` | Compat redirect → `/library` | UX7c |
 | `/deck/:id` | Enhanced deck view | UX7e |
 | `/library` | Saved deck library | UX7f |
 
@@ -36,8 +36,7 @@ SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Na
 
 | Condition | Behavior |
 | --- | --- |
-| `/build` with no in-progress wizard | Redirect to `/build/1` |
-| `/build` with saved wizard progress | Redirect to last completed step + 1, or `/build/review` if steps 1–7 done |
+| `/build` with no path suffix | Always redirect to `/build/1` (wizard draft in `sessionStorage` does not resume mid-flow) |
 | DB not ready | `/` renders with banner; `/build/*`, `/library`, `/deck/*` blocked (see [architecture.md](architecture.md) § Database gate) |
 | `/deck/:id` unknown id | Redirect to `/` |
 | `/library` when DB missing | Redirect to `/` |
@@ -58,7 +57,7 @@ SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Na
 | --- | --- |
 | `/build/*` | Partial `DeckCriteria` draft in client memory; optional `sessionStorage` for wizard refresh survival |
 | `/build/result` | Compat redirect — deck lives in server library (**UX7f**) |
-| `/deck/:id` | Session **cache** of loaded deck JSON keyed by id; canonical store is server library (**UX7f**) |
+| `/deck/:id` | Session **cache** (`mtg-deck-cache-{id}`) of loaded deck JSON; canonical store is server library (**UX7f**) |
 | `/library` | Server library index via `GET /api/v1/decks` (**UX7f**) |
 
 ---

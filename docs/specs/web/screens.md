@@ -1,6 +1,6 @@
 # Web UI — screens
 
-**Status:** UX7c + **UX7e** enhanced deck view shipped.
+**Status:** UX7c + **UX7e** + **UX7f** shipped. **UX7d** dashboard not yet implemented.
 
 Screen behavior per client route. Routes: [routes.md](routes.md). Navigation: [navigation.md](navigation.md). HTTP calls: [wizard-api.md](wizard-api.md). Layout review: [wireframes/README.md](wireframes/README.md).
 
@@ -164,15 +164,13 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 
 ## Result (`/build/result`)
 
-**Wireframe:** [build-result.html](wireframes/build-result.html)
+**Wireframe:** [build-result.html](wireframes/build-result.html) (historical UX7c mock)
 
-| Element | UX7c |
+| Element | Behavior |
 | --- | --- |
-| Deck output | HTML rendering of generated Markdown (CLI `.md` equivalent) |
-| Download JSON | Deferred (post-UX7f) |
-| Next steps | Redirect to `/deck/:id` after generate; compat redirect when active deck id exists |
+| Compat redirect | → `/library` on load (**UX7f**). Generate success goes directly to `/deck/:id` from review. |
 
-**API:** Uses `POST /api/v1/generate` — **UX7f:** returns `id` + `deck`; auto-saves to library. Markdown optional (CLI); not used for web deck view.
+**API:** `POST /api/v1/generate` on review — returns `id` + `deck`; auto-saves to library.
 
 ---
 
@@ -193,7 +191,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters |
 | Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
 | MD preview | **Removed in UX7f** — deck view renders from JSON only; markdown is CLI/export derivative |
-| Footer | **Build another deck** → `/`; **Delete deck** (destructive) → confirm modal; bottom row: **Back** (context-sensitive — see [navigation.md](navigation.md) § Deck view) + **Home** → `/` |
+| Footer | **Build another deck** → `/build/1`; **Delete deck** (destructive) → confirm modal; bottom row: **Library** → `/library` + **Home** → `/` |
 
 **Deferred on this screen:** swap / lock (**UX11**); JSON download; dependency drill-down (**UX7d**); CMC charts (**UX10**); regen / refill (**UX11**).
 
