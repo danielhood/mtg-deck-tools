@@ -1,17 +1,20 @@
-# Active roadmap (unified)
+# Active roadmap
 
-**Single register** of work selected for immediate delivery across all components. Parked work lives under [backlog/](backlog/). Shipped history: [milestones.md](../history/milestones.md) · [changelog.md](../history/changelog.md).
+**Single register** of work selected for immediate delivery. Parked work: [backlog/](backlog/). Shipped record: [changelog.md](../history/changelog.md) · [milestones.md](../history/milestones.md).
 
-Status as of 2026-06-04.
+*Last updated: 2026-06-25.*
 
-## Components
+---
 
-| Component | Code / package | Backlog |
+## Current focus
+
+| Priority | What | Why now |
 | --- | --- | --- |
-| **cli-engine** | `src/mtg_deck_tools/` (import, builder, rules, effects, analyze) | [backlog/cli-engine.md](backlog/cli-engine.md) |
-| **cli-ui** | `src/mtg_deck_tools/cli/`, `wizard/` | [backlog/cli-ui.md](backlog/cli-ui.md) |
-| **web-ui** | `packages/web/` | [backlog/web-ui.md](backlog/web-ui.md) |
-| **product-data** | Cross-cutting data, export, formats | [backlog/product-data.md](backlog/product-data.md) |
+| **P1 — UX7d** | Web dependency dashboard | Last UX7 MVP slice; library (**UX7f**) shipped so persisted decks can be inspected |
+| **ENG-MAINT** | Engine profile tuning | As needed when touching dependency rules or dogfood matrix |
+| **GATE** | Dogfood gate | Required after any engine change |
+
+**Primary thread:** web-ui **UX7d** — [specs/web/README.md](../specs/web/README.md), [user-experience.md](../specs/dependency-engine/user-experience.md).
 
 ---
 
@@ -19,11 +22,28 @@ Status as of 2026-06-04.
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX7** | web-ui | Cross-platform web shell (mobile-first); ~~**UX7c** build wizard~~ ~~**UX7e** deck view~~ ~~**UX7f** library~~ **shipped** — **UX7d** dashboard — [specs/web/README.md](../specs/web/README.md), [library-api.md](../specs/web/library-api.md) | **Selected — P1** | UX7f shipped | **ENG-MAINT**, doc-only |
-| **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | **UX7** (different paths), dogfood gate |
+| **UX7d** | web-ui | Dependency dashboard — D5 drill-down on `dependency_report` for library decks | **Selected — P1** | UX7f (shipped), D5 | **ENG-MAINT**, doc-only |
+| **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | **UX7d** (different paths), dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
-**Not active:** No **cli-engine** expansion rows (P7 remainder, new profiles) — see [backlog/cli-engine.md](backlog/cli-engine.md). Promote via table below before starting.
+**Not active:** No cli-engine expansion rows (P7 remainder, new profiles). Promote from [backlog/cli-engine.md](backlog/cli-engine.md) before starting.
+
+---
+
+## UX7 context (MVP nearly complete)
+
+UX7 is the cross-platform web shell. Sub-phases **UX7a–UX7c**, **UX7e**, and **UX7f** are **shipped** — see [changelog.md](../history/changelog.md). **UX7d** is the remaining MVP item in the register above.
+
+| Sub-phase | Deliverable | Status |
+| --- | --- | --- |
+| UX7a | `service/` extraction + OpenAPI | Shipped |
+| UX7b | `mtg-deck-tools serve` | Shipped |
+| UX7c | Build wizard + result | Shipped |
+| UX7e | Enhanced deck view | Shipped |
+| UX7f | Saved deck library | Shipped |
+| **UX7d** | Dependency dashboard | **Active — P1** |
+
+Post-MVP web work (UX10, UX11, UX7g): [backlog/web-ui.md](backlog/web-ui.md).
 
 ---
 
@@ -31,20 +51,27 @@ Status as of 2026-06-04.
 
 ```mermaid
 flowchart LR
-  UX7a[UX7a service layer]
-  UX7b[UX7b serve API]
-  UX7c[UX7c wizard]
-  UX7e[UX7e deck view]
-  UX7f[UX7f library]
-  UX7d[UX7d dashboard]
+  subgraph shipped["Shipped"]
+    UX7a[UX7a service]
+    UX7b[UX7b API]
+    UX7c[UX7c wizard]
+    UX7e[UX7e deck view]
+    UX7f[UX7f library]
+  end
+
+  subgraph active["Active"]
+    UX7d[UX7d dashboard]
+  end
+
+  subgraph backlog["Backlog"]
+    UX10[UX10 metrics]
+    UX11[UX11 editor]
+  end
+
   CORE[cli-engine core]
-  CLI[cli-ui]
-  UX10[UX10 metrics UI]
-  UX11[UX11 deck editor UI]
 
   CORE --> UX7a
   UX7a --> UX7b
-  UX7a --> CLI
   UX7b --> UX7c
   UX7c --> UX7e
   UX7e --> UX7f
@@ -53,27 +80,19 @@ flowchart LR
   UX7e --> UX11
 ```
 
-- **UX7** does not block **ENG-MAINT** (engine-only PRs).
-- **UX10 / UX11** (backlog) should not start until **UX7** shell exists ([backlog/web-ui.md](backlog/web-ui.md)).
-- New **cli-engine** dependency profiles should not run in parallel with a large **UX7** API refactor on the same modules without coordination.
+- **UX7d** does not block **ENG-MAINT** (engine-only PRs).
+- **UX10 / UX11** should not start until **UX7d** closes the UX7 MVP — see [backlog/web-ui.md](backlog/web-ui.md).
+- New cli-engine dependency profiles should not run in parallel with a large web API refactor on the same modules without coordination.
 
 ---
 
-## Suggested focus
+## Parallel work streams
 
-1. **UX7** — primary product thread ([user-experience.md](../specs/dependency-engine/user-experience.md), [packages/web/README.md](../packages/web/README.md)).
-2. **ENG-MAINT** — as needed when touching profiles / dogfood.
-3. Optional **cli-engine** expansion only after explicit promotion from [backlog/cli-engine.md](backlog/cli-engine.md) into the register above.
-
----
-
-## Parallel work streams (today)
-
-| Stream | Owner component | Safe in parallel with |
+| Stream | Component | Safe in parallel with |
 | --- | --- | --- |
-| A — UX7c wizard (+ UX7e–UX7f backlog) | web-ui | ENG-MAINT, planning/docs, cli-ui idle |
+| A — UX7d dashboard | web-ui | ENG-MAINT, planning/docs |
 | B — Engine maintenance / dogfood | cli-engine | Stream A if no conflicting `src/` edits |
-| C — CLI feature work | cli-ui | *None active* — backlog only |
+| C — CLI feature work | cli-ui | *None active* — [backlog/cli-ui.md](backlog/cli-ui.md) only |
 
 ---
 
@@ -81,7 +100,9 @@ flowchart LR
 
 1. Add row to this register from the relevant [backlog/](backlog/) file.
 2. Fill **Depends on** and **Parallel OK with** before coding.
-3. On ship (implementation complete): remove row here → [changelog.md](../history/changelog.md); update specs/inventory per [DOC-MAP.md](../DOC-MAP.md). Planning steps: [agent-phases.md](../sdlc/agent-phases.md).
+3. On ship: remove row here → [changelog.md](../history/changelog.md); update specs/inventory per [DOC-MAP.md](../DOC-MAP.md).
+
+Planning steps: [agent-phases.md](../sdlc/agent-phases.md).
 
 ---
 

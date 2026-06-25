@@ -1,6 +1,12 @@
 # Backlog (by component)
 
-Parked work — **not** in [active.md](../active.md) until promoted (planning phase: [agent-phases.md](../../sdlc/agent-phases.md) § Phase 1).
+Parked work — **not** in [active.md](../active.md) until promoted.
+
+**Workflow:** [agent-phases.md](../../sdlc/agent-phases.md) § Phase 1 (planning) · **Snapshot of active work:** [roadmap/README.md](../README.md).
+
+---
+
+## Index
 
 | Component | Backlog | Typical code |
 | --- | --- | --- |
@@ -9,4 +15,25 @@ Parked work — **not** in [active.md](../active.md) until promoted (planning ph
 | Web UI | [web-ui.md](web-ui.md) | `packages/web/` |
 | Product & data | [product-data.md](product-data.md) | formats, import pipeline, export |
 
-**Dependency engine spec** (shipped today): [shipped-inventory.md](../../specs/dependency-engine/shipped-inventory.md) · **Archive:** [dependency-priorities.md](../../history/dependency-priorities.md) · **Validate PRs:** [dependency-validation.md](../../sdlc/dependency-validation.md).
+---
+
+## How backlog relates to active and history
+
+```
+backlog/  ──promote──▶  active.md  ──ship──▶  history/changelog.md
+     ▲                        │
+     └──── demote / defer ────┘
+```
+
+- **Promote:** remove row from component backlog; add to [active.md](../active.md) with Depends on / Parallel OK with.
+- **Ship:** remove from active; append [changelog.md](../../history/changelog.md); do **not** leave shipped items in backlog tables.
+
+---
+
+## Reference (not backlog)
+
+| Doc | Role |
+| --- | --- |
+| [shipped-inventory.md](../../specs/dependency-engine/shipped-inventory.md) | Dependency rules shipped today |
+| [dependency-priorities.md](../../history/dependency-priorities.md) | Priority 1–8 archive |
+| [dependency-validation.md](../../sdlc/dependency-validation.md) | Validate dependency PRs |

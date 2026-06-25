@@ -2,7 +2,7 @@
 
 Python core: import, builder, dependency engine, analyze. Code: `src/mtg_deck_tools/` (excluding thin CLI/wizard — see [cli-ui.md](cli-ui.md)).
 
-Promote to [active.md](../active.md) before starting. Ship via [dependency-validation.md](../../sdlc/dependency-validation.md).
+Promote to [active.md](../active.md) before starting. **Index:** [backlog/README.md](README.md). Ship via [dependency-validation.md](../../sdlc/dependency-validation.md).
 
 ---
 

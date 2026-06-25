@@ -1,7 +1,7 @@
 # Web UI architecture (planned)
 
 **Status:** **UX7a–UX7c implemented** — wizard API + Svelte SPA (steps 1–7, review, result) — [specs/web/README.md](README.md).
-**Phase:** UX7 active — **UX7f** saved deck library shipped; **UX7d** dashboard next.
+**Phase:** **UX7d** dashboard active — UX7f library shipped.
 
 ## Strategic shift
 
@@ -316,4 +316,4 @@ Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `p
 - [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — Option B + unified service
 - [technology-stack.md](../../architecture/technology-stack.md) — stack update
 - [deck-output-format.md](../../product/deck-output-format.md) — shared JSON contract
-- [active.md](../../roadmap/active.md) — UX7 task register
+- [active.md](../../roadmap/active.md) — **UX7d** active; post-MVP in [backlog/web-ui.md](../../roadmap/backlog/web-ui.md)

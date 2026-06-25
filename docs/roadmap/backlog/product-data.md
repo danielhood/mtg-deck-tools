@@ -2,7 +2,7 @@
 
 Cross-cutting product features: deck file format, export, import pipeline. Not tied to a single package directory.
 
-Promote to [active.md](../active.md) before starting.
+Promote to [active.md](../active.md) before starting. **Index:** [backlog/README.md](README.md).
 
 ---
 
