@@ -64,5 +64,5 @@ Reuse existing product specs — do not fork schemas in the frontend:
 
 ## References
 
-- [active.md](../../roadmap/active.md) — UX7 is the primary product thread
+- [active.md](../../roadmap/active.md) — **UX7d** is the active web task (UX7 MVP)
 - [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — unified service option

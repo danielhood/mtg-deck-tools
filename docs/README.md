@@ -16,7 +16,8 @@ Before every PR: skill **`/sync-documentation`**. Dependency engine ship: **`/sh
 
 | I need… | Start here |
 | --- | --- |
-| What to build **now** | [roadmap/active.md](roadmap/active.md) |
+| Roadmap overview + **current snapshot** | [roadmap/README.md](roadmap/README.md) |
+| What to build **now** (full register) | [roadmap/active.md](roadmap/active.md) |
 | Parked work by component | [roadmap/backlog/README.md](roadmap/backlog/README.md) |
 | Shipped dependency behavior | [specs/dependency-engine/shipped-inventory.md](specs/dependency-engine/shipped-inventory.md) |
 | Recent ships | [history/changelog.md](history/changelog.md) |
@@ -69,13 +70,15 @@ docs/
 
 ## Roadmap · history · SDLC
 
-| Doc | Purpose |
-| --- | --- |
-| [roadmap/README.md](roadmap/README.md) | Roadmap index |
-| [roadmap/active.md](roadmap/active.md) | Active tasks (all components) |
-| [roadmap/backlog/](roadmap/backlog/) | Per-component backlog |
-| [history/changelog.md](history/changelog.md) | Recent ships |
-| [history/milestones.md](history/milestones.md) | Major phases |
-| [sdlc/agent-phases.md](sdlc/agent-phases.md) | Agent planning vs implementation |
+Work flows **backlog → active → history**. Start at [roadmap/README.md](roadmap/README.md) for the current snapshot.
 
-**Components:** cli-engine · cli-ui · web-ui · product-data — see [roadmap/active.md](roadmap/active.md).
+| Layer | Doc | Purpose |
+| --- | --- | --- |
+| Index | [roadmap/README.md](roadmap/README.md) | Snapshot, components, agent workflow |
+| Active | [roadmap/active.md](roadmap/active.md) | Selected tasks (all components) |
+| Backlog | [roadmap/backlog/](roadmap/backlog/) | Parked work by component |
+| History | [history/changelog.md](history/changelog.md) | Recent ships |
+| History | [history/milestones.md](history/milestones.md) | Major phases |
+| SDLC | [sdlc/agent-phases.md](sdlc/agent-phases.md) | Agent planning vs implementation |
+
+**Components:** cli-engine · cli-ui · web-ui · product-data — see [roadmap/README.md](roadmap/README.md).

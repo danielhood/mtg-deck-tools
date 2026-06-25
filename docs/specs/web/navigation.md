@@ -55,8 +55,9 @@ Applies to `/build/result`.
 
 | Pattern | Rule |
 | --- | --- |
-| Redirect | → `/deck/:id` when session has active deck id; else → `/` |
-| Build another | Handled on deck view footer — clears session → `/` |
+| Redirect | → `/library` on load |
+| Generate | Review **Generate** → `/deck/:id` directly (skips result route) |
+| Build another | Deck view footer — clears wizard draft → `/build/1` |
 
 ---
 
@@ -68,21 +69,13 @@ Applies to `/deck/:id`.
 | --- | --- |
 | Entry | After generate (auto-saved); home **View last deck**; library **Open** (**UX7f**) |
 | Unknown id | → `/` |
-| Build another | Footer — clear wizard draft + session cache → `/` |
-| Delete deck | Footer — confirm modal → `DELETE /api/v1/decks/{id}` → `/` (**UX7f**) |
+| Build another | Footer — clear wizard draft → `/build/1` |
+| Delete deck | Footer — confirm modal → `DELETE /api/v1/decks/{id}` → `returnTo` from session cache (default `/library`) (**UX7f**) |
 | Rename | Pencil beside deck label — confirm modal → `PATCH /api/v1/decks/{id}` (**UX7f**) |
-| Back | Footer bottom row — **context-sensitive** label and target (see below); wizard-style outline button |
-| Home | Footer bottom row — always → `/` |
+| Library | Footer bottom row — → `/library` |
+| Home | Footer bottom row — → `/` |
 
-**Back targets by entry** (store `returnTo` or equivalent at navigation time):
-
-| Arrived from | Back label | Target |
-| --- | --- | --- |
-| Library (tap card) | ← Library | `/library` |
-| Home **View last deck** | ← Home | `/` |
-| Wizard **Generate** | ← Library | `/library` |
-
-Navigation may be revised later; browser history alone is not the primary back affordance.
+`returnTo` is stored in session cache (`mtg-deck-cache-{id}`) when navigating from home, library, or generate. It is used for **delete** redirect, not for a single context-sensitive Back label.
 
 **Deferred:** swap, slot regen — **UX11**; regen via `from-deck` — **UX11**.
 

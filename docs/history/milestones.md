@@ -59,3 +59,15 @@ Enchantment matters, subtype lords, tokens, vehicles, equipment depth, rad/oil/c
 ## Dogfood
 
 Matrix: **30 scenarios**; gate `analyze run --fail-on-expect` — **30/30** as of 2026-06. See [deck-analysis.md](../specs/deck-analysis.md).
+
+## Web UI (2026-06)
+
+| Phase | Deliverable |
+| --- | --- |
+| UX7a | `service/` extraction + OpenAPI |
+| UX7b | `mtg-deck-tools serve` + health/stats |
+| UX7c | Build wizard (7 steps + review + generate) |
+| UX7e | Enhanced deck view (`/deck/:id`) |
+| UX7f | Saved deck library (`/library`, server persistence, auto-save on generate) |
+
+**Active:** UX7d dependency dashboard — [active.md](../roadmap/active.md). Detail: [specs/web/README.md](../specs/web/README.md), [changelog.md](changelog.md).

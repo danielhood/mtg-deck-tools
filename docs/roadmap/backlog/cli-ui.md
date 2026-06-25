@@ -2,7 +2,7 @@
 
 Terminal wizard and CLI flags. Code: `src/mtg_deck_tools/cli/`, `src/mtg_deck_tools/wizard/`.
 
-Promote to [active.md](../active.md) before starting.
+Promote to [active.md](../active.md) before starting. **Index:** [backlog/README.md](README.md).
 
 ---
 

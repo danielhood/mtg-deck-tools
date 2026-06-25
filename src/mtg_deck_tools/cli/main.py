@@ -306,7 +306,7 @@ def wizard_cmd(
         ),
     ] = None,
 ) -> None:
-    """Run the full deck-building wizard (steps 1–6)."""
+    """Run the full deck-building wizard (steps 1–7)."""
     initial_criteria = None
     if deck_from:
         try:

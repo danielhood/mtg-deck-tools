@@ -1,7 +1,7 @@
 # Web UI architecture (planned)
 
 **Status:** **UX7a–UX7c implemented** — wizard API + Svelte SPA (steps 1–7, review, result) — [specs/web/README.md](README.md).
-**Phase:** UX7 active — **UX7f** saved deck library shipped; **UX7d** dashboard next.
+**Phase:** **UX7d** dashboard active — UX7f library shipped.
 
 ## Strategic shift
 
@@ -241,17 +241,17 @@ Comparison retained for context (Vue was the alternative):
 
 ### Screens (phased)
 
-| Phase | Screen / feature | Depends on |
+| Phase | Screen / feature | Status |
 | --- | --- | --- |
-| UX7a | Service extraction + OpenAPI | Engine stable |
-| UX7b | `serve` + health / stats | UX7a |
-| UX7c | Build wizard (7 steps + review + MD HTML result) | UX7b — [routes.md](routes.md), [screens.md](screens.md) |
-| UX7e | Enhanced deck view (filters, summaries, art) | UX7c |
-| UX7f | Saved deck library | UX7e |
-| UX7d | Dependency dashboard | UX7f, D5 |
-| UX10b | CMC / composition charts | UX7e+ |
-| UX11 | Deck editor (swap / lock / iterate) | UX7e, `.deck.json` contract |
-| UX7g | Web DB init / Scryfall refresh | UX7b — backlog |
+| UX7a | Service extraction + OpenAPI | Shipped |
+| UX7b | `serve` + health / stats | Shipped |
+| UX7c | Build wizard (7 steps + review + generate) | Shipped — [routes.md](routes.md), [screens.md](screens.md) |
+| UX7e | Enhanced deck view (filters, summaries, art) | Shipped |
+| UX7f | Saved deck library | Shipped |
+| **UX7d** | Dependency dashboard | **Active** — [active.md](../../roadmap/active.md) |
+| UX10b | CMC / composition charts | Backlog |
+| UX11 | Deck editor (swap / lock / iterate) | Backlog |
+| UX7g | Web DB init / Scryfall refresh | Backlog |
 
 ---
 
@@ -316,4 +316,4 @@ Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `p
 - [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — Option B + unified service
 - [technology-stack.md](../../architecture/technology-stack.md) — stack update
 - [deck-output-format.md](../../product/deck-output-format.md) — shared JSON contract
-- [active.md](../../roadmap/active.md) — UX7 task register
+- [active.md](../../roadmap/active.md) — **UX7d** active; post-MVP in [backlog/web-ui.md](../../roadmap/backlog/web-ui.md)

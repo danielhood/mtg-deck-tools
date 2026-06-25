@@ -1,6 +1,6 @@
 # Web UI — wireframes and layout review
 
-**Status:** UX7c wireframes **approved** (2026-06-07). **UX7e** deck view wireframes **draft** (implementation shipped 2026-06-07) — see [§ UX7e wireframe scope](#ux7e-wireframe-scope).
+**Status:** UX7c wireframes **approved** (2026-06-07). **UX7e** and **UX7f** wireframes are **reference** mocks — Svelte shipped 2026-06-07 / 2026-06-24; see [packages/web/README.md](../../../packages/web/README.md).
 
 How to mock, review, and iterate on screen layouts **before** Svelte implementation. Behavior and routes remain authoritative in [screens.md](../screens.md), [routes.md](../routes.md), and [navigation.md](../navigation.md).
 
@@ -193,7 +193,7 @@ See Cursor Canvas skill when creating `.canvas.tsx` files.
 | Token change | **planning** | [design.md](../design.md) |
 | Svelte matching wireframe | **implementation** | `packages/web/`, same PR updates spec index if routes change |
 
-**No changelog** for wireframe-only planning PRs. Do not remove UX7 from [active.md](../../roadmap/active.md) until UX7c ships.
+**No changelog** for wireframe-only planning PRs. UX7 MVP closes when **UX7d** ships — see [active.md](../../roadmap/active.md).
 
 PR body must include **Phase: planning** and list docs touched per [DOC-MAP.md](../../DOC-MAP.md).
 
@@ -223,7 +223,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | MD preview | `<details>` default **closed** at bottom of scroll |
 | Footer | Fixed **Build another deck** (primary); **Delete deck**; bottom row **Back** + **Home** (**UX7f**) |
 
-**Dev notes only (`.dev-note`):** sessionStorage id; no API; UX11/UX7f/UX10 deferred.
+**Dev notes only (`.dev-note`):** session cache key `mtg-deck-cache-{id}`; server library API shipped (**UX7f**); UX11/UX10/UX7d deferred.
 
 **Out of scope for UX7e wireframes:** swap/lock selection; library grid; CMC chart; dependency dashboard drill-down; dark mode.
 
@@ -233,7 +233,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 ## UX7f wireframe scope
 
-**Status:** **Draft** (2026-06-08) — decisions locked — [user-experience.md](../../dependency-engine/user-experience.md) § UX7f, [screens.md](../screens.md) § Saved deck library.
+**Status:** **Shipped** (2026-06-24) — decisions locked — [user-experience.md](../../dependency-engine/user-experience.md) § UX7f, [screens.md](../screens.md) § Saved deck library.
 
 | Priority | File | Route | Notes |
 | --- | --- | --- | --- |

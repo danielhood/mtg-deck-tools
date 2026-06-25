@@ -98,6 +98,7 @@ planning | implementation
 | --- | --- |
 | [sdlc/agent-phases.md](sdlc/agent-phases.md) | Planning vs implementation vs ship |
 | [roadmap/active.md](roadmap/active.md) | Unified active register |
+| [roadmap/README.md](roadmap/README.md) | Roadmap index + current snapshot |
 | [roadmap/backlog/](roadmap/backlog/) | Per-component backlog |
 | [shipped-inventory.md](specs/dependency-engine/shipped-inventory.md) | Dependency spec (shipped) |
 | [dependency-validation.md](sdlc/dependency-validation.md) | Dependency dogfood + ship steps |
