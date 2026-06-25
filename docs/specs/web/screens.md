@@ -1,6 +1,6 @@
 # Web UI — screens
 
-**Status:** UX7c + **UX7e** + **UX7f** shipped. **UX7d** dashboard not yet implemented.
+**Status:** UX7c + **UX7e** + **UX7f** shipped. **UX7d** dependency dashboard — planned (spec + wireframes).
 
 Screen behavior per client route. Routes: [routes.md](routes.md). Navigation: [navigation.md](navigation.md). HTTP calls: [wizard-api.md](wizard-api.md). Layout review: [wireframes/README.md](wireframes/README.md).
 
@@ -186,14 +186,14 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Deck label | User `name` with pencil icon → rename modal (`PATCH`) — **UX7f** |
 | Commander header | Name, type line, color identity, hero `image_uri`; tap opens lightbox |
 | Summary panel | Always visible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
-| Analysis | **Looks good** one-liner when `dependency_report.passed` or no warn issues; else **Areas to review** list from `dependency_report.issues` (rule id + message) |
+| Analysis | **UX7e (current):** **Looks good** one-liner or **Areas to review** warn list. **UX7d:** refactored into collapsible **Dependencies** panel — see § Dependency dashboard |
 | Filters | Chip groups: **Slot** (multi), **Type** (multi), **Color** (multi); AND across groups; empty state when filter matches nothing |
 | Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters |
 | Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
 | MD preview | **Removed in UX7f** — deck view renders from JSON only; markdown is CLI/export derivative |
 | Footer | **Build another deck** → `/build/1`; **Delete deck** (destructive) → confirm modal; bottom row: **Library** → `/library` + **Home** → `/` |
 
-**Deferred on this screen:** swap / lock (**UX11**); JSON download; dependency drill-down (**UX7d**); CMC charts (**UX10**); regen / refill (**UX11**).
+**Deferred on this screen:** swap / lock (**UX11**); JSON download; CMC charts (**UX10**); regen / refill (**UX11**). Dependency drill-down → **UX7d** (same route).
 
 **API:** **UX7f:** `GET /api/v1/decks/{id}` on cache miss; primary render from JSON `deck` in session cache after load or generate. Shape: [deck-output-format.md](../../product/deck-output-format.md).
 
@@ -223,14 +223,35 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 
 ---
 
+## Dependency dashboard (`/deck/:id` panel) — UX7d
+
+**Status:** Planned. Decisions and slices: [user-experience.md](../dependency-engine/user-experience.md) § UX7d.
+
+**Wireframe:** [deck-view-dependencies.html](wireframes/deck-view-dependencies.html) (dashboard open) · [deck-view-dependencies-issue.html](wireframes/deck-view-dependencies-issue.html) (issue expanded) · [deck-view-dependencies-good.html](wireframes/deck-view-dependencies-good.html) (passed deck)
+
+Not a separate route — inline panel on the enhanced deck view.
+
+| Region | Behavior |
+| --- | --- |
+| Panel | `<details>` **Dependencies** — below Summary, above Filters |
+| Closed summary | **Looks good** when `dependency_report.passed` or no warn/fail issues; else **N areas to review** (count of warn + fail issues) |
+| Default open | **Open** when any warn/fail issue; **closed** when passed |
+| Profile summaries | One row per `dependency_report.profiles[]` entry — label (wizard prompt), status badge, `counts` chips, optional `messages` |
+| Profile sort | fail → warn → pass; then label A–Z |
+| Issues | Expandable rows for each warn/fail issue — `rule_id`, message, profile label, `detail` lists |
+| Card link | **Show in deck** when `card_oracle_id` set — scroll + brief highlight on card row |
+| Missing report | Muted *No dependency report in this deck.* — no profile/issue UI |
+| Footer | Unchanged — Build another / Delete / Library / Home |
+
+**Deferred:** repair pass; profile package swap; re-run validation; CMC charts (**UX10**); swap/lock (**UX11**).
+
+**API:** None — render from `deck.dependency_report` in session cache / library JSON. Shape: [deck-output-format.md](../../product/deck-output-format.md).
+
+---
+
 ## Planned screens (UX7d+)
 
 Feature specs and backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md), [user-experience.md](../dependency-engine/user-experience.md).
-
-### Dependency dashboard — UX7d
-
-- Drill-down on `dependency_report` (D5).
-- Attaches to enhanced deck view — not a separate top-level route in v1 planning.
 
 **UX10** charts may overlap the enhanced deck view. Route map: [routes.md](routes.md).
 

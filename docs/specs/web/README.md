@@ -1,6 +1,6 @@
 # Web UI specification (planned)
 
-**Status:** **UX7a–UX7c + UX7e + UX7f shipped** — build wizard, enhanced deck view, and saved deck library. **UX7d** dependency dashboard next.
+**Status:** **UX7a–UX7c + UX7e + UX7f shipped** — build wizard, enhanced deck view, and saved deck library. **UX7d** dependency dashboard — planned (spec + wireframes in [user-experience.md](../dependency-engine/user-experience.md) § UX7d).
 
 ## Code location
 

@@ -1,6 +1,6 @@
 # Web UI package
 
-**Status:** **UX7c + UX7e + UX7f shipped** — build wizard, enhanced deck view, and saved deck library (`/library`, library API client, JSON-first deck view). **UX7d** dashboard next — see [library-api.md](../specs/web/library-api.md).
+**Status:** **UX7c + UX7e + UX7f shipped** — build wizard, enhanced deck view, and saved deck library (`/library`, library API client, JSON-first deck view). **UX7d** dependency dashboard — planned ([user-experience.md](../specs/dependency-engine/user-experience.md) § UX7d, [screens.md](../specs/web/screens.md) § Dependency dashboard).
 
 ## Stack (locked)
 

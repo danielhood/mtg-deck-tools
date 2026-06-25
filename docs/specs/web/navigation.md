@@ -1,6 +1,6 @@
 # Web UI — navigation patterns
 
-**Status:** UX7c + **UX7e** + **UX7f** shipped.
+**Status:** UX7c + **UX7e** + **UX7f** shipped. **UX7d** dependency dashboard — planned (spec + wireframes).
 
 How users move between routes. Route map: [routes.md](routes.md). Screen details: [screens.md](screens.md).
 
@@ -72,6 +72,7 @@ Applies to `/deck/:id`.
 | Build another | Footer — clear wizard draft → `/build/1` |
 | Delete deck | Footer — confirm modal → `DELETE /api/v1/decks/{id}` → `returnTo` from session cache (default `/library`) (**UX7f**) |
 | Rename | Pencil beside deck label — confirm modal → `PATCH /api/v1/decks/{id}` (**UX7f**) |
+| Dependencies | Collapsible **Dependencies** panel — profile summaries + issue drill-down (**UX7d**); see [screens.md](screens.md) § Dependency dashboard |
 | Library | Footer bottom row — → `/library` |
 | Home | Footer bottom row — → `/` |
 
