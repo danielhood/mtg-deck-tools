@@ -239,7 +239,7 @@ Not a separate route — inline panel on the enhanced deck view.
 | Panel | `<details>` **Dependencies** — below Summary, above Filters |
 | Closed summary | **Looks good** when `dependency_report.passed` or no warn/fail issues; else **N areas to review** (count of warn + fail issues) |
 | Default open | **Open** when any warn/fail issue; **closed** when passed |
-| Profile summaries | One row per `dependency_report.profiles[]` entry — label (wizard prompt), status badge, `counts` chips, optional `messages` |
+| Profile summaries | One row per relevant `dependency_report.profiles[]` entry — hide `pass` profiles with no mechanic-specific cards (e.g. equipment without equipment/equip-payoff, landfall without landfall payoffs); label, status badge, `counts` chips, optional `messages` |
 | Profile sort | fail → warn → pass; then label A–Z |
 | Issues | Expandable rows for each warn/fail issue — human-readable rule label, message, profile label, `detail` lists |
 | Card link | **Show in deck** when `card_oracle_id` set — scroll + brief highlight on card row |

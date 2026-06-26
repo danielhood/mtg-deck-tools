@@ -563,7 +563,7 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) (after UX7f
 | Entry / default open | **Closed** when `dependency_report.passed` or no non-pass issues; **open** when any `warn` or `fail` issue exists |
 | Compact summary (closed) | **Looks good** — one line when passed or no warn/fail issues. **N areas to review** — count of `warn` + `fail` issues (not profile count) |
 | UX7e compact list | **Replaced** by Dependencies panel summary — no duplicate **Areas to review** banner |
-| Profile list | Render **only** entries in `dependency_report.profiles[]` (engine-scoped). Sort: `fail` → `warn` → `pass`; then label A–Z |
+| Profile list | Render entries after client relevance filter — hide `pass` profiles whose mechanic-specific counts are all zero. Sort: `fail` → `warn` → `pass`; then label A–Z |
 | Profile counts | Display `counts` key-value pairs as labeled chips (e.g. `producer: 2`, `consumer: 0`) — keys are profile-specific; no client-side reinterpretation |
 | Issue visibility | Dashboard shows all issues with `status` **`warn`** or **`fail`**; `pass` issues omitted |
 | Issue expand | Tap issue row → expand message, linked profile label, `detail` lists, optional **Show in deck** |
