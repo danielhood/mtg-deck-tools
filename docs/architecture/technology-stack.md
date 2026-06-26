@@ -18,7 +18,7 @@ Target environment: **cross-platform** (Windows, Linux, macOS) CLI; **web UI** f
 - **CLI (shipped):** `typer` / `questionary` / `rich` — scripting, dogfood, power users
 - **Service layer (UX7a):** `src/mtg_deck_tools/service/` facades shared by CLI and HTTP API
 - **Web API (UX7a–UX7b):** FastAPI + [openapi.yaml](../specs/web/openapi.yaml); `mtg-deck-tools serve`
-- **Web SPA (planned UX7):** Mobile-first app in `packages/web/` — no engine port
+- **Web SPA (UX7 MVP shipped):** Mobile-first app in `packages/web/` — no engine port
 
 See [specs/web/architecture.md](../specs/web/architecture.md) for layering and deployment.
 
@@ -81,11 +81,11 @@ Optional: store raw JSON as **Parquet** for faster reloads — only worth it if 
 | UI | Status | Notes |
 | --- | --- | --- |
 | **Typer + questionary CLI** | **Shipped** | Scriptable; calls engine directly (→ `service/` over time) |
-| **FastAPI + mobile-first SPA** | **Planned UX7** | Cross-platform + mobile; `mtg-deck-tools serve` |
+| **FastAPI + mobile-first SPA** | **UX7 MVP shipped** | Cross-platform + mobile; `mtg-deck-tools serve` |
 | **WPF / native desktop** | Deferred | Superseded by web for cross-platform reach |
 | **Tauri installable shell** | Optional later | Only if offline installable `.app` / `.exe` is required beyond browser |
 
-**Path:** CLI proved the engine → **UX7** adds `service/` + API + `packages/web` without forking rules.
+**Path:** CLI proved the engine → **UX7 MVP shipped** (`service/` + API + `packages/web`) without forking rules.
 
 ## Testing
 

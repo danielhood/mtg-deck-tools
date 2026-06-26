@@ -61,7 +61,7 @@ Use the effective date in the filename so updates are obvious. Commander deck co
 mtg-deck-tools/
   docs/                     # Product, architecture, specs, roadmap, history (see docs/README.md)
   src/mtg_deck_tools/       # CLI + engine; service/ + api/ (UX7a)
-  packages/web/             # Web SPA (Svelte 5 + Vite — UX7c wizard + UX7e deck view)
+  packages/web/             # Web SPA (Svelte 5 + Vite — UX7 MVP)
   scripts/                  # bootstrap-linux.sh (uv-based env on Linux)
   Dockerfile                # Production image (API + built SPA)
   docker-compose.yml        # Single-service LAN/self-host stack
@@ -200,9 +200,9 @@ docker build -t mtg-deck-tools .
 docker run --rm -p 8000:8000 -v mtg-data:/data mtg-deck-tools
 ```
 
-### Web UI (UX7c + UX7e)
+### Web UI (UX7 MVP)
 
-**Requires:** Node.js 20+ with **pnpm** (via [Corepack](https://nodejs.org/api/corepack.html): `corepack enable`), `pip install -e ".[dev,web]"`, and `data/cards.db`.
+**Requires:** Node.js 20+ with **pnpm** (via [Corepack](https://nodejs.org/api/corepack.html): `corepack enable`), `pip install -e ".[dev,web]"`, and a card database (`data/cards.db` — created automatically by `mtg-deck-tools serve` when missing and `MTG_AUTO_DOWNLOAD=1`, default).
 
 Development (API + Vite dev server with `/api` proxy):
 
@@ -216,7 +216,7 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:5173 — home → build wizard (steps 1–7) → review → generate → deck view (`/deck/:id`). Production bundle:
+Open http://127.0.0.1:5173 — home → build wizard (steps 1–7) → review → generate → deck view (`/deck/:id`) with dependency dashboard; saved decks at `/library`. Production bundle:
 
 ```bash
 cd packages/web && pnpm build

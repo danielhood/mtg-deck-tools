@@ -30,7 +30,7 @@ CLI flags override env for the current process (`--host`, `--port`, `--db`, `--u
 ## Self-hosted (single process)
 
 1. Install with web extra: `pip install -e ".[web]"`.
-2. Run `mtg-deck-tools serve --host 0.0.0.0 --port 8000` — on first start, missing `cards.db` triggers Scryfall download + import when `MTG_AUTO_DOWNLOAD=1` (default). Or import/copy `cards.db` to a persistent volume beforehand.
+2. Run `mtg-deck-tools serve --host 0.0.0.0 --port 8000` — on first start, missing `cards.db` triggers Scryfall download + import when `MTG_AUTO_DOWNLOAD=1` (default). Or import/copy `cards.db` to a persistent volume beforehand. **UX7g-b** (in-browser import when the API is already up without a DB) is backlog — see [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) § UX7g.
 3. Optionally mount the built UI:
 
 ```bash

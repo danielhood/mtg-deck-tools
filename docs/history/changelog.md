@@ -8,6 +8,7 @@ Format: `- **YYYY-MM-DD** — Short title — optional PR/issue`
 
 ## 2026-06
 
+- **2026-06-25** — UX7d dependency dashboard shipped — collapsible **Dependencies** panel on deck view (`/deck/:id`); profile summaries and expandable issues with **Show in deck** highlight; generate rejects invalid/incomplete decks; commander step defaults color filter to Exact (#77, #78)
 - **2026-06-24** — UX7f saved deck library shipped (server SQLite store, `GET/PATCH/DELETE /api/v1/decks`, generate auto-save; `/library` grid; deck view rename/delete; JSON-first deck view; home library CTAs)
 - **2026-06-24** — Fix Docker generate ignoring `MTG_DB_PATH` (deck builder used `/app/data/cards.db` instead of `/data/cards.db`)
 - **2026-06-07** — UX7e enhanced deck view shipped (`/deck/:id` — filters, summaries, dependency notes, Scryfall art; session deck cache; home resume CTA). *Superseded by UX7f for persistence — deck view now JSON-first with server library.*

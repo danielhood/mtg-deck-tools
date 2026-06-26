@@ -64,7 +64,7 @@ Used by home and generate flow:
 | --- | --- | --- |
 | GET | `/health` | Liveness |
 | GET | `/api/v1/stats` | DB probe (`404` when missing) |
-| POST | `/api/v1/import` | Not used in UX7c (CLI import until **UX7g**) |
+| POST | `/api/v1/import` | **UX7g-a shipped** — oracle import + optional Scryfall download; **UX7g-b backlog** — wire from SPA home when `!db_ready` |
 | POST | `/api/v1/generate` | Deck build |
 
 See [openapi.yaml](openapi.yaml) for current schemas.

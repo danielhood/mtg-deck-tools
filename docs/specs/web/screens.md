@@ -1,6 +1,6 @@
 # Web UI — screens
 
-**Status:** UX7c + **UX7e** + **UX7f** shipped. **UX7d** dependency dashboard — planned (spec + wireframes).
+**Status:** **UX7 MVP shipped** (UX7c + **UX7e** + **UX7f** + **UX7d**).
 
 Screen behavior per client route. Routes: [routes.md](routes.md). Navigation: [navigation.md](navigation.md). HTTP calls: [wizard-api.md](wizard-api.md). Layout review: [wireframes/README.md](wireframes/README.md).
 
@@ -14,7 +14,7 @@ CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md)
 
 | Element | Behavior |
 | --- | --- |
-| DB banner | Visible when DB missing; explains CLI `mtg-deck-tools import` |
+| DB banner | Visible when DB missing; **UX7g-a:** restart `serve` with `MTG_AUTO_DOWNLOAD=1` or CLI `mtg-deck-tools import`; **UX7g-b (backlog):** in-browser download CTA |
 | Build new deck | → `/build/1` when DB ready; disabled when blocked |
 | View last deck | → `/deck/:id` for most recently saved library deck (**UX7f**); hidden when library empty |
 | Saved library | → `/library` when DB ready (**UX7f**) |
@@ -186,14 +186,14 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Deck label | User `name` with pencil icon → rename modal (`PATCH`) — **UX7f** |
 | Commander header | Name, type line, color identity, hero `image_uri`; tap opens lightbox |
 | Summary panel | Always visible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
-| Analysis | **UX7e (current):** **Looks good** one-liner or **Areas to review** warn list. **UX7d:** refactored into collapsible **Dependencies** panel — see § Dependency dashboard |
+| Analysis | Collapsible **Dependencies** panel — profile summaries, expandable issues, **Show in deck** — see § Dependency dashboard |
 | Filters | Chip groups: **Slot** (multi), **Type** (multi), **Color** (multi); AND across groups; empty state when filter matches nothing |
 | Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters |
 | Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
 | MD preview | **Removed in UX7f** — deck view renders from JSON only; markdown is CLI/export derivative |
 | Footer | **Build another deck** → `/build/1`; **Delete deck** (destructive) → confirm modal; bottom row: **Library** → `/library` + **Home** → `/` |
 
-**Deferred on this screen:** swap / lock (**UX11**); JSON download; CMC charts (**UX10**); regen / refill (**UX11**). Dependency drill-down → **UX7d** (same route).
+**Deferred on this screen:** swap / lock (**UX11**); JSON download; CMC charts (**UX10**); regen / refill (**UX11**).
 
 **API:** **UX7f:** `GET /api/v1/decks/{id}` on cache miss; primary render from JSON `deck` in session cache after load or generate. Shape: [deck-output-format.md](../../product/deck-output-format.md).
 
@@ -225,7 +225,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 
 ## Dependency dashboard (`/deck/:id` panel) — UX7d
 
-**Status:** Planned. Decisions and slices: [user-experience.md](../dependency-engine/user-experience.md) § UX7d.
+**Status:** Shipped. Decisions and slices: [user-experience.md](../dependency-engine/user-experience.md) § UX7d.
 
 **Wireframe:** [deck-view-dependencies.html](wireframes/deck-view-dependencies.html) (dashboard open) · [deck-view-dependencies-issue.html](wireframes/deck-view-dependencies-issue.html) (issue expanded) · [deck-view-dependencies-good.html](wireframes/deck-view-dependencies-good.html) (passed deck)
 
@@ -249,7 +249,7 @@ Not a separate route — inline panel on the enhanced deck view.
 
 ---
 
-## Planned screens (UX7d+)
+## Planned screens (post-UX7 MVP)
 
 Feature specs and backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md), [user-experience.md](../dependency-engine/user-experience.md).
 

@@ -22,11 +22,10 @@ How work is **selected**, **parked**, and **recorded** in this repo. Specs live 
 
 | Priority | ID | Component | Task |
 | --- | --- | --- | --- |
-| **P1** | **UX7d** | web-ui | Dependency dashboard (D5 drill-down on persisted decks) |
 | Ongoing | **ENG-MAINT** | cli-engine | Profile tuning vs `dependency-audit` when adding rules |
 | Always | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes |
 
-**Next in web backlog (not active):** UX10 metrics UI, UX11 deck editor — [backlog/web-ui.md](backlog/web-ui.md).
+**UX7 MVP:** **Complete** (UX7a–UX7d shipped). Next web candidates: **UX10** metrics UI, **UX11** deck editor, **UX7g-b** web DB init UI — [backlog/web-ui.md](backlog/web-ui.md) (**UX7g-a** server bootstrap shipped).
 
 **Not active:** cli-engine expansion (P7 remainder), cli-ui UX8, product-data export — promote from [backlog/](backlog/) before starting.
 
@@ -42,7 +41,7 @@ roadmap/
     README.md         # Backlog index
     cli-engine.md     # Dependency engine expansion
     cli-ui.md         # Terminal wizard / CLI UX
-    web-ui.md         # Web app (post-UX7f)
+    web-ui.md         # Web app (post-UX7 MVP)
     product-data.md   # Export, formats, data pipeline
 ```
 

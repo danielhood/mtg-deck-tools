@@ -10,11 +10,10 @@
 
 | Priority | What | Why now |
 | --- | --- | --- |
-| **P1 — UX7d** | Web dependency dashboard | Last UX7 MVP slice; library (**UX7f**) shipped so persisted decks can be inspected |
 | **ENG-MAINT** | Engine profile tuning | As needed when touching dependency rules or dogfood matrix |
 | **GATE** | Dogfood gate | Required after any engine change |
 
-**Primary thread:** web-ui **UX7d** — [specs/web/README.md](../specs/web/README.md), [user-experience.md](../specs/dependency-engine/user-experience.md).
+**Primary thread:** None selected — **UX7 MVP complete** (UX7a–UX7d shipped). Promote next web work from [backlog/web-ui.md](backlog/web-ui.md) (**UX10**, **UX11**, or **UX7g-b**).
 
 ---
 
@@ -22,17 +21,16 @@
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX7d** | web-ui | Dependency dashboard — D5 drill-down on `dependency_report` for library decks | **Selected — P1** | UX7f (shipped), D5 | **ENG-MAINT**, doc-only |
-| **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | **UX7d** (different paths), dogfood gate |
+| **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | doc-only, dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
-**Not active:** No cli-engine expansion rows (P7 remainder, new profiles). Promote from [backlog/cli-engine.md](backlog/cli-engine.md) before starting.
+**Not active:** No web-ui rows (UX7 MVP shipped). No cli-engine expansion rows (P7 remainder, new profiles). Promote from [backlog/](backlog/) before starting.
 
 ---
 
-## UX7 context (MVP nearly complete)
+## UX7 context (MVP complete)
 
-UX7 is the cross-platform web shell. Sub-phases **UX7a–UX7c**, **UX7e**, and **UX7f** are **shipped** — see [changelog.md](../history/changelog.md). **UX7d** is the remaining MVP item in the register above.
+UX7 is the cross-platform web shell. All sub-phases **UX7a–UX7d** are **shipped** — see [changelog.md](../history/changelog.md).
 
 | Sub-phase | Deliverable | Status |
 | --- | --- | --- |
@@ -41,9 +39,9 @@ UX7 is the cross-platform web shell. Sub-phases **UX7a–UX7c**, **UX7e**, and *
 | UX7c | Build wizard + result | Shipped |
 | UX7e | Enhanced deck view | Shipped |
 | UX7f | Saved deck library | Shipped |
-| **UX7d** | Dependency dashboard | **Active — P1** |
+| UX7d | Dependency dashboard | Shipped |
 
-Post-MVP web work (UX10, UX11, UX7g): [backlog/web-ui.md](backlog/web-ui.md).
+Post-MVP web work (UX10, UX11, UX7g-b): [backlog/web-ui.md](backlog/web-ui.md). Server DB bootstrap (UX7g-a) shipped with `serve` / Docker.
 
 ---
 
@@ -57,15 +55,13 @@ flowchart LR
     UX7c[UX7c wizard]
     UX7e[UX7e deck view]
     UX7f[UX7f library]
-  end
-
-  subgraph active["Active"]
     UX7d[UX7d dashboard]
   end
 
   subgraph backlog["Backlog"]
     UX10[UX10 metrics]
     UX11[UX11 editor]
+    UX7g[UX7g-b web import UI]
   end
 
   CORE[cli-engine core]
@@ -80,8 +76,7 @@ flowchart LR
   UX7e --> UX11
 ```
 
-- **UX7d** does not block **ENG-MAINT** (engine-only PRs).
-- **UX10 / UX11** should not start until **UX7d** closes the UX7 MVP — see [backlog/web-ui.md](backlog/web-ui.md).
+- **UX10 / UX11** may be promoted from [backlog/web-ui.md](backlog/web-ui.md) — UX7 MVP is complete.
 - New cli-engine dependency profiles should not run in parallel with a large web API refactor on the same modules without coordination.
 
 ---
@@ -90,9 +85,8 @@ flowchart LR
 
 | Stream | Component | Safe in parallel with |
 | --- | --- | --- |
-| A — UX7d dashboard | web-ui | ENG-MAINT, planning/docs |
-| B — Engine maintenance / dogfood | cli-engine | Stream A if no conflicting `src/` edits |
-| C — CLI feature work | cli-ui | *None active* — [backlog/cli-ui.md](backlog/cli-ui.md) only |
+| A — Engine maintenance / dogfood | cli-engine | doc-only, planning |
+| B — CLI feature work | cli-ui | *None active* — [backlog/cli-ui.md](backlog/cli-ui.md) only |
 
 ---
 
