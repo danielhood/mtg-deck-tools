@@ -74,6 +74,18 @@ export function buildSummaryRows(
     muted: !commander,
   });
 
+  const commanderMin = draft.commander_price_min_usd;
+  const commanderMax = draft.commander_price_max_usd;
+  if (commanderMin != null || commanderMax != null) {
+    const parts: string[] = [];
+    if (commanderMin != null) parts.push(`min ${formatPrice(commanderMin)}`);
+    if (commanderMax != null) parts.push(`max ${formatPrice(commanderMax)}`);
+    rows.push({
+      label: "Commander prices",
+      lines: parts,
+    });
+  }
+
   if (draft.budgetEnabled && draft.budget_usd != null) {
     const budgetLines = [`${formatPrice(draft.budget_usd)} deck budget`];
     if (draft.strict_budget) budgetLines.push("Excluded unpriced cards");
