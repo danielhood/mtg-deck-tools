@@ -6,15 +6,19 @@ import { formatPrice, formatTagLabel, sortColors } from "./format";
 const MANA_COLORS = ["W", "U", "B", "R", "G"] as const;
 const TYPE_ORDER = [
   "Creature",
+  "Vehicle",
   "Instant",
   "Sorcery",
   "Enchantment",
   "Artifact",
+  "Equipment",
   "Planeswalker",
   "Battle",
   "Land",
   "Other",
 ] as const;
+
+const FILTER_SUBTYPES = ["Vehicle", "Equipment"] as const;
 
 export interface DeckCommander {
   oracle_id: string;
@@ -105,7 +109,11 @@ function asStringArray(value: unknown): string[] {
 }
 
 export function primaryCardType(typeLine: string): string {
-  const beforeDash = typeLine.split("—")[0]?.trim() ?? typeLine.trim();
+  const normalized = typeLine.trim();
+  for (const subtype of FILTER_SUBTYPES) {
+    if (normalized.includes(subtype)) return subtype;
+  }
+  const beforeDash = normalized.split("—")[0]?.trim() ?? normalized;
   const parts = beforeDash.split(/\s+/);
   for (let i = parts.length - 1; i >= 0; i -= 1) {
     if ((TYPE_ORDER as readonly string[]).includes(parts[i])) return parts[i];

@@ -42,6 +42,8 @@ def test_primary_card_type_legendary_creature() -> None:
     assert primary_card_type("Legendary Creature — Human Wizard") == "Creature"
     assert primary_card_type("Basic Land — Forest") == "Land"
     assert primary_card_type("Artifact Creature — Golem") == "Creature"
+    assert primary_card_type("Artifact Creature — Vehicle") == "Vehicle"
+    assert primary_card_type("Artifact — Equipment") == "Equipment"
 
 
 def test_cmc_histogram_quantity_weighted() -> None:

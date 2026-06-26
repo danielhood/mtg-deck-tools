@@ -190,7 +190,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Summary panel | Always visible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
 | Deck metrics (**UX10b**) | Collapsible **Deck metrics** panel — CMC bar chart from `stats.cmc_histogram`; toggle **All nonlands** / **Creatures only**; curve blurb + summary (lands, ramp, avg CMC); client fallback when older decks lack `stats` fields |
 | Analysis | Collapsible **Dependencies** panel — profile summaries, expandable issues, **Show in deck** — see § Dependency dashboard |
-| Filters | Chip groups: **Slot** (multi), **Type** (multi), **Color** (multi); AND across groups; empty state when filter matches nothing |
+| Filters | Chip groups: **Slot** (multi), **Type** (multi — Creature, Vehicle, Equipment, Instant, …), **Color** (multi); AND across groups; empty state when filter matches nothing |
 | Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters — **UX11** adds lock pin + edit-mode selection |
 | Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
 | MD preview | **Removed in UX7f** — deck view renders from JSON only; markdown is CLI/export derivative |
