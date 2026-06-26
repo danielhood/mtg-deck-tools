@@ -238,7 +238,7 @@ Not a separate route — inline panel on the enhanced deck view.
 | Default open | **Open** when any warn/fail issue; **closed** when passed |
 | Profile summaries | One row per `dependency_report.profiles[]` entry — label (wizard prompt), status badge, `counts` chips, optional `messages` |
 | Profile sort | fail → warn → pass; then label A–Z |
-| Issues | Expandable rows for each warn/fail issue — `rule_id`, message, profile label, `detail` lists |
+| Issues | Expandable rows for each warn/fail issue — human-readable rule label, message, profile label, `detail` lists |
 | Card link | **Show in deck** when `card_oracle_id` set — scroll + brief highlight on card row |
 | Missing report | Muted *No dependency report in this deck.* — no profile/issue UI |
 | Footer | Unchanged — Build another / Delete / Library / Home |

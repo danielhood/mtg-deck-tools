@@ -88,7 +88,7 @@
         {#each report.issues as issue (issue.rule_id + issue.message)}
           <details class="deps-issue-row deps-issue-{issue.status}">
             <summary class="deps-issue-head">
-              <span>{issue.rule_id}</span>
+              <span>{issue.rule_label}</span>
               <span class="deps-issue-chevron" aria-hidden="true"></span>
             </summary>
             <div class="deps-issue-body">

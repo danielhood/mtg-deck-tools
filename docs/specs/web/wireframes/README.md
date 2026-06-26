@@ -280,7 +280,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | Panel chrome | `<details>` **Dependencies** — replaces standalone **Areas to review** banner |
 | Closed summary | One line: green **Looks good** or amber **N areas to review** |
 | Profile row | Label (wizard prompt), status pill (pass/warn/fail), horizontal count chips |
-| Issue row | `rule_id` + chevron; expanded: message, profile label, bullet lists from `detail` |
+| Issue row | Human-readable rule label + chevron; expanded: message, profile label, bullet lists from `detail` |
 | Card link | Text button **Show in deck** — wireframe shows affordance only (no scroll in HTML mock) |
 | Position | Below Summary `<details>`, above Filter chip rows |
 | Footer | Same as UX7f — Build another, Delete, Library, Home |

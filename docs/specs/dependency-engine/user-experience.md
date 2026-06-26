@@ -540,6 +540,7 @@ Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7f wir
 - **Issue list** from `dependency_report.issues[]` — expandable rows with `rule_id`, `status`, `message`, optional `card_name` / `card_oracle_id`, `profile_id`, `detail`.
 - **Card attribution** — when `card_oracle_id` is set, **Show in deck** scrolls to the matching card row and applies a brief highlight (read-only; does not change filters permanently).
 - **Human-readable profile labels** — reuse wizard step 3 prompt labels (`WIZARD_FOCUS_PROMPT_LABELS` / `GET /api/v1/wizard/synergy` `prompt_label`) with fallback to title-cased `profile_id`.
+- **Human-readable rule labels** — issue row headers map `rule_id` to friendly copy (e.g. `EQUIPMENT_BALANCE` → “Equipment balance”) via `RULE_LABELS` in `dependency-report.ts`, with title-cased fallback for unknown rules.
 - **Data source** — client render from deck JSON already in session cache or library payload; **no new HTTP endpoints**.
 
 **Out of scope (UX7d):** repair / regen (`--repair-dependencies`, D5); profile package swap; card swap / lock (**UX11**); CMC charts (**UX10**); JSON download; re-validation on demand; duplicating dependency rules in TypeScript; new analyze API.

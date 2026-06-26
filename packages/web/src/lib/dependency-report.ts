@@ -1,3 +1,27 @@
+/** Dependency rule labels — keep in sync with `shipped-inventory.md` validation rules table. */
+export const RULE_LABELS: Record<string, string> = {
+  TUTOR_TARGET_EXISTS: "Tutor target",
+  ENERGY_BALANCE: "Energy balance",
+  EXPERIENCE_BALANCE: "Experience balance",
+  BLOOD_BALANCE: "Blood balance",
+  RAD_BALANCE: "Rad balance",
+  OIL_BALANCE: "Oil balance",
+  CHARGE_BALANCE: "Charge balance",
+  PLUS_ONE_BALANCE: "+1/+1 balance",
+  SACRIFICE_BALANCE: "Sacrifice balance",
+  TOKEN_BALANCE: "Token balance",
+  TOKEN_SUBTYPE_BUFF_SUPPORT: "Token subtype buff",
+  VEHICLE_BALANCE: "Vehicle balance",
+  EQUIPMENT_BALANCE: "Equipment balance",
+  TYPE_SYNERGY_MIN: "Subtype synergy",
+  AURA_SUPPORT_MIN: "Aura support",
+  ENCHANTMENT_SUPPORT_MIN: "Enchantment support",
+  REANIMATION_SUPPORT: "Reanimation support",
+  GRAVEYARD_COST_SUPPORT: "Graveyard cost support",
+  SELF_MILL_BALANCE: "Self-mill balance",
+  LANDFALL_BALANCE: "Landfall balance",
+};
+
 /** Wizard step-3 profile labels — keep in sync with `WIZARD_FOCUS_PROMPT_LABELS` (Python). */
 export const PROFILE_PROMPT_LABELS: Record<string, string> = {
   energy: "Energy focus",
@@ -29,6 +53,7 @@ export interface DependencyProfileRow {
 
 export interface DependencyIssueRow {
   rule_id: string;
+  rule_label: string;
   status: DependencyStatus;
   message: string;
   card_name: string | null;
@@ -103,6 +128,17 @@ export function profileLabel(profileId: string): string {
     profileId
       .split("_")
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ")
+  );
+}
+
+export function ruleLabel(ruleId: string): string {
+  if (!ruleId) return "Unknown rule";
+  return (
+    RULE_LABELS[ruleId] ??
+    ruleId
+      .split("_")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
       .join(" ")
   );
 }
@@ -211,6 +247,7 @@ function parseIssue(entry: unknown): DependencyIssueRow | null {
   const profileId = asString(row.profile_id) || null;
   return {
     rule_id: ruleId,
+    rule_label: ruleLabel(ruleId),
     status,
     message,
     card_name: asString(row.card_name) || null,
