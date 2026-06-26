@@ -10,6 +10,7 @@ from pathlib import Path
 
 from mtg_deck_tools import __version__
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
+from mtg_deck_tools.builder.deck_metrics import compute_deck_metrics, render_deck_metrics_section
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
 from mtg_deck_tools.builder.mana_symbols import format_mana_notation
 from mtg_deck_tools.formatting import (
@@ -82,15 +83,6 @@ def _mana_base_dict(plan: ManaBasePlan | None) -> dict | None:
 def _slugify(name: str) -> str:
     slug = name.lower().replace(" ", "-")
     return "".join(ch if ch.isalnum() or ch == "-" else "" for ch in slug)[:40]
-
-
-def _avg_cmc_nonland(cards: list[DeckCard]) -> float | None:
-    nonlands = [c for c in cards if "Land" not in c.type_line]
-    if not nonlands:
-        return None
-    total = sum(c.cmc * c.quantity for c in nonlands)
-    count = sum(c.quantity for c in nonlands)
-    return round(total / count, 2) if count else None
 
 
 def format_generated_timestamp(when: datetime) -> str:
@@ -382,7 +374,7 @@ def build_deck_document(
     """Build a .deck.json-shaped document from build results."""
     generated_at = generated_at or datetime.now(UTC)
     generated_at_iso = generated_at.isoformat()
-    avg_cmc = _avg_cmc_nonland(maindeck.cards)
+    deck_metrics = compute_deck_metrics(maindeck.cards, mana_base=maindeck.mana_base)
     estimated = estimated_deck_price(maindeck, commanders)
     unpriced_by_class = _unpriced_classifications(maindeck.cards)
     return {
@@ -399,7 +391,7 @@ def build_deck_document(
             "unpriced_card_count": len(maindeck.unpriced_names),
             "unpriced_card_names": maindeck.unpriced_names,
             "unpriced_by_classification": unpriced_by_class,
-            "avg_cmc_nonland": avg_cmc,
+            **deck_metrics,
         },
         "mana_base": _mana_base_dict(maindeck.mana_base),
         "validation": _validation_dict(maindeck.validation),
@@ -533,6 +525,9 @@ def write_deck_outputs(
             pip_line = ", ".join(f"{c}:{n}" for c, n in sorted(mb.pip_weights.items()))
             lines.append(f"- **Pip weights:** {pip_line}")
         lines.append("")
+
+    deck_metrics = compute_deck_metrics(maindeck.cards, mana_base=maindeck.mana_base)
+    lines.extend(render_deck_metrics_section(deck_metrics))
 
     by_slot: dict[str, list[DeckCard]] = defaultdict(list)
     for card in maindeck.cards:

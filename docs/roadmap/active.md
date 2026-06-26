@@ -22,10 +22,11 @@
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
+| **UX10** | web-ui | Deck composition metrics — **UX10a** CLI report in `.deck.json` + Markdown | In progress | UX7e (shipped), UX11 (shipped) | ENG-MAINT if engine untouched |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | doc-only, dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
-**Not active:** cli-engine expansion rows (P7 remainder, new profiles). **UX10** remains in [backlog/web-ui.md](backlog/web-ui.md) until promoted.
+**Not active:** cli-engine expansion rows (P7 remainder, new profiles). **UX10b** (web charts) follows UX10a.
 
 ---
 

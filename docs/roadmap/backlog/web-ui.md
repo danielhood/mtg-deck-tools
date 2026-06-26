@@ -25,15 +25,13 @@ Ship dates and PR notes: [changelog.md](../../history/changelog.md).
 
 ## Up next
 
-Promote to [active.md](../active.md) before implementation.
-
 | Order | ID | Topic | Notes | Depends on |
 | --- | --- | --- | --- | --- |
-| 1 | **UX10** | Deck composition metrics UI | CMC charts; may overlap enhanced deck view | UX7e+ (shipped), [deck-output-format.md](../../product/deck-output-format.md) |
+| 1 | **UX10b** | Deck metrics charts (web) | Interactive CMC bars on `/deck/:id` | UX10a (in progress) |
+
+**Active:** **UX10** deck composition metrics — [active.md](../active.md). **UX10a** (CLI Markdown + `.deck.json`) in progress; **UX10b** (web charts) follows.
 
 **Shipped:** **UX11** GUI deck editor — spec [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX11 · API [iterate-api.md](../../specs/web/iterate-api.md).
-
-**Parallel:** UX10 and UX11 may run in parallel; UX11 is the current primary thread.
 
 ---
 

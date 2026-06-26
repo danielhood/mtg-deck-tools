@@ -96,7 +96,13 @@ For reload, modification, image lookup, and future UI versions. Versioned schema
     "estimated_price_usd": 142.30,
     "unpriced_card_count": 3,
     "unpriced_card_names": ["..."],
-    "avg_cmc_nonland": 3.2
+    "avg_cmc_nonland": 3.2,
+    "avg_creature_cmc": 2.8,
+    "land_count": 36,
+    "ramp_count": 10,
+    "cmc_histogram": {"0": 2, "1": 8, "2": 12, "3": 10, "4": 8, "5": 6, "6": 4, "7": 2, "7+": 1},
+    "creature_cmc_histogram": {"1": 4, "2": 10, "3": 8, "4": 4, "5": 2},
+    "type_counts": {"Creature": 28, "Instant": 8, "Land": 36, "Artifact": 6}
   }
 }
 ```
@@ -221,9 +227,9 @@ Companion list for acquisition — not counted in the 100-card Commander deck.
 
 Tracked in backlog: [active.md](../roadmap/active.md).
 
-### Deck composition metrics (planned — UX10)
+### Deck composition metrics (UX10 — in progress)
 
-**Status:** **Shipped (UX11, 2026-06-26).** Partial web shell (**UX7a–UX7f shipped**); lock/swap UI on deck view edit mode. Today the builder uses **average nonland CMC** for land-count heuristics (`mana_base.py`) and **per-slot target CMC** while scoring picks (`scorer.py`); output may show `avg_cmc_nonland` in stats. There is **no** deck-wide check or report for moment-to-moment curve health (see **UX10**).
+**Status:** **UX10a in progress** (2026-06-26). **UX10b** (web charts) backlog. Partial web shell (**UX7a–UX7f shipped**); lock/swap UI on deck view edit mode (**UX11**). Today the builder uses **average nonland CMC** for land-count heuristics (`mana_base.py`) and **per-slot target CMC** while scoring picks (`scorer.py`). **UX10a** adds post-build distribution metrics to Markdown and `.deck.json` `stats`.
 
 **Goal:** After a successful build, give the user **actionable composition metrics** — starting with **mana curve / CMC distribution** — in Markdown and `.deck.json`, and eventually in a richer UI (UX7). Metrics are **informational** by default; optional **advisory warnings** (e.g. “few cards at CMC 2–3”, “creature curve top-heavy”) are separate from legality and from dependency `fail` rules unless the user opts into strict curve hints later.
 
