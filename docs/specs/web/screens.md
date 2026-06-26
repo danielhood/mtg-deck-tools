@@ -189,14 +189,15 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Summary panel | Always visible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
 | Analysis | Collapsible **Dependencies** panel — profile summaries, expandable issues, **Show in deck** — see § Dependency dashboard |
 | Filters | Chip groups: **Slot** (multi), **Type** (multi), **Color** (multi); AND across groups; empty state when filter matches nothing |
-| Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters |
+| Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters — **UX11** adds lock pin + edit-mode selection |
 | Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
 | MD preview | **Removed in UX7f** — deck view renders from JSON only; markdown is CLI/export derivative |
 | Footer | **Build another deck** → `/build/1`; **Delete deck** (destructive) → confirm modal; bottom row: **Library** → `/library` + **Home** → `/` |
+| Edit mode (**UX11**) | **Edit deck** in header → selection checkboxes + slot **Regenerate**; see § Deck editor |
 
-**Deferred on this screen:** swap / lock (**UX11**); JSON download; CMC charts (**UX10**); regen / refill (**UX11**).
+**Deferred on this screen:** JSON download; CMC charts (**UX10**).
 
-**API:** **UX7f:** `GET /api/v1/decks/{id}` on cache miss; primary render from JSON `deck` in session cache after load or generate. Shape: [deck-output-format.md](../../product/deck-output-format.md).
+**API:** **UX7f:** `GET /api/v1/decks/{id}` on cache miss; primary render from JSON `deck` in session cache after load or generate. **UX11:** [iterate-api.md](iterate-api.md). Shape: [deck-output-format.md](../../product/deck-output-format.md).
 
 ---
 
@@ -220,7 +221,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 
 **API:** `GET /api/v1/decks`, `PATCH /api/v1/decks/{id}`, `DELETE /api/v1/decks/{id}`.
 
-**Deferred:** folders; import; JSON download; save-as / clone; regen (**UX11**).
+**Deferred:** folders; import; JSON download; save-as / clone.
 
 ---
 
@@ -244,9 +245,33 @@ Not a separate route — inline panel on the enhanced deck view.
 | Missing report | Muted *No dependency report in this deck.* — no profile/issue UI |
 | Footer | Unchanged — Build another / Delete / Library / Home |
 
-**Deferred:** repair pass; profile package swap; re-run validation; CMC charts (**UX10**); swap/lock (**UX11**).
+**Deferred:** repair pass; profile package swap; re-run validation; CMC charts (**UX10**).
 
 **API:** None — render from `deck.dependency_report` in session cache / library JSON. Shape: [deck-output-format.md](../../product/deck-output-format.md).
+
+---
+
+## Deck editor (`/deck/:id` edit mode) — UX11
+
+**Status:** Planning locked (2026-06-26). Not separate route — extends enhanced deck view. Decisions: [user-experience.md](../dependency-engine/user-experience.md) § UX11. API: [iterate-api.md](iterate-api.md).
+
+**Wireframe:** [deck-view-edit-mode.html](wireframes/deck-view-edit-mode.html) (lock + slot regen) · [deck-view-edit-select.html](wireframes/deck-view-edit-select.html) (selection + swap bar) · [deck-view-edit-swap-result.html](wireframes/deck-view-edit-swap-result.html) (post-swap diff)
+
+| Region | Behavior |
+| --- | --- |
+| Entry | **Edit deck** text button in deck label row (beside rename) — toggles edit mode |
+| Exit edit | **Done** or cancel — clears selection; view mode unchanged |
+| Lock pin | On every maindeck row — tap toggles `locked`; immediate `PATCH` with updated deck JSON |
+| Locked row | Pin filled + subtle row background; **not selectable** for swap (checkbox disabled) |
+| Slot regen | Slot heading row includes **Regenerate** — confirm modal → `POST …/refill-slot`; loading state on slot group |
+| Selection | Edit mode: checkbox at row start; commander rows not selectable |
+| Swap bar | Sticky bar above footer when ≥1 card selected — **Swap (N)** primary + **Clear** |
+| Post-swap | Inline banner listing old → new per `swaps[]`; scroll to first changed row |
+| Errors | Inline error on failed PATCH/refill/swap; preserve edit mode |
+| Dependencies | Panel refreshes from returned `deck.dependency_report` after refill/swap |
+| Footer | Unchanged — Build another / Delete / Library / Home (disabled during in-flight API) |
+
+**Out of scope:** commander swap; full-deck regen; repair pass; seed UI (UX11e).
 
 ---
 

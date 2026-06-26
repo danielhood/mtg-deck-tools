@@ -1,6 +1,6 @@
 # Web UI — navigation patterns
 
-**Status:** **UX7 MVP shipped** (UX7c + **UX7e** + **UX7f** + **UX7d**).
+**Status:** **UX7 MVP shipped** (UX7c + **UX7e** + **UX7f** + **UX7d**). **UX11** iterate patterns planned — [navigation.md](navigation.md) § Deck view — iterate.
 
 How users move between routes. Route map: [routes.md](routes.md). Screen details: [screens.md](screens.md).
 
@@ -78,7 +78,23 @@ Applies to `/deck/:id`.
 
 `returnTo` is stored in session cache (`mtg-deck-cache-{id}`) when navigating from home, library, or generate. It is used for **delete** redirect, not for a single context-sensitive Back label.
 
-**Deferred:** swap, slot regen — **UX11**; regen via `from-deck` — **UX11**.
+**Iterate (UX11):** see § Deck view — iterate below.
+
+---
+
+## Deck view — iterate (**UX11**)
+
+Applies to `/deck/:id` edit mode. API: [iterate-api.md](iterate-api.md).
+
+| Pattern | Rule |
+| --- | --- |
+| Enter edit | **Edit deck** in label row |
+| Lock toggle | Available in view and edit mode — `PATCH` deck body |
+| Slot regen | **Regenerate** on slot heading — confirm → stay on deck view |
+| Swap | Select rows → **Swap (N)** → inline diff → stay on deck view |
+| Cancel selection | **Clear** on swap bar or exit edit mode |
+| Loading | Disable iterate controls + footer actions while API in flight |
+| Cache | Update `mtg-deck-cache-{id}` after every successful PATCH/refill/swap |
 
 ---
 
@@ -95,9 +111,12 @@ Applies to `/library` (**UX7f**).
 | Delete | **Deck view only** — footer **Delete deck** → confirm modal; `DELETE /api/v1/decks/{id}` → redirect `/` (not on library grid) |
 | Search / sort | Client or query params on `GET /api/v1/decks` |
 
+**Deferred:** folders; import; JSON download; save-as / clone.
+
 ---
 
 ## References
 
 - [routes.md](routes.md) — path map
 - [user-experience.md](../dependency-engine/user-experience.md) § UX7c — scope and wizard decisions
+- [iterate-api.md](iterate-api.md) — UX11 iterate HTTP API

@@ -33,6 +33,7 @@ Summary:
 | [navigation.md](navigation.md) | Next/Back, review, home flows |
 | [wizard-api.md](wizard-api.md) | Wizard HTTP endpoints; screen → API index |
 | [library-api.md](library-api.md) | **UX7f shipped** — saved deck library HTTP API |
+| [iterate-api.md](iterate-api.md) | **UX11 planning** — deck editor iterate API |
 | [design.md](design.md) | Visual design tokens |
 | [wireframes/README.md](wireframes/README.md) | Layout mock and review process (HTML wireframes) |
 | [openapi.yaml](openapi.yaml) | **Shipped** — health, stats, import, generate, library |
@@ -44,7 +45,7 @@ Reuse existing product specs — do not fork schemas in the frontend:
 
 - [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json`, metrics, lock/swap fields (UX11)
 - [user-experience.md](../dependency-engine/user-experience.md) — wizard flow, UX7c scope, UX roadmap
-- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — post-MVP delivery (**UX10**, **UX11**); **UX7g** (server bootstrap + web import UI) shipped
+- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — **UX10** backlog; **UX11** active in [active.md](../../roadmap/active.md)
 
 ## Locked v1 decisions
 

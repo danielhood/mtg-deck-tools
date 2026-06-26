@@ -40,7 +40,12 @@ Service facades live in `src/mtg_deck_tools/service/`; handlers in `src/mtg_deck
 | `/library` | `PATCH /api/v1/decks/{id}` (rename — invoked from deck view only) |
 | `/library` | `DELETE /api/v1/decks/{id}` |
 | `/deck/:id` | `DELETE /api/v1/decks/{id}` (delete from deck view footer only) |
+| `/deck/:id` | `PATCH /api/v1/decks/{id}` (rename; **UX11** lock via deck body) |
+| `/deck/:id` | `POST /api/v1/decks/{id}/refill-slot` (**UX11**) |
+| `/deck/:id` | `POST /api/v1/decks/{id}/swap` (**UX11**) |
 | `/deck/:id` | `GET /api/v1/decks/{id}` on cache miss; session cache on load |
+
+Iterate detail: [iterate-api.md](iterate-api.md).
 
 **DB gate:** All library and deck routes require `db_ready`; when the database is missing, library endpoints return `404` / blocked state consistent with wizard routes.
 
@@ -52,7 +57,7 @@ Service facades live in `src/mtg_deck_tools/service/`; handlers in `src/mtg_deck
 | --- | --- | --- |
 | GET | `/api/v1/decks` | List saved decks — summary rows for library grid |
 | GET | `/api/v1/decks/{id}` | Fetch full persisted deck JSON by id |
-| PATCH | `/api/v1/decks/{id}` | Update metadata (rename `name`); future in-place deck body updates |
+| PATCH | `/api/v1/decks/{id}` | Update metadata (rename `name`); **UX11** — in-place `deck` body (lock toggles) |
 | DELETE | `/api/v1/decks/{id}` | Remove from library |
 | POST | `/api/v1/generate` | **Existing** — extended to auto-save new deck (new UUID) and return `id` + `deck` |
 
@@ -100,10 +105,11 @@ Response: `{ "id": "…", "name": "…", "saved_at": "…", "deck": { … } }` w
 
 | Topic | Phase |
 | --- | --- |
-| `POST /api/v1/generate/from-deck` wiring from library UI | **UX11** |
 | JSON file download | Post-UX7f |
 | Import uploaded `.deck.json` | Post-UX7f |
 | Save-as / clone / duplicate | Post-UX7f |
+
+Iterate endpoints (`refill-slot`, `swap`): [iterate-api.md](iterate-api.md) — **UX11**.
 
 ---
 
