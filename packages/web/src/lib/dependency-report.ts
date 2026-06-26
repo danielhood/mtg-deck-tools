@@ -270,10 +270,44 @@ function profileCardTotal(counts: Record<string, number>): number {
   return Object.values(counts).reduce((sum, count) => sum + count, 0);
 }
 
-/** Hide pass profiles with no counted cards — inactive criteria are noise in the dashboard. */
+/**
+ * Count keys that indicate a profile is materially present in the deck.
+ * Ancillary stats (e.g. carrier_creature on equipment, land_ramp without landfall payoffs)
+ * must not keep an otherwise inactive profile visible.
+ */
+const PROFILE_RELEVANCE_KEYS: Record<string, readonly string[]> = {
+  energy: ["producer", "consumer"],
+  sacrifice: ["outlet", "payoff", "opponent_sacrifice", "death_recursion"],
+  tokens: ["producer", "payoff"],
+  tokens_subtype: ["produce_subtypes", "buff_subtypes"],
+  vehicles: ["vehicle"],
+  equipment: ["equipment", "equip_payoff"],
+  aura_support: ["aura_spell"],
+  enchantments: ["enchantment_spell"],
+  graveyard_reanimation: ["reanimate"],
+  graveyard_cost: ["graveyard_cost"],
+  graveyard_self_mill: ["mill_enabler", "graveyard_payoff"],
+  landfall: ["landfall_payoff"],
+  experience: ["producer", "consumer"],
+  blood: ["producer", "consumer"],
+  plus_one: ["producer", "consumer"],
+  rad: ["producer", "consumer"],
+  oil: ["producer", "consumer"],
+  charge: ["producer", "consumer"],
+};
+
+function profileHasRelevantCounts(profile: DependencyProfileRow): boolean {
+  const keys = PROFILE_RELEVANCE_KEYS[profile.profile_id];
+  if (keys?.length) {
+    return keys.some((key) => (profile.counts[key] ?? 0) > 0);
+  }
+  return profileCardTotal(profile.counts) > 0;
+}
+
+/** Hide pass profiles with no relevant cards — inactive criteria are noise in the dashboard. */
 export function shouldDisplayProfile(profile: DependencyProfileRow): boolean {
   if (profile.status !== "pass") return true;
-  return profileCardTotal(profile.counts) > 0;
+  return profileHasRelevantCounts(profile);
 }
 
 function parseIssue(entry: unknown): DependencyIssueRow | null {

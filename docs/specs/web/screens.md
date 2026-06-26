@@ -127,6 +127,7 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 | Control | UX7c |
 | --- | --- |
 | Search | Search-as-you-type |
+| Commander price | Min/max USD steppers below search — min defaults from budget step per-card minimum when set; max optional; overrides apply to commander search only |
 | Color match | Toggle: **`exact`** (default, left) vs **`includes`** |
 | Commander art | Scryfall `image_uri` for the selected result, shown below the search list; tap opens full-size pop-out — close control above the card (clear of mana-cost region); dismiss via close, backdrop, or Escape |
 | Selection | Required — highlighted result row is the pick indicator (no separate summary panel) |
@@ -189,7 +190,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Summary panel | Always visible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
 | Deck metrics (**UX10b**) | Collapsible **Deck metrics** panel — CMC bar chart from `stats.cmc_histogram`; toggle **All nonlands** / **Creatures only**; curve blurb + summary (lands, ramp, avg CMC); client fallback when older decks lack `stats` fields |
 | Analysis | Collapsible **Dependencies** panel — profile summaries, expandable issues, **Show in deck** — see § Dependency dashboard |
-| Filters | Chip groups: **Slot** (multi), **Type** (multi), **Color** (multi — only WUBRG/void pips present in the deck); AND across groups; empty state when filter matches nothing |
+| Filters | Chip groups: **Slot** (multi), **Type** (multi — Creature, Vehicle, Equipment, Instant, …), **Color** (multi — only WUBRG/void pips present in the deck); AND across groups; empty state when filter matches nothing |
 | Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters — **UX11** adds lock pin + edit-mode selection |
 | Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
 | MD preview | **Removed in UX7f** — deck view renders from JSON only; markdown is CLI/export derivative |
@@ -239,7 +240,7 @@ Not a separate route — inline panel on the enhanced deck view.
 | Panel | `<details>` **Dependencies** — below Summary, above Filters |
 | Closed summary | **Looks good** when `dependency_report.passed` or no warn/fail issues; else **N areas to review** (count of warn + fail issues) |
 | Default open | **Open** when any warn/fail issue; **closed** when passed |
-| Profile summaries | One row per `dependency_report.profiles[]` entry — label (wizard prompt), status badge, `counts` chips, optional `messages` |
+| Profile summaries | One row per relevant `dependency_report.profiles[]` entry — hide `pass` profiles with no mechanic-specific cards (e.g. equipment without equipment/equip-payoff, landfall without landfall payoffs); label, status badge, `counts` chips, optional `messages` |
 | Profile sort | fail → warn → pass; then label A–Z |
 | Issues | Expandable rows for each warn/fail issue — human-readable rule label, message, profile label, `detail` lists |
 | Card link | **Show in deck** when `card_oracle_id` set — scroll + brief highlight on card row |

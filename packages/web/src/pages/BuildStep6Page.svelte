@@ -2,6 +2,7 @@
   import CardLightbox from "../components/CardLightbox.svelte";
   import ErrorState from "../components/ErrorState.svelte";
   import LoadingState from "../components/LoadingState.svelte";
+  import PriceStepperRow from "../components/PriceStepperRow.svelte";
   import WizardChrome from "../components/WizardChrome.svelte";
   import WizardIntro from "../components/WizardIntro.svelte";
   import SectionHeader from "../components/SectionHeader.svelte";
@@ -14,12 +15,22 @@
   } from "../lib/commander-step";
   import {
     commanderSearchColors,
+    commanderSearchPriceBounds,
     loadDraft,
     saveDraft,
+    seedCommanderPricesIfNeeded,
     toDeckCriteria,
     type WizardDraft,
   } from "../lib/criteria";
   import { formatColorListLabel, formatPrice, pipMiniClass, sortColors } from "../lib/format";
+  import {
+    formatAmount,
+    MAX_CARD_STEP,
+    MIN_CARD_STEP,
+    parseOptionalMoney,
+    sanitizeMoneyEntry,
+    stepOptional,
+  } from "../lib/money";
 
   interface Props {
     meta: WizardMeta;
@@ -27,8 +38,10 @@
 
   let { meta }: Props = $props();
 
-  let draft = $state<WizardDraft>(loadDraft());
+  let draft = $state(seedCommanderPricesIfNeeded(loadDraft()));
   let query = $state(restoreCommanderQuery(draft));
+  let minText = $state(formatAmount(draft.commander_price_min_usd));
+  let maxText = $state(formatAmount(draft.commander_price_max_usd));
   let results = $state<CommanderResult[]>([]);
   let selected = $state<CommanderResult | null>(restoreCommanderSelection(draft));
   let showArt = $state(false);
@@ -49,6 +62,76 @@
     saveDraft(draft);
   });
 
+  const minParsed = $derived(parseOptionalMoney(minText));
+  const maxParsed = $derived(parseOptionalMoney(maxText));
+  const rangeInvalid = $derived(
+    minParsed.valid &&
+      maxParsed.valid &&
+      minParsed.value !== null &&
+      maxParsed.value !== null &&
+      minParsed.value > maxParsed.value,
+  );
+  const minFieldInvalid = $derived(!minParsed.valid || rangeInvalid);
+  const maxFieldInvalid = $derived(!maxParsed.valid || rangeInvalid);
+
+  function handleOptionalInput(raw: string, field: "min" | "max"): void {
+    const sanitized = sanitizeMoneyEntry(raw);
+    if (field === "min") minText = sanitized;
+    else maxText = sanitized;
+    const parsed = parseOptionalMoney(sanitized);
+    if (!parsed.valid) return;
+    if (field === "min") {
+      draft = { ...draft, commander_price_min_usd: parsed.value };
+    } else {
+      draft = { ...draft, commander_price_max_usd: parsed.value };
+    }
+  }
+
+  function commitOptionalInput(field: "min" | "max"): void {
+    const text = field === "min" ? minText : maxText;
+    const parsed = parseOptionalMoney(text, { strict: true });
+    if (!parsed.valid) {
+      if (field === "min") {
+        minText = "";
+        draft = { ...draft, commander_price_min_usd: null };
+      } else {
+        maxText = "";
+        draft = { ...draft, commander_price_max_usd: null };
+      }
+      return;
+    }
+    const formatted = formatAmount(parsed.value);
+    if (field === "min") {
+      minText = formatted;
+      draft = { ...draft, commander_price_min_usd: parsed.value };
+    } else {
+      maxText = formatted;
+      draft = { ...draft, commander_price_max_usd: parsed.value };
+    }
+  }
+
+  function clearOptional(field: "min" | "max"): void {
+    if (field === "min") {
+      minText = "";
+      draft = { ...draft, commander_price_min_usd: null };
+    } else {
+      maxText = "";
+      draft = { ...draft, commander_price_max_usd: null };
+    }
+  }
+
+  function stepMin(direction: "more" | "less"): void {
+    const next = stepOptional(minParsed.valid ? minParsed.value : null, MIN_CARD_STEP, direction);
+    minText = formatAmount(next);
+    draft = { ...draft, commander_price_min_usd: next };
+  }
+
+  function stepMax(direction: "more" | "less"): void {
+    const next = stepOptional(maxParsed.valid ? maxParsed.value : null, MAX_CARD_STEP, direction);
+    maxText = formatAmount(next);
+    draft = { ...draft, commander_price_max_usd: next };
+  }
+
   $effect(() => {
     if (!meta.db_ready) return;
     const { colors, color_match } = commanderSearchColors(draft);
@@ -57,12 +140,13 @@
     for (const color of colors) params.append("colors", color);
     params.set("color_match", color_match);
     const criteria = toDeckCriteria(draft);
+    const commanderPrices = commanderSearchPriceBounds(draft);
     if (criteria.budget_usd != null) params.set("budget_usd", String(criteria.budget_usd));
-    if (criteria.card_price_min_usd != null) {
-      params.set("card_price_min_usd", String(criteria.card_price_min_usd));
+    if (commanderPrices.card_price_min_usd != null) {
+      params.set("card_price_min_usd", String(commanderPrices.card_price_min_usd));
     }
-    if (criteria.card_price_max_usd != null) {
-      params.set("card_price_max_usd", String(criteria.card_price_max_usd));
+    if (commanderPrices.card_price_max_usd != null) {
+      params.set("card_price_max_usd", String(commanderPrices.card_price_max_usd));
     }
     if (criteria.strict_budget) params.set("strict_budget", "true");
 
@@ -119,7 +203,7 @@
     };
   }
 
-  const nextDisabled = $derived(!draft.commander_oracle_ids.length);
+  const nextDisabled = $derived(!draft.commander_oracle_ids.length || rangeInvalid);
 
   const filterPips = $derived.by(() => {
     if (draft.colorFilter === "colorless") return { kind: "colorless" as const, colors: [] as string[] };
@@ -220,6 +304,48 @@
       </div>
     </div>
 
+    <div class="commander-price-panel" aria-label="Commander price range">
+      <p class="commander-price-lead">
+        Filter by commander price. Minimum defaults from the budget step per-card minimum when set.
+      </p>
+      <div class="price-stepper-list">
+        <PriceStepperRow
+          label="Maximum commander price"
+          inputId="commander-price-max-input"
+          text={maxText}
+          placeholder="None"
+          stepHint="$5 per tap."
+          showClear
+          invalid={maxFieldInvalid}
+          lessDisabled={maxParsed.value === null}
+          ontextinput={(raw) => handleOptionalInput(raw, "max")}
+          onblur={() => commitOptionalInput("max")}
+          onless={() => stepMax("less")}
+          onmore={() => stepMax("more")}
+          onclear={() => clearOptional("max")}
+        />
+        <PriceStepperRow
+          label="Minimum commander price"
+          inputId="commander-price-min-input"
+          text={minText}
+          placeholder="None"
+          stepHint="$1 per tap."
+          showClear
+          invalid={minFieldInvalid}
+          lessDisabled={minParsed.value === null}
+          ontextinput={(raw) => handleOptionalInput(raw, "min")}
+          onblur={() => commitOptionalInput("min")}
+          onless={() => stepMin("less")}
+          onmore={() => stepMin("more")}
+          onclear={() => clearOptional("min")}
+        />
+      </div>
+      <p class="range-warning" class:is-visible={rangeInvalid} role="alert">
+        Minimum exceeds maximum — adjust before continuing.
+      </p>
+      <span class="field-hint">Leave blank for no limit.</span>
+    </div>
+
     {#if searchError}
       <ErrorState message={searchError} />
     {:else if searchLoading && !results.length}
@@ -262,6 +388,20 @@
 />
 
 <style>
+  .commander-price-panel {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .commander-price-lead {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
   .art-preview {
     border: none;
     background: none;
