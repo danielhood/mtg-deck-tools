@@ -36,7 +36,7 @@ Promote to [active.md](../active.md) before implementation.
 
 ---
 
-## Infrastructure backlog
+## Infrastructure (shipped — UX7g)
 
 ### UX7g — Database init / refresh
 

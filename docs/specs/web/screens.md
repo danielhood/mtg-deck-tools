@@ -89,10 +89,10 @@ CLI: [step3.py](../../../src/mtg_deck_tools/wizard/step3.py) (wizard step 4 of 7
 | --- | --- |
 | Color identity | W/U/B/R/G multi-select — fixed **52px slot** per pip; unselected inner ring ~34px; selected fills slot (same outer radius for all colours); gold fill for White when selected; **no outer box-shadow ring** |
 | Colorless (void) | **Separate control** below pips — colorless-only commanders; **mutually exclusive** with colored picks (no legendary combines empty identity with W/U/B/R/G) |
-| Any | No colored pips and Colorless off — no color filter (distinct from Colorless only — **engine TBD**) |
+| Any | No colored pips and Colorless off — no color filter (distinct from Colorless only) |
 | Selection summary | Read-only recap below controls |
 
-**Design note (engine):** Explicit Colorless at step 4 requires `DeckCriteria` / commander search to distinguish **Colorless only** (`color_identity: []`) from **Any** (no filter). Today `colors: []` behaves as colorless-only under `exact` match and unfiltered under `includes` ([`commanders.search_commanders`](../../../src/mtg_deck_tools/wizard/commanders.py), [`test_wizard_commanders.py`](../../../tests/test_wizard_commanders.py)) — resolve before UX7c implementation (e.g. `colorless_only` flag or color-filter enum).
+**Implementation:** Wizard draft uses `colorFilter`: `colorless` | `any` | `selected` (`packages/web/src/lib/criteria.ts`). Colorless sends `colors: []` with `color_match: exact`; Any sends `colors: []` with `color_match: includes`; selected colors use the step 6 toggle.
 
 **API:** None required (static UI); validation via preflight on review.
 
@@ -127,12 +127,12 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 | Control | UX7c |
 | --- | --- |
 | Search | Search-as-you-type |
-| Color match | Toggle: **`includes`** (default) vs **`exact`** |
+| Color match | Toggle: **`exact`** (default, left) vs **`includes`** |
 | Commander art | Scryfall `image_uri` for the selected result, shown below the search list; tap opens full-size pop-out — close control above the card (clear of mana-cost region); dismiss via close, backdrop, or Escape |
 | Selection | Required — highlighted result row is the pick indicator (no separate summary panel) |
 | Partner commanders | **Out of scope** UX7c. Step 1 commander slot row is a **future** hook for single vs partner mode; step 6 remains the commander pick surface until then |
 
-**API:** `GET /api/v1/wizard/commanders/search?q=&colors=&color_match=includes|exact&…` — budget filters from criteria query params.
+**API:** `GET /api/v1/wizard/commanders/search?q=&colors=&color_match=includes|exact&…` — SPA default **`exact`**; API query default is `includes` when the param is omitted.
 
 ---
 

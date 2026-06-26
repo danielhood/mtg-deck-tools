@@ -2,7 +2,7 @@
 
 **Single register** of work selected for immediate delivery. Parked work: [backlog/](backlog/). Shipped record: [changelog.md](../history/changelog.md) · [milestones.md](../history/milestones.md).
 
-*Last updated: 2026-06-25.*
+*Last updated: 2026-06-25 (docs sync — UX7g-b shipped).*
 
 ---
 
@@ -13,7 +13,7 @@
 | **ENG-MAINT** | Engine profile tuning | As needed when touching dependency rules or dogfood matrix |
 | **GATE** | Dogfood gate | Required after any engine change |
 
-**Primary thread:** None selected — **UX7 MVP complete** (UX7a–UX7d shipped). Promote next web work from [backlog/web-ui.md](backlog/web-ui.md) (**UX10**, **UX11**, or **UX7g-b**).
+**Primary thread:** None selected — **UX7 MVP complete** (UX7a–UX7d + **UX7g** shipped). Promote next web work from [backlog/web-ui.md](backlog/web-ui.md) (**UX10** or **UX11**).
 
 ---
 
@@ -40,8 +40,9 @@ UX7 is the cross-platform web shell. All sub-phases **UX7a–UX7d** are **shippe
 | UX7e | Enhanced deck view | Shipped |
 | UX7f | Saved deck library | Shipped |
 | UX7d | Dependency dashboard | Shipped |
+| UX7g | Database init / refresh (server bootstrap + web import UI) | Shipped |
 
-Post-MVP web work (UX10, UX11, UX7g-b): [backlog/web-ui.md](backlog/web-ui.md). Server DB bootstrap (UX7g-a) shipped with `serve` / Docker.
+Post-MVP web work (**UX10**, **UX11**): [backlog/web-ui.md](backlog/web-ui.md).
 
 ---
 
@@ -56,12 +57,12 @@ flowchart LR
     UX7e[UX7e deck view]
     UX7f[UX7f library]
     UX7d[UX7d dashboard]
+    UX7g[UX7g DB import]
   end
 
   subgraph backlog["Backlog"]
     UX10[UX10 metrics]
     UX11[UX11 editor]
-    UX7g[UX7g-b web import UI]
   end
 
   CORE[cli-engine core]

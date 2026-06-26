@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-25):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7d shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library + dependency dashboard). Post-MVP web: **UX10**, **UX11** — [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
+**Status (2026-06-25):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7d + UX7g shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library + dependency dashboard + web DB import). Post-MVP web: **UX10**, **UX11** — [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -388,14 +388,14 @@ Engine requirements for swaps:
 - Server-side wizard helpers ([wizard-api.md](../web/wizard-api.md)); SPA holds `DeckCriteria` draft only (`sessionStorage` key `mtg-wizard-draft`).
 - Random **seed** at generate; stored in `deck.criteria.seed` when auto-saved to library (**UX7f**).
 
-**Out of scope (UX7c):** partner commander picker; custom slot editor; JSON download; enhanced deck view; saved decks; iterate; dependency dashboard; charts; dark mode; in-browser DB import UI (**UX7g-b** — server bootstrap **UX7g-a** shipped).
+**Out of scope (UX7c):** partner commander picker; custom slot editor; JSON download; enhanced deck view; saved decks; iterate; dependency dashboard; charts; dark mode. *(DB import UI shipped separately as **UX7g**.)*
 
 **Slices:**
 
 | Slice | Deliverable |
 | --- | --- |
 | **UX7c-a** | App shell, DB gate, home, wizard API, steps 1–7 (Next/Back; optional back-swipe) — **shipped** |
-| **UX7c-b** | Review screen (inline preflight warnings), generate, MD→HTML result — **shipped** |
+| **UX7c-b** | Review screen (inline preflight warnings), generate → `/deck/:id` — **shipped** |
 | **UX7c-c** | Loading/error polish, 375px layout pass — **shipped** |
 
 Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
@@ -404,14 +404,14 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 | Topic | Decision |
 | --- | --- |
-| Steps | CLI parity: 7 wizard steps + **review** + **generate** + **result** |
+| Steps | CLI parity: 7 wizard steps + **review** + **generate** → `/deck/:id` |
 | Navigation | [navigation.md](../web/navigation.md) — linear Next/Back; optional back-swipe |
 | Preflight | Inline warnings on review; Generate allowed with warnings |
 | Step 1 slots | Defaults only |
 | Step 3 focus | Stepper per activated profile (− / + through Default → Engine); level definitions at top of section |
-| Step 6 commander | Search-as-you-type; `includes` / `exact` toggle; **no** partners |
-| Result | HTML render of output Markdown |
-| DB missing | Hard block; home banner; **UX7g-a:** `serve` auto-bootstrap when `MTG_AUTO_DOWNLOAD=1`; **UX7g-b:** in-browser import (backlog) |
+| Step 6 commander | Search-as-you-type; `exact` / `includes` toggle (**exact** default); **no** partners |
+| Result | Generate success → `/deck/:id` (enhanced deck view); `/build/result` is compat redirect only |
+| DB missing | Hard block; home banner with **Download card data**; **UX7g-a:** `serve` auto-bootstrap when `MTG_AUTO_DOWNLOAD=1`; **UX7g-b:** in-browser import + optional refresh — **shipped** |
 | Visual design | [design.md](../web/design.md) |
 
 ### UX7e — Enhanced deck view (shipped)

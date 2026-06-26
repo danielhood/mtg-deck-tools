@@ -784,17 +784,17 @@
 
         <div class="segmented-control" role="radiogroup" aria-label="Commander color filter mode">
           <label class="segment-option">
-            <input type="radio" name="color_match" value="includes" checked>
-            <span class="segment-label">
-              <strong>Includes</strong>
-              <span>Has your colors (may include more)</span>
-            </span>
-          </label>
-          <label class="segment-option">
-            <input type="radio" name="color_match" value="exact">
+            <input type="radio" name="color_match" value="exact" checked>
             <span class="segment-label">
               <strong>Exact</strong>
               <span>Only the colors you selected</span>
+            </span>
+          </label>
+          <label class="segment-option">
+            <input type="radio" name="color_match" value="includes">
+            <span class="segment-label">
+              <strong>Includes</strong>
+              <span>Has your colors (may include more)</span>
             </span>
           </label>
         </div>
@@ -1053,7 +1053,7 @@
 
     const readColorMatch = () => {
       const checked = colorMatchInputs.find((input) => input.checked);
-      return checked ? checked.value : "includes";
+      return checked ? checked.value : "exact";
     };
 
     const COLOR_LIST_LABEL = "Blue & Green";

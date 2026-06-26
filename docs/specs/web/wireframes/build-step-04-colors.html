@@ -555,17 +555,11 @@
           </div>
           <div class="dev-note-body">
             <p>
-              Add explicit <strong>Colorless</strong> (void identity) at this step.
-              Commander color identity is either empty (colorless) or one or more of
-              W/U/B/R/G — <strong>no card combines colorless with colored identity</strong>
-              under Commander rules.
-            </p>
-            <p>
-              Selecting Colorless clears colored pips and vice versa. Engine must
-              distinguish <strong>Colorless only</strong> from <strong>Any</strong>
-              (today <code>colors: []</code> is ambiguous until step 6 color-match
-              mode — likely needs <code>colorless_only</code> or filter enum in
-              <code>DeckCriteria</code>).
+              <strong>Shipped:</strong> wizard draft <code>colorFilter</code>
+              (<code>colorless</code> | <code>any</code> | <code>selected</code>) in
+              <code>packages/web/src/lib/criteria.ts</code>. Colorless clears colored pips and
+              vice versa. Commander search maps filter mode to
+              <code>colors</code> + <code>color_match</code> at step 6.
             </p>
           </div>
         </aside>

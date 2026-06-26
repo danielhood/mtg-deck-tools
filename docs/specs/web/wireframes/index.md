@@ -5,14 +5,14 @@ Route → HTML mock map. UX7c wireframes **approved 2026-06-07** (shipped). UX7e
 | Route | File | Status | Notes |
 | --- | --- | --- | --- |
 | `/` (DB ready) | [home.html](home.html) | approved | App shell, hero, primary CTA enabled |
-| `/` (DB missing) | [home-db-missing.html](home-db-missing.html) | approved | DB gate banner, Build disabled |
+| `/` (DB missing) | [home-db-missing.html](home-db-missing.html) | approved | DB gate banner + **Download card data** (UX7g-b); Build disabled |
 | `/build/1` | [build-step-01-themes.html](build-step-01-themes.html) | approved | Theme chips, default slot template, Next/Back |
 | `/build/2` | [build-step-02-mechanics.html](build-step-02-mechanics.html) | approved | Triage: keyword · avoid · include; ghost zone icons |
 | `/build/3` | [build-step-03-synergy.html](build-step-03-synergy.html) | approved | Synergy toggles; focus stepper + dot meter; collapsed level help |
 | `/build/3` (no profiles) | [build-step-03-synergy-empty.html](build-step-03-synergy-empty.html) | approved | Toggles only; dashed empty state for mechanic focus |
-| `/build/4` | [build-step-04-colors.html](build-step-04-colors.html) | approved | WUBRG pips + Colorless (void); engine design note |
+| `/build/4` | [build-step-04-colors.html](build-step-04-colors.html) | approved | WUBRG pips + Colorless (void); `colorFilter` enum |
 | `/build/5` | [build-step-05-budget.html](build-step-05-budget.html) | approved | Steppers + manual $ fields; independent min/max; range warning only |
-| `/build/6` | [build-step-06-commander.html](build-step-06-commander.html) | approved | Search-as-you-type; includes/exact; highlighted row + tappable card art lightbox |
+| `/build/6` | [build-step-06-commander.html](build-step-06-commander.html) | approved | Search-as-you-type; exact/includes (exact default); highlighted row + tappable card art lightbox |
 | `/build/6` (no results) | [build-step-06-commander-empty.html](build-step-06-commander-empty.html) | approved | Dashed empty state; links back to steps 4–5; Next disabled |
 | `/build/7` | [build-step-07-rarity.html](build-step-07-rarity.html) | approved | Min rarity radio list (common → mythic); commander exempt |
 | `/build/review` | [build-review.html](build-review.html) | approved | Preflight warnings panel + criteria recap; Back / Generate |

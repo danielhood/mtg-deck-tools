@@ -49,7 +49,7 @@ Forward mapping (route → endpoints consumed). Screen behavior: [screens.md](sc
 
 - **`synergy-context`** — body: partial `DeckCriteria`; response: activated profiles and allowed focus levels.
 - **`preflight`** — body: full `DeckCriteria`; response: `criteria_warnings[]` aligned with CLI preflight.
-- **`commanders/search`** — query: `q`, `colors`, `color_match=includes|exact`, budget fields from criteria.
+- **`commanders/search`** — query: `q`, `colors`, `color_match=includes|exact` (SPA default **exact**; API default `includes` when omitted), budget fields from criteria.
 - **`generate`** — server assigns random `seed` when absent; persisted in `deck.criteria.seed` when **UX7f** auto-saves to library.
 
 **UX7f web response:** `{ id, deck }` — `.deck.json` body only; no `json_path` / `md_path`. Optional `markdown` for CLI/export requests; not persisted and not required for web deck view.
