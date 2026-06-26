@@ -8,15 +8,19 @@ from mtg_deck_tools.builder.mana_base import ManaBasePlan
 _CMC_BUCKETS = tuple(str(n) for n in range(8)) + ("7+",)
 _TYPE_ORDER = (
     "Creature",
+    "Vehicle",
     "Instant",
     "Sorcery",
     "Artifact",
     "Enchantment",
+    "Equipment",
     "Planeswalker",
     "Battle",
     "Land",
     "Other",
 )
+
+_FILTER_SUBTYPES = ("Vehicle", "Equipment")
 
 
 def _is_land(type_line: str) -> bool:
@@ -30,7 +34,11 @@ def _is_creature(type_line: str) -> bool:
 
 def primary_card_type(type_line: str) -> str:
     """Last recognized primary type before the em dash, matching web deck-view."""
-    before_dash = (type_line or "").split("—")[0].strip()
+    normalized = (type_line or "").strip()
+    for subtype in _FILTER_SUBTYPES:
+        if subtype in normalized:
+            return subtype
+    before_dash = normalized.split("—")[0].strip()
     parts = before_dash.split()
     for part in reversed(parts):
         if part in _TYPE_ORDER:
