@@ -358,6 +358,8 @@ def test_write_deck_outputs_groups_notes_and_card_details(tmp_path) -> None:
     assert "**Mana cost:** (G)" in text
     assert "**Description:** **Tap**: Add (G)." in text
     assert "#### Forest - Basic Land — Forest (98×)" in text
+    assert "## Deck metrics" in text
+    assert "### Mana curve (nonlands)" in text
 
 
 def test_write_deck_outputs_shows_estimated_deck_without_budget_cap(tmp_path) -> None:
