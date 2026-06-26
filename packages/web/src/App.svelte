@@ -82,7 +82,7 @@
   {:else if metaLoading || !meta}
     <LoadingState message="Connecting to server…" />
   {:else if route === "home"}
-    <HomePage {meta} />
+    <HomePage {meta} onMetaReload={() => (metaReload += 1)} />
   {:else if route === "build-step-1"}
     <BuildStep1Page {meta} />
   {:else if route === "build-step-2"}

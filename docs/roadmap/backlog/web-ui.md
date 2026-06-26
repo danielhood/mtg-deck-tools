@@ -40,7 +40,7 @@ Promote to [active.md](../active.md) before implementation.
 
 ### UX7g — Database init / refresh
 
-**Status:** **Partially shipped** — server bootstrap done; web-initiated flow backlog.
+**Status:** **Shipped** — server bootstrap (UX7g-a) and web-initiated import/refresh (UX7g-b).
 
 | Slice | Deliverable | Status |
 | --- | --- | --- |
@@ -48,11 +48,11 @@ Promote to [active.md](../active.md) before implementation.
 | **UX7g-a** | `mtg-deck-tools serve` startup bootstrap via `ensure_cards_database` | Shipped |
 | **UX7g-a** | `POST /api/v1/import` (same pipeline; unused by SPA) | Shipped |
 | **UX7g-a** | Docker first-boot download + import | Shipped |
-| **UX7g-b** | Home **Download card data** → `POST /api/v1/import` with progress UI | Backlog |
-| **UX7g-b** | Poll `GET /api/v1/wizard/meta` until `db_ready`; enable wizard without CLI | Backlog |
-| **UX7g-b** | Optional web **refresh** (re-import bulk) | Backlog |
+| **UX7g-b** | Home **Download card data** → `POST /api/v1/import` with progress UI | Shipped |
+| **UX7g-b** | Poll `GET /api/v1/wizard/meta` until `db_ready`; enable wizard without CLI | Shipped |
+| **UX7g-b** | Optional web **refresh** (re-import bulk) | Shipped |
 
-**Today:** With default `MTG_AUTO_DOWNLOAD=1`, `serve` (and Docker) often builds `cards.db` **before** the SPA loads — many users never see the DB-missing banner. When `MTG_AUTO_DOWNLOAD=0`, the API is already running without a DB, or a browser-only user needs refresh, the SPA still shows a **CLI/server** banner (`DbBanner`) — not UX7g-b.
+**Today:** With default `MTG_AUTO_DOWNLOAD=1`, `serve` (and Docker) often builds `cards.db` **before** the SPA loads. When the API is up without a DB (`MTG_AUTO_DOWNLOAD=0`), or a browser user wants a newer snapshot, the home screen offers **Download card data** / **Refresh card data** via `POST /api/v1/import` (`DbBanner`, `HomePage`).
 
 Spec: [architecture.md](../../specs/web/architecture.md) § Database gate · [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX7g.
 

@@ -183,9 +183,8 @@ When `cards.db` is missing (`GET /api/v1/stats` → 404 or wizard meta reports n
 
 - **Hard block** — no wizard, **library**, or deck view functionality.
 - **Home** (`/`) still renders with a **banner**; **Build new deck** and **Saved library** disabled.
+- **Current SPA:** when `!db_ready`, home banner offers **Download card data** (`POST /api/v1/import`); when ready, optional **Refresh card data** with confirm — see `DbBanner.svelte`, `HomePage.svelte`.
 - **Server bootstrap (UX7g-a, shipped):** `mtg-deck-tools serve` with `MTG_AUTO_DOWNLOAD=1` (default) downloads oracle bulk and imports **before** listening — Docker uses the same path. See [deployment.md](deployment.md).
-- **Current SPA copy:** banner directs to CLI `mtg-deck-tools import` or restarting `serve` when auto-download is enabled — see `DbBanner.svelte`.
-- **UX7g-b (backlog):** in-browser **Download card data** via `POST /api/v1/import`, progress UI, meta poll until `db_ready`; optional refresh. See [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) § UX7g.
 
 ### Saved deck library (UX7f)
 
@@ -251,7 +250,7 @@ Comparison retained for context (Vue was the alternative):
 | UX7f | Saved deck library | Shipped |
 | UX7d | Dependency dashboard | Shipped |
 | UX7g-a | Server DB bootstrap (`serve` + `MTG_AUTO_DOWNLOAD`, `POST /api/v1/import`) | Shipped |
-| UX7g-b | Web-initiated import / refresh UI | Backlog |
+| UX7g-b | Web-initiated import / refresh UI | Shipped |
 | UX10b | CMC / composition charts | Backlog |
 | UX11 | Deck editor (swap / lock / iterate) | Backlog |
 

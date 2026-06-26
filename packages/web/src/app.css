@@ -168,16 +168,71 @@ a {
 }
 
 .db-banner {
-  padding: 12px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 14px 14px 12px;
   border-radius: 10px;
-  border: 1px dashed var(--warn-700);
+  border: 1px solid var(--warn-700);
   background: var(--warn-100);
   font-size: 13px;
   line-height: 1.45;
 }
 
-.db-banner code {
+.db-banner-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--warn-700);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.db-banner-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.db-banner-body h2 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--warn-700);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.db-banner-body p {
+  margin-bottom: 10px;
+}
+
+.db-banner-cta {
+  width: 100%;
+}
+
+.db-banner-progress {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--warn-700);
+}
+
+.db-banner-progress-copy p {
+  margin-bottom: 0;
+}
+
+.db-banner-progress-note {
+  margin-top: 4px;
   font-size: 12px;
+}
+
+.db-banner-error {
+  color: #b91c1c;
 }
 
 .section-title {
@@ -292,11 +347,20 @@ a {
 
 .status-loading {
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-muted);
+}
+
+.status-loading-copy p {
+  margin: 0;
+}
+
+.status-loading-detail {
+  margin-top: 4px;
+  font-size: 12px;
 }
 
 .status-error {
