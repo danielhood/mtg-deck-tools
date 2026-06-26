@@ -2,7 +2,7 @@
 
 **Single register** of work selected for immediate delivery. Parked work: [backlog/](backlog/). Shipped record: [changelog.md](../history/changelog.md) · [milestones.md](../history/milestones.md).
 
-*Last updated: 2026-06-25 (docs sync — UX7g-b shipped).*
+*Last updated: 2026-06-26.*
 
 ---
 
@@ -10,10 +10,11 @@
 
 | Priority | What | Why now |
 | --- | --- | --- |
+| **UX11** | GUI deck editor (planning → implementation) | Primary post-MVP web thread — swap, lock, slot regen on deck view |
 | **ENG-MAINT** | Engine profile tuning | As needed when touching dependency rules or dogfood matrix |
 | **GATE** | Dogfood gate | Required after any engine change |
 
-**Primary thread:** None selected — **UX7 MVP complete** (UX7a–UX7d + **UX7g** shipped). Promote next web work from [backlog/web-ui.md](backlog/web-ui.md) (**UX10** or **UX11**).
+**Primary thread:** **UX11** — planning locked; promote slices to implementation per [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
 
 ---
 
@@ -21,10 +22,11 @@
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
+| **UX11** | web-ui | GUI deck editor — lock, slot regen, swap (slices UX11a–e) | **Planning** | UX7e, UX7f (shipped) | UX10 (metrics UI) |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | doc-only, dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
-**Not active:** No web-ui rows (UX7 MVP shipped). No cli-engine expansion rows (P7 remainder, new profiles). Promote from [backlog/](backlog/) before starting.
+**Not active:** cli-engine expansion rows (P7 remainder, new profiles). **UX10** remains in [backlog/web-ui.md](backlog/web-ui.md) until promoted.
 
 ---
 
@@ -62,6 +64,9 @@ flowchart LR
 
   subgraph backlog["Backlog"]
     UX10[UX10 metrics]
+  end
+
+  subgraph active["Active"]
     UX11[UX11 editor]
   end
 
@@ -73,11 +78,11 @@ flowchart LR
   UX7c --> UX7e
   UX7e --> UX7f
   UX7f --> UX7d
-  UX7e --> UX10
   UX7e --> UX11
+  UX11 --> UX10
 ```
 
-- **UX10 / UX11** may be promoted from [backlog/web-ui.md](backlog/web-ui.md) — UX7 MVP is complete.
+- **UX11** is active (planning complete — see [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11). **UX10** may be promoted from [backlog/web-ui.md](backlog/web-ui.md).
 - New cli-engine dependency profiles should not run in parallel with a large web API refactor on the same modules without coordination.
 
 ---

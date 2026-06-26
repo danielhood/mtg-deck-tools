@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Deck view edit mode (UX11 P0)</title>
+  <style>
+    :root {
+      --bg: #ffffff; --surface: #f8fafc; --blue-900: #1e3a5f; --blue-700: #2563eb;
+      --text: #0f172a; --text-muted: #64748b; --border: #e2e8f0; --danger: #dc2626;
+      --locked-bg: #f1f5f9; --frame-width: 375px; --footer-height: 196px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Verdana, Geneva, Tahoma, sans-serif; background: #e2e8f0; color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 48px; }
+    .preview-label { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+    .frame { width: var(--frame-width); min-height: 667px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12); display: flex; flex-direction: column; overflow: hidden; }
+    .app-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .app-title { font-size: 15px; font-weight: 700; color: var(--blue-900); }
+    .deck-pill { font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; background: #dbeafe; color: var(--blue-700); }
+    .deck-scroll { flex: 1; overflow-y: auto; padding: 16px 16px calc(var(--footer-height) + 16px); }
+    .deck-label-row { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .deck-label { flex: 1; font-size: 15px; font-weight: 700; color: var(--blue-900); min-width: 120px; }
+    .btn-text { border: none; background: none; color: var(--blue-700); font-size: 13px; font-weight: 600; font-family: inherit; min-height: 44px; padding: 0 8px; }
+    .btn-text-active { text-decoration: underline; }
+    .rename-btn { width: 44px; height: 44px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--text-muted); }
+    .slot-heading-row { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 8px; }
+    .slot-heading { font-size: 12px; font-weight: 700; color: var(--blue-900); text-transform: uppercase; }
+    .btn-regen { border: none; background: none; color: var(--blue-700); font-size: 12px; font-weight: 600; font-family: inherit; min-height: 44px; padding: 0 4px; }
+    .card-row { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .card-row.locked { background: var(--locked-bg); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 6px; }
+    .card-thumb { width: 40px; height: 56px; border-radius: 4px; background: #94a3b8; flex-shrink: 0; }
+    .card-main { flex: 1; min-width: 0; }
+    .card-name { font-size: 13px; font-weight: 600; }
+    .card-sub { font-size: 11px; color: var(--text-muted); }
+    .lock-btn { width: 44px; height: 44px; border: none; background: none; font-size: 18px; flex-shrink: 0; }
+    .lock-btn.on { color: var(--blue-700); }
+    .lock-btn.off { color: var(--text-muted); }
+    .deck-footer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+    .btn-primary, .btn-delete { display: block; width: 100%; min-height: 44px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; font-family: inherit; }
+    .btn-primary { background: var(--blue-700); color: #fff; }
+    .btn-delete { background: var(--danger); color: #fff; text-align: center; line-height: 44px; text-decoration: none; }
+    .nav-row { display: flex; gap: 10px; }
+    .btn-back { flex: 1; min-height: 44px; border-radius: 10px; font-size: 14px; font-weight: 600; text-align: center; line-height: 44px; text-decoration: none; border: 1.5px solid var(--blue-700); color: var(--blue-700); }
+    .wireframe-meta, .dev-note { width: var(--frame-width); margin-top: 12px; font-size: 11px; color: var(--text-muted); }
+    .dev-note { padding: 10px 12px; background: #fff; border: 1px dashed var(--border); border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <p class="preview-label">375px · UX11 P0 · edit mode · lock + slot regen</p>
+  <div class="frame">
+    <header class="app-header">
+      <div class="app-title">MTG Deck Tools</div>
+      <span class="deck-pill">Editing</span>
+    </header>
+    <div class="deck-scroll">
+      <div class="deck-label-row">
+        <h2 class="deck-label">Simic tokens</h2>
+        <button class="btn-text btn-text-active" type="button">Done</button>
+        <a class="rename-btn" href="#" aria-label="Rename">✎</a>
+      </div>
+      <div class="slot-heading-row">
+        <h3 class="slot-heading">Synergy</h3>
+        <button class="btn-regen" type="button">Regenerate</button>
+      </div>
+      <div class="card-row locked">
+        <div class="card-thumb" aria-hidden="true"></div>
+        <div class="card-main">
+          <div class="card-name">Deep Forest Hermit</div>
+          <div class="card-sub">{2}{G} · Creature</div>
+        </div>
+        <button class="lock-btn on" type="button" aria-label="Unlock card">📌</button>
+      </div>
+      <div class="card-row">
+        <div class="card-thumb" aria-hidden="true"></div>
+        <div class="card-main">
+          <div class="card-name">Nest Invader</div>
+          <div class="card-sub">{1}{G} · Creature</div>
+        </div>
+        <button class="lock-btn off" type="button" aria-label="Lock card">📍</button>
+      </div>
+    </div>
+    <footer class="deck-footer">
+      <button class="btn-primary" type="button">Build another deck</button>
+      <a class="btn-delete" href="#">Delete deck</a>
+      <div class="nav-row">
+        <a class="btn-back" href="library.html">← Library</a>
+        <a class="btn-back" href="home-library-ready.html">Home</a>
+      </div>
+    </footer>
+  </div>
+  <aside class="wireframe-meta">
+    Route: <code>/deck/:id</code> ·
+    <a href="deck-view-edit-select.html">selection</a> ·
+    <a href="deck-view-dependencies.html">dependencies base</a>
+  </aside>
+  <p class="dev-note"><strong>Dev note:</strong> Lock → <code>PATCH /api/v1/decks/{id}</code> with deck body. Regenerate → confirm → <code>POST …/refill-slot</code>.</p>
+</body>
+</html>

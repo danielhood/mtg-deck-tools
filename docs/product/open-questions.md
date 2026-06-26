@@ -35,7 +35,7 @@ See [active.md](../roadmap/active.md) for the active backlog (dependency UX cali
 
 | Topic | Notes |
 | --- | --- |
-| **Colorless vs Any (UX7c step 4)** | Web wizard adds explicit **Colorless only** (void identity), mutually exclusive with W/U/B/R/G. Engine must distinguish Colorless-only from unfiltered Any — today `DeckCriteria.colors: []` is ambiguous (`exact` → colorless commanders only; `includes` → all). Likely needs schema flag or filter enum before UX7c ships — [screens.md](../specs/web/screens.md) § Step 4 |
+| **Colorless vs Any (UX7c step 4)** | **Resolved** — web wizard `colorFilter`: `colorless` \| `any` \| `selected` in `packages/web/src/lib/criteria.ts`; maps to commander search at step 6 — [screens.md](../specs/web/screens.md) § Step 4 |
 | Dependency wizard UX (UX7+) | UX2–UX5 CLI wizard shipped; web build wizard UX7c — [user-experience.md](../specs/dependency-engine/user-experience.md) § UX7c |
 | Power level / salt | Complicated, context-dependent; not a single dial |
 | Obscure vs new null-price classification | Shipped heuristic favors obscure detection — [card-availability.md](card-availability.md) |

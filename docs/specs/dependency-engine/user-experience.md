@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-25):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7d + UX7g shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library + dependency dashboard + web DB import). Post-MVP web: **UX10**, **UX11** — [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
+**Status (2026-06-26):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7d + UX7g shipped**. **UX11** GUI deck editor — planning locked, active — [active.md](../../roadmap/active.md). Post-MVP backlog: **UX10** — [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -603,42 +603,95 @@ Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7d wir
 
 **Out of scope (UX7g):** live Scryfall sync; user-uploaded bulk JSON; auth-gated admin import.
 
-### UX11 — GUI deck editor: swap and lock (parked)
+### UX11 — GUI deck editor: swap and lock (planning)
 
-**Status:** Not implemented. CLI today: full regen or `--refill-slot <name>` refills **every** card in that slot ([`reload.py`](../src/mtg_deck_tools/builder/reload.py), [`filler.refill_deck_slot`](../src/mtg_deck_tools/builder/filler.py)). Post-build **dependency repair** swaps cards automatically (D5), not user-picked rows. Profile-level “swap energy package” is separate ([§ Understanding and swapping dependencies](#understanding-and-swapping-dependencies-future)).
+**Status:** **Planning locked (2026-06-26)** — slices UX11a–e defined; wireframes P0 approved for implementation gate. API: [iterate-api.md](../web/iterate-api.md). Screens: [screens.md](../web/screens.md) § Deck editor.
 
-**Target shell:** Cross-platform web (**UX7**), mobile-first. These interactions are poor fits for the terminal; park the product model now so `.deck.json` and the Python core do not paint us into a corner.
+**Goal:** **Iterate** mode on `/deck/:id` — pin cards, refill a slot, or swap selected maindeck cards without re-running the build wizard. Mobile-first; poor fit for terminal (GUI primary).
 
-#### Swap button (selected cards)
+**Depends on:** **UX7e** deck view, **UX7f** library persistence (shipped).
+
+**Engine today:** Full regen or `--refill-slot` refills **every** card in that slot ([`reload.py`](../../src/mtg_deck_tools/builder/reload.py), [`filler.refill_deck_slot`](../../src/mtg_deck_tools/builder/filler.py)). No `locked` field. Post-build **dependency repair** (D5) is automatic, not user-picked rows. Profile-level package swap is separate ([§ Understanding and swapping dependencies](#understanding-and-swapping-dependencies-future)).
+
+#### Scope
+
+**In scope (UX11):**
+
+- Per-card **lock** toggle on maindeck rows; persist `locked` in library JSON.
+- **Slot regen** per slot heading — refill open positions respecting locks.
+- **Swap** one or more selected maindeck cards → replacements via generate pick pipeline.
+- Stay on `/deck/:id`; update session cache + library after each operation.
+- Re-run validation + `dependency_report` after regen/swap (embedded in returned deck).
+
+**Out of scope (UX11):**
+
+- Commander swap (commanders implicit locked; not in selection surface).
+- Full-deck regen button (CLI `from-deck` without `--refill-slot` stays CLI).
+- Dependency **repair** pass from UI (D5 / `--repair-dependencies`).
+- Profile package swap (UX8).
+- CMC charts (**UX10**); JSON download; import; save-as / clone.
+- Re-run build wizard for iterate; new analyze HTTP endpoints; TS validation duplication.
+- Seed picker UI (API accepts `seed`; UI deferred to **UX11e** stretch).
+
+#### Slices
+
+| Slice | Deliverable | Status |
+| --- | --- | --- |
+| **UX11a** | Schema + engine: `locked` on `cards[]`; `refill_deck_slot` respects locks; swap pipeline in `service/` | Planned |
+| **UX11b** | `POST /api/v1/decks/{id}/refill-slot` + OpenAPI | Planned |
+| **UX11c** | Lock toggle UI + `PATCH` deck body | Planned |
+| **UX11d** | `POST /api/v1/decks/{id}/swap` + selection mode + Swap action bar + inline diff | Planned |
+| **UX11e** | 375px polish, loading/errors, optional seed advanced control | Planned |
+
+**Implementation order:** UX11a → UX11b + UX11c (parallel OK) → UX11d → UX11e.
+
+#### UX11 decisions
+
+| Topic | Decision |
+| --- | --- |
+| Route | Same `/deck/:id` — **edit mode** is client state, not a new route |
+| Commander | **Implicit locked** — not selectable for swap; no lock toggle on commander header |
+| Lock default | `locked: false` on maindeck cards; omitted = false in JSON |
+| Lock persistence | `PATCH /api/v1/decks/{id}` with full `deck` body after toggle (no engine call) |
+| Slot regen | Per slot heading **Regenerate** → confirm → `POST …/refill-slot` |
+| Refill + locks | Skip locked rows; reduce refill count; **400** if locked count ≥ slot target |
+| Full regen + locks | **(a)** keep locked maindeck when engine supports full regen — **defer** full regen UI to CLI; slot regen only in UX11 |
+| Swap selection | Maindeck rows only; multi-select via row checkbox in edit mode |
+| Swap order | Deterministic: slot name A→Z, then vacated order within slot |
+| Swap vs D5 | User swap **≠** `repair_dependencies`; no auto-repair after swap |
+| Post-op feedback | Inline **swap diff** banner (old → new names); refresh Dependencies panel from new `deck` |
+| Seed | API optional `seed`; UI hidden until UX11e |
+| UX8 boundary | Card lock ≠ profile slot lock (UX8 parked) |
+
+#### Swap (selected cards)
 
 | Aspect | Spec |
 | --- | --- |
-| **User action** | Select one or more maindeck cards (not commander unless product allows) → **Swap** |
-| **Engine behavior** | Remove selected `oracle_id`s from the working list; for each vacated **slot** (and quantity for basics), run the **same pick pipeline** as `generate` — pool filters (`DeckCriteria`, CI, budget, rarity, tags, `--strict-dependencies`, availability, slot oracle guards, scorer) — excluding cards already in deck and **locked** cards |
-| **Output** | Inline diff (old → new), re-run validation + `dependency_report`; optional seed control for reproducibility |
-| **Multi-select** | Batch swap: process slots in deterministic order; warn if budget/dependency repair needed after batch |
-| **Relation to D5** | User-initiated swap is **not** `repair_dependencies`; may call shared pool/score helpers with a “replacement for oracle_id X in slot Y” hint |
+| **User action** | Enter edit mode → select one or more maindeck cards → **Swap (N)** |
+| **Engine behavior** | Remove selected `oracle_id`s; for each vacated slot/qty, run generate pick pipeline — `DeckCriteria`, CI, budget, rarity, tags, strict dependencies, slot guards, scorer — exclude deck + **locked** cards |
+| **Output** | `{ id, deck, swaps[] }`; update list + dependency panel |
+| **Multi-select** | Batch swap; warn in UI if new `dependency_report` has warn/fail issues (no auto-repair) |
 
-#### Lock flag (per card)
+#### Lock (per card)
 
 | Aspect | Spec |
 | --- | --- |
-| **User action** | Toggle **lock** on a card row (pin icon / checkbox) |
-| **Persistence** | Optional field on each entry in `.deck.json` `cards[]` — e.g. `"locked": true` (default false). Commander row policy TBD (default locked). |
-| **Refill** | `generate --from deck.json --refill-slot synergy` (and GUI equivalent) **must not** replace locked cards in that slot; reduce refill count by locked cards in slot; error or warn if locked cards exceed slot size |
-| **Full regen** | Policy TBD: (a) full regen keeps all locked maindeck cards and only fills open slots, or (b) full regen ignores locks with confirmation — **recommended (a)** for GUI parity |
-| **Budget trim / mechanic packages** | Locked cards exempt from automatic swap passes unless user opts in |
-| **Distinct from UX8 “slot lock”** | UX8 *slot lock* = keep a **profile package** together; UX11 *card lock* = pin **specific** cards regardless of profile |
+| **User action** | Pin icon on row — toggle without entering selection mode |
+| **Persistence** | `"locked": true` on `cards[]` entry — [deck-output-format.md](../../product/deck-output-format.md) |
+| **Refill** | Locked cards never replaced in that slot's regen |
+| **Budget trim / packages** | Locked cards exempt from automatic engine swap passes |
 
 #### CLI fit (UX11)
 
 | Control | CLI | GUI |
 | --- | --- | --- |
-| Swap selected cards | Poor (multi oracle_id args conceivable later) | **Primary** |
+| Swap selected cards | Poor (future multi `oracle_id` args conceivable) | **Primary** |
 | Lock / unlock card | Poor (manual JSON edit) | **Primary** |
-| Refill slot respecting locks | **Stretch** — e.g. `--keep-locked` on `--refill-slot` | **Primary** |
+| Refill slot respecting locks | **Stretch** — `--keep-locked` on `--refill-slot` | **Primary** |
 
-Contract sketch: [deck-output-format.md](../../product/deck-output-format.md) § GUI deck editor. Backlog: [active.md](../../roadmap/active.md).
+Wireframes: [wireframes/README.md](../web/wireframes/README.md) § UX11 wireframe scope.
+
+Contract: [deck-output-format.md](../../product/deck-output-format.md) § GUI deck editor · API: [iterate-api.md](../web/iterate-api.md) · Active: [active.md](../../roadmap/active.md).
 
 ### UX10 — Deck composition metrics (planned)
 

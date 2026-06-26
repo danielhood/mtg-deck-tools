@@ -30,9 +30,10 @@ Promote to [active.md](../active.md) before implementation.
 | Order | ID | Topic | Notes | Depends on |
 | --- | --- | --- | --- | --- |
 | 1 | **UX10** | Deck composition metrics UI | CMC charts; may overlap enhanced deck view | UX7e+ (shipped), [deck-output-format.md](../../product/deck-output-format.md) |
-| 2 | **UX11** | GUI deck editor / iterate | Swap, lock, slot regen, regen without wizard | UX7e (shipped), [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX11 |
 
-**Parallel:** UX10 and UX11 can run **in parallel with each other**; both need enhanced deck view (shipped).
+**Active:** **UX11** GUI deck editor — [active.md](../active.md); spec [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX11 · API [iterate-api.md](../../specs/web/iterate-api.md).
+
+**Parallel:** UX10 and UX11 may run in parallel; UX11 is the current primary thread.
 
 ---
 

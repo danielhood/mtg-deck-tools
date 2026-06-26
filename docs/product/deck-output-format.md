@@ -247,14 +247,15 @@ Tracked in backlog: [active.md](../roadmap/active.md).
 
 Spec and UX phasing: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX10. Backlog: [active.md](../roadmap/active.md).
 
-### GUI deck editor (parked — UX11)
+### GUI deck editor (planned — UX11)
 
-**Status:** Not implemented. Planned for **UX11** GUI deck editor; schema and core should allow it without a breaking migration.
+**Status:** **Planning locked (2026-06-26)** — field spec finalized; engine + UI in [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
 
 | Feature | Behavior |
 | --- | --- |
-| **Lock** | Per-card `"locked": true` in `cards[]` — excluded from slot refill and from automatic package/repair swaps unless user overrides |
-| **Swap** | User selects card(s) → replacements chosen with the same rules as `generate` (criteria, CI, budget, tags, strict dependencies, slot guards) |
+| **Lock** | Per maindeck card `"locked": true` in `cards[]` — default `false` or omitted; commanders treated as locked (no field required on commander rows) |
+| **Swap** | User selects maindeck card(s) → replacements via generate pick pipeline (criteria, CI, budget, tags, strict dependencies, slot guards) |
+| **Slot regen** | Refill one slot; locked cards in that slot are never replaced |
 
 Illustrative card entry:
 
@@ -268,7 +269,11 @@ Illustrative card entry:
 }
 ```
 
-CLI today: `--refill-slot` replaces **all** cards in that slot; no `locked` field. Stretch: `--keep-locked` on refill. Full spec: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `locked` | boolean | no | Default `false`. When `true`, slot regen and swap vacated positions skip this row. Commander rows: implicit locked — field optional and ignored for swap selection. |
+
+CLI today: `--refill-slot` replaces **all** cards in that slot; no `locked` field in builder yet (**UX11a**). Stretch: `--keep-locked` on refill. Full spec: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
 
 ### Future utility operations on `.deck.json`
 

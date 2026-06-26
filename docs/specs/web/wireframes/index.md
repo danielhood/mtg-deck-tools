@@ -23,6 +23,9 @@ Route → HTML mock map. UX7c wireframes **approved 2026-06-07** (shipped). UX7e
 | `/deck/:id` (post-generate) | [deck-view-from-generate.html](deck-view-from-generate.html) | shipped | Entry after wizard generate |
 | `/deck/:id` (warnings) | [deck-view-warnings.html](deck-view-warnings.html) | shipped | Expanded summary + dependency warn analysis — **superseded by UX7d panel** |
 | `/deck/:id` (dependencies) | [deck-view-dependencies.html](deck-view-dependencies.html) | shipped | UX7d — panel open, profile summaries |
+| `/deck/:id` (edit mode) | [deck-view-edit-mode.html](deck-view-edit-mode.html) | approved | UX11 — lock pins + slot Regenerate |
+| `/deck/:id` (edit select) | [deck-view-edit-select.html](deck-view-edit-select.html) | approved | UX11 — checkboxes + Swap (N) bar |
+| `/deck/:id` (swap result) | [deck-view-edit-swap-result.html](deck-view-edit-swap-result.html) | approved | UX11 — inline diff banner |
 | `/deck/:id` (issue detail) | [deck-view-dependencies-issue.html](deck-view-dependencies-issue.html) | shipped | UX7d — expanded issue + Show in deck |
 | `/deck/:id` (deps ok) | [deck-view-dependencies-good.html](deck-view-dependencies-good.html) | shipped | UX7d — passed deck, panel closed |
 | `/deck/:id` (delete) | [deck-view-delete.html](deck-view-delete.html) | shipped | Delete confirm modal |

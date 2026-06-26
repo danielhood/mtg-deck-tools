@@ -293,6 +293,35 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 ---
 
+## UX11 wireframe scope
+
+**Status:** **Planning approved (2026-06-26)** — decisions locked — [user-experience.md](../../dependency-engine/user-experience.md) § UX11, [screens.md](../screens.md) § Deck editor.
+
+| Priority | File | Route | States to show |
+| --- | --- | --- | --- |
+| **P0** | `deck-view-edit-mode.html` | `/deck/:id` | **Edit deck** active; lock pins on rows; slot **Regenerate** on heading |
+| **P0** | `deck-view-edit-select.html` | `/deck/:id` | Row checkboxes; sticky **Swap (2)** bar above footer |
+| **P0** | `deck-view-edit-swap-result.html` | `/deck/:id` | Post-swap inline diff banner; view mode |
+
+**In frame (product UI):**
+
+| Region | Layout notes |
+| --- | --- |
+| Edit entry | **Edit deck** text button in deck label row (left of rename pencil) |
+| Lock pin | 44px tap target on row trailing edge; filled = locked |
+| Slot regen | Text **Regenerate** right-aligned on slot heading row |
+| Selection | Checkbox 44px at row start; commander block not selectable |
+| Swap bar | Sticky above footer — primary **Swap (N)** + secondary **Clear** |
+| Diff banner | Amber info strip below commander — `Old name → New name` per swap |
+
+**Dev notes only (`.dev-note`):** `PATCH` lock; `POST …/refill-slot`; `POST …/swap` — [iterate-api.md](../iterate-api.md). No repair pass.
+
+**Out of scope for UX11 wireframes:** full-deck regen; commander swap; seed picker; repair; dark mode.
+
+**Approval gate:** Mark P0 files `approved` in [index.md](index.md) before UX11a Svelte work.
+
+---
+
 ## Out of scope for wireframes
 
 - Real API integration or `DeckCriteria` persistence
