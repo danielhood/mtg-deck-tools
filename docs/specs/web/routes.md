@@ -68,4 +68,4 @@ SPA route map for `packages/web/`. Screen behavior: [screens.md](screens.md). Na
 - [navigation.md](navigation.md) — Next/Back, review, home flows
 - [architecture.md](architecture.md) — product modes, phased delivery, DB gate
 - [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json` contract
-- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — post-MVP backlog (UX10, UX11, UX7g-b)
+- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — post-MVP backlog (**UX10**, **UX11**)

@@ -148,6 +148,18 @@
       margin-bottom: 10px;
     }
 
+    .db-banner-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .db-banner-cta {
+      margin-top: 4px;
+      background: var(--blue-700);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
     .db-banner-body code {
       display: block;
       font-family: "Courier New", Courier, monospace;
@@ -366,10 +378,9 @@
       <div class="db-banner-body">
         <h2>Card database not found</h2>
         <p>
-          <strong>UX7g-a (shipped):</strong> restart <code>serve</code> with
-          <code>MTG_AUTO_DOWNLOAD=1</code> or run <code>mtg-deck-tools import</code> in a terminal.
-          <strong>UX7g-b (backlog):</strong> in-browser download button on this screen.
+          Download Scryfall oracle bulk data and build the local database to use the build wizard.
         </p>
+        <button class="btn db-banner-cta" type="button">Download card data</button>
       </div>
     </aside>
 
@@ -379,7 +390,12 @@
         <span class="dev-note-label">Dev note</span>
       </div>
       <div class="dev-note-body">
-        <p>Web-side import is planned for <strong>UX7g-b</strong>. Server auto-bootstrap (<strong>UX7g-a</strong>) runs on <code>serve</code> startup when auto-download is enabled.</p>
+        <p>
+          <strong>UX7g-b (shipped):</strong> <code>POST /api/v1/import</code> from
+          <strong>Download card data</strong>; poll <code>GET /api/v1/wizard/meta</code> until
+          <code>db_ready</code>. <strong>UX7g-a:</strong> server auto-bootstrap on
+          <code>serve</code> when <code>MTG_AUTO_DOWNLOAD=1</code>.
+        </p>
       </div>
     </aside>
 
@@ -387,7 +403,7 @@
       <section class="hero">
         <h1>Build a new deck</h1>
         <p>
-          The build wizard needs a local card database. Import once, then return
+          The build wizard needs a local card database. Download card data once, then return
           here to start.
         </p>
       </section>
@@ -402,27 +418,6 @@
           Build new deck
         </button>
         <p class="btn-hint">Unavailable until import completes.</p>
-      </section>
-
-      <section class="future-section" aria-label="Coming soon">
-        <p class="future-label">Coming later</p>
-        <div class="actions">
-          <button class="btn btn-secondary" type="button" disabled aria-disabled="true">
-            Saved library
-          </button>
-          <button class="btn btn-secondary" type="button" disabled aria-disabled="true">
-            Resume active deck
-          </button>
-        </div>
-        <aside class="dev-note" role="note" aria-label="Developer note">
-          <div class="dev-note-header">
-            <span class="dev-note-icon" aria-hidden="true">&lt;/&gt;</span>
-            <span class="dev-note-label">Dev note</span>
-          </div>
-          <div class="dev-note-body">
-            <p>Library and resume deck ship in <strong>UX7f</strong> / <strong>UX7e</strong>.</p>
-          </div>
-        </aside>
       </section>
     </main>
   </div>
