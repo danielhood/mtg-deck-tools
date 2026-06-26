@@ -117,6 +117,15 @@
       (!parsed.dependencyReport.passed || parsed.dependencyReport.reviewCount > 0),
   );
 
+  $effect(() => {
+    if (!parsed?.filterOptions.colors.length) return;
+    const available = new Set(parsed.filterOptions.colors);
+    const pruned = new Set([...filters.colors].filter((color) => available.has(color)));
+    if (pruned.size !== filters.colors.size) {
+      filters = { ...filters, colors: pruned };
+    }
+  });
+
   function applyDeckUpdate(deck: Record<string, unknown>): void {
     deckPayload = deck;
     cacheDeck({ id: deckId, name: deckName, deck, returnTo });
@@ -426,6 +435,7 @@
         </div>
       </div>
 
+      {#if parsed.filterOptions.colors.length}
       <div class="filter-group filter-group-colors">
         <div class="filter-header">
           <span class="filter-label">Color</span>
@@ -437,10 +447,12 @@
         </div>
         <ColorPipPicker
           mode="filter"
+          availableColors={parsed.filterOptions.colors}
           selected={filters.colors}
           onfilterchange={(colors) => (filters = { ...filters, colors })}
         />
       </div>
+      {/if}
     </section>
 
     {#if !filtered.length}

@@ -7,6 +7,8 @@
     colorFilter?: ColorFilter;
     colors?: string[];
     selected?: Set<string>;
+    /** Filter mode: only show pips present in the deck (from `parseDeck` filterOptions.colors). */
+    availableColors?: string[];
     onwizardchange?: (value: { colorFilter: ColorFilter; colors: string[] }) => void;
     onfilterchange?: (selected: Set<string>) => void;
     voidTitle?: string;
@@ -18,11 +20,22 @@
     colorFilter = "any",
     colors = [],
     selected = new Set<string>(),
+    availableColors = [],
     onwizardchange,
     onfilterchange,
     voidTitle = "Colorless only",
     voidLead = "Commanders with empty color identity (void) — excludes all colored picks.",
   }: Props = $props();
+
+  const visiblePips = $derived(
+    mode === "filter"
+      ? MANA_PIPS.filter((pip) => availableColors.includes(pip.id))
+      : MANA_PIPS,
+  );
+  const showVoidPip = $derived(
+    mode === "filter" && availableColors.includes(VOID_COLOR_ID),
+  );
+  const filterColumnCount = $derived(visiblePips.length + (showVoidPip ? 1 : 0));
 
   function isPipChecked(id: string): boolean {
     if (mode === "filter") return selected.has(id);
@@ -73,11 +86,14 @@
 
 <div
   class="color-grid"
-  class:color-grid-six={mode === "filter"}
+  class:color-grid-six={mode === "filter" && filterColumnCount === 6}
+  style={mode === "filter" && filterColumnCount !== 6
+    ? `grid-template-columns: repeat(${filterColumnCount}, 1fr)`
+    : undefined}
   role="group"
   aria-label="Mana colors"
 >
-  {#each MANA_PIPS as pip (pip.id)}
+  {#each visiblePips as pip (pip.id)}
     <label class="color-option color-{pip.id.toLowerCase()}">
       <input
         type="checkbox"
@@ -93,7 +109,7 @@
     </label>
   {/each}
 
-  {#if mode === "filter"}
+  {#if showVoidPip}
     <label class="color-option color-void">
       <input
         type="checkbox"
