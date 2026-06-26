@@ -214,6 +214,7 @@
       newCardIds = new Set(response.swaps.map((row) => row.to_oracle_id));
       selectedIds = new Set();
       swappingIssueKey = null;
+      scrollDeckViewToTop();
     } catch (err) {
       iterateError = err instanceof Error ? err.message : "Swap failed.";
     } finally {
@@ -287,6 +288,12 @@
       highlightedOracleId = null;
       highlightTimer = null;
     }, 2000);
+  }
+
+  function scrollDeckViewToTop(): void {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   }
 </script>
 

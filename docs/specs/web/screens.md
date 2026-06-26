@@ -267,7 +267,7 @@ Not a separate route — inline panel on the enhanced deck view.
 | Slot regen | Slot heading row includes **Regenerate** — confirm modal → `POST …/refill-slot`; loading state on slot group |
 | Selection | Checkbox at row start; commander rows not selectable |
 | Swap bar | Sticky bar above footer when ≥1 card selected — **Swap (N)** primary + **Clear** |
-| Post-swap | Inline banner listing old → new per `swaps[]`; scroll to first changed row |
+| Post-swap | Inline banner listing old → new per `swaps[]`; scroll to top of deck view |
 | Errors | Inline error on failed PATCH/refill/swap |
 | Dependencies | Panel refreshes from returned `deck.dependency_report` after refill/swap; per-issue **Swap All** when issue lists swappable cards |
 | Footer | Unchanged — Build another / Delete / Library / Home (disabled during in-flight API) |
