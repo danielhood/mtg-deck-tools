@@ -45,7 +45,7 @@ Reuse existing product specs — do not fork schemas in the frontend:
 
 - [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json`, metrics, lock/swap fields (UX11)
 - [user-experience.md](../dependency-engine/user-experience.md) — wizard flow, UX7c scope, UX roadmap
-- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — **UX10** backlog; **UX11** active in [active.md](../../roadmap/active.md)
+- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — **UX10** backlog
 
 ## Locked v1 decisions
 

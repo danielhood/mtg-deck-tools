@@ -52,7 +52,7 @@ From CR 903 ([`resources/mtg/MagicCompRules 20260417.txt`](../resources/mtg/Magi
 - Third-party site export (Moxfield/Archidekt) — v2; v1 uses Markdown + `.deck.json`
 - Related **token card** companion list in deck output (acquisition aid; not part of 100-card count) — planned; [deck-output-format.md](deck-output-format.md)
 - **Deck composition metrics** (CMC distribution report/visualization; optional curve advisories) — planned UX10; [deck-output-format.md](deck-output-format.md), [user-experience.md](../specs/dependency-engine/user-experience.md)
-- **GUI deck editor** (per-card lock; swap selected cards under current build rules) — planned UX11; [user-experience.md](../specs/dependency-engine/user-experience.md)
+- **GUI deck editor** (per-card lock; swap selected cards under current build rules) — **UX11 shipped**; [user-experience.md](../specs/dependency-engine/user-experience.md)
 
 ## Success criteria for v1
 

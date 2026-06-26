@@ -8,7 +8,7 @@ Format: `- **YYYY-MM-DD** — Short title — optional PR/issue`
 
 ## 2026-06
 
-- **2026-06-25** — UX7g-b web-initiated card import/refresh shipped — home **Download card data** / **Refresh card data** via `POST /api/v1/import` (`DbBanner`, `HomePage`); poll `GET /api/v1/wizard/meta` until `db_ready` (#81)
+- **2026-06-26** — UX11 GUI deck editor shipped — per-card lock (`PATCH` deck body), slot regen (`POST …/refill-slot`), multi-select swap (`POST …/swap`); edit mode on `/deck/:id`; lock-aware engine refill — home **Download card data** / **Refresh card data** via `POST /api/v1/import` (`DbBanner`, `HomePage`); poll `GET /api/v1/wizard/meta` until `db_ready` (#81)
 - **2026-06-25** — UX7d dependency dashboard shipped — collapsible **Dependencies** panel on deck view (`/deck/:id`); profile summaries and expandable issues with **Show in deck** highlight; generate rejects invalid/incomplete decks; commander step defaults color filter to Exact (#77, #78)
 - **2026-06-24** — UX7f saved deck library shipped (server SQLite store, `GET/PATCH/DELETE /api/v1/decks`, generate auto-save; `/library` grid; deck view rename/delete; JSON-first deck view; home library CTAs)
 - **2026-06-24** — Fix Docker generate ignoring `MTG_DB_PATH` (deck builder used `/app/data/cards.db` instead of `/data/cards.db`)

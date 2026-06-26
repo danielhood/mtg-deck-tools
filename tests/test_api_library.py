@@ -125,6 +125,51 @@ def test_library_crud(client: TestClient, library_env) -> None:
     assert client.get(f"/api/v1/decks/{deck_id}", params={"decks": str(decks_db)}).status_code == 404
 
 
+def test_patch_deck_body(client: TestClient, library_env) -> None:
+    cards_db, decks_db = library_env
+    generated = client.post(
+        "/api/v1/generate",
+        json={
+            "stub": True,
+            "db_path": str(cards_db),
+            "criteria": {"themes": ["tokens"], "commander_oracle_ids": ["cmd-1"]},
+        },
+    ).json()
+    deck_id = generated["id"]
+    deck = generated["deck"]
+    deck["schema_version"] = "1.0"
+    deck["cards"] = [
+        {"oracle_id": "syn-1", "name": "Synergy", "slot": "synergy", "quantity": 1, "locked": True},
+    ]
+
+    patched = client.patch(
+        f"/api/v1/decks/{deck_id}",
+        params={"db": str(cards_db), "decks": str(decks_db)},
+        json={"deck": deck},
+    )
+    assert patched.status_code == 200
+    assert patched.json()["deck"]["cards"][0]["locked"] is True
+
+
+def test_swap_endpoint_rejects_empty(client: TestClient, library_env) -> None:
+    cards_db, decks_db = library_env
+    generated = client.post(
+        "/api/v1/generate",
+        json={
+            "stub": True,
+            "db_path": str(cards_db),
+            "criteria": {"themes": [], "commander_oracle_ids": ["cmd-1"]},
+        },
+    ).json()
+    deck_id = generated["id"]
+    response = client.post(
+        f"/api/v1/decks/{deck_id}/swap",
+        params={"db": str(cards_db), "decks": str(decks_db)},
+        json={"oracle_ids": []},
+    )
+    assert response.status_code == 400
+
+
 def test_library_search_and_sort(client: TestClient, library_env, monkeypatch) -> None:
     _, decks_db = library_env
     monkeypatch.setenv("MTG_DECKS_PATH", str(decks_db))

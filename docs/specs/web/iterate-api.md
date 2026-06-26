@@ -1,10 +1,10 @@
-# Web UI — deck iterate HTTP API (planned)
+# Web UI — deck iterate HTTP API
 
-**Status:** **UX11 planning** — decisions locked 2026-06-26. Implementation: [user-experience.md](../dependency-engine/user-experience.md) § UX11.
+**Status:** **UX11 shipped (2026-06-26).** Implementation: [user-experience.md](../dependency-engine/user-experience.md) § UX11.
 
 Server-side iterate operations for saved library decks. The SPA does **not** call subprocess CLI; all paths use `service/` facades (same rule as generate).
 
-Contract: [openapi.yaml](openapi.yaml) — paths added at **UX11a** implementation.
+Contract: [openapi.yaml](openapi.yaml).
 
 ---
 

@@ -84,6 +84,8 @@ def _pick_victim(
                 continue
             if card.oracle_id in protect_oracle_ids:
                 continue
+            if card.locked:
+                continue
             if "Basic" in card.type_line:
                 continue
             return card

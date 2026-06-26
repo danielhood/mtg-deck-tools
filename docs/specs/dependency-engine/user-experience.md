@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-26):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7d + UX7g shipped**. **UX11** GUI deck editor — planning locked, active — [active.md](../../roadmap/active.md). Post-MVP backlog: **UX10** — [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
+**Status (2026-06-26):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7d + UX7g shipped**. **UX11** GUI deck editor **shipped**. Post-MVP backlog: **UX10** — [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -603,9 +603,9 @@ Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7d wir
 
 **Out of scope (UX7g):** live Scryfall sync; user-uploaded bulk JSON; auth-gated admin import.
 
-### UX11 — GUI deck editor: swap and lock (planning)
+### UX11 — GUI deck editor: swap and lock (shipped)
 
-**Status:** **Planning locked (2026-06-26)** — slices UX11a–e defined; wireframes P0 approved for implementation gate. API: [iterate-api.md](../web/iterate-api.md). Screens: [screens.md](../web/screens.md) § Deck editor.
+**Status:** **Shipped (2026-06-26)** — slices UX11a–e complete. API: [iterate-api.md](../web/iterate-api.md). Screens: [screens.md](../web/screens.md) § Deck editor.
 
 **Goal:** **Iterate** mode on `/deck/:id` — pin cards, refill a slot, or swap selected maindeck cards without re-running the build wizard. Mobile-first; poor fit for terminal (GUI primary).
 
@@ -637,11 +637,11 @@ Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7d wir
 
 | Slice | Deliverable | Status |
 | --- | --- | --- |
-| **UX11a** | Schema + engine: `locked` on `cards[]`; `refill_deck_slot` respects locks; swap pipeline in `service/` | Planned |
-| **UX11b** | `POST /api/v1/decks/{id}/refill-slot` + OpenAPI | Planned |
-| **UX11c** | Lock toggle UI + `PATCH` deck body | Planned |
-| **UX11d** | `POST /api/v1/decks/{id}/swap` + selection mode + Swap action bar + inline diff | Planned |
-| **UX11e** | 375px polish, loading/errors, optional seed advanced control | Planned |
+| **UX11a** | Schema + engine: `locked` on `cards[]`; `refill_deck_slot` respects locks; swap pipeline in `service/` | Shipped |
+| **UX11b** | `POST /api/v1/decks/{id}/refill-slot` + OpenAPI | Shipped |
+| **UX11c** | Lock toggle UI + `PATCH` deck body | Shipped |
+| **UX11d** | `POST /api/v1/decks/{id}/swap` + selection mode + Swap action bar + inline diff | Shipped |
+| **UX11e** | 375px polish, loading/errors, optional seed advanced control | Shipped |
 
 **Implementation order:** UX11a → UX11b + UX11c (parallel OK) → UX11d → UX11e.
 

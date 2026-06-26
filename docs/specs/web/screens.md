@@ -253,7 +253,7 @@ Not a separate route — inline panel on the enhanced deck view.
 
 ## Deck editor (`/deck/:id` edit mode) — UX11
 
-**Status:** Planning locked (2026-06-26). Not separate route — extends enhanced deck view. Decisions: [user-experience.md](../dependency-engine/user-experience.md) § UX11. API: [iterate-api.md](iterate-api.md).
+**Status:** **Shipped (2026-06-26).** Not separate route — extends enhanced deck view. Decisions: [user-experience.md](../dependency-engine/user-experience.md) § UX11. API: [iterate-api.md](iterate-api.md).
 
 **Wireframe:** [deck-view-edit-mode.html](wireframes/deck-view-edit-mode.html) (lock + slot regen) · [deck-view-edit-select.html](wireframes/deck-view-edit-select.html) (selection + swap bar) · [deck-view-edit-swap-result.html](wireframes/deck-view-edit-swap-result.html) (post-swap diff)
 

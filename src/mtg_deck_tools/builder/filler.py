@@ -432,8 +432,19 @@ def refill_deck_slot(
     slots = adjust_slot_template_for_commanders(slots, commander_count)
     mainboard_size = mainboard_size_for_commanders(commander_count)
 
-    kept = [c for c in fixed_cards if c.slot != refill_slot]
+    locked_in_slot = [c for c in fixed_cards if c.slot == refill_slot and c.locked]
+    kept = [c for c in fixed_cards if c.slot != refill_slot] + locked_in_slot
+    locked_qty = sum(c.quantity for c in locked_in_slot)
     count = slots.get(refill_slot, 0)
+    refill_count = count - locked_qty
+    if refill_count < 0:
+        raise ValueError(
+            f"Locked cards ({locked_qty}) exceed slot '{refill_slot}' target ({count})."
+        )
+    if refill_count == 0:
+        raise ValueError(
+            f"All cards in slot '{refill_slot}' are locked; nothing to refill."
+        )
 
     commander_tags: set[str] = set()
     if commander_oracle_ids:
@@ -459,9 +470,9 @@ def refill_deck_slot(
 
     mana_plan: ManaBasePlan | None = None
     if refill_slot == "lands":
-        mana_plan = _fill_lands(state, count, mainboard_size=mainboard_size)
+        mana_plan = _fill_lands(state, refill_count, mainboard_size=mainboard_size)
     else:
-        _fill_slot(state, refill_slot, count)
+        _fill_slot(state, refill_slot, refill_count)
 
     cards, budget_spent, warnings = trim_deck_to_budget(
         conn,

@@ -262,7 +262,8 @@ def trim_deck_to_budget(
         swappable = [
             c
             for c in working
-            if "Basic" not in c.type_line
+            if not c.locked
+            and "Basic" not in c.type_line
             and c.price_known
             and c.price_usd is not None
             and c.price_usd > 0

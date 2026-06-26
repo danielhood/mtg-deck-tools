@@ -108,7 +108,32 @@ class DeckLibraryDetailResponse(BaseModel):
 
 
 class PatchDeckRequest(BaseModel):
-    name: str
+    name: str | None = None
+    deck: dict[str, Any] | None = None
+
+
+class RefillSlotRequest(BaseModel):
+    slot: str
+    seed: int | None = None
+
+
+class SwapCardsRequest(BaseModel):
+    oracle_ids: list[str]
+    seed: int | None = None
+
+
+class SwapRecordResponse(BaseModel):
+    slot: str
+    from_oracle_id: str
+    from_name: str
+    to_oracle_id: str
+    to_name: str
+
+
+class SwapCardsResponse(BaseModel):
+    id: str
+    deck: dict[str, Any]
+    swaps: list[SwapRecordResponse] = Field(default_factory=list)
 
 
 class WizardBuildStep(BaseModel):

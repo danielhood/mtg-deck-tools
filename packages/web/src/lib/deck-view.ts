@@ -38,6 +38,7 @@ export interface DeckCardRow {
   price_known: boolean;
   image_uri: string | null;
   scryfall_uri: string | null;
+  locked: boolean;
 }
 
 export interface DeckStats {
@@ -217,7 +218,26 @@ function parseCard(entry: unknown): DeckCardRow | null {
     price_known: row.price_known !== false,
     image_uri: asString(row.image_uri) || null,
     scryfall_uri: asString(row.scryfall_uri) || null,
+    locked: row.locked === true,
   };
+}
+
+export function toggleCardLocked(
+  deck: Record<string, unknown>,
+  oracleId: string,
+  locked: boolean,
+): Record<string, unknown> {
+  const cards = Array.isArray(deck.cards) ? deck.cards : [];
+  const nextCards = cards.map((entry) => {
+    if (!entry || typeof entry !== "object") return entry;
+    const row = entry as Record<string, unknown>;
+    if (asString(row.oracle_id) !== oracleId) return entry;
+    const next = { ...row };
+    if (locked) next.locked = true;
+    else delete next.locked;
+    return next;
+  });
+  return { ...deck, cards: nextCards };
 }
 
 function slotOrderFromDeck(deck: Record<string, unknown>): string[] {
