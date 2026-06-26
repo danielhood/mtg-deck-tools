@@ -25,6 +25,10 @@ export interface WizardDraft {
   commander_label: string | null;
   commander_search_query: string;
   commander_snapshot: CommanderSnapshot | null;
+  /** Commander search price bounds (step 6); default from budget per-card min/max once. */
+  commander_price_min_usd: number | null;
+  commander_price_max_usd: number | null;
+  commanderPriceInitialized: boolean;
   budget_usd: number | null;
   card_price_min_usd: number | null;
   card_price_max_usd: number | null;
@@ -54,6 +58,9 @@ export function emptyDraft(): WizardDraft {
     commander_label: null,
     commander_search_query: "",
     commander_snapshot: null,
+    commander_price_min_usd: null,
+    commander_price_max_usd: null,
+    commanderPriceInitialized: false,
     budget_usd: null,
     card_price_min_usd: null,
     card_price_max_usd: null,
@@ -141,4 +148,25 @@ export function commanderSearchColors(draft: WizardDraft): { colors: string[]; c
     return { colors: [...draft.colors], color_match: draft.colorMatch };
   }
   return { colors: [], color_match: "includes" };
+}
+
+/** Seed commander search price bounds from budget step per-card range (once). */
+export function seedCommanderPricesIfNeeded(draft: WizardDraft): WizardDraft {
+  if (draft.commanderPriceInitialized) return draft;
+  return {
+    ...draft,
+    commander_price_min_usd: draft.cardPriceRangeEnabled ? draft.card_price_min_usd : null,
+    commander_price_max_usd: draft.cardPriceRangeEnabled ? draft.card_price_max_usd : null,
+    commanderPriceInitialized: true,
+  };
+}
+
+export function commanderSearchPriceBounds(draft: WizardDraft): {
+  card_price_min_usd: number | null;
+  card_price_max_usd: number | null;
+} {
+  return {
+    card_price_min_usd: draft.commander_price_min_usd,
+    card_price_max_usd: draft.commander_price_max_usd,
+  };
 }

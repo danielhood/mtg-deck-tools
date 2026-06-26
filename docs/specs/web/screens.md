@@ -127,6 +127,7 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 | Control | UX7c |
 | --- | --- |
 | Search | Search-as-you-type |
+| Commander price | Min/max USD steppers below search — default min (and max when set) from budget step per-card range; overrides apply to commander search only |
 | Color match | Toggle: **`exact`** (default, left) vs **`includes`** |
 | Commander art | Scryfall `image_uri` for the selected result, shown below the search list; tap opens full-size pop-out — close control above the card (clear of mana-cost region); dismiss via close, backdrop, or Escape |
 | Selection | Required — highlighted result row is the pick indicator (no separate summary panel) |
