@@ -49,7 +49,7 @@ export function emptyDraft(): WizardDraft {
     avoid_mechanics: [],
     colors: [],
     colorFilter: "any",
-    colorMatch: "includes",
+    colorMatch: "exact",
     commander_oracle_ids: [],
     commander_label: null,
     commander_search_query: "",
