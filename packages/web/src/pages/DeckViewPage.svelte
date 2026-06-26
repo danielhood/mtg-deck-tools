@@ -1,5 +1,6 @@
 <script lang="ts">
   import CardLightbox from "../components/CardLightbox.svelte";
+  import DeckMetricsPanel from "../components/DeckMetricsPanel.svelte";
   import DependenciesPanel from "../components/DependenciesPanel.svelte";
   import ColorPipPicker from "../components/ColorPipPicker.svelte";
   import ErrorState from "../components/ErrorState.svelte";
@@ -377,6 +378,10 @@
         <p class="deck-panel-secondary">{formatTypeCountLine(parsed.typeCounts)}</p>
       </div>
     </section>
+
+    {#if parsed.deckMetrics}
+      <DeckMetricsPanel metrics={parsed.deckMetrics} />
+    {/if}
 
     <DependenciesPanel
       report={parsed.dependencyReport}

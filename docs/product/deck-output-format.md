@@ -227,9 +227,9 @@ Companion list for acquisition — not counted in the 100-card Commander deck.
 
 Tracked in backlog: [active.md](../roadmap/active.md).
 
-### Deck composition metrics (UX10 — in progress)
+### Deck composition metrics (UX10 — shipped)
 
-**Status:** **UX10a in progress** (2026-06-26). **UX10b** (web charts) backlog. Partial web shell (**UX7a–UX7f shipped**); lock/swap UI on deck view edit mode (**UX11**). Today the builder uses **average nonland CMC** for land-count heuristics (`mana_base.py`) and **per-slot target CMC** while scoring picks (`scorer.py`). **UX10a** adds post-build distribution metrics to Markdown and `.deck.json` `stats`.
+**Status:** **Shipped (2026-06-26)** — **UX10a** CLI report + **UX10b** web charts. Lock/swap UI on deck view edit mode (**UX11** shipped). The builder uses **average nonland CMC** for land-count heuristics (`mana_base.py`) and **per-slot target CMC** while scoring picks (`scorer.py`). Post-build distribution metrics appear in Markdown, `.deck.json` `stats`, and the web deck view.
 
 **Goal:** After a successful build, give the user **actionable composition metrics** — starting with **mana curve / CMC distribution** — in Markdown and `.deck.json`, and eventually in a richer UI (UX7). Metrics are **informational** by default; optional **advisory warnings** (e.g. “few cards at CMC 2–3”, “creature curve top-heavy”) are separate from legality and from dependency `fail` rules unless the user opts into strict curve hints later.
 
@@ -238,7 +238,7 @@ Tracked in backlog: [active.md](../roadmap/active.md).
 | **Report (UX10a)** | CMC histogram (0–7+ buckets), counts by primary type (creature, instant, …), `avg_cmc_nonland`, **creature-only** average and histogram, ramp count, land count (reuse build stats) |
 | **Markdown** | Table and/or ASCII bar chart; short interpretation blurb |
 | **JSON** | `deck_metrics` or extended `stats` with `cmc_histogram`, `creature_cmc_histogram`, `type_counts` |
-| **Visualization (UX10b)** | Local web or desktop: bar chart, pip color breakdown (stretch) — depends on UX7 shell |
+| **Visualization (UX10b)** | Local web: bar chart on `/deck/:id`; All nonlands / Creatures only toggle; curve blurb — shipped |
 | **Advisory rules (stretch)** | Warn-only `CURVE_TOP_HEAVY` / `CURVE_MISSING_EARLY` — profile- or archetype-specific thresholds; not v1 gate |
 
 **Relationship to existing behavior:**
@@ -251,7 +251,7 @@ Tracked in backlog: [active.md](../roadmap/active.md).
 
 **Non-goals for first ship:** Enforcing a universal “correct” Commander curve; simulating goldfish turns; sideboard metrics.
 
-Spec and UX phasing: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX10. Backlog: [active.md](../roadmap/active.md).
+Spec and UX phasing: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX10. Shipped: [changelog.md](../history/changelog.md).
 
 ### GUI deck editor (shipped — UX11)
 

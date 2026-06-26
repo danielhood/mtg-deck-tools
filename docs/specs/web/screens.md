@@ -187,6 +187,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Deck label | User `name` with pencil icon → rename modal (`PATCH`) — **UX7f** |
 | Commander header | Name, type line, color identity, hero `image_uri`; tap opens lightbox |
 | Summary panel | Always visible — slot counts, `stats.estimated_price_usd`, unpriced count, `avg_cmc_nonland`, type breakdown (client-computed) |
+| Deck metrics (**UX10b**) | Collapsible **Deck metrics** panel — CMC bar chart from `stats.cmc_histogram`; toggle **All nonlands** / **Creatures only**; curve blurb + summary (lands, ramp, avg CMC); client fallback when older decks lack `stats` fields |
 | Analysis | Collapsible **Dependencies** panel — profile summaries, expandable issues, **Show in deck** — see § Dependency dashboard |
 | Filters | Chip groups: **Slot** (multi), **Type** (multi), **Color** (multi); AND across groups; empty state when filter matches nothing |
 | Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters — **UX11** adds lock pin + edit-mode selection |
@@ -195,7 +196,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Footer | **Build another deck** → `/build/1`; **Delete deck** (destructive) → confirm modal; bottom row: **Library** → `/library` + **Home** → `/` |
 | Edit mode (**UX11**) | **Edit deck** in header → selection checkboxes + slot **Regenerate**; see § Deck editor |
 
-**Deferred on this screen:** JSON download; CMC charts (**UX10**).
+**Deferred on this screen:** JSON download.
 
 **API:** **UX7f:** `GET /api/v1/decks/{id}` on cache miss; primary render from JSON `deck` in session cache after load or generate. **UX11:** [iterate-api.md](iterate-api.md). Shape: [deck-output-format.md](../../product/deck-output-format.md).
 
@@ -245,7 +246,7 @@ Not a separate route — inline panel on the enhanced deck view.
 | Missing report | Muted *No dependency report in this deck.* — no profile/issue UI |
 | Footer | Unchanged — Build another / Delete / Library / Home |
 
-**Deferred:** repair pass; profile package swap; re-run validation; CMC charts (**UX10**).
+**Deferred:** repair pass; profile package swap; re-run validation.
 
 **API:** None — render from `deck.dependency_report` in session cache / library JSON. Shape: [deck-output-format.md](../../product/deck-output-format.md).
 
@@ -278,8 +279,6 @@ Not a separate route — inline panel on the enhanced deck view.
 ## Planned screens (post-UX7 MVP)
 
 Feature specs and backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md), [user-experience.md](../dependency-engine/user-experience.md).
-
-**UX10** charts may overlap the enhanced deck view. Route map: [routes.md](routes.md).
 
 ---
 

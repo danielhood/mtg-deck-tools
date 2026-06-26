@@ -2016,6 +2016,148 @@
   color: var(--warn-700);
 }
 
+.metrics-panel {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background: var(--bg);
+}
+
+.metrics-panel[open] > summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.metrics-panel summary {
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue-900);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.metrics-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.metrics-summary-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.metrics-body {
+  padding: 12px 14px 14px;
+}
+
+.metrics-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.metrics-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.metrics-chip.active {
+  border-color: var(--blue-700);
+  background: var(--blue-100);
+  color: var(--blue-900);
+}
+
+.metrics-chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.metrics-blurb {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.metrics-empty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.metrics-chart {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 4px;
+  align-items: end;
+  min-height: 120px;
+  margin-bottom: 10px;
+}
+
+.metrics-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.metrics-bar-track {
+  width: 100%;
+  max-width: 28px;
+  height: 88px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.metrics-bar-fill {
+  width: 100%;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  min-height: 0;
+  transition: height 0.15s ease;
+}
+
+.metrics-bar-fill--zero {
+  background: transparent;
+}
+
+.metrics-bar-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text);
+  min-height: 14px;
+  line-height: 1;
+}
+
+.metrics-bar-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.metrics-summary {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
 .deps-body {
   padding: 12px 14px 14px;
 }

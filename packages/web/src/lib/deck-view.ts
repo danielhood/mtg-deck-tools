@@ -1,4 +1,5 @@
 import { VOID_COLOR_ID } from "./color-pips";
+import { parseDeckMetrics, type DeckMetrics } from "./deck-metrics";
 import { parseDependencyReport, type ParsedDependencyReport } from "./dependency-report";
 import { formatPrice, formatTagLabel, sortColors } from "./format";
 
@@ -66,6 +67,7 @@ export interface ParsedDeck {
   slotCounts: Record<string, number>;
   stats: DeckStats;
   typeCounts: Record<string, number>;
+  deckMetrics: DeckMetrics | null;
   dependencyReport: ParsedDependencyReport;
   filterOptions: {
     slots: string[];
@@ -318,6 +320,7 @@ export function parseDeck(deck: Record<string, unknown> | null): ParsedDeck | nu
     slotCounts,
     stats: parseStats(deck),
     typeCounts,
+    deckMetrics: parseDeckMetrics(deck.stats, cards),
     dependencyReport: parseDependencyReport(deck),
     filterOptions: { slots, types, colors },
   };

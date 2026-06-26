@@ -117,7 +117,7 @@ Within a slot, rank candidates by weighted score:
 | Commander synergy | Tag overlap, oracle_text keyword match to commander | High |
 | EDHREC rank | `edhrec_rank` (lower = more popular) | Medium |
 | Curve fit | Distance from target CMC for slot | Medium |
-| Post-build curve metrics | CMC histogram / creature distribution in output (UX10) | N/A today — planned advisory report, not pick-time gate |
+| Post-build curve metrics | CMC histogram / creature distribution in output (UX10) | **Shipped** — advisory report in CLI/JSON/web; not pick-time gate |
 | Budget efficiency | Price vs. remaining budget | Medium |
 | Redundancy penalty | Similar cards already in deck | Low |
 
