@@ -180,10 +180,10 @@ export function curveBlurb(histogram: CmcHistogram): string {
 export function formatMetricsSummary(metrics: DeckMetrics): string {
   const parts: string[] = [];
   if (metrics.avg_cmc_nonland != null) {
-    parts.push(`avg nonland CMC ${metrics.avg_cmc_nonland.toFixed(1)}`);
+    parts.push(`Avg nonland CMC ${metrics.avg_cmc_nonland.toFixed(1)}`);
   }
   if (metrics.avg_creature_cmc != null) {
-    parts.push(`avg creature CMC ${metrics.avg_creature_cmc.toFixed(1)}`);
+    parts.push(`Avg creature CMC ${metrics.avg_creature_cmc.toFixed(1)}`);
   }
   if (metrics.land_count > 0) parts.push(`${metrics.land_count} lands`);
   if (metrics.ramp_count > 0) parts.push(`${metrics.ramp_count} ramp`);

@@ -161,6 +161,46 @@ export function formatReviewSummary(count: number): string {
   return `${count} area${count === 1 ? "" : "s"} to review`;
 }
 
+export function issueSwapOracleIds(
+  issue: DependencyIssueRow,
+  cards: IssueSwapCard[],
+): string[] {
+  const nameListKeys = [
+    ...DETAIL_LIST_KEYS,
+    "equip_payoffs",
+    "tutor",
+  ] as const;
+
+  if (issue.card_oracle_id) {
+    const card = cards.find((row) => row.oracle_id === issue.card_oracle_id);
+    if (card && !card.locked) return [issue.card_oracle_id];
+  }
+
+  const names = new Set<string>();
+  if (issue.card_name?.trim()) names.add(issue.card_name.trim());
+
+  for (const key of nameListKeys) {
+    const value = issue.detail[key];
+    if (!Array.isArray(value)) continue;
+    for (const item of value) {
+      if (typeof item === "string" && item.trim()) names.add(item.trim());
+    }
+  }
+
+  const ids: string[] = [];
+  for (const name of names) {
+    const card = cards.find((row) => row.name === name);
+    if (card && !card.locked) ids.push(card.oracle_id);
+  }
+  return [...new Set(ids)];
+}
+
+export interface IssueSwapCard {
+  oracle_id: string;
+  name: string;
+  locked: boolean;
+}
+
 export function buildDetailBlocks(detail: Record<string, unknown>): DetailBlock[] {
   const blocks: DetailBlock[] = [];
   const consumed = new Set<string>();

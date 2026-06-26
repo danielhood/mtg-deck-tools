@@ -387,7 +387,7 @@ export function formatSummaryLine(stats: DeckStats): string {
     );
   }
   if (stats.avg_cmc_nonland != null) {
-    parts.push(`avg CMC ${stats.avg_cmc_nonland.toFixed(1)} (nonlands)`);
+    parts.push(`Avg CMC ${stats.avg_cmc_nonland.toFixed(1)} (nonlands)`);
   }
   return parts.join(" · ") || "No summary stats available.";
 }
