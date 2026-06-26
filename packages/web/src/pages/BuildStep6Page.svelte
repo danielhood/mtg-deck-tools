@@ -156,19 +156,6 @@
         <input
           type="radio"
           name="color_match"
-          value="includes"
-          checked={draft.colorMatch === "includes"}
-          onchange={() => (draft = { ...draft, colorMatch: "includes" })}
-        />
-        <span class="segment-label">
-          <strong>Includes</strong>
-          <span>Has your colors (may include more)</span>
-        </span>
-      </label>
-      <label class="segment-option">
-        <input
-          type="radio"
-          name="color_match"
           value="exact"
           checked={draft.colorMatch === "exact"}
           onchange={() => (draft = { ...draft, colorMatch: "exact" })}
@@ -176,6 +163,19 @@
         <span class="segment-label">
           <strong>Exact</strong>
           <span>Only the colors you selected</span>
+        </span>
+      </label>
+      <label class="segment-option">
+        <input
+          type="radio"
+          name="color_match"
+          value="includes"
+          checked={draft.colorMatch === "includes"}
+          onchange={() => (draft = { ...draft, colorMatch: "includes" })}
+        />
+        <span class="segment-label">
+          <strong>Includes</strong>
+          <span>Has your colors (may include more)</span>
         </span>
       </label>
     </div>
