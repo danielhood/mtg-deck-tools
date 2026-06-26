@@ -1,7 +1,7 @@
-# Web UI architecture (planned)
+# Web UI architecture
 
-**Status:** **UX7a–UX7c implemented** — wizard API + Svelte SPA (steps 1–7, review, result) — [specs/web/README.md](README.md).
-**Phase:** **UX7d** dashboard active — UX7f library shipped.
+**Status:** **UX7 MVP shipped** (UX7a–UX7d) — wizard API + Svelte SPA + deck view + library + dependency dashboard — [specs/web/README.md](README.md).
+**Phase:** Post-MVP — promote from [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 ## Strategic shift
 
@@ -144,7 +144,7 @@ The web app is the **primary interactive shell**. The CLI remains for automation
 | --- | --- | --- | --- |
 | **Build** | New deck from scratch | Yes — once | **UX7c** |
 | **Iterate** | Swap, slot regen, param changes → partial/full rebuild | No | **UX11** + **UX7f** |
-| **View** | Inspect active deck (filters, balance, analysis) | No | **UX7e** → **UX7d** / **UX10** |
+| **View** | Inspect active deck (filters, balance, analysis) | No | **UX7e** + **UX7d** / **UX10** |
 
 Routes: [routes.md](routes.md). Screens: [screens.md](screens.md). Navigation: [navigation.md](navigation.md). Wizard API: [wizard-api.md](wizard-api.md). Library API: [library-api.md](library-api.md). Visual design: [design.md](design.md).
 
@@ -183,8 +183,9 @@ When `cards.db` is missing (`GET /api/v1/stats` → 404 or wizard meta reports n
 
 - **Hard block** — no wizard, **library**, or deck view functionality.
 - **Home** (`/`) still renders with a **banner**; **Build new deck** and **Saved library** disabled.
-- Copy directs user to CLI: `mtg-deck-tools import`.
-- **UX7g** (backlog): web-side init / Scryfall refresh when online.
+- **Server bootstrap (UX7g-a, shipped):** `mtg-deck-tools serve` with `MTG_AUTO_DOWNLOAD=1` (default) downloads oracle bulk and imports **before** listening — Docker uses the same path. See [deployment.md](deployment.md).
+- **Current SPA copy:** banner directs to CLI `mtg-deck-tools import` or restarting `serve` when auto-download is enabled — see `DbBanner.svelte`.
+- **UX7g-b (backlog):** in-browser **Download card data** via `POST /api/v1/import`, progress UI, meta poll until `db_ready`; optional refresh. See [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) § UX7g.
 
 ### Saved deck library (UX7f)
 
@@ -248,10 +249,11 @@ Comparison retained for context (Vue was the alternative):
 | UX7c | Build wizard (7 steps + review + generate) | Shipped — [routes.md](routes.md), [screens.md](screens.md) |
 | UX7e | Enhanced deck view (filters, summaries, art) | Shipped |
 | UX7f | Saved deck library | Shipped |
-| **UX7d** | Dependency dashboard | **Active** — [active.md](../../roadmap/active.md) |
+| UX7d | Dependency dashboard | Shipped |
+| UX7g-a | Server DB bootstrap (`serve` + `MTG_AUTO_DOWNLOAD`, `POST /api/v1/import`) | Shipped |
+| UX7g-b | Web-initiated import / refresh UI | Backlog |
 | UX10b | CMC / composition charts | Backlog |
 | UX11 | Deck editor (swap / lock / iterate) | Backlog |
-| UX7g | Web DB init / Scryfall refresh | Backlog |
 
 ---
 
@@ -316,4 +318,4 @@ Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `p
 - [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — Option B + unified service
 - [technology-stack.md](../../architecture/technology-stack.md) — stack update
 - [deck-output-format.md](../../product/deck-output-format.md) — shared JSON contract
-- [active.md](../../roadmap/active.md) — **UX7d** active; post-MVP in [backlog/web-ui.md](../../roadmap/backlog/web-ui.md)
+- [active.md](../../roadmap/active.md) — post-MVP web work in [backlog/web-ui.md](../../roadmap/backlog/web-ui.md)

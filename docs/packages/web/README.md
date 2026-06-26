@@ -1,6 +1,6 @@
 # Web UI package
 
-**Status:** **UX7c + UX7e + UX7f shipped** — build wizard, enhanced deck view, and saved deck library (`/library`, library API client, JSON-first deck view). **UX7d** dependency dashboard — planned ([user-experience.md](../specs/dependency-engine/user-experience.md) § UX7d, [screens.md](../specs/web/screens.md) § Dependency dashboard).
+**Status:** **UX7 MVP shipped** (UX7c + UX7e + UX7f + UX7d) — build wizard, enhanced deck view, saved deck library, and dependency dashboard (`DependenciesPanel`, `/library`, library API client, JSON-first deck view).
 
 ## Stack (locked)
 
@@ -21,7 +21,7 @@ packages/web/
   src/
     App.svelte              # Route switcher
     app.css                 # Design tokens (wireframe parity)
-    components/             # AppShell, WizardChrome, LoadingState, ErrorState, CardLightbox
+    components/             # AppShell, WizardChrome, DependenciesPanel, LoadingState, ErrorState, CardLightbox
     lib/                    # api, criteria draft, router, format
     pages/                  # Home, build steps 1–7, review, deck view
   index.html
@@ -54,9 +54,9 @@ Without Corepack, install pnpm globally: `npm install -g pnpm` (or see [pnpm.io/
 
 ## Dev workflow
 
-1. `mtg-deck-tools import` (once) so `GET /api/v1/wizard/meta` reports `db_ready`.
-2. `mtg-deck-tools serve` in one terminal.
-3. `cd packages/web && pnpm install && pnpm dev` in another.
+1. `mtg-deck-tools serve` — with default `MTG_AUTO_DOWNLOAD=1`, missing `cards.db` is built at startup (no separate `import` step). Set `MTG_AUTO_DOWNLOAD=0` only when using a pre-built DB.
+2. Confirm `GET /api/v1/wizard/meta` reports `db_ready: true`.
+3. `cd packages/web && pnpm install && pnpm dev` in another terminal.
 4. Walk `/` → `/build/1` … `/build/7` → `/build/review` → Generate → `/deck/:id`.
 
 Wizard draft persists in `sessionStorage` (`mtg-wizard-draft`). Loaded decks cache in `sessionStorage` as `mtg-deck-cache-{uuid}` (includes `returnTo` for delete redirect). Canonical deck store is the server library API.

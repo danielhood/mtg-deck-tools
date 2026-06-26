@@ -69,5 +69,6 @@ Matrix: **30 scenarios**; gate `analyze run --fail-on-expect` — **30/30** as o
 | UX7c | Build wizard (7 steps + review + generate) |
 | UX7e | Enhanced deck view (`/deck/:id`) |
 | UX7f | Saved deck library (`/library`, server persistence, auto-save on generate) |
+| UX7d | Dependency dashboard (collapsible **Dependencies** panel, generate validation gate) |
 
-**Active:** UX7d dependency dashboard — [active.md](../roadmap/active.md). Detail: [specs/web/README.md](../specs/web/README.md), [changelog.md](changelog.md).
+**UX7 MVP complete.** Next web work: [backlog/web-ui.md](../roadmap/backlog/web-ui.md). Detail: [specs/web/README.md](../specs/web/README.md), [changelog.md](changelog.md).

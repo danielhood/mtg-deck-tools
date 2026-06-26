@@ -1,6 +1,6 @@
-# Web UI specification (planned)
+# Web UI specification
 
-**Status:** **UX7a–UX7c + UX7e + UX7f shipped** — build wizard, enhanced deck view, and saved deck library. **UX7d** dependency dashboard — planned (spec + wireframes in [user-experience.md](../dependency-engine/user-experience.md) § UX7d).
+**Status:** **UX7 MVP shipped** (UX7a–UX7d) — build wizard, enhanced deck view, saved deck library, and dependency dashboard. Post-MVP: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 ## Code location
 
@@ -44,7 +44,7 @@ Reuse existing product specs — do not fork schemas in the frontend:
 
 - [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json`, metrics, lock/swap fields (UX11)
 - [user-experience.md](../dependency-engine/user-experience.md) — wizard flow, UX7c scope, UX roadmap
-- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — delivery sequence, UX7e–UX7g
+- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — post-MVP delivery (UX10, UX11, UX7g-b); UX7g-a server bootstrap shipped
 
 ## Locked v1 decisions
 
@@ -64,5 +64,5 @@ Reuse existing product specs — do not fork schemas in the frontend:
 
 ## References
 
-- [active.md](../../roadmap/active.md) — **UX7d** is the active web task (UX7 MVP)
+- [active.md](../../roadmap/active.md) — promote next web task from [backlog/web-ui.md](../../roadmap/backlog/web-ui.md)
 - [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — unified service option

@@ -193,7 +193,7 @@ See Cursor Canvas skill when creating `.canvas.tsx` files.
 | Token change | **planning** | [design.md](../design.md) |
 | Svelte matching wireframe | **implementation** | `packages/web/`, same PR updates spec index if routes change |
 
-**No changelog** for wireframe-only planning PRs. UX7 MVP closes when **UX7d** ships — see [active.md](../../roadmap/active.md).
+**No changelog** for wireframe-only planning PRs. **UX7 MVP shipped** (UX7d closed the MVP) — see [changelog.md](../../history/changelog.md).
 
 PR body must include **Phase: planning** and list docs touched per [DOC-MAP.md](../../DOC-MAP.md).
 
@@ -223,7 +223,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | MD preview | `<details>` default **closed** at bottom of scroll |
 | Footer | Fixed **Build another deck** (primary); **Delete deck**; bottom row **Back** + **Home** (**UX7f**) |
 
-**Dev notes only (`.dev-note`):** session cache key `mtg-deck-cache-{id}`; server library API shipped (**UX7f**); UX11/UX10/UX7d deferred.
+**Dev notes only (`.dev-note`):** session cache key `mtg-deck-cache-{id}`; server library API shipped (**UX7f**); dependency dashboard shipped (**UX7d**); UX11/UX10 deferred.
 
 **Out of scope for UX7e wireframes:** swap/lock selection; library grid; CMC chart; dependency dashboard drill-down; dark mode.
 
@@ -265,7 +265,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 ## UX7d wireframe scope
 
-**Status:** **Approved (2026-06-25)** — decisions locked — [user-experience.md](../../dependency-engine/user-experience.md) § UX7d, [screens.md](../screens.md) § Dependency dashboard.
+**Status:** **Shipped (2026-06-25)** — decisions locked — [user-experience.md](../../dependency-engine/user-experience.md) § UX7d, [screens.md](../screens.md) § Dependency dashboard.
 
 | Priority | File | Route | States to show |
 | --- | --- | --- | --- |
@@ -277,7 +277,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 | Region | Layout notes |
 | --- | --- |
-| Panel chrome | `<details>` **Dependencies** — replaces standalone **Areas to review** banner when UX7d ships |
+| Panel chrome | `<details>` **Dependencies** — replaces standalone **Areas to review** banner |
 | Closed summary | One line: green **Looks good** or amber **N areas to review** |
 | Profile row | Label (wizard prompt), status pill (pass/warn/fail), horizontal count chips |
 | Issue row | `rule_id` + chevron; expanded: message, profile label, bullet lists from `detail` |
@@ -289,7 +289,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 **Out of scope for UX7d wireframes:** repair/regen buttons; profile package swap; CMC chart; swap/lock selection; dark mode.
 
-**Approval gate:** P0 files **approved 2026-06-25** in [index.md](index.md) — UX7d-a Svelte work may start.
+**Approval gate:** P0 files shipped 2026-06-25 — see [index.md](index.md).
 
 ---
 

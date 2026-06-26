@@ -76,9 +76,7 @@ Web (HTTP)       ──→ api/     ──→ service/
 | OpenAPI contract for frontend | Optional `--api-url` adds test surface |
 | Dogfood unchanged (in-process CLI) | |
 
-**Status:** **UX7a shipped** — `service/` and `api/` in `src/mtg_deck_tools/`; CLI uses in-process facades.
-
-**Best when:** CLI and web must stay in sync without duplicating logic — **required for UX7** (remaining: `serve`, SPA).
+**Status:** **UX7 MVP shipped** — `service/`, `api/`, and `packages/web/` in tree; CLI uses in-process facades.
 
 ---
 

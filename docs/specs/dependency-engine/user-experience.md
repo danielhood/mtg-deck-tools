@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-25):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7c + UX7e + UX7f shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library). **UX7d** dashboard — planned (spec + wireframes in § UX7d below) — [architecture.md](../web/architecture.md), [screens.md](../web/screens.md) § Dependency dashboard, [active.md](../../roadmap/active.md).
+**Status (2026-06-25):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7d shipped** (CLI wizard + web build wizard + enhanced deck view + saved deck library + dependency dashboard). Post-MVP web: **UX10**, **UX11** — [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -367,7 +367,7 @@ Engine requirements for swaps:
 | ~~**UX4**~~ | ~~**Wizard step back-navigation** — return to earlier steps to revise selections~~ — **Shipped 2026-06-04** | None (wizard orchestration) |
 | ~~**UX5**~~ | ~~Wizard prepopulate on regen~~ — **Shipped 2026-06-04** | `.deck.json` criteria round-trip |
 | **UX6** | `.deck.json` per-card `dependency_roles` | D2 |
-| **UX7** | Cross-platform web (mobile-first): ~~`service/` + FastAPI~~ **UX7a shipped**; ~~`serve`~~ **UX7b shipped**; ~~build wizard **UX7c**~~ **shipped**; ~~deck view **UX7e**~~ **shipped**; ~~library **UX7f**~~ **shipped**; dashboard **UX7d**; iterate **UX11** | D5 + [specs/web/](../web/) |
+| **UX7** | Cross-platform web (mobile-first): ~~`service/` + FastAPI~~ **UX7a shipped**; ~~`serve`~~ **UX7b shipped**; ~~build wizard **UX7c**~~ **shipped**; ~~deck view **UX7e**~~ **shipped**; ~~library **UX7f**~~ **shipped**; ~~dashboard **UX7d**~~ **shipped**; iterate **UX11** | D5 + [specs/web/](../web/) |
 | **UX8** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
 | **UX9** | Web constraint panel + pick preview (interactive build) | D3–D4 + UX7 shell |
 | **UX10** | **Deck composition metrics** — CMC distribution report (+ optional curve advisories); CLI MD/JSON first, charts in UX7 | Build result / `output.py`; no new `card_effects` |
@@ -388,7 +388,7 @@ Engine requirements for swaps:
 - Server-side wizard helpers ([wizard-api.md](../web/wizard-api.md)); SPA holds `DeckCriteria` draft only (`sessionStorage` key `mtg-wizard-draft`).
 - Random **seed** at generate; stored in `deck.criteria.seed` when auto-saved to library (**UX7f**).
 
-**Out of scope (UX7c):** partner commander picker; custom slot editor; JSON download; enhanced deck view; saved decks; iterate; dependency dashboard; charts; dark mode; web DB import (**UX7g**).
+**Out of scope (UX7c):** partner commander picker; custom slot editor; JSON download; enhanced deck view; saved decks; iterate; dependency dashboard; charts; dark mode; in-browser DB import UI (**UX7g-b** — server bootstrap **UX7g-a** shipped).
 
 **Slices:**
 
@@ -411,7 +411,7 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | Step 3 focus | Stepper per activated profile (− / + through Default → Engine); level definitions at top of section |
 | Step 6 commander | Search-as-you-type; `includes` / `exact` toggle; **no** partners |
 | Result | HTML render of output Markdown |
-| DB missing | Hard block; home banner; CLI `import` until **UX7g** |
+| DB missing | Hard block; home banner; **UX7g-a:** `serve` auto-bootstrap when `MTG_AUTO_DOWNLOAD=1`; **UX7g-b:** in-browser import (backlog) |
 | Visual design | [design.md](../web/design.md) |
 
 ### UX7e — Enhanced deck view (shipped)
@@ -430,7 +430,7 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 - Collapsible Markdown preview (same MD→HTML path as UX7c result).
 - Home **View last deck** when a session deck exists.
 
-**Out of scope (UX7e):** saved library (**UX7f**); JSON download; swap / lock / regen (**UX11**); dependency drill-down dashboard (**UX7d**); CMC histogram charts (**UX10**); new analyze HTTP endpoints; server-side deck persistence.
+**Out of scope (UX7e):** saved library (**UX7f**); JSON download; swap / lock / regen (**UX11**); dependency drill-down dashboard (**UX7d** — shipped separately); CMC histogram charts (**UX10**); new analyze HTTP endpoints; server-side deck persistence.
 
 **Slices:**
 
@@ -525,9 +525,9 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7f wireframe scope — [library.html](../web/wireframes/library.html), [deck-view.html](../web/wireframes/deck-view.html), [deck-view-from-home.html](../web/wireframes/deck-view-from-home.html), [deck-view-from-generate.html](../web/wireframes/deck-view-from-generate.html), [deck-view-rename.html](../web/wireframes/deck-view-rename.html), [deck-view-delete.html](../web/wireframes/deck-view-delete.html), [home-library-ready.html](../web/wireframes/home-library-ready.html).
 
-### UX7d — Dependency dashboard (planned)
+### UX7d — Dependency dashboard (shipped)
 
-**Status:** **Planned — P1 active** — [screens.md](../web/screens.md) § Dependency dashboard, [active.md](../../roadmap/active.md). Closes UX7 MVP.
+**Status:** **Shipped 2026-06-25** — [screens.md](../web/screens.md) § Dependency dashboard, [changelog.md](../../history/changelog.md). Closes UX7 MVP.
 
 **Goal:** Drill down on persisted `dependency_report` for library decks so users can see **per-profile balance** and **rule-level detail** without re-running the wizard or duplicating engine logic in the browser.
 
@@ -561,7 +561,7 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) (after UX7f
 | Placement | **Same route** `/deck/:id` — inline `<details>` panel titled **Dependencies**, below Summary, above Filters |
 | Entry / default open | **Closed** when `dependency_report.passed` or no non-pass issues; **open** when any `warn` or `fail` issue exists |
 | Compact summary (closed) | **Looks good** — one line when passed or no warn/fail issues. **N areas to review** — count of `warn` + `fail` issues (not profile count) |
-| UX7e compact list | **Replaced** by Dependencies panel summary — no duplicate **Areas to review** banner once UX7d ships |
+| UX7e compact list | **Replaced** by Dependencies panel summary — no duplicate **Areas to review** banner |
 | Profile list | Render **only** entries in `dependency_report.profiles[]` (engine-scoped). Sort: `fail` → `warn` → `pass`; then label A–Z |
 | Profile counts | Display `counts` key-value pairs as labeled chips (e.g. `producer: 2`, `consumer: 0`) — keys are profile-specific; no client-side reinterpretation |
 | Issue visibility | Dashboard shows all issues with `status` **`warn`** or **`fail`**; `pass` issues omitted |
@@ -575,6 +575,32 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) (after UX7f
 | Visual design | [design.md](../web/design.md) — warn amber, fail red accent, pass green check; 375px baseline |
 
 Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7d wireframe scope — [deck-view-dependencies.html](../web/wireframes/deck-view-dependencies.html), [deck-view-dependencies-issue.html](../web/wireframes/deck-view-dependencies-issue.html), [deck-view-dependencies-good.html](../web/wireframes/deck-view-dependencies-good.html).
+
+### UX7g — Database init / refresh (partial)
+
+**Status:** **UX7g-a shipped** (server bootstrap); **UX7g-b backlog** (web UI). Detail: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) § UX7g, [architecture.md](../web/architecture.md) § Database gate.
+
+**Goal:** Replace the CLI-only first-time setup gate for browser users, and optionally support intentional bulk refresh.
+
+#### UX7g-a — Server bootstrap (shipped)
+
+| Deliverable | Notes |
+| --- | --- |
+| Scryfall oracle bulk download | `import_/scryfall_bulk.py`; `MTG_AUTO_DOWNLOAD` env (default on) |
+| `serve` startup | `ensure_cards_database` before uvicorn listens |
+| `POST /api/v1/import` | Same `import_oracle_cards` facade; blocking request; **not wired in SPA** |
+| Docker | First boot on empty `/data` volume |
+
+#### UX7g-b — Web-initiated flow (backlog)
+
+| Deliverable | Notes |
+| --- | --- |
+| Home CTA | **Download card data** when `!db_ready` → `POST /api/v1/import` |
+| Progress | Long-running import feedback (minutes); disable duplicate submits |
+| Ready handoff | Poll `GET /api/v1/wizard/meta` until `db_ready`; enable wizard |
+| Refresh (optional) | Confirm + re-import; out of scope for UX7g-a |
+
+**Out of scope (UX7g):** live Scryfall sync; user-uploaded bulk JSON; auth-gated admin import.
 
 ### UX11 — GUI deck editor: swap and lock (parked)
 

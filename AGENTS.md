@@ -53,7 +53,7 @@ ruff check src tests        # configured in pyproject.toml; ruff is not a declar
 Tests do **not** need Scryfall bulk JSON. Manual `import` / `generate` do:
 
 1. Use the bundled snapshot under `resources/scryfall/oracle-cards-*.json`, or download [Scryfall Oracle Cards bulk](https://scryfall.com/docs/api/bulk-data) when intentionally refreshing (see README).
-2. `mtg-deck-tools import` → `data/cards.db` (downloads oracle bulk first when no local JSON exists).
+2. `mtg-deck-tools import` → `data/cards.db` (downloads oracle bulk first when no local JSON exists). **`mtg-deck-tools serve`** does the same bootstrap at startup when `cards.db` is missing (`MTG_AUTO_DOWNLOAD=1`, default).
 3. Example full flow: `mtg-deck-tools stats` then `mtg-deck-tools generate --seed 42 --colors G --themes tokens`.
 
 **Data freshness:** Static DB is intentional — target users build with older used cards; no live Scryfall sync. Companion datasets (tags, `card_effects`, audit reports) update when maintainers re-run `import` and `dependency-audit`.
@@ -62,7 +62,7 @@ Tests do **not** need Scryfall bulk JSON. Manual `import` / `generate` do:
 
 ### Services
 
-**CLI-only:** nothing listens on a port. **With `[web]`:** run `mtg-deck-tools serve` locally (see README → HTTP API). **Docker:** `docker compose up --build` (see README → Docker) — API + SPA behind Traefik at `http://mtg-deck-tools.deck-build.lan` with a persistent `/data` volume. No background daemons required for dogfood or pytest.
+**CLI-only:** nothing listens on a port. **With `[web]`:** run `mtg-deck-tools serve` locally (see README → HTTP API) — auto-builds `cards.db` on first start when `MTG_AUTO_DOWNLOAD=1`. **Docker:** `docker compose up --build` (see README → Docker) — API + SPA behind Traefik at `http://mtg-deck-tools.deck-build.lan` with a persistent `/data` volume. No background daemons required for dogfood or pytest.
 
 ### Web frontend (`packages/web`)
 
