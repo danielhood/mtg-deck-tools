@@ -11,7 +11,11 @@ from mtg_deck_tools.service.dto import (
     DeckLibraryDetailResponse,
     DeckLibraryEntry,
     PatchDeckRequest,
+    RefillSlotRequest,
+    SwapCardsRequest,
+    SwapCardsResponse,
 )
+from mtg_deck_tools.service.iterate import refill_library_deck_slot, swap_library_deck_cards
 from mtg_deck_tools.service.library import (
     delete_library_deck,
     get_library_deck,
@@ -93,3 +97,49 @@ def delete_deck(
     deleted = delete_library_deck(deck_id, decks_path=Path(decks) if decks else None)
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Deck not found: {deck_id}")
+
+
+@router.post("/{deck_id}/refill-slot", response_model=DeckLibraryDetailResponse)
+def refill_deck_slot(
+    deck_id: str,
+    body: RefillSlotRequest,
+    db: Annotated[str | None, Query(description="SQLite database path")] = None,
+    decks: Annotated[str | None, Query(description="Saved deck library path")] = None,
+) -> DeckLibraryDetailResponse:
+    _db_gate(Path(db) if db else None)
+    try:
+        record = refill_library_deck_slot(
+            deck_id,
+            body,
+            db_path=Path(db) if db else None,
+            decks_path=Path(decks) if decks else None,
+        )
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    if record is None:
+        raise HTTPException(status_code=404, detail=f"Deck not found: {deck_id}")
+    return record
+
+
+@router.post("/{deck_id}/swap", response_model=SwapCardsResponse)
+def swap_deck_cards_route(
+    deck_id: str,
+    body: SwapCardsRequest,
+    db: Annotated[str | None, Query(description="SQLite database path")] = None,
+    decks: Annotated[str | None, Query(description="Saved deck library path")] = None,
+) -> SwapCardsResponse:
+    _db_gate(Path(db) if db else None)
+    if not body.oracle_ids:
+        raise HTTPException(status_code=400, detail="oracle_ids must not be empty.")
+    try:
+        record = swap_library_deck_cards(
+            deck_id,
+            body,
+            db_path=Path(db) if db else None,
+            decks_path=Path(decks) if decks else None,
+        )
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    if record is None:
+        raise HTTPException(status_code=404, detail=f"Deck not found: {deck_id}")
+    return record

@@ -112,6 +112,20 @@ export interface DeckLibraryDetail {
   deck: Record<string, unknown>;
 }
 
+export interface SwapRecord {
+  slot: string;
+  from_oracle_id: string;
+  from_name: string;
+  to_oracle_id: string;
+  to_name: string;
+}
+
+export interface SwapCardsResponse {
+  id: string;
+  deck: Record<string, unknown>;
+  swaps: SwapRecord[];
+}
+
 export type LibrarySort = "saved_at" | "name" | "commander";
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
@@ -223,11 +237,42 @@ export function getDeck(id: string): Promise<DeckLibraryDetail> {
   return fetchJson<DeckLibraryDetail>(`/api/v1/decks/${encodeURIComponent(id)}`);
 }
 
-export function patchDeck(id: string, name: string): Promise<DeckLibraryDetail> {
+export function patchDeck(
+  id: string,
+  body: { name?: string; deck?: Record<string, unknown> },
+): Promise<DeckLibraryDetail> {
   return fetchJson<DeckLibraryDetail>(`/api/v1/decks/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify(body),
+  });
+}
+
+export function refillDeckSlot(
+  id: string,
+  slot: string,
+  seed?: number,
+): Promise<DeckLibraryDetail> {
+  const body: { slot: string; seed?: number } = { slot };
+  if (seed != null) body.seed = seed;
+  return fetchJson<DeckLibraryDetail>(`/api/v1/decks/${encodeURIComponent(id)}/refill-slot`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function swapDeckCards(
+  id: string,
+  oracleIds: string[],
+  seed?: number,
+): Promise<SwapCardsResponse> {
+  const body: { oracle_ids: string[]; seed?: number } = { oracle_ids: oracleIds };
+  if (seed != null) body.seed = seed;
+  return fetchJson<SwapCardsResponse>(`/api/v1/decks/${encodeURIComponent(id)}/swap`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
 }
 

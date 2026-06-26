@@ -9,7 +9,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from mtg_deck_tools.builder.deck_load import SUPPORTED_SCHEMA_VERSION
 from mtg_deck_tools.db.decks_schema import apply_decks_schema
+from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.paths import resolve_db_path, resolve_decks_path
 from mtg_deck_tools.service.dto import (
     DeckLibraryDetailResponse,
@@ -44,6 +46,27 @@ def require_cards_db(db_path: Path | None = None) -> Path:
     if not path.exists():
         raise FileNotFoundError(f"Database not found: {path}")
     return path
+
+
+def validate_deck_document(deck: dict[str, Any]) -> None:
+    """Validate a client-supplied .deck.json document before persisting."""
+    version = deck.get("schema_version")
+    if version != SUPPORTED_SCHEMA_VERSION:
+        raise ValueError(
+            f"Unsupported schema_version {version!r}; expected {SUPPORTED_SCHEMA_VERSION!r}"
+        )
+    if "criteria" not in deck:
+        raise ValueError("Deck body must include criteria.")
+    DeckCriteria.model_validate(deck["criteria"])
+    cards = deck.get("cards")
+    if not isinstance(cards, list):
+        raise ValueError("Deck body must include cards array.")
+    for entry in cards:
+        if not isinstance(entry, dict):
+            raise ValueError("Each card entry must be an object.")
+        for field in ("oracle_id", "name", "slot"):
+            if not entry.get(field):
+                raise ValueError(f"Each card must include {field}.")
 
 
 def default_deck_name(deck: dict[str, Any]) -> str:
@@ -214,9 +237,8 @@ def patch_library_deck(
     *,
     decks_path: Path | None = None,
 ) -> DeckLibraryDetailResponse | None:
-    name = body.name.strip()
-    if not name:
-        raise ValueError("name must not be empty")
+    if body.name is None and body.deck is None:
+        raise ValueError("Provide name and/or deck to patch.")
 
     with _connect_decks(decks_path) as conn:
         row = conn.execute(
@@ -225,17 +247,37 @@ def patch_library_deck(
         ).fetchone()
         if row is None:
             return None
-        conn.execute(
-            "UPDATE saved_decks SET name = ? WHERE id = ?",
-            (name, deck_id),
-        )
-        conn.commit()
 
-    deck = json.loads(row["deck_json"])
+        current_name = row["name"]
+        deck = json.loads(row["deck_json"])
+        saved_at = row["saved_at"]
+
+        if body.name is not None:
+            name = body.name.strip()
+            if not name:
+                raise ValueError("name must not be empty")
+            current_name = name
+
+        if body.deck is not None:
+            validate_deck_document(body.deck)
+            deck = body.deck
+            saved_at = _utc_now_iso()
+
+        if body.name is not None or body.deck is not None:
+            conn.execute(
+                """
+                UPDATE saved_decks
+                SET name = ?, saved_at = ?, deck_json = ?
+                WHERE id = ?
+                """,
+                (current_name, saved_at, json.dumps(deck, separators=(",", ":")), deck_id),
+            )
+            conn.commit()
+
     return DeckLibraryDetailResponse(
-        id=row["id"],
-        name=name,
-        saved_at=row["saved_at"],
+        id=deck_id,
+        name=current_name,
+        saved_at=saved_at,
         deck=deck,
     )
 

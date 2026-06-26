@@ -44,6 +44,12 @@ export function updateCachedDeckName(id: string, name: string): void {
   cacheDeck({ ...cached, name });
 }
 
+export function updateCachedDeck(id: string, deck: Record<string, unknown>): void {
+  const cached = loadCachedDeck(id);
+  if (!cached) return;
+  cacheDeck({ ...cached, deck });
+}
+
 export function removeCachedDeck(id: string): void {
   sessionStorage.removeItem(deckStorageKey(id));
 }

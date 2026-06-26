@@ -458,6 +458,110 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/decks/{deck_id}/refill-slot:
+    post:
+      tags:
+      - library
+      summary: Refill Deck Slot
+      operationId: refill_deck_slot_api_v1_decks__deck_id__refill_slot_post
+      parameters:
+      - name: deck_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Deck Id
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      - name: decks
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Saved deck library path
+          title: Decks
+        description: Saved deck library path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefillSlotRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeckLibraryDetailResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/decks/{deck_id}/swap:
+    post:
+      tags:
+      - library
+      summary: Swap Deck Cards
+      operationId: swap_deck_cards_api_v1_decks__deck_id__swap_post
+      parameters:
+      - name: deck_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Deck Id
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      - name: decks
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Saved deck library path
+          title: Decks
+        description: Saved deck library path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwapCardsRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapCardsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /health:
     get:
       tags:
@@ -1118,12 +1222,92 @@ components:
     PatchDeckRequest:
       properties:
         name:
-          type: string
+          anyOf:
+          - type: string
+          - type: 'null'
           title: Name
+        deck:
+          anyOf:
+          - type: object
+            additionalProperties: true
+          - type: 'null'
+          title: Deck
+      type: object
+      title: PatchDeckRequest
+    RefillSlotRequest:
+      properties:
+        slot:
+          type: string
+          title: Slot
+        seed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Seed
       type: object
       required:
-      - name
-      title: PatchDeckRequest
+      - slot
+      title: RefillSlotRequest
+    SwapCardsRequest:
+      properties:
+        oracle_ids:
+          items:
+            type: string
+          type: array
+          title: Oracle Ids
+        seed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Seed
+      type: object
+      required:
+      - oracle_ids
+      title: SwapCardsRequest
+    SwapRecordResponse:
+      properties:
+        slot:
+          type: string
+          title: Slot
+        from_oracle_id:
+          type: string
+          title: From Oracle Id
+        from_name:
+          type: string
+          title: From Name
+        to_oracle_id:
+          type: string
+          title: To Oracle Id
+        to_name:
+          type: string
+          title: To Name
+      type: object
+      required:
+      - slot
+      - from_oracle_id
+      - from_name
+      - to_oracle_id
+      - to_name
+      title: SwapRecordResponse
+    SwapCardsResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        deck:
+          type: object
+          additionalProperties: true
+          title: Deck
+        swaps:
+          items:
+            $ref: '#/components/schemas/SwapRecordResponse'
+          type: array
+          title: Swaps
+      type: object
+      required:
+      - id
+      - deck
+      title: SwapCardsResponse
     PreflightResponse:
       properties:
         warnings:

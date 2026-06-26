@@ -48,6 +48,7 @@ def _deck_card_from_saved(entry: dict) -> DeckCard:
         rarity=entry.get("rarity"),
         power=entry.get("power"),
         toughness=entry.get("toughness"),
+        locked=bool(entry.get("locked", False)),
     )
 
 
@@ -82,14 +83,8 @@ def load_deck_criteria_for_wizard(path: Path) -> DeckCriteria:
     return _criteria_from_deck_data(data)
 
 
-def load_deck_json(path: Path) -> LoadedDeckFile:
-    """Parse a .deck.json file written by write_deck_outputs."""
-    if not path.exists():
-        raise FileNotFoundError(f"Deck file not found: {path}")
-    if path.suffix != ".json":
-        raise ValueError(f"Expected a .deck.json file, got: {path.name}")
-
-    data = json.loads(path.read_text(encoding="utf-8"))
+def load_deck_data(data: dict) -> LoadedDeckFile:
+    """Parse an in-memory .deck.json document."""
     version = data.get("schema_version")
     if version != SUPPORTED_SCHEMA_VERSION:
         raise ValueError(
@@ -103,4 +98,21 @@ def load_deck_json(path: Path) -> LoadedDeckFile:
     if not cards:
         raise ValueError("Deck file contains no maindeck cards.")
 
-    return LoadedDeckFile(path=path, criteria=criteria, commanders=commanders, cards=cards)
+    return LoadedDeckFile(path=Path("-"), criteria=criteria, commanders=commanders, cards=cards)
+
+
+def load_deck_json(path: Path) -> LoadedDeckFile:
+    """Parse a .deck.json file written by write_deck_outputs."""
+    if not path.exists():
+        raise FileNotFoundError(f"Deck file not found: {path}")
+    if path.suffix != ".json":
+        raise ValueError(f"Expected a .deck.json file, got: {path.name}")
+
+    data = json.loads(path.read_text(encoding="utf-8"))
+    loaded = load_deck_data(data)
+    return LoadedDeckFile(
+        path=path,
+        criteria=loaded.criteria,
+        commanders=loaded.commanders,
+        cards=loaded.cards,
+    )

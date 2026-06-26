@@ -223,7 +223,7 @@ Tracked in backlog: [active.md](../roadmap/active.md).
 
 ### Deck composition metrics (planned — UX10)
 
-**Status:** Not implemented. Partial web shell exists (**UX7a–UX7f shipped**); lock/swap UI is **UX11** backlog. Today the builder only uses **average nonland CMC** for land-count heuristics (`mana_base.py`) and **per-slot target CMC** while scoring picks (`scorer.py`); output may show `avg_cmc_nonland` in stats. There is **no** deck-wide check or report for a healthy mix of low- and high-CMC cards (especially creatures).
+**Status:** **Shipped (UX11, 2026-06-26).** Partial web shell (**UX7a–UX7f shipped**); lock/swap UI on deck view edit mode. Today the builder uses **average nonland CMC** for land-count heuristics (`mana_base.py`) and **per-slot target CMC** while scoring picks (`scorer.py`); output may show `avg_cmc_nonland` in stats. There is **no** deck-wide check or report for moment-to-moment curve health (see **UX10**).
 
 **Goal:** After a successful build, give the user **actionable composition metrics** — starting with **mana curve / CMC distribution** — in Markdown and `.deck.json`, and eventually in a richer UI (UX7). Metrics are **informational** by default; optional **advisory warnings** (e.g. “few cards at CMC 2–3”, “creature curve top-heavy”) are separate from legality and from dependency `fail` rules unless the user opts into strict curve hints later.
 
@@ -247,9 +247,9 @@ Tracked in backlog: [active.md](../roadmap/active.md).
 
 Spec and UX phasing: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX10. Backlog: [active.md](../roadmap/active.md).
 
-### GUI deck editor (planned — UX11)
+### GUI deck editor (shipped — UX11)
 
-**Status:** **Planning locked (2026-06-26)** — field spec finalized; engine + UI in [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
+**Status:** **Shipped (2026-06-26)** — field spec in [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
 
 | Feature | Behavior |
 | --- | --- |
@@ -273,7 +273,7 @@ Illustrative card entry:
 | --- | --- | --- | --- |
 | `locked` | boolean | no | Default `false`. When `true`, slot regen and swap vacated positions skip this row. Commander rows: implicit locked — field optional and ignored for swap selection. |
 
-CLI today: `--refill-slot` replaces **all** cards in that slot; no `locked` field in builder yet (**UX11a**). Stretch: `--keep-locked` on refill. Full spec: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
+CLI today: `--refill-slot` replaces unlocked cards in that slot when deck JSON includes `locked` flags (**UX11a**). Stretch: `--keep-locked` CLI flag. Full spec: [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
 
 ### Future utility operations on `.deck.json`
 

@@ -5,13 +5,21 @@
   import ErrorState from "../components/ErrorState.svelte";
   import LoadingState from "../components/LoadingState.svelte";
   import ManaCost from "../components/ManaCost.svelte";
-  import { deleteDeck, getDeck, patchDeck } from "../lib/api";
+  import {
+    deleteDeck,
+    getDeck,
+    patchDeck,
+    refillDeckSlot,
+    swapDeckCards,
+    type SwapRecord,
+  } from "../lib/api";
   import { resetDraft } from "../lib/criteria";
   import type { DeckCardPreview } from "../lib/deck-cards";
   import {
     cacheDeck,
     loadCachedDeck,
     removeCachedDeck,
+    updateCachedDeck,
     updateCachedDeckName,
   } from "../lib/deck-cache";
   import {
@@ -24,6 +32,7 @@
     formatTypeCountLine,
     groupCardsBySlot,
     parseDeck,
+    toggleCardLocked,
     toggleFilterValue,
     type DeckCardRow,
     type DeckFilters,
@@ -53,6 +62,16 @@
   let deleteError = $state("");
   let highlightedOracleId = $state<string | null>(null);
   let highlightTimer: ReturnType<typeof setTimeout> | null = null;
+
+  let editMode = $state(false);
+  let selectedIds = $state<Set<string>>(new Set());
+  let lockBusyId = $state<string | null>(null);
+  let iterateError = $state("");
+  let iterateBusy = $state(false);
+  let regenSlot = $state<string | null>(null);
+  let regenBusy = $state(false);
+  let swapDiff = $state<SwapRecord[] | null>(null);
+  let newCardIds = $state<Set<string>>(new Set());
 
   $effect(() => {
     loading = true;
@@ -90,6 +109,17 @@
   const slotGroups = $derived(
     parsed ? groupCardsBySlot(filtered, parsed.slotOrder) : [],
   );
+  const selectionCount = $derived(selectedIds.size);
+  const dependencyHasIssues = $derived(
+    parsed != null &&
+      (!parsed.dependencyReport.passed || parsed.dependencyReport.reviewCount > 0),
+  );
+
+  function applyDeckUpdate(deck: Record<string, unknown>): void {
+    deckPayload = deck;
+    cacheDeck({ id: deckId, name: deckName, deck, returnTo });
+    updateCachedDeck(deckId, deck);
+  }
 
   function openCardPreview(card: DeckCardRow): void {
     previewCard = {
@@ -112,6 +142,88 @@
     filters = { ...filters, [group]: new Set() };
   }
 
+  function enterEditMode(): void {
+    editMode = true;
+    iterateError = "";
+    swapDiff = null;
+    newCardIds = new Set();
+    selectedIds = new Set();
+  }
+
+  function exitEditMode(): void {
+    editMode = false;
+    selectedIds = new Set();
+    iterateError = "";
+    regenSlot = null;
+  }
+
+  function toggleSelection(oracleId: string): void {
+    const next = new Set(selectedIds);
+    if (next.has(oracleId)) next.delete(oracleId);
+    else next.add(oracleId);
+    selectedIds = next;
+  }
+
+  function clearSelection(): void {
+    selectedIds = new Set();
+  }
+
+  async function toggleLock(card: DeckCardRow): Promise<void> {
+    if (!deckPayload || lockBusyId) return;
+    const nextLocked = !card.locked;
+    const nextDeck = toggleCardLocked(deckPayload, card.oracle_id, nextLocked);
+    lockBusyId = card.oracle_id;
+    iterateError = "";
+    try {
+      const detail = await patchDeck(deckId, { deck: nextDeck });
+      applyDeckUpdate(detail.deck);
+    } catch (err) {
+      iterateError = err instanceof Error ? err.message : "Lock update failed.";
+    } finally {
+      lockBusyId = null;
+    }
+  }
+
+  function promptRegen(slot: string): void {
+    regenSlot = slot;
+    iterateError = "";
+  }
+
+  async function confirmRegen(): Promise<void> {
+    if (!regenSlot) return;
+    regenBusy = true;
+    iterateError = "";
+    try {
+      const detail = await refillDeckSlot(deckId, regenSlot);
+      applyDeckUpdate(detail.deck);
+      swapDiff = null;
+      newCardIds = new Set();
+      regenSlot = null;
+    } catch (err) {
+      iterateError = err instanceof Error ? err.message : "Slot regenerate failed.";
+    } finally {
+      regenBusy = false;
+    }
+  }
+
+  async function performSwap(): Promise<void> {
+    if (!selectionCount || iterateBusy) return;
+    iterateBusy = true;
+    iterateError = "";
+    try {
+      const response = await swapDeckCards(deckId, [...selectedIds]);
+      applyDeckUpdate(response.deck);
+      swapDiff = response.swaps;
+      newCardIds = new Set(response.swaps.map((row) => row.to_oracle_id));
+      selectedIds = new Set();
+      editMode = false;
+    } catch (err) {
+      iterateError = err instanceof Error ? err.message : "Swap failed.";
+    } finally {
+      iterateBusy = false;
+    }
+  }
+
   function openRename(): void {
     renameValue = deckName;
     renameError = "";
@@ -127,7 +239,7 @@
     renameSaving = true;
     renameError = "";
     try {
-      const detail = await patchDeck(deckId, next);
+      const detail = await patchDeck(deckId, { name: next });
       deckName = detail.name;
       if (deckPayload) {
         cacheDeck({ id: deckId, name: detail.name, deck: deckPayload, returnTo });
@@ -181,13 +293,38 @@
 {:else if loadError}
   <ErrorState message={loadError} />
 {:else if parsed}
-  <div class="deck-view-body">
+  <div class="deck-view-body" class:deck-view-editing={editMode}>
     <div class="deck-label-row">
       <h2 class="deck-label">{deckName}</h2>
+      {#if editMode}
+        <button type="button" class="btn-text btn-text-active" onclick={exitEditMode}>Done</button>
+      {:else}
+        <button type="button" class="btn-text" onclick={enterEditMode}>Edit deck</button>
+      {/if}
       <button type="button" class="rename-btn" aria-label="Rename deck" onclick={openRename}>
         ✎
       </button>
     </div>
+
+    {#if swapDiff?.length}
+      <aside class="swap-diff" role="status">
+        <h3 class="swap-diff-title">Swapped {swapDiff.length} card{swapDiff.length === 1 ? "" : "s"}</h3>
+        <ul class="swap-diff-list">
+          {#each swapDiff as row (row.from_oracle_id + row.to_oracle_id)}
+            <li>{row.from_name} → {row.to_name}</li>
+          {/each}
+        </ul>
+        {#if dependencyHasIssues}
+          <p class="swap-diff-warn">
+            Dependency review may need attention — check the Dependencies panel below.
+          </p>
+        {/if}
+      </aside>
+    {/if}
+
+    {#if iterateError}
+      <p class="iterate-error" role="alert">{iterateError}</p>
+    {/if}
 
     {#if commander}
       <section class="commander-block" aria-label="Commander">
@@ -209,6 +346,7 @@
             price_known: false,
             image_uri: commander.image_uri,
             scryfall_uri: commander.scryfall_uri,
+            locked: true,
           })}
         >
           {#if commander.image_uri}
@@ -313,13 +451,39 @@
       <p class="deck-empty" role="status">No cards match the current filters.</p>
     {:else}
       {#each slotGroups as group (group.slot)}
-        <h2 class="slot-heading">{group.label}</h2>
+        <div class="slot-heading-row">
+          <h2 class="slot-heading">{group.label}</h2>
+          {#if editMode}
+            <button
+              type="button"
+              class="btn-regen"
+              disabled={iterateBusy || regenBusy}
+              onclick={() => promptRegen(group.slot)}
+            >
+              Regenerate
+            </button>
+          {/if}
+        </div>
         {#each group.cards as card (card.oracle_id)}
           <div
             id="deck-card-{card.oracle_id}"
             class="card-row"
             class:card-row-highlight={highlightedOracleId === card.oracle_id}
+            class:card-row-locked={editMode && card.locked}
+            class:card-row-selected={editMode && selectedIds.has(card.oracle_id)}
+            class:card-row-new={newCardIds.has(card.oracle_id)}
           >
+            {#if editMode}
+              <label class="row-check">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(card.oracle_id)}
+                  disabled={card.locked || iterateBusy}
+                  aria-label={`Select ${card.name}`}
+                  onchange={() => toggleSelection(card.oracle_id)}
+                />
+              </label>
+            {/if}
             <button
               type="button"
               class="card-thumb-btn"
@@ -338,16 +502,49 @@
                 <ManaCost cost={card.mana_cost} />
                 <span class="card-sub-sep" aria-hidden="true">·</span>
                 {formatCardPrice(card)}
+                {#if newCardIds.has(card.oracle_id)}
+                  <span class="card-sub-sep" aria-hidden="true">·</span>
+                  <span class="card-tag-new">new</span>
+                {/if}
               </div>
             </div>
-            <span class="slot-badge">{group.label}</span>
+            {#if editMode}
+              <button
+                type="button"
+                class="lock-btn"
+                class:lock-btn-on={card.locked}
+                disabled={lockBusyId === card.oracle_id || iterateBusy}
+                aria-label={card.locked ? `Unlock ${card.name}` : `Lock ${card.name}`}
+                onclick={() => void toggleLock(card)}
+              >
+                {card.locked ? "📌" : "📍"}
+              </button>
+            {:else}
+              <span class="slot-badge">{group.label}</span>
+            {/if}
           </div>
         {/each}
       {/each}
     {/if}
   </div>
 
-  <div class="deck-footer deck-footer-stack">
+  {#if editMode && selectionCount > 0}
+    <div class="swap-bar" role="toolbar" aria-label="Swap selected cards">
+      <button
+        type="button"
+        class="btn-swap"
+        disabled={iterateBusy}
+        onclick={() => void performSwap()}
+      >
+        {iterateBusy ? "Swapping…" : `Swap (${selectionCount})`}
+      </button>
+      <button type="button" class="btn-clear" disabled={iterateBusy} onclick={clearSelection}>
+        Clear
+      </button>
+    </div>
+  {/if}
+
+  <div class="deck-footer deck-footer-stack" class:deck-footer-with-swap={editMode && selectionCount > 0}>
     <button class="btn btn-primary" type="button" onclick={buildAnother}>Build another deck</button>
     <button class="btn btn-delete" type="button" onclick={() => (showDelete = true)}>
       Delete deck
@@ -394,6 +591,37 @@
             onclick={() => void confirmRename()}
           >
             {renameSaving ? "Saving…" : "Save"}
+          </button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if regenSlot}
+    <div class="modal-backdrop" role="presentation" onclick={() => (regenSlot = null)}>
+      <div
+        class="modal-panel"
+        role="alertdialog"
+        aria-labelledby="regen-title"
+        aria-modal="true"
+        onclick={(event) => event.stopPropagation()}
+      >
+        <h2 id="regen-title" class="modal-title">Regenerate slot?</h2>
+        <p class="modal-copy">
+          Replace unlocked cards in <strong>{formatTagLabel(regenSlot)}</strong>. Locked cards stay pinned.
+        </p>
+        {#if iterateError}
+          <p class="modal-error" role="alert">{iterateError}</p>
+        {/if}
+        <div class="modal-actions">
+          <button class="btn btn-back" type="button" onclick={() => (regenSlot = null)}>Cancel</button>
+          <button
+            class="btn btn-primary"
+            type="button"
+            disabled={regenBusy}
+            onclick={() => void confirmRegen()}
+          >
+            {regenBusy ? "Regenerating…" : "Regenerate"}
           </button>
         </div>
       </div>

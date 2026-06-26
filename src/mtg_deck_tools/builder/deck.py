@@ -36,6 +36,7 @@ class DeckCard:
     toughness: str | None = None
     rarity: str | None = None
     unpriced_classification: str | None = None
+    locked: bool = False
 
 
 @dataclass

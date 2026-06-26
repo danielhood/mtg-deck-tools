@@ -10,11 +10,11 @@
 
 | Priority | What | Why now |
 | --- | --- | --- |
-| **UX11** | GUI deck editor (planning → implementation) | Primary post-MVP web thread — swap, lock, slot regen on deck view |
+| **UX10** | Deck composition metrics UI | Next post-MVP web thread — promote from [backlog/web-ui.md](backlog/web-ui.md) |
 | **ENG-MAINT** | Engine profile tuning | As needed when touching dependency rules or dogfood matrix |
 | **GATE** | Dogfood gate | Required after any engine change |
 
-**Primary thread:** **UX11** — planning locked; promote slices to implementation per [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11.
+**Primary thread:** **UX10** — see [backlog/web-ui.md](backlog/web-ui.md).
 
 ---
 
@@ -22,7 +22,6 @@
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX11** | web-ui | GUI deck editor — lock, slot regen, swap (slices UX11a–e) | **Planning** | UX7e, UX7f (shipped) | UX10 (metrics UI) |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | doc-only, dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
@@ -60,14 +59,11 @@ flowchart LR
     UX7f[UX7f library]
     UX7d[UX7d dashboard]
     UX7g[UX7g DB import]
+    UX11[UX11 editor]
   end
 
   subgraph backlog["Backlog"]
     UX10[UX10 metrics]
-  end
-
-  subgraph active["Active"]
-    UX11[UX11 editor]
   end
 
   CORE[cli-engine core]
@@ -82,7 +78,7 @@ flowchart LR
   UX11 --> UX10
 ```
 
-- **UX11** is active (planning complete — see [user-experience.md](../specs/dependency-engine/user-experience.md) § UX11). **UX10** may be promoted from [backlog/web-ui.md](backlog/web-ui.md).
+- **UX11** shipped — GUI deck editor (lock, slot regen, swap) on `/deck/:id`. **UX10** may be promoted from [backlog/web-ui.md](backlog/web-ui.md).
 - New cli-engine dependency profiles should not run in parallel with a large web API refactor on the same modules without coordination.
 
 ---

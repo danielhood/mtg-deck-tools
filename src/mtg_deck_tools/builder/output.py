@@ -344,60 +344,54 @@ def _render_card_details_section(
     return lines
 
 
-def write_deck_outputs(
+def _card_to_dict(card: DeckCard) -> dict:
+    payload = {
+        "oracle_id": card.oracle_id,
+        "name": card.name,
+        "slot": card.slot,
+        "quantity": card.quantity,
+        "cmc": card.cmc,
+        "mana_cost": card.mana_cost,
+        "type_line": card.type_line,
+        "price_usd": card.price_usd,
+        "price_known": card.price_known,
+        "scryfall_uri": card.scryfall_uri,
+        "image_uri": card.image_uri,
+        "mechanic_tags": card.mechanic_tags,
+        "color_identity": card.color_identity,
+        "produced_mana": card.produced_mana,
+        "released_at": card.released_at,
+        "rarity": card.rarity,
+        "power": card.power,
+        "toughness": card.toughness,
+        "unpriced_classification": card.unpriced_classification,
+    }
+    if card.locked:
+        payload["locked"] = True
+    return payload
+
+
+def build_deck_document(
     *,
-    base_path: Path,
     criteria: DeckCriteria,
     commanders: list[dict],
     maindeck: DeckBuildResult,
     identity: list[str],
-) -> tuple[Path, Path]:
-    """Write paired .deck.json and .md files; return json path."""
-    slot_config = load_slot_template_config()
-    generated_at = datetime.now(UTC)
+    generated_at: datetime | None = None,
+) -> dict:
+    """Build a .deck.json-shaped document from build results."""
+    generated_at = generated_at or datetime.now(UTC)
     generated_at_iso = generated_at.isoformat()
-    generated_at_display = format_generated_timestamp(generated_at)
-    commander_names = ", ".join(
-        format_card_name_with_type(c["name"], c.get("type_line")) for c in commanders
-    )
-    slug = _slugify(commanders[0]["name"] if commanders else "deck")
-    timestamp = generated_at.strftime("%Y%m%d%H%M%S")
-    out_base = base_path.parent / f"{slug}-{timestamp}"
-    out_base.parent.mkdir(parents=True, exist_ok=True)
-
     avg_cmc = _avg_cmc_nonland(maindeck.cards)
     estimated = estimated_deck_price(maindeck, commanders)
     unpriced_by_class = _unpriced_classifications(maindeck.cards)
-    deck_json = {
+    return {
         "schema_version": "1.0",
         "generated_at": generated_at_iso,
         "generator": {"name": "mtg-deck-tools", "version": __version__},
         "criteria": criteria.model_dump(),
         "commanders": commanders,
-        "cards": [
-            {
-                "oracle_id": c.oracle_id,
-                "name": c.name,
-                "slot": c.slot,
-                "quantity": c.quantity,
-                "cmc": c.cmc,
-                "mana_cost": c.mana_cost,
-                "type_line": c.type_line,
-                "price_usd": c.price_usd,
-                "price_known": c.price_known,
-                "scryfall_uri": c.scryfall_uri,
-                "image_uri": c.image_uri,
-                "mechanic_tags": c.mechanic_tags,
-                "color_identity": c.color_identity,
-                "produced_mana": c.produced_mana,
-                "released_at": c.released_at,
-                "rarity": c.rarity,
-                "power": c.power,
-                "toughness": c.toughness,
-                "unpriced_classification": c.unpriced_classification,
-            }
-            for c in maindeck.cards
-        ],
+        "cards": [_card_to_dict(c) for c in maindeck.cards],
         "stats": {
             "maindeck_cards": sum(c.quantity for c in maindeck.cards),
             "estimated_price_usd": estimated,
@@ -416,6 +410,36 @@ def write_deck_outputs(
         ),
         "warnings": maindeck.warnings,
     }
+
+
+def write_deck_outputs(
+    *,
+    base_path: Path,
+    criteria: DeckCriteria,
+    commanders: list[dict],
+    maindeck: DeckBuildResult,
+    identity: list[str],
+) -> tuple[Path, Path]:
+    """Write paired .deck.json and .md files; return json path."""
+    slot_config = load_slot_template_config()
+    generated_at = datetime.now(UTC)
+    generated_at_display = format_generated_timestamp(generated_at)
+    commander_names = ", ".join(
+        format_card_name_with_type(c["name"], c.get("type_line")) for c in commanders
+    )
+    slug = _slugify(commanders[0]["name"] if commanders else "deck")
+    timestamp = generated_at.strftime("%Y%m%d%H%M%S")
+    out_base = base_path.parent / f"{slug}-{timestamp}"
+    out_base.parent.mkdir(parents=True, exist_ok=True)
+
+    deck_json = build_deck_document(
+        criteria=criteria,
+        commanders=commanders,
+        maindeck=maindeck,
+        identity=identity,
+        generated_at=generated_at,
+    )
+    estimated = deck_json["stats"]["estimated_price_usd"] or 0.0
 
     json_path = out_base.with_suffix(".deck.json")
     md_path = out_base.with_suffix(".md")
