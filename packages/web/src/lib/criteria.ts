@@ -150,13 +150,13 @@ export function commanderSearchColors(draft: WizardDraft): { colors: string[]; c
   return { colors: [], color_match: "includes" };
 }
 
-/** Seed commander search price bounds from budget step per-card range (once). */
+/** Seed commander search min from budget step per-card min (once). Max stays unset. */
 export function seedCommanderPricesIfNeeded(draft: WizardDraft): WizardDraft {
   if (draft.commanderPriceInitialized) return draft;
   return {
     ...draft,
     commander_price_min_usd: draft.cardPriceRangeEnabled ? draft.card_price_min_usd : null,
-    commander_price_max_usd: draft.cardPriceRangeEnabled ? draft.card_price_max_usd : null,
+    commander_price_max_usd: null,
     commanderPriceInitialized: true,
   };
 }

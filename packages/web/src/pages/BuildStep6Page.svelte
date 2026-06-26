@@ -306,7 +306,7 @@
 
     <div class="commander-price-panel" aria-label="Commander price range">
       <p class="commander-price-lead">
-        Filter by commander price. Minimum defaults from the budget step when set.
+        Filter by commander price. Minimum defaults from the budget step per-card minimum when set.
       </p>
       <div class="price-stepper-list">
         <PriceStepperRow
