@@ -20,7 +20,7 @@ Default bind: `127.0.0.1:8000`. **v1 has no auth** — use the default host for 
 | `MTG_SERVE_HOST` | `127.0.0.1` | Bind address |
 | `MTG_SERVE_PORT` | `8000` | Listen port |
 | `MTG_DB_PATH` | `data/cards.db` | Default SQLite for API when `?db=` is omitted |
-| `MTG_AUTO_DOWNLOAD` | `1` | When `MTG_DB_PATH` is missing at `serve` startup, download oracle bulk + import (`0` to skip) |
+| `MTG_AUTO_DOWNLOAD` | `1` | When `MTG_DB_PATH` is missing at `serve` startup, download oracle bulk + import (`0` to skip and start without a DB — use web **Download card data** or CLI `import`) |
 | `MTG_DECKS_PATH` | `data/decks.db` | Saved deck library SQLite (persist on same volume as `cards.db`) |
 | `MTG_PROJECT_ROOT` | *(source layout)* | Repo root for `config/`, `resources/`, and `packages/web/dist` when the package is pip-installed outside a checkout |
 | `MTG_SERVE_STATIC_DIR` | *(unset)* | SPA static root (set by `serve --with-ui` / `--ui-dir`) |
@@ -30,7 +30,7 @@ CLI flags override env for the current process (`--host`, `--port`, `--db`, `--u
 ## Self-hosted (single process)
 
 1. Install with web extra: `pip install -e ".[web]"`.
-2. Run `mtg-deck-tools serve --host 0.0.0.0 --port 8000` — on first start, missing `cards.db` triggers Scryfall download + import when `MTG_AUTO_DOWNLOAD=1` (default). Or import/copy `cards.db` to a persistent volume beforehand. **UX7g-b** (in-browser import when the API is already up without a DB) is backlog — see [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) § UX7g.
+2. Run `mtg-deck-tools serve --host 0.0.0.0 --port 8000` — on first start, missing `cards.db` triggers Scryfall download + import when `MTG_AUTO_DOWNLOAD=1` (default). With `MTG_AUTO_DOWNLOAD=0`, the API starts without a DB; use the SPA **Download card data** or CLI `import`. Or import/copy `cards.db` to a persistent volume beforehand.
 3. Optionally mount the built UI:
 
 ```bash

@@ -151,7 +151,7 @@ mtg-deck-tools serve
 | `--host` / `MTG_SERVE_HOST` | Bind address (default `127.0.0.1`) |
 | `--port` / `MTG_SERVE_PORT` | Listen port (default `8000`) |
 | `--db` / `MTG_DB_PATH` | Default SQLite path for API requests without `?db=` |
-| `MTG_AUTO_DOWNLOAD` | When `cards.db` is missing at startup, download oracle bulk + import (default `1`; set `0` to skip) |
+| `MTG_AUTO_DOWNLOAD` | When `cards.db` is missing at `serve` startup, download oracle bulk + import (default `1`; set `0` to start without a DB and use web **Download card data** or CLI `import`) |
 | `--with-ui` | Mount built SPA from `packages/web/dist` |
 | `--ui-dir` | Override static UI directory |
 | `--reload` | Auto-restart on code changes (development) |

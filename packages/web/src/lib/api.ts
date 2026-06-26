@@ -14,6 +14,15 @@ export interface WizardMeta {
   result_route: string;
 }
 
+export interface ImportResponse {
+  source_file: string;
+  source_count: number;
+  playable_count: number;
+  tag_count: number;
+  effect_count: number;
+  db_path: string;
+}
+
 export interface ThemeChoice {
   id: string;
   description: string;
@@ -126,6 +135,31 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 
 export function getWizardMeta(): Promise<WizardMeta> {
   return fetchJson<WizardMeta>("/api/v1/wizard/meta");
+}
+
+export function postImport(): Promise<ImportResponse> {
+  return fetchJson<ImportResponse>("/api/v1/import", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+}
+
+export async function pollWizardMetaUntilReady(options?: {
+  intervalMs?: number;
+  timeoutMs?: number;
+}): Promise<WizardMeta> {
+  const intervalMs = options?.intervalMs ?? 1000;
+  const timeoutMs = options?.timeoutMs ?? 60_000;
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    const meta = await getWizardMeta();
+    if (meta.db_ready) return meta;
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error("Card database is still not ready after import. Try refreshing the page.");
 }
 
 export function getThemes(): Promise<ThemeChoice[]> {

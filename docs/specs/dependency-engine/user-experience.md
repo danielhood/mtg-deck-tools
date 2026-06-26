@@ -579,7 +579,7 @@ Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7d wir
 
 ### UX7g — Database init / refresh (partial)
 
-**Status:** **UX7g-a shipped** (server bootstrap); **UX7g-b backlog** (web UI). Detail: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) § UX7g, [architecture.md](../web/architecture.md) § Database gate.
+**Status:** **UX7g-a shipped** (server bootstrap); **UX7g-b shipped** (web UI). Detail: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) § UX7g, [architecture.md](../web/architecture.md) § Database gate.
 
 **Goal:** Replace the CLI-only first-time setup gate for browser users, and optionally support intentional bulk refresh.
 
@@ -592,7 +592,7 @@ Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7d wir
 | `POST /api/v1/import` | Same `import_oracle_cards` facade; blocking request; **not wired in SPA** |
 | Docker | First boot on empty `/data` volume |
 
-#### UX7g-b — Web-initiated flow (backlog)
+#### UX7g-b — Web-initiated flow (shipped)
 
 | Deliverable | Notes |
 | --- | --- |

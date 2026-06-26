@@ -15,6 +15,7 @@ from mtg_deck_tools.analysis.runner import run_analysis_suite
 from mtg_deck_tools.builder.deck_load import load_deck_criteria_for_wizard
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.effects.audit import run_audit_to_disk
+from mtg_deck_tools.import_.scryfall_bulk import auto_download_enabled
 from mtg_deck_tools.api.serve import (
     DEFAULT_HOST,
     DEFAULT_PORT,
@@ -121,19 +122,26 @@ def serve_cmd(
 
     db = config.db_path or resolve_db_path()
     if not db.exists():
-        console.print("[yellow]Card database missing — downloading and importing...[/yellow]")
-        try:
-            ensure_cards_database(
-                db_path=config.db_path,
-                progress=lambda msg: console.print(msg),
-            )
-        except (FileNotFoundError, RuntimeError) as exc:
-            console.print(f"[red]Bootstrap failed:[/red] {exc}")
+        if auto_download_enabled():
+            console.print("[yellow]Card database missing — downloading and importing...[/yellow]")
+            try:
+                ensure_cards_database(
+                    db_path=config.db_path,
+                    progress=lambda msg: console.print(msg),
+                )
+            except (FileNotFoundError, RuntimeError) as exc:
+                console.print(f"[red]Bootstrap failed:[/red] {exc}")
+                console.print(
+                    "[dim]Set MTG_AUTO_DOWNLOAD=0 to start without a DB "
+                    "(web UI can import), or run `mtg-deck-tools import` manually.[/dim]"
+                )
+                raise typer.Exit(1) from exc
+        else:
             console.print(
-                "[dim]Set MTG_AUTO_DOWNLOAD=0 to skip automatic download, "
-                "or run `mtg-deck-tools import` manually.[/dim]"
+                "[yellow]Card database missing[/yellow] — starting without a DB at "
+                f"[dim]{db}[/dim]. Use the web UI **Download card data** or run "
+                "`mtg-deck-tools import`."
             )
-            raise typer.Exit(1) from exc
 
     console.print(
         f"[green]Starting API[/green] http://{config.host}:{config.port}/health"

@@ -14,7 +14,8 @@ CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md)
 
 | Element | Behavior |
 | --- | --- |
-| DB banner | Visible when DB missing; **UX7g-a:** restart `serve` with `MTG_AUTO_DOWNLOAD=1` or CLI `mtg-deck-tools import`; **UX7g-b (backlog):** in-browser download CTA |
+| DB banner | Visible when DB missing; **Download card data** → `POST /api/v1/import` with progress; polls meta until `db_ready` |
+| Refresh card data | Home footer when DB ready; confirm + re-import |
 | Build new deck | → `/build/1` when DB ready; disabled when blocked |
 | View last deck | → `/deck/:id` for most recently saved library deck (**UX7f**); hidden when library empty |
 | Saved library | → `/library` when DB ready (**UX7f**) |

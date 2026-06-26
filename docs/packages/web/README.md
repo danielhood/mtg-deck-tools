@@ -21,7 +21,7 @@ packages/web/
   src/
     App.svelte              # Route switcher
     app.css                 # Design tokens (wireframe parity)
-    components/             # AppShell, WizardChrome, DependenciesPanel, LoadingState, ErrorState, CardLightbox
+    components/             # AppShell, WizardChrome, DbBanner, DependenciesPanel, LoadingState, ErrorState, CardLightbox
     lib/                    # api, criteria draft, router, format
     pages/                  # Home, build steps 1–7, review, deck view
   index.html
