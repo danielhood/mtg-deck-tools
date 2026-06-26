@@ -10,11 +10,10 @@
 
 | Priority | What | Why now |
 | --- | --- | --- |
-| **UX10** | Deck composition metrics UI | Next post-MVP web thread — promote from [backlog/web-ui.md](backlog/web-ui.md) |
 | **ENG-MAINT** | Engine profile tuning | As needed when touching dependency rules or dogfood matrix |
 | **GATE** | Dogfood gate | Required after any engine change |
 
-**Primary thread:** **UX10** — see [backlog/web-ui.md](backlog/web-ui.md).
+**Primary thread:** None — promote next row from [backlog/web-ui.md](backlog/web-ui.md) when ready.
 
 ---
 
@@ -22,11 +21,10 @@
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX10** | web-ui | Deck composition metrics — **UX10a** CLI report in `.deck.json` + Markdown | In progress | UX7e (shipped), UX11 (shipped) | ENG-MAINT if engine untouched |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | doc-only, dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
-**Not active:** cli-engine expansion rows (P7 remainder, new profiles). **UX10b** (web charts) follows UX10a.
+**Not active:** cli-engine expansion rows (P7 remainder, new profiles). Post-MVP web backlog: [backlog/web-ui.md](backlog/web-ui.md).
 
 ---
 
@@ -44,7 +42,7 @@ UX7 is the cross-platform web shell. All sub-phases **UX7a–UX7d** are **shippe
 | UX7d | Dependency dashboard | Shipped |
 | UX7g | Database init / refresh (server bootstrap + web import UI) | Shipped |
 
-Post-MVP web work (**UX10**, **UX11**): [backlog/web-ui.md](backlog/web-ui.md).
+Post-MVP web work: [backlog/web-ui.md](backlog/web-ui.md) (**UX10** shipped).
 
 ---
 
@@ -61,10 +59,10 @@ flowchart LR
     UX7d[UX7d dashboard]
     UX7g[UX7g DB import]
     UX11[UX11 editor]
+    UX10[UX10 metrics]
   end
 
   subgraph backlog["Backlog"]
-    UX10[UX10 metrics]
   end
 
   CORE[cli-engine core]
@@ -79,7 +77,7 @@ flowchart LR
   UX11 --> UX10
 ```
 
-- **UX11** shipped — GUI deck editor (lock, slot regen, swap) on `/deck/:id`. **UX10** may be promoted from [backlog/web-ui.md](backlog/web-ui.md).
+- **UX10** shipped — CLI deck metrics (UX10a) + web CMC charts on `/deck/:id` (UX10b). **UX11** shipped — GUI deck editor.
 - New cli-engine dependency profiles should not run in parallel with a large web API refactor on the same modules without coordination.
 
 ---

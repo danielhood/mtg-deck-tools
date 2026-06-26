@@ -235,7 +235,7 @@ Comparison retained for context (Vue was the alternative):
 | Build | Vite (`@sveltejs/vite-plugin-svelte`) |
 | App shape | SPA — `packages/web/dist` mounted by `serve` |
 | API types | OpenAPI-generated TypeScript client (framework-agnostic) |
-| Charts (UX10) | Chart.js or layercake — evaluate at UX10b |
+| Charts (UX10) | Custom CSS bar chart (no Chart.js dependency) |
 
 **Not deciding factors:** deck generation performance (server-side), SEO (local-first), auth (none in v1).
 
@@ -251,7 +251,7 @@ Comparison retained for context (Vue was the alternative):
 | UX7d | Dependency dashboard | Shipped |
 | UX7g-a | Server DB bootstrap (`serve` + `MTG_AUTO_DOWNLOAD`, `POST /api/v1/import`) | Shipped |
 | UX7g-b | Web-initiated import / refresh UI | Shipped |
-| UX10b | CMC / composition charts | Backlog |
+| UX10b | CMC / composition charts | Shipped |
 | UX11 | Deck editor (swap / lock / iterate) | **Planning** — [iterate-api.md](iterate-api.md) |
 
 ---

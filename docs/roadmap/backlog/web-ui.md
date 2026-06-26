@@ -25,13 +25,9 @@ Ship dates and PR notes: [changelog.md](../../history/changelog.md).
 
 ## Up next
 
-| Order | ID | Topic | Notes | Depends on |
-| --- | --- | --- | --- | --- |
-| 1 | **UX10b** | Deck metrics charts (web) | Interactive CMC bars on `/deck/:id` | UX10a (in progress) |
+*No promoted rows.* Next web work: promote from backlog or add a new row.
 
-**Active:** **UX10** deck composition metrics — [active.md](../active.md). **UX10a** (CLI Markdown + `.deck.json`) in progress; **UX10b** (web charts) follows.
-
-**Shipped:** **UX11** GUI deck editor — spec [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX11 · API [iterate-api.md](../../specs/web/iterate-api.md).
+**Shipped:** **UX10** deck composition metrics — CLI Markdown + `.deck.json` stats (UX10a); interactive CMC bar chart on `/deck/:id` (UX10b). **UX11** GUI deck editor — spec [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX11 · API [iterate-api.md](../../specs/web/iterate-api.md).
 
 ---
 
