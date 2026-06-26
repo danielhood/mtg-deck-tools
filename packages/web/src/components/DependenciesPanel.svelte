@@ -1,16 +1,29 @@
 <script lang="ts">
   import {
     buildDetailBlocks,
+    issueSwapOracleIds,
     type DependencyIssueRow,
+    type IssueSwapCard,
     type ParsedDependencyReport,
   } from "../lib/dependency-report";
 
   interface Props {
     report: ParsedDependencyReport;
+    cards?: IssueSwapCard[];
+    swapBusy?: boolean;
+    swappingIssueKey?: string | null;
     onShowInDeck?: (oracleId: string, cardName: string | null) => void;
+    onSwapAll?: (oracleIds: string[], issueKey: string) => void;
   }
 
-  let { report, onShowInDeck }: Props = $props();
+  let {
+    report,
+    cards = [],
+    swapBusy = false,
+    swappingIssueKey = null,
+    onShowInDeck,
+    onSwapAll,
+  }: Props = $props();
 
   let open = $state(false);
 
@@ -25,6 +38,14 @@
   function showInDeckLabel(issue: DependencyIssueRow): string {
     const name = issue.card_name?.trim();
     return name ? `Show in deck — ${name}` : "Show in deck";
+  }
+
+  function issueKey(issue: DependencyIssueRow): string {
+    return `${issue.rule_id}:${issue.message}`;
+  }
+
+  function swapTargets(issue: DependencyIssueRow): string[] {
+    return issueSwapOracleIds(issue, cards);
   }
 </script>
 
@@ -124,6 +145,21 @@
                 >
                   {showInDeckLabel(issue)}
                 </button>
+              {/if}
+              {#if onSwapAll}
+                {@const targets = swapTargets(issue)}
+                {#if targets.length}
+                  <button
+                    type="button"
+                    class="deps-link-btn deps-link-btn-inline"
+                    disabled={swapBusy}
+                    onclick={() => onSwapAll(targets, issueKey(issue))}
+                  >
+                    {swapBusy && swappingIssueKey === issueKey(issue)
+                      ? "Swapping…"
+                      : "Swap All"}
+                  </button>
+                {/if}
               {/if}
             </div>
           </details>

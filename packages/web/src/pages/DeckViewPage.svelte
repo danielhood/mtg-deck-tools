@@ -2,6 +2,7 @@
   import CardLightbox from "../components/CardLightbox.svelte";
   import DeckMetricsPanel from "../components/DeckMetricsPanel.svelte";
   import DependenciesPanel from "../components/DependenciesPanel.svelte";
+  import LockIcon from "../components/LockIcon.svelte";
   import ColorPipPicker from "../components/ColorPipPicker.svelte";
   import ErrorState from "../components/ErrorState.svelte";
   import LoadingState from "../components/LoadingState.svelte";
@@ -64,15 +65,15 @@
   let highlightedOracleId = $state<string | null>(null);
   let highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
-  let editMode = $state(false);
-  let selectedIds = $state<Set<string>>(new Set());
   let lockBusyId = $state<string | null>(null);
   let iterateError = $state("");
   let iterateBusy = $state(false);
+  let swappingIssueKey = $state<string | null>(null);
   let regenSlot = $state<string | null>(null);
   let regenBusy = $state(false);
   let swapDiff = $state<SwapRecord[] | null>(null);
   let newCardIds = $state<Set<string>>(new Set());
+  let selectedIds = $state<Set<string>>(new Set());
 
   $effect(() => {
     loading = true;
@@ -143,21 +144,6 @@
     filters = { ...filters, [group]: new Set() };
   }
 
-  function enterEditMode(): void {
-    editMode = true;
-    iterateError = "";
-    swapDiff = null;
-    newCardIds = new Set();
-    selectedIds = new Set();
-  }
-
-  function exitEditMode(): void {
-    editMode = false;
-    selectedIds = new Set();
-    iterateError = "";
-    regenSlot = null;
-  }
-
   function toggleSelection(oracleId: string): void {
     const next = new Set(selectedIds);
     if (next.has(oracleId)) next.delete(oracleId);
@@ -207,22 +193,28 @@
     }
   }
 
-  async function performSwap(): Promise<void> {
-    if (!selectionCount || iterateBusy) return;
+  async function performSwap(oracleIds?: string[]): Promise<void> {
+    const targets = oracleIds ?? [...selectedIds];
+    if (!targets.length || iterateBusy) return;
     iterateBusy = true;
     iterateError = "";
     try {
-      const response = await swapDeckCards(deckId, [...selectedIds]);
+      const response = await swapDeckCards(deckId, targets);
       applyDeckUpdate(response.deck);
       swapDiff = response.swaps;
       newCardIds = new Set(response.swaps.map((row) => row.to_oracle_id));
       selectedIds = new Set();
-      editMode = false;
+      swappingIssueKey = null;
     } catch (err) {
       iterateError = err instanceof Error ? err.message : "Swap failed.";
     } finally {
       iterateBusy = false;
     }
+  }
+
+  async function swapIssueCards(oracleIds: string[], issueKey: string): Promise<void> {
+    swappingIssueKey = issueKey;
+    await performSwap(oracleIds);
   }
 
   function openRename(): void {
@@ -294,14 +286,9 @@
 {:else if loadError}
   <ErrorState message={loadError} />
 {:else if parsed}
-  <div class="deck-view-body" class:deck-view-editing={editMode}>
+  <div class="deck-view-body deck-view-editing">
     <div class="deck-label-row">
       <h2 class="deck-label">{deckName}</h2>
-      {#if editMode}
-        <button type="button" class="btn-text btn-text-active" onclick={exitEditMode}>Done</button>
-      {:else}
-        <button type="button" class="btn-text" onclick={enterEditMode}>Edit deck</button>
-      {/if}
       <button type="button" class="rename-btn" aria-label="Rename deck" onclick={openRename}>
         ✎
       </button>
@@ -385,7 +372,11 @@
 
     <DependenciesPanel
       report={parsed.dependencyReport}
+      cards={parsed.cards}
+      swapBusy={iterateBusy}
+      swappingIssueKey={swappingIssueKey}
       onShowInDeck={(oracleId) => showInDeck(oracleId)}
+      onSwapAll={(oracleIds, issueKey) => void swapIssueCards(oracleIds, issueKey)}
     />
 
     <section class="deck-filters" aria-label="Filters">
@@ -458,37 +449,33 @@
       {#each slotGroups as group (group.slot)}
         <div class="slot-heading-row">
           <h2 class="slot-heading">{group.label}</h2>
-          {#if editMode}
-            <button
-              type="button"
-              class="btn-regen"
-              disabled={iterateBusy || regenBusy}
-              onclick={() => promptRegen(group.slot)}
-            >
-              Regenerate
-            </button>
-          {/if}
+          <button
+            type="button"
+            class="btn-regen"
+            disabled={iterateBusy || regenBusy}
+            onclick={() => promptRegen(group.slot)}
+          >
+            Regenerate
+          </button>
         </div>
         {#each group.cards as card (card.oracle_id)}
           <div
             id="deck-card-{card.oracle_id}"
             class="card-row"
             class:card-row-highlight={highlightedOracleId === card.oracle_id}
-            class:card-row-locked={editMode && card.locked}
-            class:card-row-selected={editMode && selectedIds.has(card.oracle_id)}
+            class:card-row-locked={card.locked}
+            class:card-row-selected={selectedIds.has(card.oracle_id)}
             class:card-row-new={newCardIds.has(card.oracle_id)}
           >
-            {#if editMode}
-              <label class="row-check">
-                <input
-                  type="checkbox"
-                  checked={selectedIds.has(card.oracle_id)}
-                  disabled={card.locked || iterateBusy}
-                  aria-label={`Select ${card.name}`}
-                  onchange={() => toggleSelection(card.oracle_id)}
-                />
-              </label>
-            {/if}
+            <label class="row-check">
+              <input
+                type="checkbox"
+                checked={selectedIds.has(card.oracle_id)}
+                disabled={card.locked || iterateBusy}
+                aria-label={`Select ${card.name}`}
+                onchange={() => toggleSelection(card.oracle_id)}
+              />
+            </label>
             <button
               type="button"
               class="card-thumb-btn"
@@ -513,27 +500,24 @@
                 {/if}
               </div>
             </div>
-            {#if editMode}
-              <button
-                type="button"
-                class="lock-btn"
-                class:lock-btn-on={card.locked}
-                disabled={lockBusyId === card.oracle_id || iterateBusy}
-                aria-label={card.locked ? `Unlock ${card.name}` : `Lock ${card.name}`}
-                onclick={() => void toggleLock(card)}
-              >
-                {card.locked ? "📌" : "📍"}
-              </button>
-            {:else}
-              <span class="slot-badge">{group.label}</span>
-            {/if}
+            <button
+              type="button"
+              class="lock-btn"
+              class:lock-btn-on={card.locked}
+              class:lock-btn-off={!card.locked}
+              disabled={lockBusyId === card.oracle_id || iterateBusy}
+              aria-label={card.locked ? `Unlock ${card.name}` : `Lock ${card.name}`}
+              onclick={() => void toggleLock(card)}
+            >
+              <LockIcon locked={card.locked} />
+            </button>
           </div>
         {/each}
       {/each}
     {/if}
   </div>
 
-  {#if editMode && selectionCount > 0}
+  {#if selectionCount > 0}
     <div class="swap-bar" role="toolbar" aria-label="Swap selected cards">
       <button
         type="button"
@@ -549,7 +533,7 @@
     </div>
   {/if}
 
-  <div class="deck-footer deck-footer-stack" class:deck-footer-with-swap={editMode && selectionCount > 0}>
+  <div class="deck-footer deck-footer-stack" class:deck-footer-with-swap={selectionCount > 0}>
     <button class="btn btn-primary" type="button" onclick={buildAnother}>Build another deck</button>
     <button class="btn btn-delete" type="button" onclick={() => (showDelete = true)}>
       Delete deck
@@ -613,7 +597,7 @@
       >
         <h2 id="regen-title" class="modal-title">Regenerate slot?</h2>
         <p class="modal-copy">
-          Replace unlocked cards in <strong>{formatTagLabel(regenSlot)}</strong>. Locked cards stay pinned.
+          Replace unlocked cards in <strong>{formatTagLabel(regenSlot)}</strong>. Locked cards stay locked.
         </p>
         {#if iterateError}
           <p class="modal-error" role="alert">{iterateError}</p>

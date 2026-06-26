@@ -2364,6 +2364,15 @@
   padding: 0;
 }
 
+.deps-link-btn-inline {
+  margin-left: 12px;
+}
+
+.deps-link-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .deck-filters {
   display: flex;
   flex-direction: column;
@@ -2912,16 +2921,27 @@
   height: 44px;
   border: none;
   background: none;
-  font-size: 18px;
   flex-shrink: 0;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
-.lock-btn-off {
+.lock-icon {
+  display: block;
+}
+
+.lock-icon--locked {
+  color: var(--blue-700);
+}
+
+.lock-btn-off .lock-icon {
   color: var(--text-muted);
 }
 
-.lock-btn-on {
+.lock-btn-on .lock-icon {
   color: var(--blue-700);
 }
 

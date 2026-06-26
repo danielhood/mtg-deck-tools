@@ -260,16 +260,15 @@ Not a separate route — inline panel on the enhanced deck view.
 
 | Region | Behavior |
 | --- | --- |
-| Entry | **Edit deck** text button in deck label row (beside rename) — toggles edit mode |
-| Exit edit | **Done** or cancel — clears selection; view mode unchanged |
-| Lock pin | On every maindeck row — tap toggles `locked`; immediate `PATCH` with updated deck JSON |
-| Locked row | Pin filled + subtle row background; **not selectable** for swap (checkbox disabled) |
+| Entry | **Always on** — lock, selection, slot regen, and swap available on every deck view load (no Edit/Done toggle) |
+| Lock control | On every maindeck row — lock/unlock SVG icon toggles `locked`; immediate `PATCH` with updated deck JSON |
+| Locked row | Lock icon filled + subtle row background; **not selectable** for swap (checkbox disabled) |
 | Slot regen | Slot heading row includes **Regenerate** — confirm modal → `POST …/refill-slot`; loading state on slot group |
-| Selection | Edit mode: checkbox at row start; commander rows not selectable |
+| Selection | Checkbox at row start; commander rows not selectable |
 | Swap bar | Sticky bar above footer when ≥1 card selected — **Swap (N)** primary + **Clear** |
 | Post-swap | Inline banner listing old → new per `swaps[]`; scroll to first changed row |
-| Errors | Inline error on failed PATCH/refill/swap; preserve edit mode |
-| Dependencies | Panel refreshes from returned `deck.dependency_report` after refill/swap |
+| Errors | Inline error on failed PATCH/refill/swap |
+| Dependencies | Panel refreshes from returned `deck.dependency_report` after refill/swap; per-issue **Swap All** when issue lists swappable cards |
 | Footer | Unchanged — Build another / Delete / Library / Home (disabled during in-flight API) |
 
 **Out of scope:** commander swap; full-deck regen; repair pass; seed UI (UX11e).
