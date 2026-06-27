@@ -56,17 +56,6 @@ roadmap/
 
 ---
 
-## Related docs
-
-| Question | Read |
-| --- | --- |
-| What dependency rules exist **today**? | [shipped-inventory.md](../specs/dependency-engine/shipped-inventory.md) |
-| How do we **validate** dependency PRs? | [dependency-validation.md](../sdlc/dependency-validation.md) |
-| Priority 1–8 **archive**? | [dependency-priorities.md](../history/dependency-priorities.md) |
-| Promote / ship workflow | [agent-phases.md](../sdlc/agent-phases.md) · [DOC-MAP.md](../DOC-MAP.md) |
-
----
-
 ## Agent workflow (summary)
 
 1. **Planning** — promote backlog → active; design specs; no changelog.

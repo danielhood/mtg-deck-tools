@@ -27,13 +27,3 @@ Promote to [active.md](../active.md) before starting. **Index:** [backlog/README
 | GY-PKG | Graveyard/landfall post-fill packages | Beyond warn-only rules |
 
 Stances: [`resources/dependency/hard-cases.yaml`](../../../resources/dependency/hard-cases.yaml).
-
----
-
-## References
-
-| Doc | Role |
-| --- | --- |
-| [shipped-inventory.md](../../specs/dependency-engine/shipped-inventory.md) | Current atoms, rules, packages |
-| [dependency-priorities.md](../../history/dependency-priorities.md) | Shipped Priority 1–8 archive |
-| [overview.md](../../specs/dependency-engine/overview.md) | Engine architecture |

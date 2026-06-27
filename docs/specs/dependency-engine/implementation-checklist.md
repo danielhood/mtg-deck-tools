@@ -166,7 +166,5 @@ Manual scenarios below are covered by automated tests and/or the **30/30** dogfo
 
 - [overview.md](overview.md) — D0–D5 technical phases
 - [user-experience.md](user-experience.md) — UX phases, progressive constraints
-- [backlog/cli-engine.md](../../roadmap/backlog/cli-engine.md) — post–D5 expansion backlog
 - [shipped-inventory.md](shipped-inventory.md) — shipped atoms and rules
-- [active.md](../../roadmap/active.md) — unified active register
 - [`config/dependency-profiles.yaml`](../config/dependency-profiles.yaml) — thresholds (update after D0.5)

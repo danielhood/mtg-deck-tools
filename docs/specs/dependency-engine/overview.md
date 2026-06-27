@@ -430,4 +430,3 @@ D0–D5 and initial mechanic packages are **shipped** (energy, sacrifice, auras,
 - [problem-decomposition.md](../../architecture/problem-decomposition.md) — tagging vs filtering
 - [technology-stack.md](../../architecture/technology-stack.md) — why not full rules engine
 - [card-availability.md](../../product/card-availability.md) — similar preprocess + score pattern
-- [active.md](../../roadmap/active.md) — active register (ENG-MAINT, GATE)

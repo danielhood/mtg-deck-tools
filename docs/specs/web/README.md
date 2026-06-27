@@ -62,8 +62,3 @@ Reuse existing product specs — do not fork schemas in the frontend:
 - Live Scryfall sync (same static snapshot policy as CLI)
 - User accounts, sessions, or per-user databases
 - Porting the engine to another language
-
-## References
-
-- [active.md](../../roadmap/active.md) — promote next web task from [backlog/web-ui.md](../../roadmap/backlog/web-ui.md)
-- [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — unified service option
