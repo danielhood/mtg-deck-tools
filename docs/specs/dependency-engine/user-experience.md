@@ -1008,5 +1008,4 @@ Decisions here should **constrain** doc 10 implementation early:
 - [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json` schema
 - [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — CLI vs web vs desktop
 - [open-questions.md](../../product/open-questions.md) — deferred power level; UI timing
-- [active.md](../../roadmap/active.md) — backlog ordering
 - [`config/mechanic-taxonomy.yaml`](../config/mechanic-taxonomy.yaml) — current include/avoid tags

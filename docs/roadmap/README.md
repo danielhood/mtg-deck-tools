@@ -12,7 +12,7 @@ How work is **selected**, **parked**, and **recorded** in this repo. Specs live 
 | **Backlog** | [backlog/](backlog/) | What is **parked** until promoted? |
 | **History** | [changelog.md](../history/changelog.md) · [milestones.md](../history/milestones.md) | What **shipped**? |
 
-**Rule:** Only [active.md](active.md) lists selected work. Backlog rows move to active when promoted; active rows are removed when shipped. Do not duplicate ship narratives in active — append [changelog.md](../history/changelog.md) instead.
+**Rule:** Only [active.md](active.md) lists selected work. Backlog rows move to active when promoted; active rows are removed when shipped. Do not duplicate ship narratives or shipped feature detail in active or backlog — append [changelog.md](../history/changelog.md) and update specs instead.
 
 ---
 
@@ -25,9 +25,7 @@ How work is **selected**, **parked**, and **recorded** in this repo. Specs live 
 | Ongoing | **ENG-MAINT** | cli-engine | Profile tuning vs `dependency-audit` when adding rules |
 | Always | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes |
 
-**UX7 MVP:** **Complete** (UX7a–UX7d + **UX7g** shipped). **UX10** metrics **shipped** (UX10a–c). **UX11** deck editor **shipped**. Web backlog: [backlog/web-ui.md](backlog/web-ui.md).
-
-**Not active:** cli-engine expansion (P7 remainder), cli-ui UX8, product-data export — promote from [backlog/](backlog/) before starting.
+**Not active:** cli-engine expansion (P7 remainder), cli-ui UX8, product-data export, web-ui — promote from [backlog/](backlog/) before starting.
 
 ---
 
@@ -41,7 +39,7 @@ roadmap/
     README.md         # Backlog index
     cli-engine.md     # Dependency engine expansion
     cli-ui.md         # Terminal wizard / CLI UX
-    web-ui.md         # Web app (post-UX7 MVP)
+    web-ui.md         # Web app
     product-data.md   # Export, formats, data pipeline
 ```
 
@@ -55,17 +53,6 @@ roadmap/
 | **cli-ui** | `src/mtg_deck_tools/cli/`, `wizard/` | [cli-ui.md](backlog/cli-ui.md) |
 | **web-ui** | `packages/web/` | [web-ui.md](backlog/web-ui.md) |
 | **product-data** | Cross-cutting data, export, formats | [product-data.md](backlog/product-data.md) |
-
----
-
-## Related docs
-
-| Question | Read |
-| --- | --- |
-| What dependency rules exist **today**? | [shipped-inventory.md](../specs/dependency-engine/shipped-inventory.md) |
-| How do we **validate** dependency PRs? | [dependency-validation.md](../sdlc/dependency-validation.md) |
-| Priority 1–8 **archive**? | [dependency-priorities.md](../history/dependency-priorities.md) |
-| Promote / ship workflow | [agent-phases.md](../sdlc/agent-phases.md) · [DOC-MAP.md](../DOC-MAP.md) |
 
 ---
 

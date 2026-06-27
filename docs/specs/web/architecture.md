@@ -315,7 +315,4 @@ Keep core `pip install -e .` free of FastAPI so CLI-only installs stay light; `p
 - [wizard-api.md](wizard-api.md) — planned wizard HTTP endpoints
 - [design.md](design.md) — visual design tokens
 - [user-experience.md](../dependency-engine/user-experience.md) — UX7c scope, UX roadmap
-- [pipeline-and-components.md](../../architecture/pipeline-and-components.md) — Option B + unified service
-- [technology-stack.md](../../architecture/technology-stack.md) — stack update
 - [deck-output-format.md](../../product/deck-output-format.md) — shared JSON contract
-- [active.md](../../roadmap/active.md) — post-MVP web work in [backlog/web-ui.md](../../roadmap/backlog/web-ui.md)

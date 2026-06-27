@@ -338,4 +338,3 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 - [navigation.md](../navigation.md) — wizard flow
 - [design.md](../design.md) — visual tokens
 - [user-experience.md](../../dependency-engine/user-experience.md) § UX7c — scope and slices
-- [backlog/web-ui.md](../../../roadmap/backlog/web-ui.md) — delivery order

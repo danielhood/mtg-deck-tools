@@ -1,55 +1,14 @@
 # Backlog — Web UI
 
-Planned app: `packages/web/`. **UX7 MVP shipped** — promote next row to [active.md](../active.md) before implementation.
+Planned app: `packages/web/`. Promote the next row to [active.md](../active.md) before implementation.
 
-Spec: [specs/web/README.md](../../specs/web/README.md) · [architecture.md](../../specs/web/architecture.md) · Package: [packages/web/README.md](../../packages/web/README.md).
-
----
-
-## UX7 MVP status
-
-All sub-phases **UX7a–UX7d** are **shipped**.
-
-| Sub-phase | Deliverable | Status |
-| --- | --- | --- |
-| UX7a | `service/` + OpenAPI | Shipped — [changelog](../../history/changelog.md) |
-| UX7b | `mtg-deck-tools serve` | Shipped |
-| UX7c | Build wizard + result | Shipped |
-| UX7e | Enhanced deck view | Shipped |
-| UX7f | Saved deck library | Shipped — [library-api.md](../../specs/web/library-api.md) |
-| UX7d | Dependency dashboard | Shipped — [screens.md](../../specs/web/screens.md) § Dependency dashboard |
-
-Ship dates and PR notes: [changelog.md](../../history/changelog.md).
+Specs: [specs/web/README.md](../../specs/web/README.md) · [architecture.md](../../specs/web/architecture.md) · Package: [packages/web/README.md](../../packages/web/README.md). Shipped work: [changelog.md](../../history/changelog.md).
 
 ---
 
 ## Up next
 
-*No promoted rows.* Next web work: promote from backlog or add a new row.
-
-**Shipped:** **UX10** deck composition metrics — CLI Markdown + `.deck.json` stats (UX10a); interactive CMC bar chart on `/deck/:id` (UX10b); YAML curve advisories `CURVE_MISSING_EARLY` / `CURVE_TOP_HEAVY` with theme overrides (UX10c). **UX11** GUI deck editor — spec [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX11 · API [iterate-api.md](../../specs/web/iterate-api.md).
-
----
-
-## Infrastructure (shipped — UX7g)
-
-### UX7g — Database init / refresh
-
-**Status:** **Shipped** — server bootstrap (UX7g-a) and web-initiated import/refresh (UX7g-b).
-
-| Slice | Deliverable | Status |
-| --- | --- | --- |
-| **UX7g-a** | Scryfall bulk auto-download (`scryfall_bulk.py`, `MTG_AUTO_DOWNLOAD`) | Shipped |
-| **UX7g-a** | `mtg-deck-tools serve` startup bootstrap via `ensure_cards_database` | Shipped |
-| **UX7g-a** | `POST /api/v1/import` (same pipeline; unused by SPA) | Shipped |
-| **UX7g-a** | Docker first-boot download + import | Shipped |
-| **UX7g-b** | Home **Download card data** → `POST /api/v1/import` with progress UI | Shipped |
-| **UX7g-b** | Poll `GET /api/v1/wizard/meta` until `db_ready`; enable wizard without CLI | Shipped |
-| **UX7g-b** | Optional web **refresh** (re-import bulk) | Shipped |
-
-**Today:** With default `MTG_AUTO_DOWNLOAD=1`, `serve` (and Docker) often builds `cards.db` **before** the SPA loads. When the API is up without a DB (`MTG_AUTO_DOWNLOAD=0`), or a browser user wants a newer snapshot, the home screen offers **Download card data** / **Refresh card data** via `POST /api/v1/import` (`DbBanner`, `HomePage`).
-
-Spec: [architecture.md](../../specs/web/architecture.md) § Database gate · [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX7g.
+*No promoted rows.*
 
 ---
 

@@ -25,4 +25,4 @@ Promote to [active.md](../active.md) before starting. **Index:** [backlog/README
 | PROD-POWER | Power level / salt | [open-questions.md](../../product/open-questions.md) |
 | LEG-REPAIR | Post-validation CR repair | Deferred — fill-time filters sufficient |
 
-**Parallel:** Most rows **parallel with UX7** if they do not change shared API contracts. **EXP-*** may **depend on** UX7 for preview UI.
+**Parallel:** Most rows **parallel with web-ui work** if they do not change shared API contracts. **EXP-*** may **depend on** web preview UI.

@@ -46,7 +46,7 @@ If no doc updates apply: PR body must say *No doc changes — [reason]*.
 | **Locked v1 dependency decisions** | [decisions.md](specs/dependency-engine/decisions.md) |
 | **Major milestone (rare)** | [milestones.md](history/milestones.md) |
 
-**Roadmap rule:** Only [roadmap/active.md](roadmap/active.md) lists **selected** work. Parked items stay in [roadmap/backlog/](roadmap/backlog/).
+**Roadmap rule:** Only [roadmap/active.md](roadmap/active.md) lists **selected** work. Parked items stay in [roadmap/backlog/](roadmap/backlog/). Do **not** duplicate shipped features, sub-phase tables, or ship narratives in active or backlog — record those in [changelog.md](history/changelog.md), [milestones.md](history/milestones.md), and domain specs.
 
 ---
 
@@ -89,17 +89,3 @@ planning | implementation
 ## Verification
 - _pytest / analyze run / N/A for planning-only_
 ```
-
----
-
-## References
-
-| Doc | Role |
-| --- | --- |
-| [sdlc/agent-phases.md](sdlc/agent-phases.md) | Planning vs implementation vs ship |
-| [roadmap/active.md](roadmap/active.md) | Unified active register |
-| [roadmap/README.md](roadmap/README.md) | Roadmap index + current snapshot |
-| [roadmap/backlog/](roadmap/backlog/) | Per-component backlog |
-| [shipped-inventory.md](specs/dependency-engine/shipped-inventory.md) | Dependency spec (shipped) |
-| [dependency-validation.md](sdlc/dependency-validation.md) | Dependency dogfood + ship steps |
-| [history/changelog.md](history/changelog.md) | Recent ships |
