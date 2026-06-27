@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MTG Deck Tools — wireframe index</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --link: #2563eb;
+      --border: #e2e8f0;
+      --draft: #b45309;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 16px 48px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 1.35rem; margin-bottom: 4px; }
+    .lead { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+    section { margin-bottom: 28px; }
+    h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    ul { list-style: none; }
+    li {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+    a {
+      display: block;
+      padding: 10px 14px;
+      color: var(--link);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    a:hover { background: #eff6ff; }
+    .tag {
+      float: right;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--draft);
+      margin-top: 2px;
+    }
+    .meta { font-size: 0.8rem; color: var(--muted); margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Wireframe index</h1>
+  <p class="lead">Static HTML mocks for layout review. Behavior specs: <code>docs/specs/web/screens.md</code>.</p>
+
+  <section>
+    <h2>UX12 — Advanced swap (draft)</h2>
+    <ul>
+      <li><a href="deck-view-advanced-swap-sheet.html">Advanced swap sheet <span class="tag">draft</span></a></li>
+      <li><a href="deck-view-issue-fix-strategies.html">Issue fix strategies <span class="tag">draft</span></a></li>
+      <li><a href="deck-view-named-swap.html">Named card swap <span class="tag">draft</span></a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>UX11 — Deck editor</h2>
+    <ul>
+      <li><a href="deck-view-edit-mode.html">Edit mode — lock + regen</a></li>
+      <li><a href="deck-view-edit-select.html">Selection + swap bar</a></li>
+      <li><a href="deck-view-edit-swap-result.html">Post-swap diff</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>UX7d — Dependencies</h2>
+    <ul>
+      <li><a href="deck-view-dependencies.html">Dependencies panel</a></li>
+      <li><a href="deck-view-dependencies-issue.html">Issue expanded</a></li>
+      <li><a href="deck-view-dependencies-good.html">Passed deck</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>UX7 — Deck view &amp; library</h2>
+    <ul>
+      <li><a href="deck-view.html">Deck view</a></li>
+      <li><a href="library.html">Library</a></li>
+      <li><a href="home-library-ready.html">Home (library ready)</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>UX7c — Build wizard</h2>
+    <ul>
+      <li><a href="build-step-01-themes.html">Step 1 — Themes</a></li>
+      <li><a href="build-step-03-synergy.html">Step 3 — Synergy</a></li>
+      <li><a href="build-review.html">Review + preflight</a></li>
+    </ul>
+  </section>
+
+  <p class="meta">Full route map: <a href="index.md">index.md</a> (markdown, not served as HTML).</p>
+</body>
+</html>

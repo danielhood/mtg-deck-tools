@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Advanced swap sheet (UX12 P0)</title>
+  <style>
+    :root {
+      --bg: #ffffff; --surface: #f8fafc; --blue-900: #1e3a5f; --blue-700: #2563eb;
+      --blue-100: #dbeafe; --text: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
+      --warn-700: #b45309; --frame-width: 375px; --sheet-max: 85vh;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif; background: #e2e8f0; color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 48px;
+    }
+    .preview-label { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+    .frame {
+      width: var(--frame-width); height: 667px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex; flex-direction: column; overflow: hidden; position: relative;
+    }
+    .frame-dim { filter: brightness(0.92); }
+    .deck-bg { flex: 1; padding: 16px; opacity: 0.45; pointer-events: none; }
+    .deck-label { font-size: 15px; font-weight: 700; color: var(--blue-900); margin-bottom: 8px; }
+    .swap-bar-ghost {
+      position: absolute; left: 0; right: 0; bottom: 120px;
+      display: flex; gap: 8px; padding: 8px 16px; background: var(--surface);
+      border-top: 1px solid var(--border); opacity: 0.5;
+    }
+    .sheet-scrim {
+      position: absolute; inset: 0; background: rgba(15, 23, 42, 0.35);
+      display: flex; align-items: flex-end;
+    }
+    .sheet {
+      width: 100%; max-height: var(--sheet-max); background: var(--bg);
+      border-radius: 16px 16px 0 0; box-shadow: 0 -4px 24px rgba(15, 23, 42, 0.15);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .sheet-handle {
+      width: 40px; height: 4px; background: var(--border); border-radius: 2px;
+      margin: 10px auto 0;
+    }
+    .sheet-header {
+      padding: 12px 16px 8px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+    }
+    .sheet-title { font-size: 15px; font-weight: 700; color: var(--blue-900); }
+    .sheet-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .btn-close {
+      width: 44px; height: 44px; border: none; background: none; font-size: 20px;
+      color: var(--text-muted); flex-shrink: 0;
+    }
+    .sheet-scroll { flex: 1; overflow-y: auto; padding: 12px 16px 16px; }
+    .section-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-muted); margin: 12px 0 8px;
+    }
+    .section-label:first-child { margin-top: 0; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--border);
+      background: var(--bg); font-size: 12px; font-weight: 600; font-family: inherit; color: var(--text);
+    }
+    .chip.active { border-color: var(--blue-700); background: var(--blue-100); color: var(--blue-900); }
+    .chip-card {
+      font-size: 11px; padding: 6px 10px; border-radius: 8px; background: var(--surface);
+      border: 1px solid var(--border); margin-bottom: 4px;
+    }
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface);
+      margin-top: 8px;
+    }
+    .toggle-label { font-size: 12px; font-weight: 600; }
+    .toggle-hint { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .toggle {
+      width: 44px; height: 26px; border-radius: 999px; background: var(--border); position: relative; flex-shrink: 0;
+    }
+    .toggle.on { background: var(--blue-700); }
+    .toggle::after {
+      content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px;
+      border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+    .toggle.on::after { left: 21px; }
+    .preview-list { margin-top: 8px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .preview-row {
+      display: flex; gap: 10px; align-items: center; padding: 10px 12px;
+      border-bottom: 1px solid var(--border); font-size: 12px;
+    }
+    .preview-row:last-child { border-bottom: none; }
+    .preview-thumb { width: 32px; height: 44px; border-radius: 4px; background: #94a3b8; flex-shrink: 0; }
+    .preview-name { font-weight: 600; }
+    .preview-meta { font-size: 10px; color: var(--text-muted); }
+    .sheet-footer {
+      padding: 12px 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px;
+      background: var(--bg);
+    }
+    .btn-preview {
+      width: 100%; min-height: 44px; border: 1.5px solid var(--blue-700); border-radius: 10px;
+      background: var(--bg); color: var(--blue-700); font-size: 14px; font-weight: 600; font-family: inherit;
+    }
+    .btn-apply {
+      width: 100%; min-height: 44px; border: none; border-radius: 10px;
+      background: var(--blue-700); color: #fff; font-size: 15px; font-weight: 600; font-family: inherit;
+    }
+    .wireframe-meta, .dev-note { width: var(--frame-width); margin-top: 12px; font-size: 11px; color: var(--text-muted); }
+    .dev-note { padding: 10px 12px; background: #fff; border: 1px dashed var(--border); border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <p class="preview-label">375px · UX12 P0 · advanced swap sheet · preview visible</p>
+  <div class="frame frame-dim">
+    <div class="deck-bg">
+      <h2 class="deck-label">Orzhov equipment</h2>
+      <p style="font-size:12px;color:var(--text-muted)">2 cards selected…</p>
+    </div>
+    <div class="swap-bar-ghost" aria-hidden="true">
+      <span style="flex:1;height:44px;background:var(--blue-700);border-radius:10px;opacity:0.6"></span>
+      <span style="font-size:12px;line-height:44px;color:var(--blue-700);font-weight:600">Advanced…</span>
+    </div>
+    <div class="sheet-scrim" role="dialog" aria-label="Advanced swap">
+      <div class="sheet">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <header class="sheet-header">
+          <div>
+            <h2 class="sheet-title">Advanced swap</h2>
+            <p class="sheet-sub">Replacing 2 cards in Synergy</p>
+          </div>
+          <button class="btn-close" type="button" aria-label="Close">×</button>
+        </header>
+        <div class="sheet-scroll">
+          <p class="section-label">Replacing</p>
+          <div class="chip-card">Stoneforge Mystic</div>
+          <div class="chip-card">Expedition Map</div>
+
+          <p class="section-label">Strategy</p>
+          <div class="chip-row" role="group" aria-label="Strategy presets">
+            <button class="chip active" type="button">Add equipment</button>
+            <button class="chip" type="button">Add carriers</button>
+            <button class="chip" type="button">Trim equipment</button>
+          </div>
+
+          <p class="section-label">Filters</p>
+          <div class="chip-row" role="group" aria-label="Card type">
+            <button class="chip active" type="button">Equipment</button>
+            <button class="chip" type="button">Artifact</button>
+            <button class="chip" type="button">Creature</button>
+          </div>
+          <div class="chip-row" style="margin-top:8px" role="group" aria-label="Color">
+            <button class="chip" type="button">W</button>
+            <button class="chip active" type="button">B</button>
+            <button class="chip" type="button">Any CI</button>
+          </div>
+          <div class="chip-row" style="margin-top:8px" role="group" aria-label="Rarity">
+            <button class="chip" type="button">Common</button>
+            <button class="chip active" type="button">Uncommon+</button>
+            <button class="chip" type="button">Rare+</button>
+          </div>
+          <p style="font-size:11px;color:var(--text-muted);margin-top:8px">Max price: <strong>$5.00</strong> per card</p>
+
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Any eligible slot</div>
+              <div class="toggle-hint">Expert — allow cross-slot replacement</div>
+            </div>
+            <div class="toggle" role="switch" aria-checked="false" aria-label="Any eligible slot"></div>
+          </div>
+
+          <p class="section-label">Preview candidates</p>
+          <div class="preview-list" role="list" aria-label="Top candidates for first position">
+            <div class="preview-row" role="listitem">
+              <div class="preview-thumb" aria-hidden="true"></div>
+              <div>
+                <div class="preview-name">Skullclamp</div>
+                <div class="preview-meta">{1} · Equipment · $2.40 · uncommon</div>
+              </div>
+            </div>
+            <div class="preview-row" role="listitem">
+              <div class="preview-thumb" aria-hidden="true"></div>
+              <div>
+                <div class="preview-name">Swiftfoot Boots</div>
+                <div class="preview-meta">{2} · Equipment · $1.80 · uncommon</div>
+              </div>
+            </div>
+            <div class="preview-row" role="listitem">
+              <div class="preview-thumb" aria-hidden="true"></div>
+              <div>
+                <div class="preview-name">Sword of Feast and Famine</div>
+                <div class="preview-meta">{3} · Equipment · $45 · mythic</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="sheet-footer">
+          <button class="btn-preview" type="button">Refresh preview</button>
+          <button class="btn-apply" type="button">Apply swap</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+  <aside class="wireframe-meta">
+    Route: <code>/deck/:id</code> (sheet overlay) ·
+    <a href="deck-view-edit-select.html">selection entry</a> ·
+    <a href="deck-view-issue-fix-strategies.html">from issue</a> ·
+    <a href="deck-view-named-swap.html">named card</a>
+  </aside>
+  <p class="dev-note">
+    <strong>Dev note:</strong> Entry from swap bar <strong>Advanced…</strong> or issue <strong>Fix issue…</strong>.
+  <code>POST …/swap/preview</code> returns top-K per position;
+  <code>POST …/swap</code> with <code>constraints</code>. Quick <strong>Swap (N)</strong> unchanged.
+  </p>
+</body>
+</html>

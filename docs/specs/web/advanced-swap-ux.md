@@ -1,6 +1,6 @@
 # Advanced swap & guided rebalance — UX planning (UX12)
 
-**Status:** Planning (2026-06-27).  
+**Status:** Planning (2026-06-27). **Active** — [active.md](../../roadmap/active.md). Wireframes: P0 drafts in [wireframes/](wireframes/).  
 **Phase:** Planning only — no implementation or changelog until slices ship.  
 **Depends on:** **UX11** (shipped), **UX7d** dependency dashboard (shipped), **UX10** deck metrics (shipped).  
 **Related:** [iterate-api.md](iterate-api.md) · [user-experience.md](../dependency-engine/user-experience.md) § Understanding and swapping dependencies · [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
@@ -303,15 +303,15 @@ On dependency issue rows, a tertiary **Quick fix** button applies the playbook�
 
 ---
 
-## Wireframe targets (next planning step)
+## Wireframe targets
 
 | File | State |
 | --- | --- |
-| `deck-view-advanced-swap-sheet.html` | Sheet open from swap bar; filters, cross-slot toggle, Preview + Apply |
-| `deck-view-issue-fix-strategies.html` | Issue expanded with strategy chips, Fix issue…, Quick fix (prototype) |
-| `deck-view-named-swap.html` | Named card search result |
+| `deck-view-advanced-swap-sheet.html` | **Draft** — sheet open from swap bar; filters, cross-slot toggle, Preview + Apply |
+| `deck-view-issue-fix-strategies.html` | **Draft** — issue expanded with strategy chips, Fix issue…, Quick fix (prototype) |
+| `deck-view-named-swap.html` | **Draft** — named card search + validation states |
 
-Add to [wireframes/README.md](wireframes/README.md) when HTML mocks exist.
+Indexed in [wireframes/index.md](wireframes/index.md). Approve P0 files before UX12b implementation.
 
 ---
 

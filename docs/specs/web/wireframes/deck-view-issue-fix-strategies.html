@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wireframe — Dependency issue fix strategies (UX12 P0)</title>
+  <style>
+    :root {
+      --bg: #ffffff; --surface: #f8fafc; --blue-900: #1e3a5f; --blue-700: #2563eb;
+      --text: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
+      --warn-700: #b45309; --warn-100: #fef3c7; --danger: #dc2626;
+      --proto-bg: #f5f3ff; --proto-border: #8b5cf6; --frame-width: 375px; --footer-height: 196px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif; background: #e2e8f0; color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 48px;
+    }
+    .preview-label { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+    .frame {
+      width: var(--frame-width); min-height: 667px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .deck-scroll { flex: 1; overflow-y: auto; padding: 16px 16px calc(var(--footer-height) + 16px); }
+    .deck-label { font-size: 15px; font-weight: 700; color: var(--blue-900); margin-bottom: 12px; }
+    details.deps-panel {
+      border: 1px solid var(--warn-700); border-radius: 10px; margin-bottom: 12px; background: var(--bg);
+    }
+    details.deps-panel summary {
+      padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--blue-900);
+      list-style: none; display: flex; justify-content: space-between;
+    }
+    details.deps-panel summary::-webkit-details-marker { display: none; }
+    .summary-hint { font-size: 12px; font-weight: 600; color: var(--warn-700); }
+    .deps-body { padding: 0 14px 14px; }
+    .deps-section-title {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--text-muted); margin-bottom: 8px;
+    }
+    details.issue-row {
+      border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; overflow: hidden;
+    }
+    details.issue-row[open] .issue-head { border-bottom: 1px solid var(--border); }
+    .issue-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; font-size: 12px; font-weight: 600; background: var(--warn-100); color: var(--warn-700);
+      list-style: none; cursor: pointer;
+    }
+    .issue-head::-webkit-details-marker { display: none; }
+    .issue-body { padding: 10px 12px 12px; font-size: 12px; line-height: 1.45; }
+    .issue-message { margin-bottom: 8px; }
+    .issue-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+    .detail-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin: 8px 0 4px;
+    }
+    .detail-list { padding-left: 18px; margin-bottom: 4px; }
+    .strategy-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);
+      margin: 12px 0 6px;
+    }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      min-height: 36px; padding: 0 10px; border-radius: 999px; border: 1.5px solid var(--border);
+      background: var(--bg); font-size: 11px; font-weight: 600; font-family: inherit;
+    }
+    .chip.active { border-color: var(--blue-700); background: #dbeafe; color: var(--blue-900); }
+    .action-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+    .link-btn {
+      font-size: 12px; font-weight: 600; color: var(--blue-700); text-decoration: underline;
+      background: none; border: none; font-family: inherit; cursor: pointer; padding: 8px 0; min-height: 44px;
+    }
+    .btn-fix {
+      min-height: 44px; padding: 0 14px; border: none; border-radius: 10px;
+      background: var(--blue-700); color: #fff; font-size: 13px; font-weight: 600; font-family: inherit;
+    }
+    .btn-quick-fix {
+      min-height: 44px; padding: 0 12px; border: 1.5px solid var(--proto-border); border-radius: 10px;
+      background: var(--proto-bg); color: #5b21b6; font-size: 12px; font-weight: 600; font-family: inherit;
+    }
+    .proto-badge {
+      display: inline-block; font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: #5b21b6; background: var(--proto-bg); border: 1px solid var(--proto-border);
+      border-radius: 4px; padding: 2px 5px; margin-left: 4px; vertical-align: middle;
+    }
+    .deck-footer {
+      padding: 12px 16px; border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .btn-primary {
+      width: 100%; min-height: 44px; border: none; border-radius: 10px;
+      background: var(--blue-700); color: #fff; font-size: 15px; font-weight: 600; font-family: inherit;
+    }
+    .wireframe-meta, .dev-note { width: var(--frame-width); margin-top: 12px; font-size: 11px; color: var(--text-muted); }
+    .dev-note { padding: 10px 12px; background: #fff; border: 1px dashed var(--border); border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <p class="preview-label">375px · UX12 P0 · issue strategies + Fix issue / Quick fix</p>
+  <div class="frame">
+    <div class="deck-scroll">
+      <h2 class="deck-label">Orzhov equipment</h2>
+
+      <details class="deps-panel" open>
+        <summary>
+          <span>Dependencies</span>
+          <span class="summary-hint">1 area to review</span>
+        </summary>
+        <div class="deps-body">
+          <p class="deps-section-title">Issues</p>
+
+          <details class="issue-row" open>
+            <summary class="issue-head">
+              <span>Equipment balance</span>
+              <span aria-hidden="true">▼</span>
+            </summary>
+            <div class="issue-body">
+              <p class="issue-message">
+                Deck has 5 equipment pieces but only 8 carrier creatures (recommended minimum 10).
+              </p>
+              <p class="issue-meta">Profile: Equipment focus · Status: warn · Deficit: carriers</p>
+              <div class="detail-label">Equipment</div>
+              <ul class="detail-list">
+                <li>Skullclamp</li>
+                <li>Swiftfoot Boots</li>
+                <li>Batterskull</li>
+              </ul>
+
+              <p class="strategy-label">How do you want to fix this?</p>
+              <div class="chip-row" role="group" aria-label="Resolution strategies">
+                <button class="chip active" type="button">Add carriers</button>
+                <button class="chip" type="button">Add equipment</button>
+                <button class="chip" type="button">Add equip payoffs</button>
+                <button class="chip" type="button">Trim equipment</button>
+                <button class="chip" type="button">Quick shuffle</button>
+              </div>
+
+              <div class="action-row">
+                <button class="btn-fix" type="button">Fix issue…</button>
+                <button class="btn-quick-fix" type="button">
+                  Quick fix<span class="proto-badge">Prototype</span>
+                </button>
+                <button class="link-btn" type="button">Swap All</button>
+                <button class="link-btn" type="button">Show in deck</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="issue-row">
+            <summary class="issue-head">
+              <span>Token balance</span>
+              <span aria-hidden="true">▶</span>
+            </summary>
+          </details>
+        </div>
+      </details>
+
+      <p style="font-size:11px;color:var(--text-muted)">Card list continues below…</p>
+    </div>
+
+    <footer class="deck-footer" aria-hidden="true">
+      <button class="btn-primary" type="button" disabled>Build another deck</button>
+    </footer>
+  </div>
+
+  <aside class="wireframe-meta">
+    Route: <code>/deck/:id</code> ·
+    <a href="deck-view-dependencies-issue.html">UX7d issue (before UX12)</a> ·
+    <a href="deck-view-advanced-swap-sheet.html">advanced sheet</a>
+  </aside>
+  <p class="dev-note">
+    <strong>Dev note:</strong> <strong>Fix issue…</strong> opens advanced sheet with selected strategy + issue targets pre-filled.
+    <strong>Quick fix</strong> (prototype) applies default strategy for <code>detail.deficit</code> with confirm — keep or remove after dogfood.
+    <strong>Swap All</strong> = unconstrained quick swap (UX11).
+  </p>
+</body>
+</html>

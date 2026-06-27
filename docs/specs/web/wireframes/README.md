@@ -19,6 +19,28 @@ Wireframes are **throwaway planning assets**. They do not call the API and are n
 
 ---
 
+## Serving wireframes (Docker)
+
+[`../docker-compose.yml`](../docker-compose.yml) runs **nginx** over this folder for LAN review.
+
+**Prerequisites:** Traefik on external Docker network `proxy` ([docker-reverse-proxy](https://github.com/danielhood/docker-reverse-proxy)); DNS or `/etc/hosts` entry for `wireframes.deck-build.lan` → Traefik host.
+
+```bash
+cd docs/specs/web
+docker compose up -d
+```
+
+Open **http://wireframes.deck-build.lan** — landing page [`index.html`](index.html) links to key mocks.
+
+| Mode | URL |
+| --- | --- |
+| Traefik (default) | `http://wireframes.deck-build.lan` |
+| Standalone | Uncomment `ports` in compose → `http://localhost:8080` |
+
+Config: [`nginx-wireframes.conf`](../nginx-wireframes.conf) — static files, `Cache-Control: no-store` for active review.
+
+---
+
 ## Fidelity tiers
 
 Use the lowest tier that answers the question; escalate when layout risk is high.
@@ -42,6 +64,7 @@ Use the lowest tier that answers the question; escalate when layout risk is high
 docs/specs/web/wireframes/
   README.md                 # this file
   index.md                  # route → file map (create when first mock lands)
+  index.html                # browse landing page (Docker / local open)
   home.html
   build-step-01-themes.html
   build-step-03-synergy.html
@@ -319,6 +342,37 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 **Out of scope for UX11 wireframes:** full-deck regen; commander swap; seed picker; repair; dark mode.
 
 **Approval gate:** Mark P0 files `approved` in [index.md](index.md) before UX11a Svelte work.
+
+---
+
+## UX12 wireframe scope
+
+**Status:** **P0 drafts (2026-06-27)** — [advanced-swap-ux.md](../advanced-swap-ux.md), [active.md](../../roadmap/active.md).
+
+| Priority | File | Route | States to show |
+| --- | --- | --- | --- |
+| **P0** | `deck-view-advanced-swap-sheet.html` | `/deck/:id` | Bottom sheet — strategy chips, filters, cross-slot toggle, preview list, Apply |
+| **P0** | `deck-view-issue-fix-strategies.html` | `/deck/:id` | Issue expanded — strategy chips, **Fix issue…**, **Quick fix** (prototype), **Swap All** |
+| **P0** | `deck-view-named-swap.html` | `/deck/:id` | Named-card search + selected result; validation ok + error states |
+
+**In frame (product UI):**
+
+| Region | Layout notes |
+| --- | --- |
+| Sheet chrome | Bottom sheet scrim over dimmed deck; handle bar; **×** close 44px |
+| Context | Replacing N cards or issue label; source card chips |
+| Strategy | Horizontal chip row — one active; pre-filled from issue `deficit` |
+| Filters | Type, color, rarity chips; max price line; collapses when named card pinned |
+| Cross-slot | Expert toggle row — default off (`slot_policy: same`) |
+| Preview | Top 3–8 candidates per position after **Refresh preview** |
+| Issue actions | **Fix issue…** (primary) opens sheet; **Quick fix** purple prototype styling; **Swap All** link retained |
+| Named search | Wizard-style search input; result list; inline legal/budget validation |
+
+**Dev notes only (`.dev-note`):** `POST …/swap/preview`; `POST …/swap` with `constraints` + `replacement_oracle_id`; playbook YAML TBD in UX12a.
+
+**Out of scope for UX12 wireframes:** curve advisory **Adjust curve…** (UX12f); profile package swap; repair pass; dark mode.
+
+**Approval gate:** Mark P0 files `approved` in [index.md](index.md) before UX12b Svelte/engine work.
 
 ---
 

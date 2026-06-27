@@ -80,6 +80,7 @@
     <div class="swap-bar" role="toolbar" aria-label="Swap selected cards">
       <button class="btn-swap" type="button">Swap (2)</button>
       <button class="btn-clear" type="button">Clear</button>
+      <button class="btn-clear" type="button" style="border-color:var(--blue-700);color:var(--blue-700)">Advanced…</button>
     </div>
     <footer class="deck-footer" aria-hidden="true">
       <button class="btn-primary" type="button" disabled>Build another deck</button>
@@ -89,7 +90,8 @@
   <aside class="wireframe-meta">
     Route: <code>/deck/:id</code> ·
     <a href="deck-view-edit-mode.html">edit mode</a> ·
-    <a href="deck-view-edit-swap-result.html">swap result</a>
+    <a href="deck-view-edit-swap-result.html">swap result</a> ·
+    <a href="deck-view-advanced-swap-sheet.html">advanced sheet (UX12)</a>
   </aside>
   <p class="dev-note"><strong>Dev note:</strong> <code>POST /api/v1/decks/{id}/swap</code> with <code>oracle_ids[]</code>. Footer disabled while swap bar active.</p>
 </body>
