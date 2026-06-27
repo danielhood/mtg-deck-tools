@@ -218,7 +218,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | Commander block | Hero art (tap affordance), name, type, CI pips |
 | Summary | `<details>` default **closed** — slot table + price + avg CMC |
 | Analysis | One panel: green **Looks good** *or* warn list — not both |
-| Filters | Three horizontal chip rows (Slot · Type · Color); wrap on 375px |
+| Filters | Three horizontal chip rows (Slot · Type · Color); wrap on 375px. Color multi-select requires **all** selected pips on each card (AND within color row). |
 | Card list | Thumb 40×56, name, slot badge, mana + price; grouped by slot heading |
 | MD preview | `<details>` default **closed** at bottom of scroll |
 | Footer | Fixed **Build another deck** (primary); **Delete deck**; bottom row **Back** + **Home** (**UX7f**) |
