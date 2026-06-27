@@ -2129,24 +2129,18 @@
   line-height: 1.45;
 }
 
-.metrics-advisories {
-  margin: 0 0 10px;
-  padding-left: 18px;
-  font-size: 12px;
-  line-height: 1.45;
+.metrics-blurb--warn {
+  position: relative;
+  padding-left: 12px;
 }
 
-.metrics-advisory-title {
+.metrics-blurb--warn::before {
+  content: "•";
+  position: absolute;
+  left: 0;
   color: var(--warn-700);
-  font-weight: 600;
-}
-
-.metrics-advisory-title::after {
-  content: " ";
-}
-
-.metrics-advisory-message {
-  color: var(--text);
+  font-weight: 700;
+  font-style: normal;
 }
 
 .metrics-empty {
