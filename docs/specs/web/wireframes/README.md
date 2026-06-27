@@ -19,6 +19,28 @@ Wireframes are **throwaway planning assets**. They do not call the API and are n
 
 ---
 
+## Serving wireframes (Docker)
+
+[`../docker-compose.yml`](../docker-compose.yml) runs **nginx** over this folder for LAN review.
+
+**Prerequisites:** Traefik on external Docker network `proxy` ([docker-reverse-proxy](https://github.com/danielhood/docker-reverse-proxy)); DNS or `/etc/hosts` entry for `deck-build-wireframes.lan` → Traefik host.
+
+```bash
+cd docs/specs/web
+docker compose up -d
+```
+
+Open **http://deck-build-wireframes.lan** — landing page [`index.html`](index.html) links to key mocks.
+
+| Mode | URL |
+| --- | --- |
+| Traefik (default) | `http://deck-build-wireframes.lan` |
+| Standalone | Uncomment `ports` in compose → `http://localhost:8080` |
+
+Config: [`nginx-wireframes.conf`](../nginx-wireframes.conf) — static files, `Cache-Control: no-store` for active review.
+
+---
+
 ## Fidelity tiers
 
 Use the lowest tier that answers the question; escalate when layout risk is high.
