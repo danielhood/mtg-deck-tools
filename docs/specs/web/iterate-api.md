@@ -113,6 +113,8 @@ Replace one or more **maindeck** cards with new picks under current `DeckCriteri
 | Full-deck regen button | **UX11b** uses slot refill only; full `from-deck` regen without slot stays CLI |
 | JSON download / import | Post-UX7f |
 | Batch iterate across multiple library decks | Out of scope |
+| Constrained / guided swap (type, role, named card) | **UX12** — [advanced-swap-ux.md](advanced-swap-ux.md) |
+| `POST …/swap/preview` (candidate preview) | **UX12** — ships in first implementation tranche |
 
 ---
 
