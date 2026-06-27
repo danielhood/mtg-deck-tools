@@ -10,7 +10,11 @@ from pathlib import Path
 
 from mtg_deck_tools import __version__
 from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
-from mtg_deck_tools.builder.deck_metrics import compute_deck_metrics, render_deck_metrics_section
+from mtg_deck_tools.builder.deck_metrics import (
+    compute_deck_metrics,
+    render_deck_metrics_section,
+)
+from mtg_deck_tools.builder.curve_advisories import evaluate_curve_advisories
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
 from mtg_deck_tools.builder.mana_symbols import format_mana_notation
 from mtg_deck_tools.formatting import (
@@ -375,6 +379,11 @@ def build_deck_document(
     generated_at = generated_at or datetime.now(UTC)
     generated_at_iso = generated_at.isoformat()
     deck_metrics = compute_deck_metrics(maindeck.cards, mana_base=maindeck.mana_base)
+    curve_advisories = [
+        item.to_dict() for item in evaluate_curve_advisories(deck_metrics, themes=criteria.themes)
+    ]
+    if curve_advisories:
+        deck_metrics = {**deck_metrics, "curve_advisories": curve_advisories}
     estimated = estimated_deck_price(maindeck, commanders)
     unpriced_by_class = _unpriced_classifications(maindeck.cards)
     return {
@@ -527,7 +536,12 @@ def write_deck_outputs(
         lines.append("")
 
     deck_metrics = compute_deck_metrics(maindeck.cards, mana_base=maindeck.mana_base)
-    lines.extend(render_deck_metrics_section(deck_metrics))
+    curve_advisories = [
+        item.to_dict() for item in evaluate_curve_advisories(deck_metrics, themes=criteria.themes)
+    ]
+    if curve_advisories:
+        deck_metrics = {**deck_metrics, "curve_advisories": curve_advisories}
+    lines.extend(render_deck_metrics_section(deck_metrics, themes=criteria.themes))
 
     by_slot: dict[str, list[DeckCard]] = defaultdict(list)
     for card in maindeck.cards:

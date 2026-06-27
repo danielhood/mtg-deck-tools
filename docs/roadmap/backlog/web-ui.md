@@ -27,7 +27,7 @@ Ship dates and PR notes: [changelog.md](../../history/changelog.md).
 
 *No promoted rows.* Next web work: promote from backlog or add a new row.
 
-**Shipped:** **UX10** deck composition metrics — CLI Markdown + `.deck.json` stats (UX10a); interactive CMC bar chart on `/deck/:id` (UX10b). **UX11** GUI deck editor — spec [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX11 · API [iterate-api.md](../../specs/web/iterate-api.md).
+**Shipped:** **UX10** deck composition metrics — CLI Markdown + `.deck.json` stats (UX10a); interactive CMC bar chart on `/deck/:id` (UX10b); YAML curve advisories `CURVE_MISSING_EARLY` / `CURVE_TOP_HEAVY` with theme overrides (UX10c). **UX11** GUI deck editor — spec [user-experience.md](../../specs/dependency-engine/user-experience.md) § UX11 · API [iterate-api.md](../../specs/web/iterate-api.md).
 
 ---
 

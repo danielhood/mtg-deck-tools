@@ -695,7 +695,7 @@ Contract: [deck-output-format.md](../../product/deck-output-format.md) § GUI de
 
 ### UX10 — Deck composition metrics (shipped)
 
-**Status:** **Shipped (2026-06-26)** — **UX10a** CLI + JSON; **UX10b** web deck view panel.
+**Status:** **Shipped (2026-06-26)** — **UX10a** CLI + JSON; **UX10b** web deck view panel; **UX10c** YAML curve advisories.
 
 **Problem:** Users cannot see whether the generated list has enough early plays and late threats. Average CMC alone hides a deck of all 5-drops vs a balanced curve. Pick-time `_curve_score` only nudges **per slot** (ramp ≈2, wincon ≈5), not deck-wide creature distribution.
 
@@ -705,7 +705,7 @@ Contract: [deck-output-format.md](../../product/deck-output-format.md) § GUI de
 | --- | --- | --- | --- |
 | **UX10a** | Markdown + `.deck.json` after `generate` / `--from` regen | `cmc_histogram` (nonlands, quantity-weighted), `creature_cmc_histogram`, type-line counts, existing `avg_cmc_nonland`, ramp/land counts; ASCII or table in **Deck metrics** section | Shipped |
 | **UX10b** | UX7 local web | Interactive bar chart on `/deck/:id`; **All nonlands** / **Creatures only** toggle; curve blurb | Shipped |
-| **UX10c** | Optional warn-only rules | e.g. `CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY` — thresholds in YAML, scoped by theme; **not** pick-time block unless user enables strict curve mode (TBD) | Backlog |
+| **UX10c** | Optional warn-only rules | e.g. `CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY` — thresholds in `config/curve-advisories.yaml`, scoped by theme; **not** pick-time block unless user enables strict curve mode (TBD) | Shipped |
 
 **Data:** Computed from built `DeckCard` rows (`cmc`, `type_line`, `quantity`) — no Scryfall API. `analyze run` may aggregate the same metrics into `summary.json` for regression dashboards ([deck-analysis.md](../deck-analysis.md)).
 

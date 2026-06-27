@@ -1,0 +1,31 @@
+# Post-build mana curve advisories (UX10c).
+# Warn-only — not pick-time gates. Theme overrides merge leniently when multiple themes match.
+# Spec: docs/specs/dependency-engine/user-experience.md § UX10c
+
+schema_version: 1
+
+defaults:
+  histogram: nonlands
+  rules:
+    CURVE_MISSING_EARLY:
+      histogram: nonlands
+      buckets: ["0", "1", "2"]
+      min_share: 0.15
+      message: "Light early game — few cards at 0–2 CMC."
+    CURVE_TOP_HEAVY:
+      histogram: nonlands
+      buckets: ["5", "6", "7", "7+"]
+      max_share: 0.45
+      message: "Top-heavy curve — many cards at 5+ CMC."
+
+# Per-theme threshold overrides (merged leniently across matching themes).
+theme_overrides:
+  ramp:
+    CURVE_MISSING_EARLY:
+      min_share: 0.10
+  tokens:
+    CURVE_MISSING_EARLY:
+      min_share: 0.18
+  voltron:
+    CURVE_TOP_HEAVY:
+      max_share: 0.50

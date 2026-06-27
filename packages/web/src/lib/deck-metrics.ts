@@ -9,6 +9,15 @@ export interface CmcHistogram {
   [bucket: string]: number;
 }
 
+export interface CurveAdvisory {
+  rule: string;
+  status: string;
+  message: string;
+  actual_share: number;
+  threshold: number;
+  histogram: string;
+}
+
 export interface DeckMetrics {
   cmc_histogram: CmcHistogram;
   creature_cmc_histogram: CmcHistogram;
@@ -17,6 +26,7 @@ export interface DeckMetrics {
   avg_creature_cmc: number | null;
   land_count: number;
   ramp_count: number;
+  curve_advisories?: CurveAdvisory[];
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -121,6 +131,31 @@ function parseTypeCounts(value: unknown): Record<string, number> | null {
   return Object.keys(counts).length ? counts : null;
 }
 
+function parseCurveAdvisories(value: unknown): CurveAdvisory[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const advisories: CurveAdvisory[] = [];
+  for (const item of value) {
+    const row = asRecord(item);
+    if (!row) continue;
+    const rule = typeof row.rule === "string" ? row.rule : "";
+    const message = typeof row.message === "string" ? row.message : "";
+    const status = typeof row.status === "string" ? row.status : "warn";
+    const histogram = typeof row.histogram === "string" ? row.histogram : "nonlands";
+    const actualShare = asNumber(row.actual_share);
+    const threshold = asNumber(row.threshold);
+    if (!rule || !message || actualShare == null || threshold == null) continue;
+    advisories.push({
+      rule,
+      status,
+      message,
+      actual_share: actualShare,
+      threshold,
+      histogram,
+    });
+  }
+  return advisories.length ? advisories : undefined;
+}
+
 function statsHaveMetrics(stats: Record<string, unknown>): boolean {
   return parseHistogram(stats.cmc_histogram) != null;
 }
@@ -145,6 +180,7 @@ export function parseDeckMetrics(
     avg_creature_cmc: asNumber(row.avg_creature_cmc) ?? fromCards.avg_creature_cmc,
     land_count: Math.max(0, asNumber(row.land_count) ?? fromCards.land_count),
     ramp_count: Math.max(0, asNumber(row.ramp_count) ?? fromCards.ramp_count),
+    curve_advisories: parseCurveAdvisories(row.curve_advisories),
   };
 }
 
@@ -160,9 +196,11 @@ export function histogramForView(metrics: DeckMetrics, view: CurveView): CmcHist
   return view === "creatures" ? metrics.creature_cmc_histogram : metrics.cmc_histogram;
 }
 
-export function curveBlurb(histogram: CmcHistogram): string {
+export function curveBlurb(histogram: CmcHistogram, advisories?: CurveAdvisory[]): string {
   const total = sumHistogram(histogram);
   if (total === 0) return "No cards to chart for this view.";
+  const matching = (advisories ?? []).filter((item) => item.histogram === "nonlands");
+  if (matching.length) return matching.map((item) => item.message).join(" ");
   const early =
     (histogram["0"] ?? 0) + (histogram["1"] ?? 0) + (histogram["2"] ?? 0);
   const top =

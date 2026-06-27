@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from mtg_deck_tools.builder.curve_advisories import (
+    curve_advisory_blurb,
+    evaluate_curve_advisories,
+)
 from mtg_deck_tools.builder.deck import DeckCard
 from mtg_deck_tools.builder.mana_base import ManaBasePlan
 
@@ -128,27 +132,25 @@ def _ascii_bar(count: int, max_count: int) -> str:
     return "█" * filled
 
 
-def _curve_blurb(cmc_histogram: dict[str, int]) -> str:
+def _curve_blurb(
+    cmc_histogram: dict[str, int],
+    *,
+    themes: list[str] | None = None,
+    metrics: dict | None = None,
+) -> str:
     total = sum(cmc_histogram.values())
     if total == 0:
         return "No nonland spells to chart."
-    early = cmc_histogram.get("0", 0) + cmc_histogram.get("1", 0) + cmc_histogram.get("2", 0)
-    top = (
-        cmc_histogram.get("5", 0)
-        + cmc_histogram.get("6", 0)
-        + cmc_histogram.get("7", 0)
-        + cmc_histogram.get("7+", 0)
-    )
-    early_share = early / total
-    top_share = top / total
-    if early_share < 0.15:
-        return "Light early game — few cards at 0–2 CMC."
-    if top_share > 0.45:
-        return "Top-heavy curve — many cards at 5+ CMC."
-    return "Mana curve is spread across several CMC bands."
+    base_metrics = metrics or {"cmc_histogram": cmc_histogram}
+    advisories = evaluate_curve_advisories(base_metrics, themes=themes)
+    return curve_advisory_blurb(advisories, histogram="nonlands")
 
 
-def render_deck_metrics_section(metrics: dict) -> list[str]:
+def render_deck_metrics_section(
+    metrics: dict,
+    *,
+    themes: list[str] | None = None,
+) -> list[str]:
     """Render ## Deck metrics markdown lines."""
     lines = ["## Deck metrics", ""]
     counts_by_type: dict[str, int] = metrics.get("type_counts") or {}
@@ -160,13 +162,19 @@ def render_deck_metrics_section(metrics: dict) -> list[str]:
 
     cmc_hist: dict[str, int] = metrics.get("cmc_histogram") or {}
     creature_hist: dict[str, int] = metrics.get("creature_cmc_histogram") or {}
+    curve_advisories = metrics.get("curve_advisories")
+    if curve_advisories is None:
+        curve_advisories = [
+            item.to_dict()
+            for item in evaluate_curve_advisories(metrics, themes=themes)
+        ]
     if cmc_hist:
         max_count = max(cmc_hist.values(), default=0)
         lines.extend(
             [
                 "### Mana curve (nonlands)",
                 "",
-                f"_{_curve_blurb(cmc_hist)}_",
+                f"_{_curve_blurb(cmc_hist, themes=themes, metrics=metrics)}_",
                 "",
                 "| CMC | Count | Chart |",
                 "| --- | ---: | --- |",
@@ -175,6 +183,14 @@ def render_deck_metrics_section(metrics: dict) -> list[str]:
         for bucket in _CMC_BUCKETS:
             count = cmc_hist.get(bucket, 0)
             lines.append(f"| {bucket} | {count} | {_ascii_bar(count, max_count)} |")
+        lines.append("")
+
+    if curve_advisories:
+        lines.extend(["### Curve advisories", ""])
+        for item in curve_advisories:
+            rule = item.get("rule", "CURVE")
+            message = item.get("message", "")
+            lines.append(f"- **[{rule}]** {message}")
         lines.append("")
 
     avg_nonland = metrics.get("avg_cmc_nonland")

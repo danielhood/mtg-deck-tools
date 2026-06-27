@@ -229,7 +229,7 @@ Tracked in backlog: [active.md](../roadmap/active.md).
 
 ### Deck composition metrics (UX10 — shipped)
 
-**Status:** **Shipped (2026-06-26)** — **UX10a** CLI report + **UX10b** web charts. Lock/swap UI on deck view edit mode (**UX11** shipped). The builder uses **average nonland CMC** for land-count heuristics (`mana_base.py`) and **per-slot target CMC** while scoring picks (`scorer.py`). Post-build distribution metrics appear in Markdown, `.deck.json` `stats`, and the web deck view.
+**Status:** **Shipped (2026-06-26)** — **UX10a** CLI report + **UX10b** web charts + **UX10c** curve advisories. Lock/swap UI on deck view edit mode (**UX11** shipped). The builder uses **average nonland CMC** for land-count heuristics (`mana_base.py`) and **per-slot target CMC** while scoring picks (`scorer.py`). Post-build distribution metrics appear in Markdown, `.deck.json` `stats`, and the web deck view.
 
 **Goal:** After a successful build, give the user **actionable composition metrics** — starting with **mana curve / CMC distribution** — in Markdown and `.deck.json`, and eventually in a richer UI (UX7). Metrics are **informational** by default; optional **advisory warnings** (e.g. “few cards at CMC 2–3”, “creature curve top-heavy”) are separate from legality and from dependency `fail` rules unless the user opts into strict curve hints later.
 
@@ -239,7 +239,7 @@ Tracked in backlog: [active.md](../roadmap/active.md).
 | **Markdown** | Table and/or ASCII bar chart; short interpretation blurb |
 | **JSON** | `deck_metrics` or extended `stats` with `cmc_histogram`, `creature_cmc_histogram`, `type_counts` |
 | **Visualization (UX10b)** | Local web: bar chart on `/deck/:id`; All nonlands / Creatures only toggle; curve blurb — shipped |
-| **Advisory rules (stretch)** | Warn-only `CURVE_TOP_HEAVY` / `CURVE_MISSING_EARLY` — profile- or archetype-specific thresholds; not v1 gate |
+| **Advisory rules (UX10c)** | Warn-only `CURVE_TOP_HEAVY` / `CURVE_MISSING_EARLY` — theme overrides in `config/curve-advisories.yaml`; surfaced in MD, `.deck.json` `stats.curve_advisories`, and web deck metrics panel |
 
 **Relationship to existing behavior:**
 

@@ -2092,6 +2092,19 @@
   line-height: 1.45;
 }
 
+.metrics-advisories {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.metrics-advisories strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .metrics-empty {
   margin: 0;
   font-size: 12px;

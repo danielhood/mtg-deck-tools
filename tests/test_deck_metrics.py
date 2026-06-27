@@ -119,6 +119,76 @@ def test_render_deck_metrics_section_includes_curve() -> None:
     assert "### Creature curve" in text
 
 
+def test_render_deck_metrics_section_includes_curve_advisories() -> None:
+    metrics = {
+        "cmc_histogram": {
+            "0": 0,
+            "1": 0,
+            "2": 1,
+            "3": 8,
+            "4": 10,
+            "5": 12,
+            "6": 8,
+            "7": 4,
+            "7+": 2,
+        },
+        "creature_cmc_histogram": {"2": 1},
+        "curve_advisories": [
+            {
+                "rule": "CURVE_MISSING_EARLY",
+                "status": "warn",
+                "message": "Light early game — few cards at 0–2 CMC.",
+                "actual_share": 0.02,
+                "threshold": 0.15,
+                "histogram": "nonlands",
+            }
+        ],
+    }
+    text = "\n".join(render_deck_metrics_section(metrics))
+    assert "### Curve advisories" in text
+    assert "CURVE_MISSING_EARLY" in text
+
+
+def test_build_deck_document_includes_curve_advisories_in_stats() -> None:
+    doc = build_deck_document(
+        criteria=DeckCriteria(colors=["G"], commander_oracle_ids=["cmd"], themes=["tokens"]),
+        commanders=[{"name": "Commander", "oracle_id": "cmd"}],
+        maindeck=DeckBuildResult(
+            cards=[
+                _card(name="Bolt", slot="removal", cmc=1, type_line="Instant"),
+                _card(name="Bear", slot="synergy", cmc=2, type_line="Creature — Bear"),
+                *[
+                    _card(
+                        name=f"Big {idx}",
+                        slot="wincons",
+                        cmc=6,
+                        type_line="Creature — Beast",
+                    )
+                    for idx in range(30)
+                ],
+                _card(
+                    name="Forest",
+                    slot="lands",
+                    cmc=0,
+                    type_line="Basic Land — Forest",
+                    quantity=68,
+                ),
+            ],
+            warnings=[],
+            budget_spent=1.0,
+            unpriced_names=[],
+        ),
+        identity=["G"],
+    )
+    stats = doc["stats"]
+    assert "cmc_histogram" in stats
+    assert "creature_cmc_histogram" in stats
+    assert "type_counts" in stats
+    assert stats["land_count"] == 68
+    if "curve_advisories" in stats:
+        assert isinstance(stats["curve_advisories"], list)
+
+
 def test_build_deck_document_includes_deck_metrics_in_stats() -> None:
     cards = [
         _card(name="Bear", slot="synergy", cmc=2, type_line="Creature — Bear"),
