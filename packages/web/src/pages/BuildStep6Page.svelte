@@ -3,6 +3,7 @@
   import ErrorState from "../components/ErrorState.svelte";
   import LoadingState from "../components/LoadingState.svelte";
   import PriceStepperRow from "../components/PriceStepperRow.svelte";
+  import RarityIndicator from "../components/RarityIndicator.svelte";
   import WizardChrome from "../components/WizardChrome.svelte";
   import WizardIntro from "../components/WizardIntro.svelte";
   import SectionHeader from "../components/SectionHeader.svelte";
@@ -362,8 +363,12 @@
           onclick={() => pickCommander(row)}
         >
           <strong>{row.name}</strong>
-          <span>
+          <span class="commander-row-meta">
             {(row.color_identity.join("") || "C")} · {formatPrice(row.price_known ? row.price_usd : null)}
+            {#if row.rarity}
+              <span class="card-sub-sep" aria-hidden="true">·</span>
+              <RarityIndicator rarity={row.rarity} />
+            {/if}
           </span>
         </button>
       {:else}

@@ -25,6 +25,7 @@ export interface DeckCommander {
   name: string;
   type_line: string;
   color_identity: string[];
+  rarity: string | null;
   image_uri: string | null;
   scryfall_uri: string | null;
 }
@@ -41,6 +42,7 @@ export interface DeckCardRow {
   colors: string[];
   price_usd: number | null;
   price_known: boolean;
+  rarity: string | null;
   image_uri: string | null;
   scryfall_uri: string | null;
   locked: boolean;
@@ -195,6 +197,7 @@ function parseCommander(entry: unknown): DeckCommander | null {
     name,
     type_line: asString(row.type_line),
     color_identity: sortColors(asStringArray(row.color_identity)),
+    rarity: asString(row.rarity) || null,
     image_uri: asString(row.image_uri) || null,
     scryfall_uri: asString(row.scryfall_uri) || null,
   };
@@ -226,6 +229,7 @@ function parseCard(entry: unknown): DeckCardRow | null {
     ),
     price_usd: asNumber(row.price_usd),
     price_known: row.price_known !== false,
+    rarity: asString(row.rarity) || null,
     image_uri: asString(row.image_uri) || null,
     scryfall_uri: asString(row.scryfall_uri) || null,
     locked: row.locked === true,
