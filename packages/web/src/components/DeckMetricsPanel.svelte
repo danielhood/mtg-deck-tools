@@ -2,7 +2,6 @@
   import {
     CMC_BUCKETS,
     curveBlurb,
-    formatCurveAdvisoryTitle,
     formatMetricsSummary,
     histogramForView,
     maxHistogramCount,
@@ -23,10 +22,7 @@
   const activeHistogram = $derived(histogramForView(metrics, curveView));
   const chartMax = $derived(maxHistogramCount(activeHistogram));
   const chartTotal = $derived(sumHistogram(activeHistogram));
-  const activeAdvisories = $derived(
-    (metrics.curve_advisories ?? []).filter((item) => item.histogram === curveView),
-  );
-  const blurb = $derived(curveBlurb(activeHistogram, metrics.curve_advisories));
+  const curveNote = $derived(curveBlurb(activeHistogram, curveView, metrics.curve_advisories));
   const summary = $derived(formatMetricsSummary(metrics));
   const creatureTotal = $derived(sumHistogram(metrics.creature_cmc_histogram));
 </script>
@@ -63,18 +59,9 @@
     {#if chartTotal === 0}
       <p class="metrics-empty" role="status">No cards to chart for this view.</p>
     {:else}
-      {#if activeAdvisories.length}
-        <ul class="metrics-advisories" role="list">
-          {#each activeAdvisories as advisory (advisory.rule)}
-            <li>
-              <span class="metrics-advisory-title">{formatCurveAdvisoryTitle(advisory.rule)}</span>
-              <span class="metrics-advisory-message">{advisory.message}</span>
-            </li>
-          {/each}
-        </ul>
-      {:else}
-        <p class="metrics-blurb">{blurb}</p>
-      {/if}
+      <p class="metrics-blurb" class:metrics-blurb--warn={curveNote.isWarning}>
+        {curveNote.text}
+      </p>
 
       <div
         class="metrics-chart"

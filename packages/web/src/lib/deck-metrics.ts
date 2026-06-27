@@ -1,5 +1,4 @@
 import type { DeckCardRow } from "./deck-view";
-import { formatTagLabel } from "./format";
 
 export const CMC_BUCKETS = ["0", "1", "2", "3", "4", "5", "6", "7", "7+"] as const;
 
@@ -197,11 +196,30 @@ export function histogramForView(metrics: DeckMetrics, view: CurveView): CmcHist
   return view === "creatures" ? metrics.creature_cmc_histogram : metrics.cmc_histogram;
 }
 
-export function curveBlurb(histogram: CmcHistogram, advisories?: CurveAdvisory[]): string {
+export interface CurveBlurb {
+  text: string;
+  isWarning: boolean;
+}
+
+export function curveBlurb(
+  histogram: CmcHistogram,
+  view: CurveView,
+  advisories?: CurveAdvisory[],
+): CurveBlurb {
   const total = sumHistogram(histogram);
-  if (total === 0) return "No cards to chart for this view.";
-  const matching = (advisories ?? []).filter((item) => item.histogram === "nonlands");
-  if (matching.length) return matching.map((item) => item.message).join(" ");
+  if (total === 0) {
+    return { text: "No cards to chart for this view.", isWarning: false };
+  }
+
+  const histogramKey = view === "creatures" ? "creatures" : "nonlands";
+  const matching = (advisories ?? []).filter((item) => item.histogram === histogramKey);
+  if (matching.length) {
+    return {
+      text: matching.map((item) => item.message).join(" "),
+      isWarning: true,
+    };
+  }
+
   const early =
     (histogram["0"] ?? 0) + (histogram["1"] ?? 0) + (histogram["2"] ?? 0);
   const top =
@@ -211,15 +229,13 @@ export function curveBlurb(histogram: CmcHistogram, advisories?: CurveAdvisory[]
     (histogram["7+"] ?? 0);
   const earlyShare = early / total;
   const topShare = top / total;
-  if (earlyShare < 0.15) return "Light early game — few cards at 0–2 CMC.";
-  if (topShare > 0.45) return "Top-heavy curve — many cards at 5+ CMC.";
-  return "Mana curve is spread across several CMC bands.";
-}
-
-/** Human-readable title for a curve advisory rule id (e.g. CURVE_TOP_HEAVY). */
-export function formatCurveAdvisoryTitle(rule: string): string {
-  const withoutPrefix = rule.startsWith("CURVE_") ? rule.slice("CURVE_".length) : rule;
-  return formatTagLabel(withoutPrefix);
+  if (earlyShare < 0.15) {
+    return { text: "Light early game — few cards at 0–2 CMC.", isWarning: true };
+  }
+  if (topShare > 0.45) {
+    return { text: "Top-heavy curve — many cards at 5+ CMC.", isWarning: true };
+  }
+  return { text: "Mana curve is spread across several CMC bands.", isWarning: false };
 }
 
 export function formatMetricsSummary(metrics: DeckMetrics): string {
