@@ -2096,13 +2096,20 @@
   margin: 0 0 10px;
   padding-left: 18px;
   font-size: 12px;
-  color: var(--text-muted);
   line-height: 1.45;
 }
 
-.metrics-advisories strong {
-  color: var(--text);
+.metrics-advisory-title {
+  color: var(--warn-700);
   font-weight: 600;
+}
+
+.metrics-advisory-title::after {
+  content: " ";
+}
+
+.metrics-advisory-message {
+  color: var(--text);
 }
 
 .metrics-empty {
