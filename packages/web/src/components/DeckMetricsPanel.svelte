@@ -59,7 +59,11 @@
     {#if chartTotal === 0}
       <p class="metrics-empty" role="status">No cards to chart for this view.</p>
     {:else}
-      <p class="metrics-blurb" class:metrics-blurb--warn={curveNote.isWarning}>
+      <p
+        class="metrics-blurb"
+        class:metrics-blurb--warn={curveNote.isWarning}
+        class:metrics-blurb--ok={!curveNote.isWarning}
+      >
         {#if curveNote.isWarning}
           <svg
             class="metrics-warn-icon"
@@ -76,6 +80,22 @@
             <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
             <path d="M12 9v4" />
             <path d="M12 17h.01" />
+          </svg>
+        {:else}
+          <svg
+            class="metrics-ok-icon"
+            viewBox="0 0 24 24"
+            width="12"
+            height="12"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <path d="m22 4-10 10.01-3-3" />
           </svg>
         {/if}
         <span>{curveNote.text}</span>

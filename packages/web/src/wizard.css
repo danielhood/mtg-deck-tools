@@ -2134,7 +2134,8 @@
   line-height: 1.45;
 }
 
-.metrics-blurb--warn {
+.metrics-blurb--warn,
+.metrics-blurb--ok {
   display: flex;
   align-items: flex-start;
   gap: 6px;
@@ -2146,6 +2147,14 @@
   flex-shrink: 0;
   margin-top: 1px;
   color: var(--warn-700);
+}
+
+.metrics-ok-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #15803d;
 }
 
 .metrics-empty {
