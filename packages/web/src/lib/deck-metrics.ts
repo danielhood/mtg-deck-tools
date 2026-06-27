@@ -1,4 +1,5 @@
 import type { DeckCardRow } from "./deck-view";
+import { formatTagLabel } from "./format";
 
 export const CMC_BUCKETS = ["0", "1", "2", "3", "4", "5", "6", "7", "7+"] as const;
 
@@ -213,6 +214,12 @@ export function curveBlurb(histogram: CmcHistogram, advisories?: CurveAdvisory[]
   if (earlyShare < 0.15) return "Light early game — few cards at 0–2 CMC.";
   if (topShare > 0.45) return "Top-heavy curve — many cards at 5+ CMC.";
   return "Mana curve is spread across several CMC bands.";
+}
+
+/** Human-readable title for a curve advisory rule id (e.g. CURVE_TOP_HEAVY). */
+export function formatCurveAdvisoryTitle(rule: string): string {
+  const withoutPrefix = rule.startsWith("CURVE_") ? rule.slice("CURVE_".length) : rule;
+  return formatTagLabel(withoutPrefix);
 }
 
 export function formatMetricsSummary(metrics: DeckMetrics): string {

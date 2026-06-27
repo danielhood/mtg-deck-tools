@@ -2,6 +2,7 @@
   import {
     CMC_BUCKETS,
     curveBlurb,
+    formatCurveAdvisoryTitle,
     formatMetricsSummary,
     histogramForView,
     maxHistogramCount,
@@ -66,8 +67,8 @@
         <ul class="metrics-advisories" role="list">
           {#each activeAdvisories as advisory (advisory.rule)}
             <li>
-              <strong>{advisory.rule}</strong>
-              {advisory.message}
+              <span class="metrics-advisory-title">{formatCurveAdvisoryTitle(advisory.rule)}</span>
+              <span class="metrics-advisory-message">{advisory.message}</span>
             </li>
           {/each}
         </ul>
