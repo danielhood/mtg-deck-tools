@@ -1368,6 +1368,11 @@
   color: inherit;
 }
 
+.card-row .rarity-indicator .rarity-gem {
+  width: 8px;
+  height: 8px;
+}
+
 .rarity-copy strong {
   display: block;
   font-size: 14px;
@@ -2130,17 +2135,17 @@
 }
 
 .metrics-blurb--warn {
-  position: relative;
-  padding-left: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
 }
 
-.metrics-blurb--warn::before {
-  content: "•";
-  position: absolute;
-  left: 0;
+.metrics-warn-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
   color: var(--warn-700);
-  font-weight: 700;
-  font-style: normal;
 }
 
 .metrics-empty {
