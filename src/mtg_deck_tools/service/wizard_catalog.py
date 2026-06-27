@@ -187,4 +187,5 @@ def _commander_to_result(row: CommanderRow) -> CommanderSearchResult:
         price_known=row.price_known,
         released_at=row.released_at,
         image_uri=row.image_uri,
+        rarity=row.rarity,
     )

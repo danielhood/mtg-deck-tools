@@ -127,6 +127,7 @@ CLI: [step5.py](../../../src/mtg_deck_tools/wizard/step5.py).
 | --- | --- |
 | Search | Search-as-you-type |
 | Commander price | Min/max USD steppers below search — min defaults from budget step per-card minimum when set; max optional; overrides apply to commander search only |
+| Result rows | Name; meta line: color identity · price · **rarity** (coloured gem + label, same tokens as step 7) |
 | Color match | Toggle: **`exact`** (default, left) vs **`includes`** |
 | Commander art | Scryfall `image_uri` for the selected result, shown below the search list; tap opens full-size pop-out — close control above the card (clear of mana-cost region); dismiss via close, backdrop, or Escape |
 | Selection | Required — highlighted result row is the pick indicator (no separate summary panel) |
@@ -190,7 +191,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Deck metrics (**UX10b** + **UX10c**) | Collapsible **Deck metrics** panel — CMC bar chart from `stats.cmc_histogram`; toggle **All nonlands** / **Creatures only**; curve blurb or structured **curve advisories** from `stats.curve_advisories` (UX10c); summary (lands, ramp, avg CMC); client fallback when older decks lack `stats` fields |
 | Analysis | Collapsible **Dependencies** panel — profile summaries, expandable issues, **Show in deck** — see § Dependency dashboard |
 | Filters | Chip groups: **Slot** (multi), **Type** (multi — Creature, Vehicle, Equipment, Instant, …), **Color** (multi — only WUBRG/void pips present in the deck); AND across groups; empty state when filter matches nothing |
-| Card list | Read-only rows: thumb, name, slot badge, mana cost, price; grouped by slot then name; obeys active filters — **UX11** adds lock pin + edit-mode selection |
+| Card list | Rows: thumb, name, mana cost · price · **rarity** (coloured gem + label); grouped by slot then name; obeys active filters — **UX11** adds lock pin + edit-mode selection |
 | Card art | Row thumb + lightbox on tap (reuse UX7c pattern) |
 | MD preview | **Removed in UX7f** — deck view renders from JSON only; markdown is CLI/export derivative |
 | Footer | **Build another deck** → `/build/1`; **Delete deck** (destructive) → confirm modal; bottom row: **Library** → `/library` + **Home** → `/` |

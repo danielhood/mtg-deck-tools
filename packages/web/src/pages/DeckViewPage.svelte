@@ -7,6 +7,7 @@
   import ErrorState from "../components/ErrorState.svelte";
   import LoadingState from "../components/LoadingState.svelte";
   import ManaCost from "../components/ManaCost.svelte";
+  import RarityIndicator from "../components/RarityIndicator.svelte";
   import {
     deleteDeck,
     getDeck,
@@ -348,6 +349,7 @@
             colors: commander.color_identity,
             price_usd: null,
             price_known: false,
+            rarity: commander.rarity,
             image_uri: commander.image_uri,
             scryfall_uri: commander.scryfall_uri,
             locked: true,
@@ -513,6 +515,10 @@
                 <ManaCost cost={card.mana_cost} />
                 <span class="card-sub-sep" aria-hidden="true">·</span>
                 {formatCardPrice(card)}
+                {#if card.rarity}
+                  <span class="card-sub-sep" aria-hidden="true">·</span>
+                  <RarityIndicator rarity={card.rarity} />
+                {/if}
                 {#if newCardIds.has(card.oracle_id)}
                   <span class="card-sub-sep" aria-hidden="true">·</span>
                   <span class="card-tag-new">new</span>

@@ -13,6 +13,7 @@ export function snapshotToResult(snapshot: CommanderSnapshot): CommanderResult {
     price_known: snapshot.price_known,
     released_at: snapshot.released_at,
     image_uri: snapshot.image_uri,
+    rarity: snapshot.rarity,
   };
 }
 
@@ -28,6 +29,7 @@ export function resultToSnapshot(row: CommanderResult): CommanderSnapshot {
     price_known: row.price_known,
     released_at: row.released_at,
     image_uri: row.image_uri,
+    rarity: row.rarity,
   };
 }
 
@@ -54,6 +56,7 @@ export function restoreCommanderSelection(draft: WizardDraft): CommanderResult |
     price_known: false,
     released_at: null,
     image_uri: null,
+    rarity: null,
   };
 }
 
