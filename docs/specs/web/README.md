@@ -37,7 +37,7 @@ Summary:
 | [advanced-swap-ux.md](advanced-swap-ux.md) | **UX12 planning** — constrained swap, warning playbooks, named-card replacement |
 | [design.md](design.md) | Visual design tokens |
 | [wireframes/README.md](wireframes/README.md) | Layout mock and review process (HTML wireframes) |
-| [docker-compose.yml](docker-compose.yml) | nginx static server for wireframe review (`deck-build-wireframes.lan`) |
+| [docker-compose.yml](docker-compose.yml) | nginx static server for wireframe review (`wireframes.deck-build.lan`) |
 | [openapi.yaml](openapi.yaml) | **Shipped** — health, stats, import, generate, library |
 | [deployment.md](deployment.md) | **UX7b** — env vars, self-host, PaaS notes |
 

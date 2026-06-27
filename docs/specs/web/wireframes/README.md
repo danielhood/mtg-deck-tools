@@ -23,18 +23,18 @@ Wireframes are **throwaway planning assets**. They do not call the API and are n
 
 [`../docker-compose.yml`](../docker-compose.yml) runs **nginx** over this folder for LAN review.
 
-**Prerequisites:** Traefik on external Docker network `proxy` ([docker-reverse-proxy](https://github.com/danielhood/docker-reverse-proxy)); DNS or `/etc/hosts` entry for `deck-build-wireframes.lan` → Traefik host.
+**Prerequisites:** Traefik on external Docker network `proxy` ([docker-reverse-proxy](https://github.com/danielhood/docker-reverse-proxy)); DNS or `/etc/hosts` entry for `wireframes.deck-build.lan` → Traefik host.
 
 ```bash
 cd docs/specs/web
 docker compose up -d
 ```
 
-Open **http://deck-build-wireframes.lan** — landing page [`index.html`](index.html) links to key mocks.
+Open **http://wireframes.deck-build.lan** — landing page [`index.html`](index.html) links to key mocks.
 
 | Mode | URL |
 | --- | --- |
-| Traefik (default) | `http://deck-build-wireframes.lan` |
+| Traefik (default) | `http://wireframes.deck-build.lan` |
 | Standalone | Uncomment `ports` in compose → `http://localhost:8080` |
 
 Config: [`nginx-wireframes.conf`](../nginx-wireframes.conf) — static files, `Cache-Control: no-store` for active review.
@@ -64,6 +64,7 @@ Use the lowest tier that answers the question; escalate when layout risk is high
 docs/specs/web/wireframes/
   README.md                 # this file
   index.md                  # route → file map (create when first mock lands)
+  index.html                # browse landing page (Docker / local open)
   home.html
   build-step-01-themes.html
   build-step-03-synergy.html

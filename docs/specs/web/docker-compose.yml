@@ -1,7 +1,7 @@
 # Static HTML wireframes for layout review.
 #
 # Requires Traefik on the external `proxy` network (see docker-reverse-proxy).
-# LAN clients: http://deck-build-wireframes.lan (DNS → Docker host running Traefik)
+# LAN clients: http://wireframes.deck-build.lan (DNS → Docker host running Traefik)
 #
 # From this directory:
 #   docker compose up -d
@@ -20,7 +20,7 @@ services:
       - ./nginx-wireframes.conf:/etc/nginx/conf.d/default.conf:ro
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mtg-deck-wireframes.rule=Host(`deck-build-wireframes.lan`)
+      - traefik.http.routers.mtg-deck-wireframes.rule=Host(`wireframes.deck-build.lan`)
       - traefik.http.routers.mtg-deck-wireframes.entrypoints=web
       - traefik.http.services.mtg-deck-wireframes.loadbalancer.server.port=80
     # ports:
