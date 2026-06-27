@@ -365,6 +365,14 @@ export function filteredCards(cards: DeckCardRow[], filters: DeckFilters): DeckC
   return cards.filter((card) => cardMatchesFilters(card, filters));
 }
 
+export function totalCardQuantity(cards: DeckCardRow[]): number {
+  return cards.reduce((sum, card) => sum + card.quantity, 0);
+}
+
+export function filtersAreActive(filters: DeckFilters): boolean {
+  return Boolean(filters.slots.size || filters.types.size || filters.colors.size);
+}
+
 export function groupCardsBySlot(
   cards: DeckCardRow[],
   slotOrder: string[],
