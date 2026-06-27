@@ -1276,6 +1276,15 @@
   font-size: 13px;
 }
 
+.commander-row-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
 .commander-row span {
   font-size: 11px;
   color: var(--text-muted);
@@ -1329,6 +1338,34 @@
 
 .rarity-mythic {
   background: #f97316;
+}
+
+.rarity-special {
+  background: #a855f7;
+}
+
+.rarity-bonus {
+  background: #94a3b8;
+}
+
+.rarity-unknown {
+  background: #94a3b8;
+}
+
+.rarity-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rarity-indicator .rarity-gem {
+  width: 10px;
+  height: 10px;
+}
+
+.rarity-indicator .rarity-label {
+  font-size: inherit;
+  color: inherit;
 }
 
 .rarity-copy strong {

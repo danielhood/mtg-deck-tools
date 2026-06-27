@@ -33,8 +33,8 @@ def wizard_db(tmp_path, monkeypatch):
         """
         INSERT INTO cards (
             oracle_id, name, type_line, color_identity, commander_legal,
-            commander_eligible, image_uri
-        ) VALUES (?, ?, ?, ?, 1, 1, ?)
+            commander_eligible, image_uri, rarity
+        ) VALUES (?, ?, ?, ?, 1, 1, ?, ?)
         """,
         (
             "cmd-1",
@@ -42,6 +42,7 @@ def wizard_db(tmp_path, monkeypatch):
             "Legendary Creature",
             json.dumps(["B"]),
             "https://cards.scryfall.io/normal/front/test.jpg",
+            "mythic",
         ),
     )
     conn.commit()
@@ -128,6 +129,7 @@ def test_wizard_commanders_search(client: TestClient, wizard_db) -> None:
     assert len(rows) == 1
     assert rows[0]["oracle_id"] == "cmd-1"
     assert rows[0]["image_uri"].startswith("https://")
+    assert rows[0]["rarity"] == "mythic"
 
 
 def test_generate_uses_mtg_db_path_env(client: TestClient, wizard_db, tmp_path, monkeypatch) -> None:

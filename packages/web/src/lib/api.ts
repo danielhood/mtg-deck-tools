@@ -72,6 +72,7 @@ export interface CommanderResult {
   price_known: boolean;
   released_at: string | null;
   image_uri: string | null;
+  rarity: string | null;
 }
 
 export interface RarityChoice {

@@ -220,3 +220,4 @@ class CommanderSearchResult(BaseModel):
     price_known: bool = False
     released_at: str | None = None
     image_uri: str | None = None
+    rarity: str | None = None
