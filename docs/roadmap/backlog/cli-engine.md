@@ -8,15 +8,13 @@ Promote to [active.md](../active.md) before starting. **Index:** [backlog/README
 
 ## Priority 7 remainder (optional)
 
-Core surveil / discover / discard shipped 2026-06.
-
 | ID | Item | Notes |
 | --- | --- | --- |
 | P7-GOLD | Golden cases | Surveil/discover/discard rows in `tests/fixtures/effect_golden.yaml` |
 | P7-GY | Broader GY stuffing | “Put target … into your graveyard”, dies-to-GY — case-by-case patterns |
 | P7-PKG | Post-fill package | `ensure_*` for `themes: [recursion]` if warn-only insufficient |
 
-**Parallel:** Can run **in parallel with UX7** if no overlap with web API refactor; **depends on** fresh `import` before dogfood.
+**Parallel:** Can run **in parallel with web-ui work** if no overlap with web API refactor; **depends on** fresh `import` before dogfood.
 
 ---
 

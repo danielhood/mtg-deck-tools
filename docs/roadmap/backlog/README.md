@@ -26,7 +26,7 @@ backlog/  ──promote──▶  active.md  ──ship──▶  history/change
 ```
 
 - **Promote:** remove row from component backlog; add to [active.md](../active.md) with Depends on / Parallel OK with.
-- **Ship:** remove from active; append [changelog.md](../../history/changelog.md); do **not** leave shipped items in backlog tables.
+- **Ship:** remove from active; append [changelog.md](../../history/changelog.md). Do **not** leave shipped items or ship narratives in active or backlog — use changelog, milestones, and specs instead.
 
 ---
 
