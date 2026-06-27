@@ -2589,6 +2589,13 @@
   flex-shrink: 0;
 }
 
+.deck-list-count {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 .deck-empty {
   font-size: 13px;
   color: var(--text-muted);

@@ -29,6 +29,7 @@
     displayCardName,
     emptyFilters,
     filteredCards,
+    filtersAreActive,
     formatCardPrice,
     formatSlotCountLine,
     formatSummaryLine,
@@ -37,6 +38,7 @@
     parseDeck,
     toggleCardLocked,
     toggleFilterValue,
+    totalCardQuantity,
     type DeckCardRow,
     type DeckFilters,
   } from "../lib/deck-view";
@@ -109,6 +111,9 @@
   const parsed = $derived(parseDeck(deckPayload));
   const commander = $derived(parsed?.commanders[0] ?? null);
   const filtered = $derived(parsed ? filteredCards(parsed.cards, filters) : []);
+  const filteredCardTotal = $derived(totalCardQuantity(filtered));
+  const deckCardTotal = $derived(parsed ? totalCardQuantity(parsed.cards) : 0);
+  const filtersActive = $derived(filtersAreActive(filters));
   const slotGroups = $derived(
     parsed ? groupCardsBySlot(filtered, parsed.slotOrder) : [],
   );
@@ -463,6 +468,14 @@
       </div>
       {/if}
     </section>
+
+    <p class="deck-list-count" role="status" aria-live="polite">
+      {#if filtersActive}
+        {filteredCardTotal} of {deckCardTotal} cards
+      {:else}
+        {deckCardTotal} {deckCardTotal === 1 ? "card" : "cards"}
+      {/if}
+    </p>
 
     {#if !filtered.length}
       <p class="deck-empty" role="status">No cards match the current filters.</p>
