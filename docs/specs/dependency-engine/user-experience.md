@@ -704,11 +704,14 @@ Contract: [deck-output-format.md](../../product/deck-output-format.md) § GUI de
 **In scope (planned):**
 
 - **Two-tier model** — quick swap/regen unchanged; **Advanced…** bottom sheet with filters and strategy presets.
-- **Warning playbooks** — dependency issues (and stretch: curve advisories) offer multiple resolution strategies (e.g. add equipment vs trim equipment).
+- **Warning playbooks** — dependency issues offer multiple resolution strategies (e.g. add equipment vs trim equipment).
 - **Named-card swap** — optional pin to a specific oracle card when commander-legal.
-- **API** — extend `POST …/swap` and `…/refill-slot` with optional `SwapConstraints`; optional preview endpoint in later slice.
+- **Preview** — `POST …/swap/preview` + UI in first implementation tranche.
+- **Expert cross-slot toggle** — `slot_policy: any` behind toggle; default same-slot.
+- **Quick fix prototype** — one-tap strategy apply on issue rows; keep or remove after dogfood.
+- **API** — extend `POST …/swap` and `…/refill-slot` with optional `SwapConstraints`.
 
-**Out of scope (UX12):** profile package swap (**CLI-SWAP** / UX6); auto `repair_dependencies` without user confirm; new analyze HTTP endpoints.
+**Deferred (post-v1 UX12):** curve advisory **Adjust curve…** actions (UX12f); profile package swap (**CLI-SWAP** / UX6); auto `repair_dependencies` without user confirm.
 
 **Depends on:** **UX11** shipped.
 

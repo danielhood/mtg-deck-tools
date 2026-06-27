@@ -29,7 +29,7 @@ The engine already has building blocks (`dependency_repair.py` role-aware pool f
 
 1. **Preserve the fast path** — one-tap random swap/regen must remain the default for users who want speed.
 2. **Opt-in depth** — advanced controls live behind an explicit affordance, not on every row.
-3. **Warning-aware entry** — dependency issues and (later) curve advisories should offer **suggested strategies**, not a single auto-fix.
+3. **Warning-aware entry** — dependency issues offer **suggested strategies**, not a single auto-fix. Curve advisories deferred to a later UX12 slice.
 4. **Composable constraints** — color, type, rarity, price, mechanic role, and named card should combine in one swap request.
 5. **Transparent outcomes** — show what was constrained, preview candidates when feasible, diff after apply (same as UX11).
 6. **Respect locks** — locked cards never vacated; advanced swap inherits UX11 semantics.
@@ -60,7 +60,9 @@ flowchart TD
 | Tier | Entry points | User cost | Engine |
 | --- | --- | --- | --- |
 | **Quick** | Row checkbox → **Swap (N)**; slot **Regenerate**; issue **Swap All** | 1–2 taps | Current `swap_deck_cards` / `refill_deck_slot` |
-| **Advanced** | **Advanced…** on swap bar; **Fix issue…** on dependency row; **Adjust curve…** on metrics advisory (stretch) | 3–8 taps | Extended swap/refill with `SwapConstraints` |
+| **Advanced** | **Advanced…** on swap bar; **Fix issue…** on dependency row | 3–8 taps | Extended swap/refill with `SwapConstraints` + preview |
+
+**Deferred entry:** **Adjust curve…** on deck metrics advisories — post-v1 UX12 slice (see [Phased delivery](#phased-delivery)).
 
 **Principle:** Quick actions stay visible; advanced is always reachable but never required.
 
@@ -78,8 +80,8 @@ flowchart TD
 | **Strategy presets** | Issue-specific chips (see [Resolution playbooks](#resolution-playbooks)); one preset selected by default when opened from a warning |
 | **Replacement filters** | Collapsible **Filters** — type, color, rarity, max price, mechanic role |
 | **Named card** | Optional search: “Replace with specific card” — commander-legal lookup |
-| **Scope** | Which vacated positions: **Same slot only** (default) vs **Any eligible slot** (expert) |
-| **Actions** | **Apply swap** (primary), **Preview candidates** (secondary, when API supports), **Cancel** |
+| **Scope** | **Same slot only** (default); expert toggle **Any eligible slot** (`slot_policy: any`) |
+| **Actions** | **Apply swap** (primary), **Preview candidates** (secondary — v1), **Cancel** |
 
 ### Filter controls
 
@@ -149,13 +151,15 @@ Read `detail.deficit` from issue payload (`equipment` | `carriers` | equip-payof
 | **Fix tutor** | Swap tutor card → tutor with valid targets in deck |
 | **Add target** | Swap flex slot → card matching tutor predicate (reuse `swap_matching_card`) |
 
-### Curve advisories (`CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY`) — stretch
+### Curve advisories (`CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY`) — deferred
 
 | Strategy | Replacement focus |
 | --- | --- |
 | **Lower curve** | Swap high-CMC nonlands → CMC ≤ 3 |
 | **Raise curve** | Swap low-impact 1–2 drops → CMC 4+ |
 | **Slot regen early** | Refill `ramp`/`removal` with `max_cmc: 3` |
+
+**Status:** Playbook definitions may be drafted in config during UX12a, but **no UI or iterate entry** until a post-v1 slice (after dependency-issue guided swap ships).
 
 **Playbook source of truth:** YAML or JSON map `rule_id` → `strategies[]` in `config/` (mirrors `curve-advisories.yaml` pattern) so copy and constraints stay data-driven.
 
@@ -166,8 +170,8 @@ Read `detail.deficit` from issue payload (`equipment` | `carriers` | equip-payof
 | Source | Quick action (keep) | New advanced entry | Default preset |
 | --- | --- | --- | --- |
 | Card row selection + swap bar | **Swap (N)** | **Advanced…** link on bar | None — user sets filters |
-| Dependency issue row | **Swap All** | **Fix issue…** button | Highest-confidence strategy for `deficit` |
-| Deck metrics advisory | — (none today) | **Adjust curve…** link on warn blurb | `CURVE_MISSING_EARLY` → “Add early plays” |
+| Dependency issue row | **Swap All** | **Fix issue…** button; **Quick fix** (prototype) | Highest-confidence strategy for `deficit` |
+| Deck metrics advisory | — (none today) | **Adjust curve…** — *deferred* | — |
 | Slot heading | **Regenerate** | **Regenerate…** (split button) or long-press | Slot-appropriate curve bias |
 | Card row context menu (stretch) | — | **Swap for…** → named card search | Named card |
 
@@ -194,7 +198,8 @@ Extend iterate endpoints; avoid proliferating one-off routes.
     "replacement_oracle_id": null,
     "slot_policy": "same"
   },
-  "strategy_id": "add_equipment"
+  "strategy_id": "add_equipment",
+  "preview_limit": 8
 }
 ```
 
@@ -202,12 +207,31 @@ Extend iterate endpoints; avoid proliferating one-off routes.
 | --- | --- |
 | `oracle_ids` | Cards to vacate (unchanged from UX11) |
 | `constraints` | Optional; omit = quick swap |
+| `constraints.slot_policy` | `"same"` (default) or `"any"` — expert cross-slot replacement |
 | `strategy_id` | Telemetry + playbook lookup; server may validate consistency |
 | `replacement_oracle_id` | When set, direct swap if legal |
+| `preview_limit` | Preview endpoint only — max candidates per vacated position (default 8) |
 
-### `POST /api/v1/decks/{id}/swap/preview` (optional slice)
+### `POST /api/v1/decks/{id}/swap/preview` (**v1**)
 
-Returns top *K* candidates per vacated slot without persisting — powers **Preview candidates**. Non-goal for first slice if costly.
+Returns top *K* candidates per vacated slot **without persisting** — powers **Preview candidates** in the advanced sheet. Same request body as swap (including `constraints`); response:
+
+```json
+{
+  "candidates_by_position": [
+    {
+      "from_oracle_id": "…",
+      "from_name": "…",
+      "slot": "synergy",
+      "candidates": [
+        { "oracle_id": "…", "name": "…", "mana_cost": "{2}", "price_usd": 1.5, "rarity": "uncommon" }
+      ]
+    }
+  ]
+}
+```
+
+Ship in **first UX12 implementation tranche** alongside constrained swap (not a follow-up slice).
 
 ### `POST /api/v1/decks/{id}/refill-slot` extension
 
@@ -233,7 +257,7 @@ Refactor `swap_deck_cards` to accept optional `SwapConstraints`:
 | **A. Inline filters on swap bar** | Always visible | Clutters 375px; scares casual users | Reject as default; link only |
 | **B. Bottom sheet (chosen)** | Familiar mobile pattern; room for presets + filters | Extra tap to open | **Primary** |
 | **C. Separate `/deck/:id/swap` route** | Deep-linkable | Breaks UX11 “same surface” model | Defer — use sheet + URL hash `?swap=advanced` if needed |
-| **D. Auto-execute best strategy** | Fastest fix | Wrong for “abandon equipment” vs “add carriers” | **Reject** as default; offer as optional “Quick fix” with confirm |
+| **D. Auto-execute best strategy (“Quick fix”)** | Fastest fix | Wrong when user wants abandon vs add | **Prototype in v1** on issue rows; dogfood then keep or remove |
 | **E. Full candidate grid picker** | Maximum control | Heavy UI; slow on mobile | **Preview slice** only (top 5–8), not full Scryfall browser |
 | **F. Re-run wizard** | Changes criteria holistically | Loses locks and manual edits | Out of scope — iterate stays on deck view |
 
@@ -243,28 +267,39 @@ Refactor `swap_deck_cards` to accept optional `SwapConstraints`:
 
 | Slice | Deliverable | Depends on |
 | --- | --- | --- |
-| **UX12a** | Planning + playbook YAML + API contract in OpenAPI (no UI) | — |
-| **UX12b** | Engine: `SwapConstraints` on swap + refill; unit tests | UX12a |
-| **UX12c** | Advanced swap sheet from selection bar; filters (type, color, rarity, price) | UX12b |
-| **UX12d** | Issue **Fix issue…** + strategy presets for equipment, vehicles, producer/consumer | UX12b + playbook |
+| **UX12a** | Planning lock + playbook YAML + OpenAPI (`SwapConstraints`, `swap/preview`) | — |
+| **UX12b** | Engine: `SwapConstraints` on swap + refill; `swap/preview` endpoint; unit tests | UX12a |
+| **UX12c** | Advanced swap sheet; filters (type, color, rarity, price); **Preview candidates** UI; expert **cross-slot** toggle | UX12b |
+| **UX12d** | Issue **Fix issue…** + strategy presets (equipment, vehicles, producer/consumer); **Quick fix** prototype on issue rows | UX12b + playbook |
 | **UX12e** | Named-card replacement (search + pin) | UX12b |
-| **UX12f** | Curve advisory actions + metrics panel links | UX12b; UX10c |
-| **UX12g** | Preview candidates endpoint + UI | UX12b (optional) |
+| **UX12f** | Curve advisory **Adjust curve…** + metrics panel links | UX12b; UX10c — **post-v1** |
+
+**First implementation tranche (ship together):** UX12a → UX12b → UX12c + UX12d + UX12e. Preview API and UI are in-scope for that tranche, not deferred.
 
 **Parallel OK with:** doc-only, cli-engine maintenance. **Not parallel with:** large OpenAPI refactors without coordination.
 
+### Quick fix (prototype)
+
+On dependency issue rows, a tertiary **Quick fix** button applies the playbook’s default strategy for `detail.deficit` with a confirm step (and post-swap diff banner for undo context). **Ship as prototype** in UX12d; remove or promote to permanent affordance after dogfood — do not block other UX12 slices on this decision.
+
 ---
+
+## Decisions (locked)
+
+| # | Decision |
+| --- | --- |
+| 1 | **Cross-slot replacement** — expert-only toggle (`slot_policy: any`); default remains same-slot |
+| 2 | **Preview API** — `POST …/swap/preview` ships in first UX12 implementation tranche |
+| 3 | **Curve advisory actions** — deferred to UX12f (after dependency guided swap) |
+| 4 | **repair_dependencies** (D5) — separate future action; do not conflate with user swap |
+| 5 | **Batch strategies** across multiple issues — defer |
 
 ## Open decisions
 
-| # | Question | Lean |
+| # | Question | Notes |
 | --- | --- | --- |
-| 1 | Should **Quick fix** auto-apply best strategy without opening sheet? | Yes, as tertiary button with undo via second swap — not default |
-| 2 | Cross-slot replacement (`slot_policy: any`) | Expert-only toggle; default same-slot |
-| 3 | Preview API in v1 of UX12? | Defer to UX12g unless cheap |
-| 4 | CLI parity (`--swap-constraints JSON`)? | Stretch after web proves contract |
-| 5 | Tie **repair_dependencies** (D5) to UI? | Separate **Repair deck** action later; do not conflate with user swap |
-| 6 | Batch strategies across multiple issues? | Defer — one issue at a time |
+| 1 | Keep **Quick fix** after prototype? | Decide after UX12d dogfood |
+| 2 | CLI parity (`--swap-constraints JSON`)? | Stretch after web proves contract |
 
 ---
 
@@ -272,8 +307,8 @@ Refactor `swap_deck_cards` to accept optional `SwapConstraints`:
 
 | File | State |
 | --- | --- |
-| `deck-view-advanced-swap-sheet.html` | Sheet open from swap bar; filters + Apply |
-| `deck-view-issue-fix-strategies.html` | Issue expanded with strategy chips + Fix issue… |
+| `deck-view-advanced-swap-sheet.html` | Sheet open from swap bar; filters, cross-slot toggle, Preview + Apply |
+| `deck-view-issue-fix-strategies.html` | Issue expanded with strategy chips, Fix issue…, Quick fix (prototype) |
 | `deck-view-named-swap.html` | Named card search result |
 
 Add to [wireframes/README.md](wireframes/README.md) when HTML mocks exist.
