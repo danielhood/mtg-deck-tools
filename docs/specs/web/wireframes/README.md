@@ -223,9 +223,9 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | MD preview | `<details>` default **closed** at bottom of scroll |
 | Footer | Fixed **Build another deck** (primary); **Delete deck**; bottom row **Back** + **Home** (**UX7f**) |
 
-**Dev notes only (`.dev-note`):** session cache key `mtg-deck-cache-{id}`; server library API shipped (**UX7f**); dependency dashboard shipped (**UX7d**); UX11/UX10 deferred.
+**Dev notes only (`.dev-note`):** session cache key `mtg-deck-cache-{id}`; server library API shipped (**UX7f**); dependency dashboard shipped (**UX7d**); deck metrics + curve advisories shipped (**UX10**); deck editor shipped (**UX11**).
 
-**Out of scope for UX7e wireframes:** swap/lock selection; library grid; CMC chart; dependency dashboard drill-down; dark mode.
+**Out of scope for UX7e wireframes:** swap/lock selection; library grid; CMC chart (shipped **UX10b**); dependency dashboard drill-down (shipped **UX7d**); dark mode.
 
 **Approval gate:** Mark P0 files `approved` in [index.md](index.md) before UX7e-a Svelte work.
 
@@ -287,7 +287,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 **Dev notes only (`.dev-note`):** data from `deck.dependency_report`; profile labels align with `WIZARD_FOCUS_PROMPT_LABELS`; no new API; UX11 repair deferred.
 
-**Out of scope for UX7d wireframes:** repair/regen buttons; profile package swap; CMC chart; swap/lock selection; dark mode.
+**Out of scope for UX7d wireframes:** repair/regen buttons; profile package swap; CMC chart (shipped **UX10b**); swap/lock selection (shipped **UX11**); dark mode.
 
 **Approval gate:** P0 files shipped 2026-06-25 — see [index.md](index.md).
 

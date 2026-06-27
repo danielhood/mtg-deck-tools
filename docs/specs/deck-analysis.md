@@ -79,7 +79,11 @@ Target: **&lt; 5%** on the full matrix ([docs/specs/dependency-engine/decisions.
 
 ## Future: deck composition metrics in analyze output
 
-Not implemented. Planned **UX10** ([deck-output-format.md](../product/deck-output-format.md), [user-experience.md](dependency-engine/user-experience.md)): per-case and aggregate **CMC histograms** (and creature-specific curves) in `cases/<id>.json` and `summary.json` when `--write-decks` is used — useful for spotting regressions in curve shape without manual MD review. Distinct from dependency `expect` blocks (no mandatory curve gate in dogfood matrix until thresholds are calibrated).
+**Generate output (UX10a–c):** Shipped — histograms and `curve_advisories` appear in `.deck.json` `stats` and Markdown after `generate`.
+
+**Analyze runner (not implemented):** Per-case and aggregate **CMC histograms** (and creature-specific curves, optional advisory hit rates) in `cases/<id>.json` and `summary.json` when `analyze run --write-decks` is used — useful for spotting regressions in curve shape without manual MD review. Distinct from dependency `expect` blocks (no mandatory curve gate in dogfood matrix until thresholds are calibrated).
+
+Spec: [deck-output-format.md](../product/deck-output-format.md) · [user-experience.md](dependency-engine/user-experience.md) § UX10.
 
 ## Extending
 

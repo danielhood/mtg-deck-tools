@@ -42,7 +42,7 @@ UX7 is the cross-platform web shell. All sub-phases **UX7a–UX7d** are **shippe
 | UX7d | Dependency dashboard | Shipped |
 | UX7g | Database init / refresh (server bootstrap + web import UI) | Shipped |
 
-Post-MVP web work: [backlog/web-ui.md](backlog/web-ui.md) (**UX10** shipped).
+Post-MVP web work: [backlog/web-ui.md](backlog/web-ui.md) (**UX10** UX10a–c shipped, **UX11** shipped).
 
 ---
 

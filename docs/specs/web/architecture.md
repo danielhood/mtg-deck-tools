@@ -252,7 +252,8 @@ Comparison retained for context (Vue was the alternative):
 | UX7g-a | Server DB bootstrap (`serve` + `MTG_AUTO_DOWNLOAD`, `POST /api/v1/import`) | Shipped |
 | UX7g-b | Web-initiated import / refresh UI | Shipped |
 | UX10b | CMC / composition charts | Shipped |
-| UX11 | Deck editor (swap / lock / iterate) | **Planning** — [iterate-api.md](iterate-api.md) |
+| UX10c | Curve advisories panel (`stats.curve_advisories`) | Shipped |
+| UX11 | Deck editor (swap / lock / iterate) | Shipped — [iterate-api.md](iterate-api.md) |
 
 ---
 

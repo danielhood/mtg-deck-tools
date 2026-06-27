@@ -1,6 +1,6 @@
 # Web UI specification
 
-**Status:** **UX7 MVP shipped** (UX7a–UX7d) — build wizard, enhanced deck view, saved deck library, and dependency dashboard. **UX10** deck metrics and **UX11** editor shipped. Post-MVP backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
+**Status:** **UX7 MVP shipped** (UX7a–UX7d) — build wizard, enhanced deck view, saved deck library, and dependency dashboard. **UX10** deck metrics (UX10a–c) and **UX11** editor shipped. Post-MVP backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 ## Code location
 
@@ -43,9 +43,9 @@ Summary:
 
 Reuse existing product specs — do not fork schemas in the frontend:
 
-- [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json`, metrics, lock/swap fields (UX11)
+- [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json`, metrics (UX10a–c), lock/swap fields (UX11)
 - [user-experience.md](../dependency-engine/user-experience.md) — wizard flow, UX7c scope, UX roadmap
-- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — post-MVP web backlog (**UX10** shipped)
+- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — post-MVP web backlog (UX10/UX11 shipped)
 
 ## Locked v1 decisions
 

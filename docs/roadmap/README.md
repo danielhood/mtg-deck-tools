@@ -18,14 +18,14 @@ How work is **selected**, **parked**, and **recorded** in this repo. Specs live 
 
 ## Current snapshot
 
-*Updated 2026-06-25. Detail and dependencies: [active.md](active.md).*
+*Updated 2026-06-27. Detail and dependencies: [active.md](active.md).*
 
 | Priority | ID | Component | Task |
 | --- | --- | --- | --- |
 | Ongoing | **ENG-MAINT** | cli-engine | Profile tuning vs `dependency-audit` when adding rules |
 | Always | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes |
 
-**UX7 MVP:** **Complete** (UX7a–UX7d + **UX7g** shipped). **UX10** metrics **shipped**. **UX11** deck editor **shipped**. Web backlog: [backlog/web-ui.md](backlog/web-ui.md).
+**UX7 MVP:** **Complete** (UX7a–UX7d + **UX7g** shipped). **UX10** metrics **shipped** (UX10a–c). **UX11** deck editor **shipped**. Web backlog: [backlog/web-ui.md](backlog/web-ui.md).
 
 **Not active:** cli-engine expansion (P7 remainder), cli-ui UX8, product-data export — promote from [backlog/](backlog/) before starting.
 

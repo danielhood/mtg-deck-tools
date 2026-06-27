@@ -8,7 +8,7 @@ Format: `- **YYYY-MM-DD** — Short title — optional PR/issue`
 
 ## 2026-06
 
-- **2026-06-27** — UX10c curve advisories shipped — warn-only `CURVE_MISSING_EARLY` and `CURVE_TOP_HEAVY` from `config/curve-advisories.yaml` (theme overrides for ramp/tokens/voltron); `stats.curve_advisories` in `.deck.json`; **Curve advisories** in Markdown + web deck metrics panel
+- **2026-06-27** — UX10c curve advisories shipped — warn-only `CURVE_MISSING_EARLY` and `CURVE_TOP_HEAVY` from `config/curve-advisories.yaml` (theme overrides for ramp/tokens/voltron); `stats.curve_advisories` in `.deck.json`; **Curve advisories** in Markdown + web deck metrics panel (#93)
 - **2026-06-26** — UX10 deck composition metrics shipped — **UX10a** CMC histograms, type counts, and summary stats in Markdown + `.deck.json` `stats` (`deck_metrics.py`); **UX10b** collapsible **Deck metrics** panel on `/deck/:id` with interactive bar chart and All nonlands / Creatures only toggle (#85, UX10b PR)
 - **2026-06-26** — UX11 GUI deck editor shipped — per-card lock (`PATCH` deck body), slot regen (`POST …/refill-slot`), multi-select swap (`POST …/swap`); edit mode on `/deck/:id`; lock-aware engine refill — home **Download card data** / **Refresh card data** via `POST /api/v1/import` (`DbBanner`, `HomePage`); poll `GET /api/v1/wizard/meta` until `db_ready` (#81)
 - **2026-06-25** — UX7d dependency dashboard shipped — collapsible **Dependencies** panel on deck view (`/deck/:id`); profile summaries and expandable issues with **Show in deck** highlight; generate rejects invalid/incomplete decks; commander step defaults color filter to Exact (#77, #78)
