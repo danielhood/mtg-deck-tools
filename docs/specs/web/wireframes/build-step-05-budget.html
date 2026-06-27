@@ -774,18 +774,7 @@
           <p>Optional min and/or max USD per card.</p>
         </div>
 
-        <div class="toggle-list">
-          <label class="toggle-row">
-            <span class="toggle-copy">
-              <strong>Set per-card price range</strong>
-              <span>Limit individual card prices independent of total budget.</span>
-            </span>
-            <input class="toggle-input" type="checkbox" id="price-range-enabled">
-            <span class="toggle-switch" aria-hidden="true"></span>
-          </label>
-        </div>
-
-        <div class="conditional-panel is-hidden" id="price-range-panel">
+        <div class="conditional-panel" id="price-range-panel">
           <div class="price-stepper-list" aria-label="Per-card price bounds">
             <div class="price-stepper-row" id="price-max-stepper">
               <div class="price-cell">
@@ -941,8 +930,6 @@
     const strictBudget = document.getElementById("strict-budget");
     const preferAvailable = document.getElementById("prefer-available");
 
-    const priceRangeEnabled = document.getElementById("price-range-enabled");
-    const priceRangePanel = document.getElementById("price-range-panel");
     const priceMinInput = document.getElementById("price-min-input");
     const priceMaxInput = document.getElementById("price-max-input");
     const priceMinField = document.getElementById("price-min-field");
@@ -1087,7 +1074,7 @@
 
       priceMinLess.disabled = min.value === null;
       priceMaxLess.disabled = max.value === null;
-      rangeWarning.classList.toggle("is-visible", priceRangeEnabled.checked && invalidRange);
+      rangeWarning.classList.toggle("is-visible", invalidRange);
       priceMinField.classList.toggle("is-invalid", !min.valid || invalidRange);
       priceMaxField.classList.toggle("is-invalid", !max.valid || invalidRange);
     };
@@ -1099,7 +1086,6 @@
 
     const syncPanels = () => {
       budgetPanel.classList.toggle("is-hidden", !budgetEnabled.checked);
-      priceRangePanel.classList.toggle("is-hidden", !priceRangeEnabled.checked);
 
       if (!budgetEnabled.checked) {
         strictBudget.checked = false;
@@ -1127,21 +1113,17 @@
         parts.push("No total deck budget");
       }
 
-      if (priceRangeEnabled.checked) {
-        const min = readOptional(priceMinInput);
-        const max = readOptional(priceMaxInput);
-        if (min.valid && max.valid && (min.value !== null || max.value !== null)) {
-          const minLabel = min.value !== null ? formatUsd(min.value) : "no min";
-          const maxLabel = max.value !== null ? formatUsd(max.value) : "no max";
-          parts.push(`Per card: ${minLabel} – ${maxLabel}`);
-        } else if (!min.valid || !max.valid) {
-          parts.push("Per-card range: invalid amount");
-        } else {
-          parts.push("Per-card range enabled (no bounds set)");
-        }
-        if (rangeInvalid()) {
-          parts.push("min > max");
-        }
+      const min = readOptional(priceMinInput);
+      const max = readOptional(priceMaxInput);
+      if (min.valid && max.valid && (min.value !== null || max.value !== null)) {
+        const minLabel = min.value !== null ? formatUsd(min.value) : "no min";
+        const maxLabel = max.value !== null ? formatUsd(max.value) : "no max";
+        parts.push(`Per card: ${minLabel} – ${maxLabel}`);
+      } else if (!min.valid || !max.valid) {
+        parts.push("Per-card range: invalid amount");
+      }
+      if (rangeInvalid()) {
+        parts.push("min > max");
       }
 
       if (parts.length === 1 && parts[0] === "No total deck budget") {
@@ -1237,11 +1219,9 @@
     });
     priceMaxInput.addEventListener("blur", () => commitOptionalInput(priceMaxInput));
 
-    [budgetEnabled, priceRangeEnabled].forEach((el) => {
-      el.addEventListener("change", () => {
-        syncPanels();
-        refresh();
-      });
+    budgetEnabled.addEventListener("change", () => {
+      syncPanels();
+      refresh();
     });
 
     [strictBudget, preferAvailable].forEach((el) => {

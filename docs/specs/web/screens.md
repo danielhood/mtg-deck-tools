@@ -109,8 +109,7 @@ CLI: [step4.py](../../../src/mtg_deck_tools/wizard/step4.py).
 | Total budget | Master toggle — when on, **− / +** stepper row (48px tap zones) **plus** manual **$** text field; **≤2** cent digits on entry; display **$150** not **$150.00**, but **$3.40** always shows two cent digits |
 | `strict_budget` | Toggle nested under budget — exclude cards without USD prices; **cleared when budget off** (CLI parity) |
 | `prefer_available` | Toggle nested under budget — prefer readily available picks; **cleared when budget off** |
-| Per-card range | Master toggle — when on, **stacked** max then min rows (full width each) |
-| Per-card min / max | **− / +** steppers (**$1** / **$5**) **plus** manual text field each; **×** clear inside field when set; blank = no limit; same cent entry/display rules as budget |
+| Per-card min / max | Always visible — **stacked** max then min rows (full width each); **− / +** steppers (**$1** / **$5**) **plus** manual text field each; **×** clear inside field when set; blank = no limit; same cent entry/display rules as budget |
 | Range validation | If both bounds set and min &gt; max, inline warning — do **not** block stepper taps on the other field |
 | Selection summary | Read-only recap below controls |
 

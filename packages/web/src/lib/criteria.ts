@@ -41,7 +41,6 @@ export interface WizardDraft {
   slot_template: Record<string, number>;
   seed: number | null;
   budgetEnabled: boolean;
-  cardPriceRangeEnabled: boolean;
 }
 
 const STORAGE_KEY = "mtg-wizard-draft";
@@ -73,7 +72,6 @@ export function emptyDraft(): WizardDraft {
     slot_template: {},
     seed: null,
     budgetEnabled: false,
-    cardPriceRangeEnabled: false,
   };
 }
 
@@ -127,8 +125,8 @@ export function toDeckCriteria(draft: WizardDraft): Record<string, unknown> {
     colors,
     commander_oracle_ids: draft.commander_oracle_ids,
     budget_usd: draft.budgetEnabled ? draft.budget_usd : null,
-    card_price_min_usd: draft.cardPriceRangeEnabled ? draft.card_price_min_usd : null,
-    card_price_max_usd: draft.cardPriceRangeEnabled ? draft.card_price_max_usd : null,
+    card_price_min_usd: draft.card_price_min_usd,
+    card_price_max_usd: draft.card_price_max_usd,
     strict_budget: draft.budgetEnabled ? draft.strict_budget : false,
     strict_dependencies: draft.strict_dependencies,
     repair_dependencies: draft.repair_dependencies,
@@ -155,7 +153,7 @@ export function seedCommanderPricesIfNeeded(draft: WizardDraft): WizardDraft {
   if (draft.commanderPriceInitialized) return draft;
   return {
     ...draft,
-    commander_price_min_usd: draft.cardPriceRangeEnabled ? draft.card_price_min_usd : null,
+    commander_price_min_usd: draft.card_price_min_usd,
     commander_price_max_usd: null,
     commanderPriceInitialized: true,
   };

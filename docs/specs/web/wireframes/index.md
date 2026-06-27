@@ -11,7 +11,7 @@ Route → HTML mock map. UX7c wireframes **approved 2026-06-07** (shipped). UX7e
 | `/build/3` | [build-step-03-synergy.html](build-step-03-synergy.html) | approved | Synergy toggles; focus stepper + dot meter; collapsed level help |
 | `/build/3` (no profiles) | [build-step-03-synergy-empty.html](build-step-03-synergy-empty.html) | approved | Toggles only; dashed empty state for mechanic focus |
 | `/build/4` | [build-step-04-colors.html](build-step-04-colors.html) | approved | WUBRG pips + Colorless (void); `colorFilter` enum |
-| `/build/5` | [build-step-05-budget.html](build-step-05-budget.html) | approved | Steppers + manual $ fields; independent min/max; range warning only |
+| `/build/5` | [build-step-05-budget.html](build-step-05-budget.html) | approved | Steppers + manual $ fields; per-card min/max always visible; range warning only |
 | `/build/6` | [build-step-06-commander.html](build-step-06-commander.html) | approved | Search-as-you-type; exact/includes (exact default); highlighted row + tappable card art lightbox |
 | `/build/6` (no results) | [build-step-06-commander-empty.html](build-step-06-commander-empty.html) | approved | Dashed empty state; links back to steps 4–5; Next disabled |
 | `/build/7` | [build-step-07-rarity.html](build-step-07-rarity.html) | approved | Min rarity radio list (common → mythic); commander exempt |
