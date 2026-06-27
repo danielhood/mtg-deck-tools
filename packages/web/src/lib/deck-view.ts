@@ -354,7 +354,9 @@ export function cardMatchesFilters(card: DeckCardRow, filters: DeckFilters): boo
   if (filters.types.size && !filters.types.has(card.primary_type)) return false;
   if (filters.colors.size) {
     if (!card.colors.length) return false;
-    if (!card.colors.some((color) => filters.colors.has(color))) return false;
+    for (const color of filters.colors) {
+      if (!card.colors.includes(color)) return false;
+    }
   }
   return true;
 }

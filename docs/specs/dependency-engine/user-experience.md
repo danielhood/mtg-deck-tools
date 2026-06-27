@@ -455,7 +455,7 @@ Delivery order: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 | UX7d boundary | Show **compact list** of `dependency_report.issues` (rule id + message). **No** profile drill-down dashboard or repair actions. |
 | UX10 boundary | Slot counts, type breakdown, and `stats.*` from JSON only. **No** CMC histogram or interactive charts. |
 | UX11 boundary | Card rows **read-only**. **No** swap, lock, slot regen, or selection chrome. |
-| Filters | **Slot** and **Type** chip groups; **Color** uses wizard WUBRG pip controls + void (∅). Nonlands: casting-cost pips; lands: `produced_mana` → basic land type names → `color_identity` — lands are never void. Multi-select within group, AND across groups. Clear-all per group. |
+| Filters | **Slot** and **Type** chip groups; **Color** uses wizard WUBRG pip controls + void (∅). Nonlands: casting-cost pips; lands: `produced_mana` → basic land type names → `color_identity` — lands are never void. Multi-select within each group uses **AND** (all selected colors must appear on the card); filter groups combine with **AND** (slot + type + color). Clear-all per group. |
 | Summaries | Always-visible panel below commander: slot table, estimated price, unpriced count, `avg_cmc_nonland`, type counts. |
 | Analysis | **Areas to review:** warn-level `dependency_report.issues`. **Looks good:** `dependency_report.passed` or no warn issues (one-line positive copy). No new server rubric in UX7e. |
 | Card art | Commander **hero** image + **row thumbnail** per card (`image_uri`); tap → lightbox (reuse UX7c `CardLightbox` pattern). |
