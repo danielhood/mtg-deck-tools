@@ -118,7 +118,8 @@ flowchart TD
 | --- | --- | --- |
 | Removal / wipe density | Slot template, not oracle atoms | `slot-templates.yaml`, themes |
 | Curve / land count | Mana base planner | `mana_base.py`, validation |
-| Deck-wide CMC distribution | Post-build metrics, not atoms | **UX10 shipped** — [deck-output-format.md](../../product/deck-output-format.md), [user-experience.md](user-experience.md) |
+| Deck-wide CMC distribution | Post-build metrics, not atoms | **UX10 shipped** (UX10a–c) — [deck-output-format.md](../../product/deck-output-format.md), [user-experience.md](user-experience.md) |
+| Curve advisories | Post-build warn-only heuristics | **UX10c** — [`config/curve-advisories.yaml`](../../../config/curve-advisories.yaml), `curve_advisories.py` |
 | Named combo pairs | Needs external combo data | — |
 | Power level / salt | No simple dial | [open-questions.md](../../product/open-questions.md) |
 | Aura removal risk | Not statically provable | UX note in [user-experience.md](user-experience.md) |
@@ -131,4 +132,5 @@ flowchart TD
 
 - Deferred stances: [`resources/dependency/hard-cases.yaml`](../../../resources/dependency/hard-cases.yaml)
 - Profile thresholds: [`config/dependency-profiles.yaml`](../../../config/dependency-profiles.yaml)
+- Curve advisory thresholds: [`config/curve-advisories.yaml`](../../../config/curve-advisories.yaml)
 - Locked v1 scope: [decisions.md](decisions.md)

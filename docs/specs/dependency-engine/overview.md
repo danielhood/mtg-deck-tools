@@ -384,6 +384,7 @@ Feeds progressive constraints in [user-experience.md](user-experience.md) (UX8).
 User-facing mechanics (energy focus, aura density, dominance caps, strict vs warn-only, future swap workflows) are specified in **[user-experience.md](user-experience.md)**. That doc defines:
 
 - `config/dependency-profiles.yaml` — default min/max and share targets per mechanic profile
+- `config/curve-advisories.yaml` — post-build curve advisory thresholds (UX10c)
 - `DeckCriteria` extensions (`strict_dependencies`, `repair_dependencies`, `mechanic_focus` — wizard step 3 / CLI)
 - `dependency_report` shape for Markdown Notes and future UI
 

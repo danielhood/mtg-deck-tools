@@ -2,7 +2,7 @@
 
 Planning for **how users discover, constrain, and refine** card-dependency behavior alongside the technical engine in [overview.md](overview.md).
 
-**Status (2026-06-26):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7d + UX7g shipped**. **UX10** deck composition metrics **shipped**. **UX11** GUI deck editor **shipped**. Post-MVP web backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
+**Status (2026-06-27):** Engine **D0–D5 shipped**. UX1–UX5 and **UX7a–UX7d + UX7g shipped**. **UX10** deck composition metrics **shipped** (UX10a–**UX10c**). **UX11** GUI deck editor **shipped**. Post-MVP web backlog: [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 
 **UX2 scope expanded (2026-06-03):** Dependency expansion Priorities 1–6 shipped 13 additional profiles (rad, oil, charge, experience, blood, +1/+1, sacrifice, tokens, vehicles, equipment, enchantments, graveyard, landfall). The engine and schema already support focus levels for all of them (`DeckCriteria.mechanic_focus` is a generic dict; `dependency_scope.py` checks every profile). UX2 now covers focus presets for **every profile activated by the user's theme and `include_mechanics` selections**, not only energy and auras.
 
@@ -344,7 +344,8 @@ Engine requirements for swaps:
 | On/off strict dependencies | **Good** | Flag on `generate` |
 | Include/avoid mechanics (existing) | **Good** | Keep as-is |
 | Post-build dependency report | **Good** | Markdown Notes + JSON |
-| Deck composition metrics (CMC histogram) | **Good** | Markdown table / ASCII bars; JSON `deck_metrics` (UX10a) |
+| Deck composition metrics (CMC histogram) | **Good** | Markdown table / ASCII bars; JSON `stats` histogram fields (UX10a) |
+| Curve advisories (warn-only) | **Good** | Markdown **Curve advisories** + JSON `stats.curve_advisories` (UX10c); thresholds in `config/curve-advisories.yaml` |
 | CMC curve visualization (interactive) | **Poor** | **UX10b shipped** — web deck view bar chart |
 | Focus presets (incidental → engine) | **Adequate** | Wizard step with numbered menu |
 | Per-mechanic min/max overrides | **Poor** | JSON edit or defer to UI |
@@ -370,7 +371,7 @@ Engine requirements for swaps:
 | **UX7** | Cross-platform web (mobile-first): ~~`service/` + FastAPI~~ **UX7a shipped**; ~~`serve`~~ **UX7b shipped**; ~~build wizard **UX7c**~~ **shipped**; ~~deck view **UX7e**~~ **shipped**; ~~library **UX7f**~~ **shipped**; ~~dashboard **UX7d**~~ **shipped**; iterate **UX11** | D5 + [specs/web/](../web/) |
 | **UX8** | **Progressive constraints** — restrict wizard/build choices as criteria commit | D1 + inventory audit + D3–D4 |
 | **UX9** | Web constraint panel + pick preview (interactive build) | D3–D4 + UX7 shell |
-| **UX10** | **Deck composition metrics** — CMC distribution report (+ optional curve advisories); CLI MD/JSON + web charts | **Shipped** — `output.py`, `deck_metrics.py`, `DeckMetricsPanel` |
+| **UX10** | **Deck composition metrics** — CMC distribution report + YAML curve advisories; CLI MD/JSON + web charts | **Shipped** — `deck_metrics.py`, `curve_advisories.py`, `output.py`, `DeckMetricsPanel` |
 | **UX11** | **GUI deck editor** — per-card **lock** + **swap** selection; refill/swap respect `DeckCriteria` and validation | `reload.py`, `filler.py`, `.deck.json` schema; **UX7e** deck view |
 
 ### UX7c — Web build wizard (shipped)
@@ -695,7 +696,7 @@ Contract: [deck-output-format.md](../../product/deck-output-format.md) § GUI de
 
 ### UX10 — Deck composition metrics (shipped)
 
-**Status:** **Shipped (2026-06-26)** — **UX10a** CLI + JSON; **UX10b** web deck view panel.
+**Status:** **Shipped** — **UX10a** (2026-06-26) CLI + JSON metrics; **UX10b** (2026-06-26) web deck view panel; **UX10c** (2026-06-27) YAML curve advisories.
 
 **Problem:** Users cannot see whether the generated list has enough early plays and late threats. Average CMC alone hides a deck of all 5-drops vs a balanced curve. Pick-time `_curve_score` only nudges **per slot** (ramp ≈2, wincon ≈5), not deck-wide creature distribution.
 
@@ -704,10 +705,23 @@ Contract: [deck-output-format.md](../../product/deck-output-format.md) § GUI de
 | Sub-phase | Shell | Content | Status |
 | --- | --- | --- | --- |
 | **UX10a** | Markdown + `.deck.json` after `generate` / `--from` regen | `cmc_histogram` (nonlands, quantity-weighted), `creature_cmc_histogram`, type-line counts, existing `avg_cmc_nonland`, ramp/land counts; ASCII or table in **Deck metrics** section | Shipped |
-| **UX10b** | UX7 local web | Interactive bar chart on `/deck/:id`; **All nonlands** / **Creatures only** toggle; curve blurb | Shipped |
-| **UX10c** | Optional warn-only rules | e.g. `CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY` — thresholds in YAML, scoped by theme; **not** pick-time block unless user enables strict curve mode (TBD) | Backlog |
+| **UX10b** | UX7 local web | Interactive bar chart on `/deck/:id`; **All nonlands** / **Creatures only** toggle; curve blurb (or advisories when present) | Shipped |
+| **UX10c** | Markdown + `.deck.json` + web | Warn-only `CURVE_MISSING_EARLY`, `CURVE_TOP_HEAVY` from `config/curve-advisories.yaml`; theme overrides (`ramp`, `tokens`, `voltron`); `stats.curve_advisories[]`; **not** pick-time block unless strict curve mode added later (TBD) | Shipped |
 
-**Data:** Computed from built `DeckCard` rows (`cmc`, `type_line`, `quantity`) — no Scryfall API. `analyze run` may aggregate the same metrics into `summary.json` for regression dashboards ([deck-analysis.md](../deck-analysis.md)).
+**UX10c advisory object** (each entry in `stats.curve_advisories`):
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `rule` | string | e.g. `CURVE_MISSING_EARLY` |
+| `status` | string | Always `warn` today |
+| `message` | string | User-facing copy from YAML |
+| `actual_share` | number | Observed bucket share (0–1) |
+| `threshold` | number | `min_share` or `max_share` that fired |
+| `histogram` | string | `nonlands` or `creatures` |
+
+**Theme merge:** When `criteria.themes` matches multiple override rows, `min_share` uses the **lowest** (most lenient) value and `max_share` uses the **highest** (most lenient).
+
+**Data:** Computed from built `DeckCard` rows (`cmc`, `type_line`, `quantity`) — no Scryfall API. `analyze run` may aggregate the same metrics into `summary.json` for regression dashboards ([deck-analysis.md](../deck-analysis.md)) — **not implemented**.
 
 **CLI fit:** **Good** for text histogram and summary table; **poor** for interactive charts (shipped in UX10b web panel). Flags TBD: `--deck-metrics` / `--no-deck-metrics`.
 

@@ -103,7 +103,7 @@ Priority 5 shipped narrow `mill_enabler` (explicit mill / library→GY). **Prior
 | --- | --- | --- |
 | Removal / wipe density | Slot template, not oracle atoms | `slot-templates.yaml`, themes |
 | Curve / land count | Mana base planner (avg CMC + ramp → land count) | `mana_base.py`, validation |
-| Deck-wide CMC distribution / “good curve” UX | Post-build metrics & optional advisories, not `card_effects` | Planned **UX10** — [deck-output-format.md](../product/deck-output-format.md), [user-experience.md](../specs/dependency-engine/user-experience.md) |
+| Deck-wide CMC distribution / “good curve” UX | Post-build metrics & optional advisories, not `card_effects` | **UX10 shipped** (UX10a–c) — [deck-output-format.md](../product/deck-output-format.md), [user-experience.md](../specs/dependency-engine/user-experience.md) |
 | Named combo pairs | Needs external combo data | — |
 | Power level / salt | No simple dial | [open-questions.md](../product/open-questions.md) |
 | Aura removal risk | Not statically provable | UX note in [user-experience.md](../specs/dependency-engine/user-experience.md) |

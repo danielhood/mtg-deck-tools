@@ -2,7 +2,7 @@
 
 **Single register** of work selected for immediate delivery. Parked work: [backlog/](backlog/). Shipped record: [changelog.md](../history/changelog.md) · [milestones.md](../history/milestones.md).
 
-*Last updated: 2026-06-26.*
+*Last updated: 2026-06-27.*
 
 ---
 
@@ -42,7 +42,7 @@ UX7 is the cross-platform web shell. All sub-phases **UX7a–UX7d** are **shippe
 | UX7d | Dependency dashboard | Shipped |
 | UX7g | Database init / refresh (server bootstrap + web import UI) | Shipped |
 
-Post-MVP web work: [backlog/web-ui.md](backlog/web-ui.md) (**UX10** shipped).
+Post-MVP web work: [backlog/web-ui.md](backlog/web-ui.md) (**UX10** UX10a–c shipped, **UX11** shipped).
 
 ---
 
@@ -77,7 +77,7 @@ flowchart LR
   UX11 --> UX10
 ```
 
-- **UX10** shipped — CLI deck metrics (UX10a) + web CMC charts on `/deck/:id` (UX10b). **UX11** shipped — GUI deck editor.
+- **UX10** shipped — CLI deck metrics (UX10a) + web CMC charts on `/deck/:id` (UX10b) + YAML curve advisories (UX10c). **UX11** shipped — GUI deck editor.
 - New cli-engine dependency profiles should not run in parallel with a large web API refactor on the same modules without coordination.
 
 ---

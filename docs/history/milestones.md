@@ -71,5 +71,7 @@ Matrix: **30 scenarios**; gate `analyze run --fail-on-expect` — **30/30** as o
 | UX7f | Saved deck library (`/library`, server persistence, auto-save on generate) |
 | UX7d | Dependency dashboard (collapsible **Dependencies** panel, generate validation gate) |
 | UX7g | Database init / refresh (server bootstrap + web import/refresh UI) |
+| UX10 | Deck composition metrics (UX10a CLI/JSON, UX10b web chart, UX10c curve advisories) |
+| UX11 | GUI deck editor (lock, refill-slot, swap) |
 
-**UX7 MVP complete.** Next web work: **UX10**, **UX11** — [backlog/web-ui.md](../roadmap/backlog/web-ui.md). Detail: [specs/web/README.md](../specs/web/README.md), [changelog.md](changelog.md).
+**UX7 MVP complete.** **UX10** and **UX11** shipped — see [changelog.md](changelog.md). Next work: promote from [backlog/web-ui.md](../roadmap/backlog/web-ui.md).

@@ -22,7 +22,10 @@
   const activeHistogram = $derived(histogramForView(metrics, curveView));
   const chartMax = $derived(maxHistogramCount(activeHistogram));
   const chartTotal = $derived(sumHistogram(activeHistogram));
-  const blurb = $derived(curveBlurb(activeHistogram));
+  const activeAdvisories = $derived(
+    (metrics.curve_advisories ?? []).filter((item) => item.histogram === curveView),
+  );
+  const blurb = $derived(curveBlurb(activeHistogram, metrics.curve_advisories));
   const summary = $derived(formatMetricsSummary(metrics));
   const creatureTotal = $derived(sumHistogram(metrics.creature_cmc_histogram));
 </script>
@@ -59,7 +62,18 @@
     {#if chartTotal === 0}
       <p class="metrics-empty" role="status">No cards to chart for this view.</p>
     {:else}
-      <p class="metrics-blurb">{blurb}</p>
+      {#if activeAdvisories.length}
+        <ul class="metrics-advisories" role="list">
+          {#each activeAdvisories as advisory (advisory.rule)}
+            <li>
+              <strong>{advisory.rule}</strong>
+              {advisory.message}
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <p class="metrics-blurb">{blurb}</p>
+      {/if}
 
       <div
         class="metrics-chart"
