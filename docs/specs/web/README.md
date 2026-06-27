@@ -34,6 +34,7 @@ Summary:
 | [wizard-api.md](wizard-api.md) | Wizard HTTP endpoints; screen → API index |
 | [library-api.md](library-api.md) | **UX7f shipped** — saved deck library HTTP API |
 | [iterate-api.md](iterate-api.md) | **UX11 shipped** — deck editor iterate API |
+| [advanced-swap-ux.md](advanced-swap-ux.md) | **UX12 planning** — constrained swap, warning playbooks, named-card replacement |
 | [design.md](design.md) | Visual design tokens |
 | [wireframes/README.md](wireframes/README.md) | Layout mock and review process (HTML wireframes) |
 | [openapi.yaml](openapi.yaml) | **Shipped** — health, stats, import, generate, library |

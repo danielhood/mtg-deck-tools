@@ -373,6 +373,7 @@ Engine requirements for swaps:
 | **UX9** | Web constraint panel + pick preview (interactive build) | D3–D4 + UX7 shell |
 | **UX10** | **Deck composition metrics** — CMC distribution report + YAML curve advisories; CLI MD/JSON + web charts | **Shipped** — `deck_metrics.py`, `curve_advisories.py`, `output.py`, `DeckMetricsPanel` |
 | **UX11** | **GUI deck editor** — per-card **lock** + **swap** selection; refill/swap respect `DeckCriteria` and validation | `reload.py`, `filler.py`, `.deck.json` schema; **UX7e** deck view |
+| **UX12** | **Advanced swap & guided rebalance** — constrained replacements; warning playbooks; named-card swap; quick path preserved | **UX11**; `dependency_repair.py` patterns; [advanced-swap-ux.md](../web/advanced-swap-ux.md) |
 
 ### UX7c — Web build wizard (shipped)
 
@@ -693,6 +694,23 @@ Wireframe scope: [wireframes/README.md](../web/wireframes/README.md) § UX7d wir
 Wireframes: [wireframes/README.md](../web/wireframes/README.md) § UX11 wireframe scope.
 
 Contract: [deck-output-format.md](../../product/deck-output-format.md) § GUI deck editor · API: [iterate-api.md](../web/iterate-api.md) · Active: [active.md](../../roadmap/active.md).
+
+### UX12 — Advanced swap & guided rebalance (planning)
+
+**Status:** Planning (2026-06-27). Full spec: [advanced-swap-ux.md](../web/advanced-swap-ux.md).
+
+**Problem:** UX11 swap and issue **Swap All** use unconstrained random picks. Users rebalancing equipment, vehicles, producer/consumer profiles, or curve metrics need **replacement intent** (type, role, named card, price/rarity/color) while keeping the quick path for speed.
+
+**In scope (planned):**
+
+- **Two-tier model** — quick swap/regen unchanged; **Advanced…** bottom sheet with filters and strategy presets.
+- **Warning playbooks** — dependency issues (and stretch: curve advisories) offer multiple resolution strategies (e.g. add equipment vs trim equipment).
+- **Named-card swap** — optional pin to a specific oracle card when commander-legal.
+- **API** — extend `POST …/swap` and `…/refill-slot` with optional `SwapConstraints`; optional preview endpoint in later slice.
+
+**Out of scope (UX12):** profile package swap (**CLI-SWAP** / UX6); auto `repair_dependencies` without user confirm; new analyze HTTP endpoints.
+
+**Depends on:** **UX11** shipped.
 
 ### UX10 — Deck composition metrics (shipped)
 
