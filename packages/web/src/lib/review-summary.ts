@@ -95,16 +95,15 @@ export function buildSummaryRows(
     rows.push({ label: "Budget", lines: noneLine(), muted: true });
   }
 
-  if (draft.cardPriceRangeEnabled) {
-    const min = draft.card_price_min_usd;
-    const max = draft.card_price_max_usd;
+  const min = draft.card_price_min_usd;
+  const max = draft.card_price_max_usd;
+  if (min != null || max != null) {
     const parts: string[] = [];
     if (min != null) parts.push(`min ${formatPrice(min)}`);
     if (max != null) parts.push(`max ${formatPrice(max)}`);
     rows.push({
       label: "Card prices",
-      lines: parts.length ? [parts.join(" · ")] : noneLine(),
-      muted: !parts.length,
+      lines: [parts.join(" · ")],
     });
   } else {
     rows.push({ label: "Card prices", lines: noneLine(), muted: true });

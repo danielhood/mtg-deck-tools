@@ -39,8 +39,7 @@
   const maxParsed = $derived(parseOptionalMoney(maxText));
 
   const rangeInvalid = $derived(
-    draft.cardPriceRangeEnabled &&
-      minParsed.valid &&
+    minParsed.valid &&
       maxParsed.valid &&
       minParsed.value !== null &&
       maxParsed.value !== null &&
@@ -48,15 +47,15 @@
   );
 
   const budgetFieldInvalid = $derived(draft.budgetEnabled && !budgetParsed.valid);
-  const minFieldInvalid = $derived(
-    draft.cardPriceRangeEnabled && (!minParsed.valid || rangeInvalid),
-  );
-  const maxFieldInvalid = $derived(
-    draft.cardPriceRangeEnabled && (!maxParsed.valid || rangeInvalid),
-  );
+  const minFieldInvalid = $derived(!minParsed.valid || rangeInvalid);
+  const maxFieldInvalid = $derived(!maxParsed.valid || rangeInvalid);
 
   const budgetLessDisabled = $derived(
     budgetParsed.valid && budgetParsed.value !== null && budgetParsed.value <= BUDGET_MIN,
+  );
+
+  const hasPerCardBounds = $derived(
+    (minParsed.valid && minParsed.value !== null) || (maxParsed.valid && maxParsed.value !== null),
   );
 
   function handleBudgetInput(raw: string): void {
@@ -155,20 +154,22 @@
       parts.push("No total deck budget");
     }
 
-    if (draft.cardPriceRangeEnabled) {
-      if (minParsed.valid && maxParsed.valid && (minParsed.value !== null || maxParsed.value !== null)) {
+    if (hasPerCardBounds) {
+      if (minParsed.valid && maxParsed.valid) {
         const minLabel = minParsed.value !== null ? formatUsd(minParsed.value) : "no min";
         const maxLabel = maxParsed.value !== null ? formatUsd(maxParsed.value) : "no max";
         parts.push(`Per card: ${minLabel} – ${maxLabel}`);
-      } else if (!minParsed.valid || !maxParsed.valid) {
-        parts.push("Per-card range: invalid amount");
       } else {
-        parts.push("Per-card range enabled (no bounds set)");
+        parts.push("Per-card range: invalid amount");
       }
       if (rangeInvalid) parts.push("min > max");
     }
 
-    if (parts.length === 1 && parts[0] === "No total deck budget" && !draft.cardPriceRangeEnabled) {
+    if (
+      parts.length === 1 &&
+      parts[0] === "No total deck budget" &&
+      !hasPerCardBounds
+    ) {
       return { text: "No price constraints", muted: true };
     }
     return { text: parts.join(" · "), muted: false };
@@ -251,66 +252,42 @@
       description="Optional min and/or max USD per card."
     />
 
-    <div class="toggle-list">
-      <ToggleRow
-        title="Set per-card price range"
-        description="Limit individual card prices independent of total budget."
-        checked={draft.cardPriceRangeEnabled}
-        ontoggle={(enabled) => {
-          draft = {
-            ...draft,
-            cardPriceRangeEnabled: enabled,
-            card_price_min_usd: enabled ? draft.card_price_min_usd : null,
-            card_price_max_usd: enabled ? draft.card_price_max_usd : null,
-          };
-          if (!enabled) {
-            minText = "";
-            maxText = "";
-          }
-        }}
+    <div class="price-stepper-list" aria-label="Per-card price bounds">
+      <PriceStepperRow
+        label="Maximum per card"
+        inputId="price-max-input"
+        text={maxText}
+        placeholder="None"
+        stepHint="$5 per tap."
+        showClear
+        invalid={maxFieldInvalid}
+        lessDisabled={maxParsed.value === null}
+        ontextinput={(raw) => handleOptionalInput(raw, "max")}
+        onblur={() => commitOptionalInput("max")}
+        onless={() => stepMax("less")}
+        onmore={() => stepMax("more")}
+        onclear={() => clearOptional("max")}
+      />
+      <PriceStepperRow
+        label="Minimum per card"
+        inputId="price-min-input"
+        text={minText}
+        placeholder="None"
+        stepHint="$1 per tap."
+        showClear
+        invalid={minFieldInvalid}
+        lessDisabled={minParsed.value === null}
+        ontextinput={(raw) => handleOptionalInput(raw, "min")}
+        onblur={() => commitOptionalInput("min")}
+        onless={() => stepMin("less")}
+        onmore={() => stepMin("more")}
+        onclear={() => clearOptional("min")}
       />
     </div>
-
-    {#if draft.cardPriceRangeEnabled}
-      <div class="conditional-panel">
-        <div class="price-stepper-list" aria-label="Per-card price bounds">
-          <PriceStepperRow
-            label="Maximum per card"
-            inputId="price-max-input"
-            text={maxText}
-            placeholder="None"
-            stepHint="$5 per tap."
-            showClear
-            invalid={maxFieldInvalid}
-            lessDisabled={maxParsed.value === null}
-            ontextinput={(raw) => handleOptionalInput(raw, "max")}
-            onblur={() => commitOptionalInput("max")}
-            onless={() => stepMax("less")}
-            onmore={() => stepMax("more")}
-            onclear={() => clearOptional("max")}
-          />
-          <PriceStepperRow
-            label="Minimum per card"
-            inputId="price-min-input"
-            text={minText}
-            placeholder="None"
-            stepHint="$1 per tap."
-            showClear
-            invalid={minFieldInvalid}
-            lessDisabled={minParsed.value === null}
-            ontextinput={(raw) => handleOptionalInput(raw, "min")}
-            onblur={() => commitOptionalInput("min")}
-            onless={() => stepMin("less")}
-            onmore={() => stepMin("more")}
-            onclear={() => clearOptional("min")}
-          />
-        </div>
-        <p class="range-warning" class:is-visible={rangeInvalid} role="alert">
-          Minimum exceeds maximum — adjust before continuing.
-        </p>
-        <span class="field-hint">Leave blank for no limit.</span>
-      </div>
-    {/if}
+    <p class="range-warning" class:is-visible={rangeInvalid} role="alert">
+      Minimum exceeds maximum — adjust before continuing.
+    </p>
+    <span class="field-hint">Leave blank for no limit.</span>
   </section>
 
   <section aria-labelledby="summary-heading">
