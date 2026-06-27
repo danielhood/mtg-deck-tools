@@ -322,6 +322,37 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 ---
 
+## UX12 wireframe scope
+
+**Status:** **P0 drafts (2026-06-27)** — [advanced-swap-ux.md](../advanced-swap-ux.md), [active.md](../../roadmap/active.md).
+
+| Priority | File | Route | States to show |
+| --- | --- | --- | --- |
+| **P0** | `deck-view-advanced-swap-sheet.html` | `/deck/:id` | Bottom sheet — strategy chips, filters, cross-slot toggle, preview list, Apply |
+| **P0** | `deck-view-issue-fix-strategies.html` | `/deck/:id` | Issue expanded — strategy chips, **Fix issue…**, **Quick fix** (prototype), **Swap All** |
+| **P0** | `deck-view-named-swap.html` | `/deck/:id` | Named-card search + selected result; validation ok + error states |
+
+**In frame (product UI):**
+
+| Region | Layout notes |
+| --- | --- |
+| Sheet chrome | Bottom sheet scrim over dimmed deck; handle bar; **×** close 44px |
+| Context | Replacing N cards or issue label; source card chips |
+| Strategy | Horizontal chip row — one active; pre-filled from issue `deficit` |
+| Filters | Type, color, rarity chips; max price line; collapses when named card pinned |
+| Cross-slot | Expert toggle row — default off (`slot_policy: same`) |
+| Preview | Top 3–8 candidates per position after **Refresh preview** |
+| Issue actions | **Fix issue…** (primary) opens sheet; **Quick fix** purple prototype styling; **Swap All** link retained |
+| Named search | Wizard-style search input; result list; inline legal/budget validation |
+
+**Dev notes only (`.dev-note`):** `POST …/swap/preview`; `POST …/swap` with `constraints` + `replacement_oracle_id`; playbook YAML TBD in UX12a.
+
+**Out of scope for UX12 wireframes:** curve advisory **Adjust curve…** (UX12f); profile package swap; repair pass; dark mode.
+
+**Approval gate:** Mark P0 files `approved` in [index.md](index.md) before UX12b Svelte/engine work.
+
+---
+
 ## Out of scope for wireframes
 
 - Real API integration or `DeckCriteria` persistence

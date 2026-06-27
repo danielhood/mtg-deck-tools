@@ -10,10 +10,11 @@
 
 | Priority | What | Why now |
 | --- | --- | --- |
+| **UX12** | Advanced swap & guided rebalance | Planning merged; wireframes + implementation |
 | **ENG-MAINT** | Engine profile tuning | As needed when touching dependency rules or dogfood matrix |
 | **GATE** | Dogfood gate | Required after any engine change |
 
-**Primary thread:** None — promote next row from [backlog/](backlog/) when ready.
+**Primary thread:** **UX12** — constrained swap, preview API, issue playbooks ([advanced-swap-ux.md](../specs/web/advanced-swap-ux.md)).
 
 ---
 
@@ -21,10 +22,25 @@
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
+| **UX12** | web-ui | Advanced swap & guided rebalance — constraints, preview, issue playbooks, named card; Quick fix prototype | Wireframes | **UX11** (shipped) | doc-only, ENG-MAINT (coordinate on `iterate.py` / OpenAPI) |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | doc-only, dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
 **Not active:** cli-engine expansion (P7 remainder, new profiles); cli-ui UX8; product-data export — promote from [backlog/](backlog/) before starting.
+
+### UX12 slices
+
+| Slice | Deliverable | Status |
+| --- | --- | --- |
+| **UX12a** | Planning + playbook YAML + OpenAPI contract | Planning shipped |
+| **UX12a-wf** | P0 wireframes (advanced sheet, issue strategies, named swap) | Draft |
+| **UX12b** | Engine `SwapConstraints` + `swap/preview` endpoint | Pending |
+| **UX12c** | Advanced sheet UI + filters + preview + cross-slot toggle | Pending |
+| **UX12d** | Issue **Fix issue…** + playbooks + Quick fix prototype | Pending |
+| **UX12e** | Named-card replacement | Pending |
+| **UX12f** | Curve advisory actions | Deferred post-v1 |
+
+Spec: [advanced-swap-ux.md](../specs/web/advanced-swap-ux.md) · Wireframes: [wireframes/README.md](../specs/web/wireframes/README.md) § UX12.
 
 ---
 
@@ -32,10 +48,11 @@
 
 | Stream | Component | Safe in parallel with |
 | --- | --- | --- |
-| A — Engine maintenance / dogfood | cli-engine | doc-only, planning |
-| B — CLI feature work | cli-ui | *None active* — [backlog/cli-ui.md](backlog/cli-ui.md) only |
+| A — UX12 web iterate | web-ui | doc-only |
+| B — Engine maintenance / dogfood | cli-engine | doc-only, UX12b if `dependency_repair` patterns reused |
+| C — CLI feature work | cli-ui | *None active* — [backlog/cli-ui.md](backlog/cli-ui.md) only |
 
-New cli-engine dependency profiles should not run in parallel with a large web API refactor on the same modules without coordination.
+UX12b engine work touches `builder/iterate.py` and OpenAPI — coordinate with any concurrent cli-engine profile changes on the same modules.
 
 ---
 

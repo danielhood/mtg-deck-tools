@@ -695,9 +695,9 @@ Wireframes: [wireframes/README.md](../web/wireframes/README.md) § UX11 wirefram
 
 Contract: [deck-output-format.md](../../product/deck-output-format.md) § GUI deck editor · API: [iterate-api.md](../web/iterate-api.md) · Active: [active.md](../../roadmap/active.md).
 
-### UX12 — Advanced swap & guided rebalance (planning)
+### UX12 — Advanced swap & guided rebalance (active)
 
-**Status:** Planning (2026-06-27). Full spec: [advanced-swap-ux.md](../web/advanced-swap-ux.md).
+**Status:** **Active (2026-06-27)** — promoted from backlog. Wireframes: P0 drafts. Full spec: [advanced-swap-ux.md](../web/advanced-swap-ux.md). Roadmap: [active.md](../../roadmap/active.md).
 
 **Problem:** UX11 swap and issue **Swap All** use unconstrained random picks. Users rebalancing equipment, vehicles, producer/consumer profiles, or curve metrics need **replacement intent** (type, role, named card, price/rarity/color) while keeping the quick path for speed.
 

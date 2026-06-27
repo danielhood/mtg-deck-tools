@@ -267,13 +267,32 @@ Not a separate route — inline panel on the enhanced deck view.
 | Locked row | Lock icon filled + subtle row background; **not selectable** for swap (checkbox disabled) |
 | Slot regen | Slot heading row includes **Regenerate** — confirm modal → `POST …/refill-slot`; loading state on slot group |
 | Selection | Checkbox at row start; commander rows not selectable |
-| Swap bar | Sticky bar above footer when ≥1 card selected — **Swap (N)** primary + **Clear** |
+| Swap bar | Sticky bar above footer when ≥1 card selected — **Swap (N)** primary + **Clear** + **Advanced…** (**UX12**) |
 | Post-swap | Inline banner listing old → new per `swaps[]`; scroll to top of deck view |
 | Errors | Inline error on failed PATCH/refill/swap |
-| Dependencies | Panel refreshes from returned `deck.dependency_report` after refill/swap; per-issue **Swap All** when issue lists swappable cards |
+| Dependencies | Panel refreshes from returned `deck.dependency_report` after refill/swap; per-issue **Swap All** when issue lists swappable cards; **Fix issue…** + strategy chips + **Quick fix** prototype (**UX12**) |
 | Footer | Unchanged — Build another / Delete / Library / Home (disabled during in-flight API) |
 
 **Out of scope:** commander swap; full-deck regen; repair pass; seed UI (UX11e).
+
+---
+
+## Advanced swap (`/deck/:id` sheet) — UX12
+
+**Status:** **Active** — wireframes draft. Spec: [advanced-swap-ux.md](advanced-swap-ux.md). Roadmap: [active.md](../../roadmap/active.md).
+
+**Wireframe:** [deck-view-advanced-swap-sheet.html](wireframes/deck-view-advanced-swap-sheet.html) · [deck-view-issue-fix-strategies.html](wireframes/deck-view-issue-fix-strategies.html) · [deck-view-named-swap.html](wireframes/deck-view-named-swap.html)
+
+| Region | Behavior |
+| --- | --- |
+| Entry | **Advanced…** on swap bar; **Fix issue…** on dependency issue row; named-card mode within sheet |
+| Sheet | Bottom overlay on `/deck/:id`; strategy presets + filters + optional preview |
+| Quick fix | Prototype tertiary on issue row — apply default strategy with confirm; evaluate after dogfood |
+| Cross-slot | Expert toggle — default same-slot only |
+| Preview | `POST …/swap/preview` — top candidates before Apply |
+| Named card | Search + pin `replacement_oracle_id`; filters collapse; CI/budget validation inline |
+
+**Out of scope (UX12 v1):** curve advisory **Adjust curve…** (UX12f); profile package swap; repair pass.
 
 ---
 

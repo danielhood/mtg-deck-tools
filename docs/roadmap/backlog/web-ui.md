@@ -8,13 +8,7 @@ Specs: [specs/web/README.md](../../specs/web/README.md) · [architecture.md](../
 
 ## Up next
 
-| ID | Topic | Notes | Spec |
-| --- | --- | --- | --- |
-| **UX12** | Advanced swap & guided rebalance | Quick swap preserved; advanced sheet + preview API (v1); warning playbooks; named-card swap; Quick fix prototype; curve actions deferred (UX12f) | [advanced-swap-ux.md](../../specs/web/advanced-swap-ux.md) |
-
-**Depends on:** **UX11** (shipped). **Parallel OK with:** cli-engine maintenance, doc-only.
-
-**Slices:** UX12a contract → UX12b engine + preview → UX12c–e (sheet, issue strategies, named card) ship together; UX12f curve actions later.
+*No promoted rows — **UX12** active in [active.md](../active.md).*
 
 ---
 
