@@ -24,6 +24,22 @@ class ResolveIssue:
     line_number: int | None = None
 
 
+@dataclass(frozen=True)
+class PreviewLineResult:
+    input_name: str
+    status: str
+    line_number: int | None = None
+    quantity: int | None = None
+    name: str | None = None
+    oracle_id: str | None = None
+
+
+@dataclass
+class PreviewDeckResolveResult:
+    commanders: list[PreviewLineResult]
+    maindeck: list[PreviewLineResult]
+
+
 @dataclass
 class ResolvedCardLine:
     candidate: CardCandidate
@@ -90,6 +106,67 @@ def _resolve_name(
     if len(rows) > 1:
         raise ResolveError([ResolveIssue(name=name, kind="ambiguous", line_number=line_number)])
     return _row_to_candidate(rows[0])
+
+
+def _preview_resolve_name(
+    conn: sqlite3.Connection,
+    name: str,
+    *,
+    commander_eligible: bool | None,
+    line_number: int | None,
+    quantity: int | None = None,
+) -> PreviewLineResult:
+    rows = _lookup_by_name(conn, name, commander_eligible=commander_eligible)
+    if not rows:
+        return PreviewLineResult(
+            input_name=name,
+            status="unknown",
+            line_number=line_number,
+            quantity=quantity,
+        )
+    if len(rows) > 1:
+        return PreviewLineResult(
+            input_name=name,
+            status="ambiguous",
+            line_number=line_number,
+            quantity=quantity,
+        )
+    candidate = _row_to_candidate(rows[0])
+    return PreviewLineResult(
+        input_name=name,
+        status="resolved",
+        line_number=line_number,
+        quantity=quantity,
+        name=candidate.name,
+        oracle_id=candidate.oracle_id,
+    )
+
+
+def preview_resolve_parsed_deck(
+    conn: sqlite3.Connection,
+    parsed: ParsedDeckList,
+    *,
+    commander_names: list[str],
+) -> PreviewDeckResolveResult:
+    """Resolve commander and maindeck names; return per-line status without raising."""
+    if not commander_names:
+        raise ValueError("Commander required: add a Commander section or pass --commander.")
+
+    commanders = [
+        _preview_resolve_name(conn, name, commander_eligible=True, line_number=None)
+        for name in commander_names
+    ]
+    maindeck = [
+        _preview_resolve_name(
+            conn,
+            line.name,
+            commander_eligible=False,
+            line_number=line.line_number,
+            quantity=line.quantity,
+        )
+        for line in parsed.maindeck
+    ]
+    return PreviewDeckResolveResult(commanders=commanders, maindeck=maindeck)
 
 
 def resolve_parsed_deck(

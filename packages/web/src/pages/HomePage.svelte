@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { importDeckFromText, listDecks } from "../lib/api";
+  import {
+    importDeckFromText,
+    listDecks,
+    previewDeckImportFromText,
+    type ImportDeckPreviewResponse,
+  } from "../lib/api";
   import type { WizardMeta } from "../lib/api";
   import DbBanner from "../components/DbBanner.svelte";
   import LoadingState from "../components/LoadingState.svelte";
@@ -23,11 +28,14 @@
   let progressMessage = $state(IMPORT_BUSY_LEAD);
   let refreshConfirmOpen = $state(false);
   let deckImporting = $state(false);
+  let deckPreviewing = $state(false);
   let deckImportError = $state("");
   let deckImportText = $state("");
+  let deckPreview = $state<ImportDeckPreviewResponse | null>(null);
   let deckFileInput = $state<HTMLInputElement | null>(null);
 
-  const actionsDisabled = $derived(!meta.db_ready || importing || deckImporting);
+  const actionsDisabled = $derived(!meta.db_ready || importing || deckImporting || deckPreviewing);
+  const importReady = $derived(deckPreview?.summary.ready === true);
 
   $effect(() => {
     if (importing) refreshConfirmOpen = false;
@@ -49,6 +57,10 @@
         libraryReady = false;
       });
   });
+
+  function clearDeckPreview(): void {
+    deckPreview = null;
+  }
 
   async function startImport(): Promise<void> {
     if (importing) return;
@@ -106,15 +118,40 @@
   }
 
   function openDeckFilePicker(): void {
-    if (deckImporting || importing || !meta.db_ready) return;
+    if (deckImporting || deckPreviewing || importing || !meta.db_ready) return;
     deckImportError = "";
     deckFileInput?.click();
   }
 
-  async function submitDeckImport(text: string): Promise<void> {
-    const trimmed = text.trim();
+  async function previewDeckImport(): Promise<void> {
+    const trimmed = deckImportText.trim();
     if (!trimmed) {
       deckImportError = "Paste a deck list or choose a text file.";
+      clearDeckPreview();
+      return;
+    }
+    if (deckPreviewing || deckImporting || importing || !meta.db_ready) return;
+
+    deckPreviewing = true;
+    deckImportError = "";
+    try {
+      deckPreview = await previewDeckImportFromText({ text: trimmed });
+    } catch (err) {
+      clearDeckPreview();
+      deckImportError = err instanceof Error ? err.message : "Preview failed.";
+    } finally {
+      deckPreviewing = false;
+    }
+  }
+
+  async function submitDeckImport(): Promise<void> {
+    const trimmed = deckImportText.trim();
+    if (!trimmed) {
+      deckImportError = "Paste a deck list or choose a text file.";
+      return;
+    }
+    if (!importReady) {
+      deckImportError = "Preview the deck list and fix unresolved names before importing.";
       return;
     }
 
@@ -136,23 +173,27 @@
     }
   }
 
-  async function importPastedDeck(): Promise<void> {
-    if (deckImporting || importing || !meta.db_ready) return;
-    await submitDeckImport(deckImportText);
-  }
-
   async function onDeckFileSelected(event: Event): Promise<void> {
     const input = event.currentTarget as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
     try {
-      const text = await file.text();
-      deckImportText = text;
-      await submitDeckImport(text);
+      deckImportText = await file.text();
+      clearDeckPreview();
+      deckImportError = "";
+    } catch {
+      deckImportError = "Could not read the selected file.";
     } finally {
       input.value = "";
     }
+  }
+
+  function previewStatusLabel(status: string): string {
+    if (status === "resolved") return "Resolved";
+    if (status === "unknown") return "Unknown";
+    if (status === "ambiguous") return "Ambiguous";
+    return status;
   }
 </script>
 
@@ -216,14 +257,15 @@
   <section class="deck-import-section" aria-label="Import deck from text">
     <p class="future-label">Import existing deck</p>
     <p class="deck-import-copy">
-      Paste a plain-text list of card names or upload a <code>.txt</code> file. Download the template
-      for the expected format.
+      Paste a plain-text list of card names or upload a <code>.txt</code> file. Preview resolves card
+      names before saving to your library.
     </p>
     <label class="deck-import-field">
       <span class="deck-import-field-label">Deck list</span>
       <textarea
         class="deck-import-textarea"
         bind:value={deckImportText}
+        oninput={clearDeckPreview}
         rows="8"
         placeholder={"Commander\nYour Commander Name Here\n\nDeck\n1x Sol Ring\n..."}
         disabled={actionsDisabled}
@@ -237,11 +279,20 @@
       <button
         class="btn btn-primary"
         type="button"
-        onclick={() => void importPastedDeck()}
+        onclick={() => void previewDeckImport()}
         disabled={actionsDisabled || !deckImportText.trim()}
+        aria-busy={deckPreviewing}
+      >
+        {deckPreviewing ? "Previewing…" : "Preview"}
+      </button>
+      <button
+        class="btn btn-secondary"
+        type="button"
+        onclick={() => void submitDeckImport()}
+        disabled={actionsDisabled || !importReady}
         aria-busy={deckImporting}
       >
-        {deckImporting ? "Importing…" : "Import pasted list"}
+        {deckImporting ? "Importing…" : "Import deck"}
       </button>
       <button
         class="btn btn-secondary"
@@ -269,6 +320,60 @@
         tabindex="-1"
       />
     </div>
+    {#if deckPreview}
+      <div class="deck-preview-panel" aria-live="polite">
+        <p class="deck-preview-summary">
+          {#if deckPreview.summary.ready}
+            All {deckPreview.summary.resolved_count} card name(s) resolved. You can import this deck.
+          {:else}
+            {deckPreview.summary.resolved_count} resolved,
+            {deckPreview.summary.unknown_count} unknown,
+            {deckPreview.summary.ambiguous_count} ambiguous — fix names before importing.
+          {/if}
+        </p>
+        <div class="deck-preview-table-wrap">
+          <table class="deck-preview-table">
+            <thead>
+              <tr>
+                <th scope="col">Line</th>
+                <th scope="col">Input</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Status</th>
+                <th scope="col">Resolved name</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each deckPreview.commanders as line}
+                <tr class:deck-preview-row-error={line.status !== "resolved"}>
+                  <td>—</td>
+                  <td>{line.input_name}</td>
+                  <td>—</td>
+                  <td>
+                    <span class="deck-preview-status" data-status={line.status}>
+                      {previewStatusLabel(line.status)}
+                    </span>
+                  </td>
+                  <td>{line.name ?? "—"}</td>
+                </tr>
+              {/each}
+              {#each deckPreview.maindeck as line}
+                <tr class:deck-preview-row-error={line.status !== "resolved"}>
+                  <td>{line.line_number ?? "—"}</td>
+                  <td>{line.input_name}</td>
+                  <td>{line.quantity ?? "—"}</td>
+                  <td>
+                    <span class="deck-preview-status" data-status={line.status}>
+                      {previewStatusLabel(line.status)}
+                    </span>
+                  </td>
+                  <td>{line.name ?? "—"}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {/if}
     {#if deckImportError}
       <p class="deck-import-error" role="alert">{deckImportError}</p>
     {/if}
@@ -425,6 +530,61 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+
+  .deck-preview-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-subtle, #f8fafc);
+  }
+
+  .deck-preview-summary {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .deck-preview-table-wrap {
+    overflow-x: auto;
+  }
+
+  .deck-preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .deck-preview-table th,
+  .deck-preview-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .deck-preview-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .deck-preview-row-error {
+    background: rgba(185, 28, 28, 0.06);
+  }
+
+  .deck-preview-status[data-status="resolved"] {
+    color: var(--green-700, #15803d);
+    font-weight: 600;
+  }
+
+  .deck-preview-status[data-status="unknown"],
+  .deck-preview-status[data-status="ambiguous"] {
+    color: var(--red-700, #b91c1c);
+    font-weight: 600;
   }
 
   .deck-import-error {

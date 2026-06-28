@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException, Query
 from mtg_deck_tools.service.dto import (
     DeckLibraryDetailResponse,
     DeckLibraryEntry,
+    ImportDeckPreviewResponse,
     ImportDeckRequest,
     PatchDeckRequest,
     RefillSlotRequest,
@@ -18,7 +19,7 @@ from mtg_deck_tools.service.dto import (
     SwapPlaybooksResponse,
     SwapPreviewResponse,
 )
-from mtg_deck_tools.service.deck_import import import_deck_from_text
+from mtg_deck_tools.service.deck_import import import_deck_from_text, preview_deck_import
 from mtg_deck_tools.service.iterate import (
     DeckValidationFailure,
     preview_library_deck_swap,
@@ -89,6 +90,24 @@ def import_deck(
             commander_names=body.commanders,
             db_path=Path(db) if db else None,
             decks_path=Path(decks) if decks else None,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/import/preview", response_model=ImportDeckPreviewResponse)
+def preview_deck_import_route(
+    body: ImportDeckRequest,
+    db: Annotated[str | None, Query(description="SQLite database path")] = None,
+) -> ImportDeckPreviewResponse:
+    _db_gate(Path(db) if db else None)
+    if not body.text.strip():
+        raise HTTPException(status_code=400, detail="text must not be empty")
+    try:
+        return preview_deck_import(
+            body.text,
+            commander_names=body.commanders,
+            db_path=Path(db) if db else None,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

@@ -8,7 +8,7 @@ Format: `- **YYYY-MM-DD** — Short title — optional PR/issue`
 
 ## 2026-06
 
-- **2026-06-28** — UX13b web deck import paste — home textarea + **Import pasted list** alongside file upload and template download
+- **2026-06-28** — UX13c deck import preview — `POST /api/v1/decks/import/preview` (parse + resolve without save); home **Preview** → line table → gated **Import deck**; CLI `deck import --dry-run`
 - **2026-06-28** — UX13b web deck import — home **Download template** + **Import text file** → `POST /api/v1/decks/import`; opens imported deck in deck view
 - **2026-06-28** — UX13-MVP text deck import shipped — plain-text list parser (`deck_import/parse_text.py`), exact-name resolver, library save with metrics + dependency report; CLI `deck import --file`; `POST /api/v1/decks/import` (body: `text`, optional `name` / `commanders`)
 - **2026-06-27** — Web deck view + commander search: rarity indicator (coloured gem + label) on card rows after price

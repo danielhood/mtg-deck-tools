@@ -371,6 +371,40 @@ export interface ImportDeckTextRequest {
   commanders?: string[];
 }
 
+export interface ImportDeckPreviewLineItem {
+  input_name: string;
+  status: "resolved" | "unknown" | "ambiguous";
+  line_number?: number | null;
+  quantity?: number | null;
+  name?: string | null;
+  oracle_id?: string | null;
+}
+
+export interface ImportDeckPreviewSummary {
+  commander_count: number;
+  maindeck_line_count: number;
+  resolved_count: number;
+  unknown_count: number;
+  ambiguous_count: number;
+  ready: boolean;
+}
+
+export interface ImportDeckPreviewResponse {
+  commanders: ImportDeckPreviewLineItem[];
+  maindeck: ImportDeckPreviewLineItem[];
+  summary: ImportDeckPreviewSummary;
+}
+
+export function previewDeckImportFromText(
+  body: ImportDeckTextRequest,
+): Promise<ImportDeckPreviewResponse> {
+  return fetchJson<ImportDeckPreviewResponse>("/api/v1/decks/import/preview", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
 export function importDeckFromText(body: ImportDeckTextRequest): Promise<DeckLibraryDetail> {
   return fetchJson<DeckLibraryDetail>("/api/v1/decks/import", {
     method: "POST",
