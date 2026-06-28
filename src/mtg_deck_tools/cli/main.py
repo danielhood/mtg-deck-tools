@@ -32,6 +32,7 @@ from mtg_deck_tools.service import (
     ensure_cards_database,
     run_interactive_wizard,
 )
+from mtg_deck_tools.service.deck_import import import_deck_from_text
 
 app = typer.Typer(
     name="mtg-deck-tools",
@@ -545,6 +546,48 @@ def generate_cmd(
         console.print(f"[dim]Regenerated deck from {deck_from.name}.[/dim]")
     else:
         console.print("[dim]Full maindeck generated. Review warnings in the output files.[/dim]")
+
+
+deck_app = typer.Typer(
+    help="Saved deck library operations.",
+    no_args_is_help=True,
+)
+app.add_typer(deck_app, name="deck")
+
+
+@deck_app.command("import")
+def deck_import_cmd(
+    file: Annotated[
+        Path,
+        typer.Option("--file", help="Plain-text deck list file", exists=True, readable=True),
+    ],
+    name: Annotated[
+        Optional[str],
+        typer.Option("--name", help="Library display name (default: commander name(s))"),
+    ] = None,
+    commander: Annotated[
+        Optional[list[str]],
+        typer.Option(
+            "--commander",
+            help="Commander name when the file has no Commander section (repeat for partners)",
+        ),
+    ] = None,
+    db_path: Annotated[Optional[Path], typer.Option("--db", help="SQLite database path")] = None,
+) -> None:
+    """Import a plain-text deck list into the saved deck library."""
+    try:
+        text = file.read_text(encoding="utf-8")
+        result = import_deck_from_text(
+            text,
+            name=name,
+            commander_names=commander,
+            db_path=db_path,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        console.print(f"[red]Import failed:[/red] {exc}")
+        raise typer.Exit(1) from exc
+
+    console.print(f"[green]Imported[/green] {result.name} (id={result.id})")
 
 
 analyze_app = typer.Typer(

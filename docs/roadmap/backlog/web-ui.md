@@ -8,7 +8,7 @@ Specs: [specs/web/README.md](../../specs/web/README.md) · [architecture.md](../
 
 ## Up next
 
-*No promoted rows — **UX13-MVP** (text import CLI) active in [active.md](../active.md).*
+*No promoted rows — **UX13-MVP** text import shipped; web paste (**UX13b**) in backlog below.*
 
 ---
 

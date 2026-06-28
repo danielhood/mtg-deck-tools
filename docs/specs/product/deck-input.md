@@ -1,7 +1,7 @@
 # Deck input — planning (UX13)
 
-**Status:** **UX13-MVP** active — [active.md](../../roadmap/active.md). Text import decisions locked 2026-06-28.  
-**Phase:** Planning complete for MVP slice; implementation next.  
+**Status:** **UX13-MVP shipped** (2026-06-28) — text import via CLI and API. **Active** backlog: [web-ui.md](../../roadmap/backlog/web-ui.md) § UX13 (paste/upload).  
+**Phase:** MVP text import shipped; web UI slices remain backlog.  
 **Depends on:** **UX7f** library (shipped), **UX11** editor (shipped).  
 **Related:** [deck-output-format.md](deck-output-format.md) · [library-api.md](../web/library-api.md) · [user-experience.md](../dependency-engine/user-experience.md).
 
@@ -123,10 +123,10 @@ Reuse patterns from `builder/commander_resolve.resolve_commander_oracle_ids` and
 | Slice | Deliverable | Status |
 | --- | --- | --- |
 | **UX13-MVP-a** | Locked decisions + promotion (this doc) | Planning shipped |
-| **UX13-MVP-b** | `parse_text` + unit tests | Pending |
-| **UX13-MVP-c** | `resolve` + `build` + `service/deck_import` | Pending |
-| **UX13-MVP-d** | CLI `deck import --file` | Pending |
-| **UX13-MVP-e** | `POST /api/v1/decks/import` + OpenAPI | Pending |
+| **UX13-MVP-b** | `parse_text` + unit tests | Shipped |
+| **UX13-MVP-c** | `resolve` + `build` + `service/deck_import` | Shipped |
+| **UX13-MVP-d** | CLI `deck import --file` | Shipped |
+| **UX13-MVP-e** | `POST /api/v1/decks/import` + OpenAPI | Shipped |
 | **UX13-MVP-f** | Web paste / file upload (**UX13b**) | Backlog |
 
 **Parallel OK with:** doc-only, **GATE** (no engine rule changes). **Not parallel** with concurrent edits to `service/library.py` validation without coordination.

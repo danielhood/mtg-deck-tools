@@ -10,9 +10,7 @@ Promote to [active.md](../active.md) before starting. **Index:** [backlog/README
 
 Users need ways to load an **existing deck** into the builder — not Scryfall oracle bulk (`import`), but **deck list** intake.
 
-**Active:** **UX13-MVP** text import — [active.md](../active.md) · [deck-input.md](../../specs/product/deck-input.md) § MVP.
-
-**Promoted (2026-06-28):** **IN-DECK-TEXT**, **IN-DECK-RESOLVE** → **UX13-MVP** in active.
+**Shipped:** **UX13-MVP** text import (CLI + API). Remaining formats below.
 
 | ID | Topic | Notes | Spec |
 | --- | --- | --- | --- |
