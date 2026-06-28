@@ -1,6 +1,6 @@
 # Web UI package
 
-**Status:** **UX7 MVP shipped** (UX7c + UX7e + UX7f + UX7d) — build wizard, enhanced deck view, saved deck library, and dependency dashboard (`DependenciesPanel`, `/library`, library API client, JSON-first deck view). **UX13b** — plain-text deck import on home (template download + file upload).
+**Status:** **UX7 MVP shipped** (UX7c + UX7e + UX7f + UX7d) — build wizard, enhanced deck view, saved deck library, and dependency dashboard (`DependenciesPanel`, `/library`, library API client, JSON-first deck view). **UX13b** — plain-text deck import on home (paste, template download, file upload).
 
 ## Stack (locked)
 

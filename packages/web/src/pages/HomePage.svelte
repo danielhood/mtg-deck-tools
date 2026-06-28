@@ -24,6 +24,7 @@
   let refreshConfirmOpen = $state(false);
   let deckImporting = $state(false);
   let deckImportError = $state("");
+  let deckImportText = $state("");
   let deckFileInput = $state<HTMLInputElement | null>(null);
 
   const actionsDisabled = $derived(!meta.db_ready || importing || deckImporting);
@@ -110,16 +111,17 @@
     deckFileInput?.click();
   }
 
-  async function onDeckFileSelected(event: Event): Promise<void> {
-    const input = event.currentTarget as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
+  async function submitDeckImport(text: string): Promise<void> {
+    const trimmed = text.trim();
+    if (!trimmed) {
+      deckImportError = "Paste a deck list or choose a text file.";
+      return;
+    }
 
     deckImporting = true;
     deckImportError = "";
     try {
-      const text = await file.text();
-      const detail = await importDeckFromText({ text });
+      const detail = await importDeckFromText({ text: trimmed });
       cacheDeck({
         id: detail.id,
         name: detail.name,
@@ -131,6 +133,24 @@
       deckImportError = err instanceof Error ? err.message : "Import failed.";
     } finally {
       deckImporting = false;
+    }
+  }
+
+  async function importPastedDeck(): Promise<void> {
+    if (deckImporting || importing || !meta.db_ready) return;
+    await submitDeckImport(deckImportText);
+  }
+
+  async function onDeckFileSelected(event: Event): Promise<void> {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      deckImportText = text;
+      await submitDeckImport(text);
+    } finally {
       input.value = "";
     }
   }
@@ -193,12 +213,36 @@
 </section>
 
 {#if meta.db_ready}
-  <section class="deck-import-section" aria-label="Import deck from text file">
+  <section class="deck-import-section" aria-label="Import deck from text">
     <p class="future-label">Import existing deck</p>
     <p class="deck-import-copy">
-      Upload a plain-text list of card names. Download the template for the expected format.
+      Paste a plain-text list of card names or upload a <code>.txt</code> file. Download the template
+      for the expected format.
+    </p>
+    <label class="deck-import-field">
+      <span class="deck-import-field-label">Deck list</span>
+      <textarea
+        class="deck-import-textarea"
+        bind:value={deckImportText}
+        rows="8"
+        placeholder={"Commander\nYour Commander Name Here\n\nDeck\n1x Sol Ring\n..."}
+        disabled={actionsDisabled}
+        aria-describedby="deck-import-hint"
+      ></textarea>
+    </label>
+    <p id="deck-import-hint" class="deck-import-hint">
+      One card per line; optional Commander and Deck section headers.
     </p>
     <div class="deck-import-actions">
+      <button
+        class="btn btn-primary"
+        type="button"
+        onclick={() => void importPastedDeck()}
+        disabled={actionsDisabled || !deckImportText.trim()}
+        aria-busy={deckImporting}
+      >
+        {deckImporting ? "Importing…" : "Import pasted list"}
+      </button>
       <button
         class="btn btn-secondary"
         type="button"
@@ -212,9 +256,8 @@
         type="button"
         onclick={openDeckFilePicker}
         disabled={actionsDisabled}
-        aria-busy={deckImporting}
       >
-        {deckImporting ? "Importing…" : "Import text file…"}
+        Choose text file…
       </button>
       <input
         bind:this={deckFileInput}
@@ -319,6 +362,47 @@
     color: var(--text-muted);
     line-height: 1.45;
     margin: 0;
+  }
+
+  .deck-import-copy code {
+    font-size: 12px;
+  }
+
+  .deck-import-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .deck-import-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .deck-import-textarea {
+    width: 100%;
+    min-height: 140px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.45;
+    resize: vertical;
+  }
+
+  .deck-import-textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .deck-import-hint {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
   }
 
   .deck-import-actions {
