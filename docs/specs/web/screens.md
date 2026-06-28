@@ -217,9 +217,10 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Search | Filter by user label, commander name, themes |
 | Sort | `saved_at` (default newest), name, commander |
 | Open | Tap entire library card → load deck into session cache → `/deck/:id` |
+| Import | **UX13b** — **Download template** or **Choose text file** → `POST /api/v1/decks/import` → `/deck/:id` |
 | Rename | **Deck view only** — pencil beside deck label → modal; `PATCH /api/v1/decks/{id}` |
 | Delete | **Deck view only** — footer **Delete deck** → confirm modal — **no actions on library cards** |
-| Empty state | CTA to **Build new deck** when library empty |
+| Empty state | CTA to **Build new deck** or **Import text file** when library empty |
 | Auto-save | Generate from wizard creates library entry automatically (new UUID) |
 
 **API:** `GET /api/v1/decks`, `PATCH /api/v1/decks/{id}`, `DELETE /api/v1/decks/{id}`.
