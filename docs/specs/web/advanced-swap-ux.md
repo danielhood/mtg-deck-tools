@@ -341,6 +341,7 @@ On dependency issue rows, a tertiary **Quick fix** button applies the playbook�
 | --- | --- |
 | `deck-view-advanced-swap-sheet.html` | **Draft** — sheet open from swap bar; filters, cross-slot toggle, Preview + Apply |
 | `deck-view-issue-fix-strategies.html` | **Draft** — issue expanded with strategy chips, Fix issue…, Quick fix (prototype) |
+| `deck-view-named-swap.html` | **Draft** — named card search + validation/override states |
 | `deck-view-advanced-swap-override.html` | **Draft** — validation blocked + override checkbox + Apply anyway |
 
 Indexed in [wireframes/index.md](wireframes/index.md). Approve P0 files before UX12b implementation.
