@@ -182,7 +182,7 @@ def test_swap_deck_cards_replaces_selection(iterate_db: sqlite3.Connection) -> N
         _deck_card(oracle_id="syn-old", name="Old Card", slot="synergy"),
         _deck_card(oracle_id="ramp-1", name="Ramp", slot="ramp"),
     ]
-    result, swaps = swap_deck_cards(
+    result, swaps, failures = swap_deck_cards(
         iterate_db,
         criteria,
         identity=["G"],
@@ -239,7 +239,7 @@ def test_swap_with_equipment_constraint(iterate_db: sqlite3.Connection) -> None:
     )
     fixed = [_deck_card(oracle_id="syn-old", name="Old Card", slot="synergy")]
     constraints = SwapConstraints(type_lines_any=["Equipment"])
-    _result, swaps = swap_deck_cards(
+    _result, swaps, _failures = swap_deck_cards(
         iterate_db,
         criteria,
         identity=["G"],
@@ -344,7 +344,7 @@ def test_named_card_swap(iterate_db: sqlite3.Connection) -> None:
     )
     fixed = [_deck_card(oracle_id="syn-old", name="Old Card", slot="synergy")]
     constraints = SwapConstraints(replacement_oracle_id="equip-a")
-    _result, swaps = swap_deck_cards(
+    _result, swaps, _failures = swap_deck_cards(
         iterate_db,
         criteria,
         identity=["G"],
@@ -374,7 +374,7 @@ def test_preferred_replacement_swap(iterate_db: sqlite3.Connection) -> None:
             replacement_oracle_id="syn-b",
         )
     ]
-    _result, swaps = swap_deck_cards(
+    _result, swaps, _failures = swap_deck_cards(
         iterate_db,
         criteria,
         identity=["G"],
@@ -387,3 +387,39 @@ def test_preferred_replacement_swap(iterate_db: sqlite3.Connection) -> None:
     assert len(swaps) == 1
     assert swaps[0].to_oracle_id == "syn-b"
     assert swaps[0].to_name == "Other Maker"
+
+
+def test_partial_swap_continues_when_one_position_fails(iterate_db: sqlite3.Connection) -> None:
+    slots = dict(load_slot_template_config().default)
+    criteria = DeckCriteria(
+        themes=["tokens"],
+        colors=["G"],
+        commander_oracle_ids=["cmd"],
+        slot_template=slots,
+        seed=9,
+    )
+    fixed = [
+        _deck_card(oracle_id="syn-old-a", name="Old Card A", slot="synergy"),
+        _deck_card(oracle_id="syn-old-b", name="Old Card B", slot="synergy"),
+    ]
+    constraints = SwapConstraints(type_lines_any=["Equipment"])
+    result, swaps, failures = swap_deck_cards(
+        iterate_db,
+        criteria,
+        identity=["G"],
+        commander_oracle_ids=["cmd"],
+        fixed_cards=fixed,
+        oracle_ids=["syn-old-a", "syn-old-b"],
+        seed=9,
+        constraints=constraints,
+    )
+    assert len(swaps) == 1
+    assert swaps[0].to_oracle_id == "equip-a"
+    assert len(failures) == 1
+    assert failures[0].from_oracle_id == "syn-old-b"
+    assert failures[0].from_name == "Old Card B"
+    assert result is not None
+    synergy_names = [c.name for c in result.cards if c.slot == "synergy"]
+    assert "Test Sword" in synergy_names
+    assert "Old Card B" in synergy_names
+    assert synergy_names.count("Old Card A") == 0

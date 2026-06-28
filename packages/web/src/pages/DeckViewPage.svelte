@@ -17,7 +17,9 @@
     patchDeck,
     refillDeckSlot,
     swapDeckCards,
+    type SwapFailure,
     type SwapRecord,
+    type SwapCardsResponse,
     type SwapRequestOptions,
   } from "../lib/api";
   import { resetDraft } from "../lib/criteria";
@@ -84,6 +86,7 @@
   let regenSlot = $state<string | null>(null);
   let regenBusy = $state(false);
   let swapDiff = $state<SwapRecord[] | null>(null);
+  let swapFailures = $state<SwapFailure[] | null>(null);
   let newCardIds = $state<Set<string>>(new Set());
   let selectedIds = $state<Set<string>>(new Set());
 
@@ -208,6 +211,7 @@
       const detail = await refillDeckSlot(deckId, regenSlot);
       applyDeckUpdate(detail.deck);
       swapDiff = null;
+      swapFailures = null;
       newCardIds = new Set();
       regenSlot = null;
     } catch (err) {
@@ -240,13 +244,26 @@
     fixingIssueKey = null;
   }
 
-  function applyAdvancedSwap(deck: Record<string, unknown>, swaps: SwapRecord[]): void {
-    applyDeckUpdate(deck);
-    swapDiff = swaps;
-    newCardIds = new Set(swaps.map((row) => row.to_oracle_id));
+  function applySwapResult(response: SwapCardsResponse): void {
+    if (response.swaps.length) {
+      applyDeckUpdate(response.deck);
+      newCardIds = new Set(response.swaps.map((row) => row.to_oracle_id));
+    } else {
+      newCardIds = new Set();
+    }
+    swapDiff = response.swaps.length ? response.swaps : null;
+    swapFailures = response.failed_swaps.length ? response.failed_swaps : null;
     selectedIds = new Set();
     swappingIssueKey = null;
     scrollDeckViewToTop();
+  }
+
+  function applyAdvancedSwap(
+    deck: Record<string, unknown>,
+    swaps: SwapRecord[],
+    failedSwaps: SwapFailure[] = [],
+  ): void {
+    applySwapResult({ id: deckId, deck, swaps, failed_swaps: failedSwaps });
   }
 
   async function performSwap(
@@ -259,12 +276,7 @@
     iterateError = "";
     try {
       const response = await swapDeckCards(deckId, targets, options);
-      applyDeckUpdate(response.deck);
-      swapDiff = response.swaps;
-      newCardIds = new Set(response.swaps.map((row) => row.to_oracle_id));
-      selectedIds = new Set();
-      swappingIssueKey = null;
-      scrollDeckViewToTop();
+      applySwapResult(response);
     } catch (err) {
       iterateError = err instanceof Error ? err.message : "Swap failed.";
     } finally {
@@ -384,15 +396,29 @@
       </button>
     </div>
 
-    {#if swapDiff?.length}
+    {#if swapDiff?.length || swapFailures?.length}
       <aside class="swap-diff" role="status">
-        <h3 class="swap-diff-title">Swapped {swapDiff.length} card{swapDiff.length === 1 ? "" : "s"}</h3>
-        <ul class="swap-diff-list">
-          {#each swapDiff as row (row.from_oracle_id + row.to_oracle_id)}
-            <li>{row.from_name} → {row.to_name}</li>
-          {/each}
-        </ul>
-        {#if dependencyHasIssues}
+        {#if swapDiff?.length}
+          <h3 class="swap-diff-title">
+            Swapped {swapDiff.length} card{swapDiff.length === 1 ? "" : "s"}
+          </h3>
+          <ul class="swap-diff-list">
+            {#each swapDiff as row (row.from_oracle_id + row.to_oracle_id)}
+              <li>{row.from_name} → {row.to_name}</li>
+            {/each}
+          </ul>
+        {/if}
+        {#if swapFailures?.length}
+          <h3 class="swap-diff-title swap-diff-failures-title">
+            Could not swap {swapFailures.length} card{swapFailures.length === 1 ? "" : "s"}
+          </h3>
+          <ul class="swap-diff-list swap-diff-failures-list">
+            {#each swapFailures as row (row.from_oracle_id + row.message)}
+              <li>{row.from_name}</li>
+            {/each}
+          </ul>
+        {/if}
+        {#if dependencyHasIssues && swapDiff?.length}
           <p class="swap-diff-warn">
             Dependency review may need attention — check the Dependencies panel below.
           </p>

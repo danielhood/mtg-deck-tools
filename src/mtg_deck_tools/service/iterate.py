@@ -8,7 +8,7 @@ from typing import Any
 from mtg_deck_tools.builder.commander_resolve import require_db
 from mtg_deck_tools.builder.deck_load import load_deck_data
 from mtg_deck_tools.builder.filler import refill_deck_slot
-from mtg_deck_tools.builder.iterate import SwapRecord, preview_swap_deck_cards, swap_deck_cards
+from mtg_deck_tools.builder.iterate import SwapFailure, SwapRecord, preview_swap_deck_cards, swap_deck_cards
 from mtg_deck_tools.builder.output import build_deck_document
 from mtg_deck_tools.builder.reload import _commander_rows_from_db
 from mtg_deck_tools.builder.swap_playbooks import (
@@ -37,6 +37,7 @@ from mtg_deck_tools.service.dto import (
     SwapPreviewCandidateResponse,
     SwapPreviewPositionResponse,
     SwapRecordResponse,
+    SwapFailureResponse,
     SwapStrategyResponse,
 )
 from mtg_deck_tools.service.library import (
@@ -128,6 +129,18 @@ def _finalize_maindeck(
         maindeck=maindeck,
         identity=identity,
     )
+
+
+def _swap_failures_to_response(records: list[SwapFailure]) -> list[SwapFailureResponse]:
+    return [
+        SwapFailureResponse(
+            slot=r.slot,
+            from_oracle_id=r.from_oracle_id,
+            from_name=r.from_name,
+            message=r.message,
+        )
+        for r in records
+    ]
 
 
 def _swap_records_to_response(records: list[SwapRecord]) -> list[SwapRecordResponse]:
@@ -296,7 +309,7 @@ def swap_library_deck_cards(
         commander_ids = [r["oracle_id"] for r in identity_rows]
         constraints = _resolve_constraints(body)
 
-        maindeck, swaps = swap_deck_cards(
+        maindeck, swaps, failures = swap_deck_cards(
             conn,
             working,
             identity=identity,
@@ -307,6 +320,13 @@ def swap_library_deck_cards(
             constraints=constraints,
             preferred_replacements=body.preferred_replacements or None,
         )
+        if maindeck is None:
+            return SwapCardsResponse(
+                id=deck_id,
+                deck=record.deck,
+                swaps=[],
+                failed_swaps=_swap_failures_to_response(failures),
+            )
         deck_doc = _finalize_maindeck(
             conn,
             working=working,
@@ -329,4 +349,5 @@ def swap_library_deck_cards(
         id=saved.id,
         deck=saved.deck,
         swaps=_swap_records_to_response(swaps),
+        failed_swaps=_swap_failures_to_response(failures),
     )

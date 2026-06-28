@@ -174,10 +174,18 @@ class SwapRecordResponse(BaseModel):
     to_name: str
 
 
+class SwapFailureResponse(BaseModel):
+    slot: str
+    from_oracle_id: str
+    from_name: str
+    message: str
+
+
 class SwapCardsResponse(BaseModel):
     id: str
     deck: dict[str, Any]
     swaps: list[SwapRecordResponse] = Field(default_factory=list)
+    failed_swaps: list[SwapFailureResponse] = Field(default_factory=list)
 
 
 class WizardBuildStep(BaseModel):

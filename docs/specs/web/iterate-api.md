@@ -87,22 +87,28 @@ Replace one or more **maindeck** cards with new picks under current `DeckCriteri
 
 1. Load deck from library.
 2. Remove requested `oracle_id` rows (respect quantity for basics).
-3. For each vacated slot position, run generate pick pipeline — exclude deck cards + **locked** cards.
+3. For each vacated slot position, run generate pick pipeline — exclude deck cards + **locked** cards. Positions with no eligible replacement are **skipped** (original card stays); reported in `failed_swaps`.
 4. Process slots in deterministic order: slot name A→Z, then vacated row order within slot.
-5. Re-run validation + `dependency_report`.
-6. Auto-save; return `{ id, deck, swaps }`.
+5. Re-run validation + `dependency_report` when at least one swap succeeded.
+6. Auto-save when at least one swap succeeded; return `{ id, deck, swaps, failed_swaps }`.
 
-**`swaps` entry (planned):**
+**`swaps` entry:**
 
 ```json
 { "slot": "synergy", "from_oracle_id": "…", "from_name": "…", "to_oracle_id": "…", "to_name": "…" }
+```
+
+**`failed_swaps` entry:**
+
+```json
+{ "slot": "synergy", "from_oracle_id": "…", "from_name": "…", "message": "Could not find replacement for '…' in slot 'synergy'." }
 ```
 
 **Errors:**
 
 | Code | When |
 | --- | --- |
-| 400 | Commander oracle_id in request; empty selection; engine cannot find replacement; validation failure (unless `force_validation_override`) — structured `validation_errors[]` when validation fails |
+| 400 | Commander oracle_id in request; empty selection; validation failure (unless `force_validation_override`) — structured `validation_errors[]` when validation fails |
 | 404 | Deck id unknown |
 
 ### `POST /api/v1/decks/{id}/swap/preview` (**UX12**)
