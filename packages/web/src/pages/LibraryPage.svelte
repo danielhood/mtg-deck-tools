@@ -2,12 +2,14 @@
   import ErrorState from "../components/ErrorState.svelte";
   import LoadingState from "../components/LoadingState.svelte";
   import {
+    importDeckFromText,
     listDecks,
     type DeckLibraryEntry,
     type LibrarySort,
     type WizardMeta,
   } from "../lib/api";
   import { cacheDeck } from "../lib/deck-cache";
+  import { downloadDeckImportTemplate } from "../lib/deck-import-template";
   import { resetDraft } from "../lib/criteria";
   import { formatPrice, formatTagLabel, pipMiniClass } from "../lib/format";
   import { navigate } from "../lib/router";
@@ -24,6 +26,9 @@
   let loading = $state(true);
   let error = $state("");
   let reloadToken = $state(0);
+  let importing = $state(false);
+  let importError = $state("");
+  let fileInput = $state<HTMLInputElement | null>(null);
 
   $effect(() => {
     if (!meta.db_ready) {
@@ -59,6 +64,37 @@
   function buildAnother(): void {
     resetDraft();
     navigate("/build/1");
+  }
+
+  function openFilePicker(): void {
+    if (importing) return;
+    importError = "";
+    fileInput?.click();
+  }
+
+  async function onFileSelected(event: Event): Promise<void> {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    importing = true;
+    importError = "";
+    try {
+      const text = await file.text();
+      const detail = await importDeckFromText({ text });
+      cacheDeck({
+        id: detail.id,
+        name: detail.name,
+        deck: detail.deck,
+        returnTo: "/library",
+      });
+      navigate(`/deck/${detail.id}`);
+    } catch (err) {
+      importError = err instanceof Error ? err.message : "Import failed.";
+    } finally {
+      importing = false;
+      input.value = "";
+    }
   }
 
   async function loadAndOpen(entry: DeckLibraryEntry): Promise<void> {
@@ -99,6 +135,47 @@
     </div>
   </section>
 
+  <section class="library-import" aria-label="Import deck from text file">
+    <div class="library-import-head">
+      <h2 class="library-import-title">Import deck list</h2>
+      <p class="library-import-copy">
+        Upload a plain-text file of card names. Commander section required unless noted in the
+        template.
+      </p>
+    </div>
+    <div class="library-import-actions">
+      <button
+        class="btn btn-secondary"
+        type="button"
+        onclick={downloadDeckImportTemplate}
+        disabled={importing}
+      >
+        Download template
+      </button>
+      <button
+        class="btn btn-primary"
+        type="button"
+        onclick={openFilePicker}
+        disabled={importing}
+        aria-busy={importing}
+      >
+        {importing ? "Importing…" : "Choose text file…"}
+      </button>
+      <input
+        bind:this={fileInput}
+        class="library-import-file"
+        type="file"
+        accept=".txt,text/plain"
+        onchange={(event) => void onFileSelected(event)}
+        aria-hidden="true"
+        tabindex="-1"
+      />
+    </div>
+    {#if importError}
+      <p class="library-import-error" role="alert">{importError}</p>
+    {/if}
+  </section>
+
   {#if loading}
     <LoadingState message="Loading library…" />
   {:else if error}
@@ -108,6 +185,9 @@
       <p>No saved decks yet.</p>
       <button class="btn btn-primary" type="button" onclick={() => navigate("/build/1")}>
         Build new deck
+      </button>
+      <button class="btn btn-secondary" type="button" onclick={openFilePicker} disabled={importing}>
+        Import text file
       </button>
     </section>
   {:else}
@@ -160,5 +240,8 @@
 
 <div class="library-footer library-footer-stack">
   <button class="btn btn-primary" type="button" onclick={buildAnother}>Build another deck</button>
+  <button class="btn btn-secondary" type="button" onclick={openFilePicker} disabled={importing}>
+    Import text file
+  </button>
   <button class="btn btn-back" type="button" onclick={() => navigate("/")}>Home</button>
 </div>

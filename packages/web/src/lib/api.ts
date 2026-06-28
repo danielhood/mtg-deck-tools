@@ -365,6 +365,20 @@ export function listDecks(params: {
   return fetchJson<DeckLibraryEntry[]>(`/api/v1/decks${query ? `?${query}` : ""}`);
 }
 
+export interface ImportDeckTextRequest {
+  text: string;
+  name?: string;
+  commanders?: string[];
+}
+
+export function importDeckFromText(body: ImportDeckTextRequest): Promise<DeckLibraryDetail> {
+  return fetchJson<DeckLibraryDetail>("/api/v1/decks/import", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
 export function getDeck(id: string): Promise<DeckLibraryDetail> {
   return fetchJson<DeckLibraryDetail>(`/api/v1/decks/${encodeURIComponent(id)}`);
 }
