@@ -12,6 +12,25 @@ Specs: [specs/web/README.md](../../specs/web/README.md) · [architecture.md](../
 
 ---
 
+## Deck input — existing lists (UX13)
+
+Load a deck the user already has (file, paste, or interactive capture) into the library and editor. Cross-format parsers and resolution: [deck-input.md](../../specs/product/deck-input.md) · [product-data.md](product-data.md) § IN-DECK-*.
+
+| ID | Topic | Notes | Spec |
+| --- | --- | --- | --- |
+| **UX13** | Deck input (umbrella) | Entry from library or new `/import` route TBD | [deck-input.md](../../specs/product/deck-input.md) |
+| UX13a | Search by name | Typeahead add-card; commander picker; disambiguation sheet | [deck-input.md](../../specs/product/deck-input.md) § Search |
+| UX13b | Bulk paste + file upload | Textarea parse preview; `.deck.json` + `.txt` upload | [deck-input.md](../../specs/product/deck-input.md) § Bulk paste |
+| UX13c | Spreadsheet upload UI | CSV (XLSX later); column mapping step | [deck-input.md](../../specs/product/deck-input.md) § Spreadsheet |
+| UX13e | Voice input (mobile) | Web Speech API → confirm matches; experimental | [deck-input.md](../../specs/product/deck-input.md) § Voice |
+| UX13f | Camera scan (mobile) | Per-card recognition spike; on-device preferred | [deck-input.md](../../specs/product/deck-input.md) § Camera |
+
+**Depends on:** **UX7f**, **UX11** (shipped). **Parallel OK with:** **UX12** (shared card search). **After:** **UX13a** before voice/camera (**UX13e/f**).
+
+**Deferred wireframes:** import hub, paste preview, disambiguation list, mobile capture bar — add under [wireframes/README.md](../../specs/web/wireframes/README.md) when promoted.
+
+---
+
 ## Platform notes (reference)
 
 - **Platform:** Windows, Linux, macOS browsers + mobile layouts.

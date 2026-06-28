@@ -289,6 +289,7 @@ def test_swap_playbooks_load_equipment_strategies() -> None:
     assert "Equipment" in constraints.type_lines_any
 
 
+
 def test_effect_role_token_payoff_filter(iterate_db: sqlite3.Connection) -> None:
     iterate_db.execute(
         """

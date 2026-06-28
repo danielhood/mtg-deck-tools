@@ -96,6 +96,33 @@
   function strategyForIssue(issue: DependencyIssueRow): string | null {
     return selectedStrategy[issueKey(issue)] ?? null;
   }
+
+  async function ensurePlaybooks(issue: DependencyIssueRow): Promise<void> {
+    const key = issueKey(issue);
+    if (playbooks[key]) return;
+    if (!SWAP_PLAYBOOK_RULES.has(issue.rule_id)) return;
+    try {
+      const response = await getSwapPlaybooks(issue.rule_id, issueDeficit(issue) ?? undefined);
+      playbooks = { ...playbooks, [key]: response.strategies };
+      if (!selectedStrategy[key]) {
+        const defaultStrategy = response.strategies.find((row) => row.default);
+        selectedStrategy = {
+          ...selectedStrategy,
+          [key]: defaultStrategy?.id ?? response.strategies[0]?.id ?? null,
+        };
+      }
+    } catch {
+      playbooks = { ...playbooks, [key]: [] };
+    }
+  }
+
+  function pickStrategy(issue: DependencyIssueRow, strategyId: string): void {
+    selectedStrategy = { ...selectedStrategy, [issueKey(issue)]: strategyId };
+  }
+
+  function strategyForIssue(issue: DependencyIssueRow): string | null {
+    return selectedStrategy[issueKey(issue)] ?? null;
+  }
 </script>
 
 <details
