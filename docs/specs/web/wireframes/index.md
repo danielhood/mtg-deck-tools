@@ -28,7 +28,8 @@ Route → HTML mock map. UX7c wireframes **approved 2026-06-07** (shipped). UX7e
 | `/deck/:id` (swap result) | [deck-view-edit-swap-result.html](deck-view-edit-swap-result.html) | approved | UX11 — inline diff banner |
 | `/deck/:id` (advanced swap) | [deck-view-advanced-swap-sheet.html](deck-view-advanced-swap-sheet.html) | draft | UX12 — bottom sheet + preview |
 | `/deck/:id` (issue fix) | [deck-view-issue-fix-strategies.html](deck-view-issue-fix-strategies.html) | draft | UX12 — strategy chips + Fix issue / Quick fix |
-| `/deck/:id` (named swap) | [deck-view-named-swap.html](deck-view-named-swap.html) | draft | UX12 — named card search + validation |
+| `/deck/:id` (named swap) | [deck-view-named-swap.html](deck-view-named-swap.html) | draft | UX12 — named card search + validation override |
+| `/deck/:id` (swap override) | [deck-view-advanced-swap-override.html](deck-view-advanced-swap-override.html) | draft | UX12 — validation override on apply |
 | `/deck/:id` (issue detail) | [deck-view-dependencies-issue.html](deck-view-dependencies-issue.html) | shipped | UX7d — expanded issue + Show in deck |
 | `/deck/:id` (deps ok) | [deck-view-dependencies-good.html](deck-view-dependencies-good.html) | shipped | UX7d — passed deck, panel closed |
 | `/deck/:id` (delete) | [deck-view-delete.html](deck-view-delete.html) | shipped | Delete confirm modal |

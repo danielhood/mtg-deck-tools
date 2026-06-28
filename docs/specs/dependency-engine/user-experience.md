@@ -709,6 +709,7 @@ Contract: [deck-output-format.md](../../product/deck-output-format.md) § GUI de
 - **Preview** — `POST …/swap/preview` + UI in first implementation tranche.
 - **Expert cross-slot toggle** — `slot_policy: any` behind toggle; default same-slot.
 - **Quick fix prototype** — one-tap strategy apply on issue rows; keep or remove after dogfood.
+- **Validation override** — `force_validation_override` on swap/refill; checkbox gates **Apply anyway**.
 - **API** — extend `POST …/swap` and `…/refill-slot` with optional `SwapConstraints`.
 
 **Deferred (post-v1 UX12):** curve advisory **Adjust curve…** actions (UX12f); profile package swap (**CLI-SWAP** / UX6); auto `repair_dependencies` without user confirm.

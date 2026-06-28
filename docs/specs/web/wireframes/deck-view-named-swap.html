@@ -157,28 +157,36 @@
     </div>
   </div>
 
-  <p class="preview-label" style="margin-top:24px">375px · validation error state</p>
-  <div class="frame" style="height:320px">
+  <p class="preview-label" style="margin-top:24px">375px · validation error — override available</p>
+  <div class="frame" style="height:420px">
     <div class="sheet-scrim">
       <div class="sheet" style="max-height:100%">
         <div class="sheet-scroll" style="padding-top:16px">
           <div class="validation-err" role="alert">
             Cannot add Sword of Fire and Ice — exceeds deck budget ($150.00 remaining: $12.40).
           </div>
+          <label class="override-row" style="display:flex;gap:12px;align-items:flex-start;padding:12px;margin-top:12px;border:1px solid #b45309;border-radius:10px;background:#fef3c7;font-size:12px">
+            <input type="checkbox" style="width:20px;height:20px;margin-top:2px">
+            <span><strong style="color:#b45309">Override validation and apply anyway</strong></span>
+          </label>
         </div>
+        <footer class="sheet-footer">
+          <button class="btn-apply" type="button" disabled>Apply anyway</button>
+        </footer>
       </div>
     </div>
   </div>
 
   <aside class="wireframe-meta">
     Route: <code>/deck/:id</code> ·
-    <a href="deck-view-advanced-swap-sheet.html">full advanced sheet</a> ·
+    <a href="deck-view-advanced-swap-sheet.html">advanced sheet</a> ·
+    <a href="deck-view-advanced-swap-override.html">validation override</a> ·
     <a href="deck-view-edit-select.html">selection entry</a>
   </aside>
   <p class="dev-note">
     <strong>Dev note:</strong> Commander search reuse from wizard step 6 pattern.
     Request sets <code>replacement_oracle_id</code>; server validates CI, budget, uniqueness before apply.
-    Filters collapse when named card selected.
+    On failure, show override checkbox — <a href="deck-view-advanced-swap-override.html">override wireframe</a>.
   </p>
 </body>
 </html>
