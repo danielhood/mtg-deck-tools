@@ -1,0 +1,78 @@
+# UX12 — dependency issue resolution strategies (playbook presets).
+# Maps rule_id + optional deficit → strategy chips and SwapConstraints presets.
+
+rules:
+  EQUIPMENT_BALANCE:
+    strategies:
+      - id: add_equipment
+        label: Add equipment
+        when_deficit: [equipment]
+        constraints:
+          type_lines_any: [Equipment]
+      - id: add_carriers
+        label: Add carriers
+        when_deficit: [carriers]
+        constraints:
+          type_lines_any: [Creature]
+          type_lines_none: [Vehicle]
+      - id: trim_equipment
+        label: Trim equipment
+        when_deficit: [equipment]
+        trim_targets_from: equipment
+      - id: quick_shuffle
+        label: Quick shuffle
+        constraints: {}
+
+  VEHICLE_BALANCE:
+    strategies:
+      - id: add_vehicles
+        label: Add vehicles
+        when_deficit: [vehicles]
+        constraints:
+          type_lines_any: [Vehicle]
+      - id: add_pilots
+        label: Add pilots
+        when_deficit: [creatures]
+        constraints:
+          type_lines_any: [Creature]
+      - id: quick_shuffle
+        label: Quick shuffle
+        constraints: {}
+
+  TOKEN_BALANCE:
+    strategies:
+      - id: add_consumers
+        label: Add token payoffs
+        when_deficit: [consumers]
+        constraints:
+          effect_role:
+            profile_id: tokens
+            role: consumer
+      - id: add_producers
+        label: Add token producers
+        when_deficit: [producers]
+        constraints:
+          effect_role:
+            profile_id: tokens
+            role: producer
+      - id: quick_shuffle
+        label: Quick shuffle
+        constraints: {}
+
+  ENERGY_BALANCE:
+    strategies:
+      - id: add_consumers
+        label: Add energy payoffs
+        constraints:
+          effect_role:
+            profile_id: energy
+            role: consumer
+      - id: add_producers
+        label: Add energy producers
+        constraints:
+          effect_role:
+            profile_id: energy
+            role: producer
+      - id: quick_shuffle
+        label: Quick shuffle
+        constraints: {}

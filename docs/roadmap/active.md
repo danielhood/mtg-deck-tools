@@ -22,7 +22,7 @@
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX12** | web-ui | Advanced swap & guided rebalance — constraints, preview, issue playbooks, named card; Quick fix prototype | Wireframes | **UX11** (shipped) | doc-only, ENG-MAINT (coordinate on `iterate.py` / OpenAPI) |
+| **UX12** | web-ui | Advanced swap & guided rebalance — constraints, preview, issue playbooks, named card; Quick fix prototype | Implementation complete — dogfood + ship | **UX11** (shipped) | doc-only, ENG-MAINT (coordinate on `iterate.py` / OpenAPI) |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | doc-only, dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
@@ -33,11 +33,11 @@
 | Slice | Deliverable | Status |
 | --- | --- | --- |
 | **UX12a** | Planning + playbook YAML + OpenAPI contract | Planning shipped |
-| **UX12a-wf** | P0 wireframes (advanced sheet, issue strategies, named swap) | Draft |
-| **UX12b** | Engine `SwapConstraints` + `swap/preview` endpoint | Pending |
-| **UX12c** | Advanced sheet UI + filters + preview + cross-slot toggle | Pending |
-| **UX12d** | Issue **Fix issue…** + playbooks + Quick fix prototype | Pending |
-| **UX12e** | Named-card replacement | Pending |
+| **UX12a-wf** | P0 wireframes (advanced sheet, issue strategies, named swap) | Approved |
+| **UX12b** | Engine `SwapConstraints` + `swap/preview` endpoint | Implemented |
+| **UX12c** | Advanced sheet UI + filters + preview + cross-slot toggle | Implemented |
+| **UX12d** | Issue **Fix issue…** + playbooks + Quick fix prototype | Implemented |
+| **UX12e** | Named-card replacement | Implemented |
 | **UX12f** | Curve advisory actions | Deferred post-v1 |
 
 Spec: [advanced-swap-ux.md](../specs/web/advanced-swap-ux.md) · Wireframes: [wireframes/README.md](../specs/web/wireframes/README.md) § UX12.

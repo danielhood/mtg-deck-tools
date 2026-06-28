@@ -7,6 +7,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.models.swap_constraints import SwapConstraints
 
 
 class HealthResponse(BaseModel):
@@ -115,11 +116,52 @@ class PatchDeckRequest(BaseModel):
 class RefillSlotRequest(BaseModel):
     slot: str
     seed: int | None = None
+    constraints: SwapConstraints | None = None
+    force_validation_override: bool = False
 
 
 class SwapCardsRequest(BaseModel):
     oracle_ids: list[str]
     seed: int | None = None
+    constraints: SwapConstraints | None = None
+    strategy_id: str | None = None
+    preview_limit: int | None = Field(default=None, ge=1, le=20)
+    force_validation_override: bool = False
+
+
+class ValidationErrorItem(BaseModel):
+    code: str
+    message: str
+
+
+class SwapPreviewCandidateResponse(BaseModel):
+    oracle_id: str
+    name: str
+    mana_cost: str
+    price_usd: float | None = None
+    rarity: str | None = None
+
+
+class SwapPreviewPositionResponse(BaseModel):
+    from_oracle_id: str
+    from_name: str
+    slot: str
+    candidates: list[SwapPreviewCandidateResponse] = Field(default_factory=list)
+
+
+class SwapPreviewResponse(BaseModel):
+    candidates_by_position: list[SwapPreviewPositionResponse] = Field(default_factory=list)
+
+
+class SwapStrategyResponse(BaseModel):
+    id: str
+    label: str
+    default: bool = False
+
+
+class SwapPlaybooksResponse(BaseModel):
+    rule_id: str
+    strategies: list[SwapStrategyResponse] = Field(default_factory=list)
 
 
 class SwapRecordResponse(BaseModel):
@@ -219,5 +261,17 @@ class CommanderSearchResult(BaseModel):
     price_usd: float | None = None
     price_known: bool = False
     released_at: str | None = None
+    image_uri: str | None = None
+    rarity: str | None = None
+
+
+class CardSearchResult(BaseModel):
+    oracle_id: str
+    name: str
+    type_line: str = ""
+    mana_cost: str = ""
+    color_identity: list[str] = Field(default_factory=list)
+    price_usd: float | None = None
+    price_known: bool = False
     image_uri: str | None = None
     rarity: str | None = None

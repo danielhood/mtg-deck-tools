@@ -14,8 +14,16 @@ from mtg_deck_tools.service.dto import (
     RefillSlotRequest,
     SwapCardsRequest,
     SwapCardsResponse,
+    SwapPlaybooksResponse,
+    SwapPreviewResponse,
 )
-from mtg_deck_tools.service.iterate import refill_library_deck_slot, swap_library_deck_cards
+from mtg_deck_tools.service.iterate import (
+    DeckValidationFailure,
+    preview_library_deck_swap,
+    refill_library_deck_slot,
+    swap_library_deck_cards,
+    swap_playbooks_for_rule,
+)
 from mtg_deck_tools.service.library import (
     delete_library_deck,
     get_library_deck,
@@ -25,6 +33,16 @@ from mtg_deck_tools.service.library import (
 )
 
 router = APIRouter(prefix="/api/v1/decks", tags=["library"])
+
+
+def _validation_http_error(exc: DeckValidationFailure) -> HTTPException:
+    return HTTPException(
+        status_code=400,
+        detail={
+            "message": str(exc),
+            "validation_errors": exc.validation_errors,
+        },
+    )
 
 
 def _db_gate(db: Path | None) -> None:
@@ -114,6 +132,8 @@ def refill_deck_slot(
             db_path=Path(db) if db else None,
             decks_path=Path(decks) if decks else None,
         )
+    except DeckValidationFailure as exc:
+        raise _validation_http_error(exc) from exc
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     if record is None:
@@ -138,8 +158,42 @@ def swap_deck_cards_route(
             db_path=Path(db) if db else None,
             decks_path=Path(decks) if decks else None,
         )
+    except DeckValidationFailure as exc:
+        raise _validation_http_error(exc) from exc
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     if record is None:
         raise HTTPException(status_code=404, detail=f"Deck not found: {deck_id}")
     return record
+
+
+@router.post("/{deck_id}/swap/preview", response_model=SwapPreviewResponse)
+def preview_deck_swap(
+    deck_id: str,
+    body: SwapCardsRequest,
+    db: Annotated[str | None, Query(description="SQLite database path")] = None,
+    decks: Annotated[str | None, Query(description="Saved deck library path")] = None,
+) -> SwapPreviewResponse:
+    _db_gate(Path(db) if db else None)
+    if not body.oracle_ids:
+        raise HTTPException(status_code=400, detail="oracle_ids must not be empty.")
+    try:
+        record = preview_library_deck_swap(
+            deck_id,
+            body,
+            db_path=Path(db) if db else None,
+            decks_path=Path(decks) if decks else None,
+        )
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    if record is None:
+        raise HTTPException(status_code=404, detail=f"Deck not found: {deck_id}")
+    return record
+
+
+@router.get("/swap-playbooks/{rule_id}", response_model=SwapPlaybooksResponse)
+def get_swap_playbooks(
+    rule_id: str,
+    deficit: Annotated[str | None, Query(description="Issue detail.deficit filter")] = None,
+) -> SwapPlaybooksResponse:
+    return swap_playbooks_for_rule(rule_id, deficit=deficit)

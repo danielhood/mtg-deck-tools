@@ -191,6 +191,50 @@ def fetch_candidates(
     return candidates
 
 
+def search_cards_by_name(
+    conn: sqlite3.Connection,
+    *,
+    name_query: str,
+    colors: list[str] | None = None,
+    limit: int = 15,
+) -> list[CardCandidate]:
+    """Commander-legal cards matching a name substring and optional color identity."""
+    sql = """
+        SELECT oracle_id, name, type_line, mana_cost, cmc, color_identity,
+               keywords, price_usd, price_known, edhrec_rank, oracle_text,
+               is_basic_land, produced_mana, scryfall_uri, image_uri,
+               released_at, power, toughness, rarity, availability_score
+        FROM cards
+        WHERE commander_legal = 1
+    """
+    params: list = []
+    if name_query.strip():
+        sql += " AND name LIKE ? ESCAPE '\\'"
+        params.append(f"%{name_query.strip()}%")
+    if colors:
+        for color in colors:
+            sql += " AND color_identity LIKE ?"
+            params.append(f'%"{color}"%')
+    sql += " ORDER BY edhrec_rank ASC NULLS LAST, name ASC LIMIT ?"
+    params.append(limit)
+    rows = conn.execute(sql, params).fetchall()
+    return [_row_to_candidate(row) for row in rows]
+
+
+def fetch_card_by_oracle_id(conn: sqlite3.Connection, oracle_id: str) -> sqlite3.Row | None:
+    return conn.execute(
+        """
+        SELECT oracle_id, name, type_line, mana_cost, cmc, color_identity,
+               keywords, price_usd, price_known, edhrec_rank, oracle_text,
+               is_basic_land, produced_mana, scryfall_uri, image_uri,
+               released_at, power, toughness, rarity, availability_score
+        FROM cards
+        WHERE oracle_id = ?
+        """,
+        (oracle_id,),
+    ).fetchone()
+
+
 def fetch_card_tags(conn: sqlite3.Connection, oracle_ids: list[str]) -> dict[str, list[str]]:
     if not oracle_ids:
         return {}

@@ -14,11 +14,17 @@ from mtg_deck_tools.builder.deck import DeckBuildResult, DeckCard
 from mtg_deck_tools.builder.filler import (
     _BuildState,
     _fill_lands,
-    _fill_slot,
     _init_state_from_cards,
 )
-from mtg_deck_tools.builder.mana_base import ManaBasePlan, plan_mana_base
+from mtg_deck_tools.builder.mana_base import plan_mana_base
+from mtg_deck_tools.builder.swap_constraints import (
+    SwapPreviewPosition,
+    add_candidate_to_state,
+    pick_swap_replacement,
+    preview_swap_candidates,
+)
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.models.swap_constraints import SwapConstraints
 from mtg_deck_tools.rules.validate import (
     adjust_slot_template_for_commanders,
     mainboard_size_for_commanders,
@@ -101,6 +107,75 @@ def _remove_cards_for_swap(
     return remaining, removed
 
 
+def _build_swap_state(
+    conn: sqlite3.Connection,
+    criteria: DeckCriteria,
+    *,
+    identity: list[str],
+    commander_oracle_ids: list[str],
+    fixed_cards: list[DeckCard],
+    seed: int | None,
+) -> _BuildState:
+    commander_set = set(commander_oracle_ids)
+    tags = commander_theme_tags(conn, commander_oracle_ids)
+    state = _BuildState(
+        conn=conn,
+        criteria=criteria,
+        identity=identity,
+        commander_oracle_ids=commander_set,
+        commander_theme_tags=tags,
+        rng=random.Random(seed if seed is not None else criteria.seed),
+    )
+    _init_state_from_cards(state, fixed_cards)
+    return state
+
+
+def preview_swap_deck_cards(
+    conn: sqlite3.Connection,
+    criteria: DeckCriteria,
+    *,
+    identity: list[str],
+    commander_oracle_ids: list[str],
+    fixed_cards: list[DeckCard],
+    oracle_ids: list[str],
+    constraints: SwapConstraints | None = None,
+    preview_limit: int = 8,
+    seed: int | None = None,
+) -> list[SwapPreviewPosition]:
+    """Return top candidate picks per vacated position without mutating the deck."""
+    commander_set = set(commander_oracle_ids)
+    remaining, removed = _remove_cards_for_swap(
+        fixed_cards,
+        oracle_ids,
+        commander_oracle_ids=commander_set,
+    )
+    state = _build_swap_state(
+        conn,
+        criteria,
+        identity=identity,
+        commander_oracle_ids=commander_oracle_ids,
+        fixed_cards=remaining,
+        seed=seed,
+    )
+    positions: list[SwapPreviewPosition] = []
+    for slot, from_id, from_name in removed:
+        candidates = preview_swap_candidates(
+            state,
+            slot,
+            constraints=constraints,
+            limit=preview_limit,
+        )
+        positions.append(
+            SwapPreviewPosition(
+                from_oracle_id=from_id,
+                from_name=from_name,
+                slot=slot,
+                candidates=candidates,
+            )
+        )
+    return positions
+
+
 def swap_deck_cards(
     conn: sqlite3.Connection,
     criteria: DeckCriteria,
@@ -110,6 +185,7 @@ def swap_deck_cards(
     fixed_cards: list[DeckCard],
     oracle_ids: list[str],
     seed: int | None = None,
+    constraints: SwapConstraints | None = None,
 ) -> tuple[DeckBuildResult, list[SwapRecord]]:
     """Replace selected maindeck cards with new picks under current criteria."""
     slot_config = load_slot_template_config()
@@ -125,28 +201,39 @@ def swap_deck_cards(
         commander_oracle_ids=commander_set,
     )
 
-    tags = commander_theme_tags(conn, commander_oracle_ids)
-    state = _BuildState(
-        conn=conn,
-        criteria=criteria,
+    state = _build_swap_state(
+        conn,
+        criteria,
         identity=identity,
-        commander_oracle_ids=commander_set,
-        commander_theme_tags=tags,
-        rng=random.Random(seed if seed is not None else criteria.seed),
+        commander_oracle_ids=commander_oracle_ids,
+        fixed_cards=remaining,
+        seed=seed,
     )
-    _init_state_from_cards(state, remaining)
     state.warnings.append(f"Swapped {len(removed)} maindeck card(s).")
 
     swaps: list[SwapRecord] = []
+    use_lands_pipeline = constraints is None or not (
+        constraints.type_lines_any
+        or constraints.replacement_oracle_id
+        or constraints.effect_role
+    )
     for slot, from_id, from_name in removed:
-        card_count_before = len(state.cards)
-        if slot == "lands":
+        if slot == "lands" and use_lands_pipeline:
+            card_count_before = len(state.cards)
             _fill_lands(state, 1, mainboard_size=mainboard_size)
+            if len(state.cards) <= card_count_before:
+                raise RuntimeError(f"Could not find replacement for {from_name!r} in slot '{slot}'.")
+            new_card = state.cards[-1]
         else:
-            _fill_slot(state, slot, 1)
-        if len(state.cards) <= card_count_before:
-            raise RuntimeError(f"Could not find replacement for {from_name!r} in slot '{slot}'.")
-        new_card = state.cards[-1]
+            pick = pick_swap_replacement(
+                state,
+                slot,
+                constraints=constraints,
+                rng=state.rng,
+            )
+            if pick is None:
+                raise RuntimeError(f"Could not find replacement for {from_name!r} in slot '{slot}'.")
+            new_card = add_candidate_to_state(state, slot, pick)
         swaps.append(
             SwapRecord(
                 slot=slot,

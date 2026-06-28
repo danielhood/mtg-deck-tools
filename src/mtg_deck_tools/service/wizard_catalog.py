@@ -12,6 +12,7 @@ from mtg_deck_tools.rules.criteria_linter import lint_criteria
 from mtg_deck_tools.rules.rarity import RARITY_ORDER, format_min_rarity_display
 from mtg_deck_tools.service.dto import (
     ActivatedProfileResponse,
+    CardSearchResult,
     CommanderSearchResult,
     CriteriaWarningResponse,
     FocusLevelOption,
@@ -27,6 +28,7 @@ from mtg_deck_tools.service.dto import (
 )
 from mtg_deck_tools.service.stats import get_database_stats
 from mtg_deck_tools.wizard.commanders import CommanderRow, search_commanders
+from mtg_deck_tools.builder.pool import search_cards_by_name
 from mtg_deck_tools.wizard.dependencies import FOCUS_LEVELS, activated_profiles_for_wizard
 from mtg_deck_tools.wizard.mechanics import keyword_mechanic_choices
 from mtg_deck_tools.wizard.slots import load_slot_template_config, slot_template_total
@@ -189,3 +191,40 @@ def _commander_to_result(row: CommanderRow) -> CommanderSearchResult:
         image_uri=row.image_uri,
         rarity=row.rarity,
     )
+
+
+def search_wizard_cards(
+    *,
+    name_query: str,
+    colors: list[str] | None = None,
+    limit: int = 15,
+    db_path: Path | None = None,
+) -> list[CardSearchResult]:
+    path = resolve_db_path(db_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Database not found: {path}")
+
+    conn = connect(path)
+    try:
+        rows = search_cards_by_name(
+            conn,
+            name_query=name_query,
+            colors=colors or None,
+            limit=limit,
+        )
+    finally:
+        conn.close()
+    return [
+        CardSearchResult(
+            oracle_id=row.oracle_id,
+            name=row.name,
+            type_line=row.type_line or "",
+            mana_cost=row.mana_cost or "",
+            color_identity=list(row.color_identity or []),
+            price_usd=row.price_usd,
+            price_known=row.price_known,
+            image_uri=row.image_uri,
+            rarity=row.rarity,
+        )
+        for row in rows
+    ]
