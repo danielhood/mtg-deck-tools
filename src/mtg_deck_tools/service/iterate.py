@@ -305,6 +305,7 @@ def swap_library_deck_cards(
             oracle_ids=body.oracle_ids,
             seed=working.seed,
             constraints=constraints,
+            preferred_replacements=body.preferred_replacements or None,
         )
         deck_doc = _finalize_maindeck(
             conn,

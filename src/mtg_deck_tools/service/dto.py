@@ -7,7 +7,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.models.swap_constraints import SwapConstraints
+from mtg_deck_tools.models.swap_constraints import SwapConstraints, SwapPreferredReplacement
 
 
 class HealthResponse(BaseModel):
@@ -126,6 +126,7 @@ class SwapCardsRequest(BaseModel):
     constraints: SwapConstraints | None = None
     strategy_id: str | None = None
     rule_id: str | None = None
+    preferred_replacements: list[SwapPreferredReplacement] = Field(default_factory=list)
     preview_limit: int | None = Field(default=None, ge=1, le=20)
     force_validation_override: bool = False
 
