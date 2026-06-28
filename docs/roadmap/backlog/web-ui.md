@@ -20,7 +20,7 @@ Load a deck the user already has (file, paste, or interactive capture) into the 
 
 | ID | Topic | Notes | Spec |
 | --- | --- | --- | --- |
-| **UX13** | Deck input (umbrella) | Library **Import** entry when **UX13b** promotes | [deck-input.md](../../specs/product/deck-input.md) |
+| **UX13** | Deck input (umbrella) | Home import shipped; further UX13 slices below | [deck-input.md](../../specs/product/deck-input.md) |
 | UX13a | Search by name | Typeahead add-card; disambiguation when fuzzy ships | [deck-input.md](../../specs/product/deck-input.md) § Search |
 | UX13b | Bulk paste + file upload | **Shipped** — home template download + `.txt` upload | [deck-input.md](../../specs/product/deck-input.md) |
 | UX13c | Spreadsheet upload UI | CSV (XLSX later); column mapping step | [deck-input.md](../../specs/product/deck-input.md) § Spreadsheet |

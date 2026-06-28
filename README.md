@@ -216,7 +216,7 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:5173 — home → build wizard (steps 1–7) or **import text file** (download template on home); review → generate → deck view (`/deck/:id`); saved decks at `/library`. Production bundle:
+Open http://127.0.0.1:5173 — home → build wizard (steps 1–7) or **import text file** (download template on home); review → generate → deck view (`/deck/:id`) with dependency dashboard; saved decks at `/library`. Production bundle:
 
 ```bash
 cd packages/web && pnpm build
