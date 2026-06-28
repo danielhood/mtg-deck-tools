@@ -272,19 +272,6 @@ export function issueDeficit(issue: DependencyIssueRow): string | null {
   return typeof deficit === "string" && deficit.trim() ? deficit.trim() : null;
 }
 
-/** UX12 playbook-backed dependency rules. */
-export const SWAP_PLAYBOOK_RULES = new Set([
-  "EQUIPMENT_BALANCE",
-  "VEHICLE_BALANCE",
-  "TOKEN_BALANCE",
-  "ENERGY_BALANCE",
-]);
-
-export function issueDeficit(issue: DependencyIssueRow): string | null {
-  const deficit = issue.detail.deficit;
-  return typeof deficit === "string" && deficit.trim() ? deficit.trim() : null;
-}
-
 export interface IssueSwapCard {
   oracle_id: string;
   name: string;
