@@ -88,6 +88,7 @@ def import_deck(
             body.text,
             name=body.name,
             commander_names=body.commanders,
+            resolutions=body.resolutions,
             db_path=Path(db) if db else None,
             decks_path=Path(decks) if decks else None,
         )
@@ -107,6 +108,7 @@ def preview_deck_import_route(
         return preview_deck_import(
             body.text,
             commander_names=body.commanders,
+            resolutions=body.resolutions,
             db_path=Path(db) if db else None,
         )
     except ValueError as exc:

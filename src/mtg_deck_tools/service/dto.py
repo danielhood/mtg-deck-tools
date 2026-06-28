@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -113,6 +113,12 @@ class PatchDeckRequest(BaseModel):
     deck: dict[str, Any] | None = None
 
 
+class ImportDeckResolution(BaseModel):
+    section: Literal["commander", "maindeck"]
+    index: int = Field(description="Commander 0-based index or maindeck source line number")
+    oracle_id: str
+
+
 class ImportDeckRequest(BaseModel):
     """Plain-text deck list import (UX13-MVP)."""
 
@@ -122,6 +128,17 @@ class ImportDeckRequest(BaseModel):
         default=None,
         description="Commander name(s) when the text omits a Commander section",
     )
+    resolutions: list[ImportDeckResolution] = Field(
+        default_factory=list,
+        description="Manual oracle_id picks for ambiguous or unknown preview lines",
+    )
+
+
+class ImportDeckPreviewCandidate(BaseModel):
+    oracle_id: str
+    name: str
+    type_line: str | None = None
+    score: float | None = None
 
 
 class ImportDeckPreviewLineItem(BaseModel):
@@ -131,6 +148,8 @@ class ImportDeckPreviewLineItem(BaseModel):
     quantity: int | None = None
     name: str | None = None
     oracle_id: str | None = None
+    match_method: str | None = None
+    candidates: list[ImportDeckPreviewCandidate] = Field(default_factory=list)
 
 
 class ImportDeckPreviewSummary(BaseModel):

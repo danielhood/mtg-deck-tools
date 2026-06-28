@@ -1,6 +1,6 @@
 # Deck input — planning (UX13)
 
-**Status:** **UX13-MVP** + **UX13b** + **UX13c** shipped (2026-06-28). Next: resolver v2 — [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).  
+**Status:** **UX13-MVP** + **UX13b** + **UX13c** + **resolver v2** shipped (2026-06-28). Next: **IN-DECK-JSON** — [backlog/product-data.md](../../roadmap/backlog/product-data.md).  
 **Depends on:** **UX7f** library (shipped), **UX11** editor (shipped).  
 **Related:** [deck-output-format.md](deck-output-format.md) · [library-api.md](../web/library-api.md) · [user-experience.md](../dependency-engine/user-experience.md).
 
@@ -11,13 +11,13 @@
 | Layer | Deliverable |
 | --- | --- |
 | **Parser** | `deck_import/parse_text.py` — Commander/Deck sections, quantities, comments |
-| **Resolver** | Exact `cards.name` match; fail on unknown or ambiguous |
+| **Resolver** | Exact + case-insensitive + fuzzy match; disambiguation via `resolutions` |
 | **Builder** | Library `.deck.json` with `imported`/`lands` slots, metrics, `dependency_report` |
 | **CLI** | `mtg-deck-tools deck import --file` (`--commander`, `--name`) |
 | **API** | `POST /api/v1/decks/import` |
 | **Web** | Home — paste, file upload, template download, **Preview** → gated import |
 
-**Gap today:** exact-name matching fails on typos and duplicate-name collisions; preview shows failures but resolver v2 is needed for recovery.
+**Gap today:** no `.deck.json` upload; import+fill and spreadsheet paths remain backlog.
 
 ---
 
@@ -27,12 +27,11 @@ Recommended priority for remaining deck-input work:
 
 | Priority | ID | Topic | Rationale |
 | --- | --- | --- | --- |
-| **1** | Resolver v2 | Fuzzy match + disambiguation | Biggest quality jump for real lists; unlocks **UX13a** search-by-name |
-| **2** | **IN-DECK-JSON** | `.deck.json` upload | Reload saved decks without retyping |
-| **3** | Import + fill | Lock imported cards → generate remainder | Addresses “continue editing” goal (**UX11** locks) |
-| **4** | **IN-DECK-SHEET** / **UX13d** | CSV spreadsheet | After text path stable |
-| **5** | **IN-DECK-EXT** | Site-specific parsers | Moxfield plaintext may already work via text grammar |
-| **6** | **UX13e/f** | Voice / camera | Experimental; after resolver UX solid |
+| **1** | **IN-DECK-JSON** | `.deck.json` upload | Reload saved decks without retyping |
+| **2** | Import + fill | Lock imported cards → generate remainder | Addresses “continue editing” goal (**UX11** locks) |
+| **3** | **IN-DECK-SHEET** / **UX13d** | CSV spreadsheet | After text path stable |
+| **4** | **IN-DECK-EXT** | Site-specific parsers | Moxfield plaintext may already work via text grammar |
+| **5** | **UX13e/f** | Voice / camera | Experimental; after resolver UX solid |
 
 **Not planned:** sideboard/companion, live Scryfall lookup, partial save with placeholders, batch multi-deck import.
 
@@ -82,7 +81,7 @@ Promoted IDs: **IN-DECK-TEXT**, **IN-DECK-RESOLVE**, **CLI-IN**, **UX13b**.
 | --- | --- |
 | **Commander** | Required — `Commander` section or CLI/API `commanders` / `--commander` |
 | **Unknown names** | Fail import with unresolved line list (no partial save) |
-| **Name matching** | Exact `cards.name` only (preview uses same resolver) |
+| **Name matching** | Resolver v2 — exact, case-insensitive, fuzzy auto-pick; manual `resolutions` for ambiguous/unknown |
 | **Slots** | `lands` for basics; `imported` otherwise |
 | **Deck size** | Incomplete lists OK; validation warnings, not hard fail on import |
 | **Web entry** | Home — paste, file upload, template download |
@@ -173,15 +172,37 @@ See [changelog](../../history/changelog.md) 2026-06-28 for ship record.
 
 ---
 
+## Resolver v2 — shipped (IN-DECK-RESOLVE-v2)
+
+**Goal:** Recover from typos, case differences, and duplicate-name collisions during text import preview.
+
+### Product decisions (locked 2026-06-28)
+
+| Topic | Decision |
+| --- | --- |
+| **Match order** | Exact → case-insensitive → fuzzy (single high-confidence auto-pick) |
+| **Ambiguous** | Multiple exact rows or multiple fuzzy scores ≥ 0.85 → `ambiguous` with `candidates` |
+| **Unknown** | No strong match; return top fuzzy `candidates` (score ≥ 0.65) as suggestions |
+| **Manual pick** | `resolutions[]` on preview/import — `{ section, index, oracle_id }` |
+| **Commit gate** | Unchanged — import only when preview `ready` (all lines resolved) |
+| **Web** | Candidate chips on ambiguous/unknown lines; re-preview after pick |
+
+### Implementation modules
+
+| Module | Responsibility |
+| --- | --- |
+| `deck_import/normalize.py` | Name normalization for fuzzy compare |
+| `deck_import/resolve.py` | Fuzzy candidate search + `build_resolution_map` |
+| `service/dto.py` | `ImportDeckResolution`, preview `candidates` |
+| `packages/web/…/HomePage.svelte` | Disambiguation candidate buttons |
+
+---
+
 ## Backlog (not active)
-
-### Resolver v2 (fuzzy + disambiguation)
-
-Exact match limitations: typos, punctuation, multiple DB rows per name. Enables **UX13a** search-by-name and richer preview/disambiguation UI. Promote after **UX13c** ships.
 
 ### Search by name (UX13a)
 
-Typeahead add-card on deck view / import flow. Depends on resolver v2 for disambiguation.
+Typeahead add-card on deck view / import flow. Resolver v2 shipped — UX13a can promote next.
 
 ### Spreadsheet (IN-DECK-SHEET / UX13d)
 
@@ -224,7 +245,7 @@ Experimental mobile; backlog until text + resolver UX stable.
 | 3 | Preview before save? | **Yes** — **UX13c** shipped |
 | 4 | Per-site parsers? | **Deferred** — plaintext grammar first |
 | 5 | Import + auto-fill? | **Separate flow** — backlog |
-| 6 | Fuzzy in preview? | **No** — resolver v2 later |
+| 6 | Fuzzy in preview? | **Yes** — resolver v2 shipped (auto-pick + manual `resolutions`) |
 
 ---
 

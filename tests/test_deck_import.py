@@ -16,6 +16,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 from mtg_deck_tools.api.app import create_app  # noqa: E402
 from mtg_deck_tools.db.schema import apply_schema  # noqa: E402
 from mtg_deck_tools.deck_import.resolve import ResolveError  # noqa: E402
+from mtg_deck_tools.service.dto import ImportDeckResolution  # noqa: E402
 from mtg_deck_tools.service.deck_import import (  # noqa: E402
     import_deck_from_text,
     preview_deck_import,
@@ -253,3 +254,94 @@ def test_api_preview_deck(import_env: tuple[Path, Path]) -> None:
     body = response.json()
     assert body["summary"]["ready"] is True
     assert len(body["maindeck"]) == 3
+
+
+def test_preview_case_insensitive_match(import_env: tuple[Path, Path]) -> None:
+    cards_db, _ = import_env
+    text = """
+    Commander
+    meren of clan nel toth
+
+    Deck
+    sol ring
+    """
+    preview = preview_deck_import(text, db_path=cards_db)
+    assert preview.summary.ready is True
+    assert preview.maindeck[0].match_method == "case_insensitive"
+
+
+def test_preview_ambiguous_includes_candidates(import_env: tuple[Path, Path]) -> None:
+    cards_db, _ = import_env
+    conn = sqlite3.connect(cards_db)
+    _insert_card(
+        conn,
+        oracle_id="forest-2",
+        name="Forest",
+        color_identity=[],
+        type_line="Basic Land — Forest",
+        is_basic_land=1,
+        cmc=0,
+    )
+    conn.commit()
+    conn.close()
+
+    text = """
+    Commander
+    Meren of Clan Nel Toth
+
+    Deck
+    Forest
+    """
+    preview = preview_deck_import(text, db_path=cards_db)
+    assert preview.maindeck[0].status == "ambiguous"
+    assert len(preview.maindeck[0].candidates) == 2
+
+
+def test_import_with_resolution_for_ambiguous(import_env: tuple[Path, Path]) -> None:
+    cards_db, decks_db = import_env
+    conn = sqlite3.connect(cards_db)
+    _insert_card(
+        conn,
+        oracle_id="forest-2",
+        name="Forest",
+        color_identity=[],
+        type_line="Basic Land — Forest",
+        is_basic_land=1,
+        cmc=0,
+    )
+    conn.commit()
+    conn.close()
+
+    text = """
+    Commander
+    Meren of Clan Nel Toth
+
+    Deck
+    Forest
+    """
+    line_number = preview_deck_import(text, db_path=cards_db).maindeck[0].line_number
+    assert line_number is not None
+    result = import_deck_from_text(
+        text,
+        db_path=cards_db,
+        decks_path=decks_db,
+        resolutions=[
+            ImportDeckResolution(section="maindeck", index=line_number, oracle_id="forest-2"),
+        ],
+    )
+    assert result.deck["cards"][0]["oracle_id"] == "forest-2"
+
+
+def test_preview_fuzzy_typo(import_env: tuple[Path, Path]) -> None:
+    cards_db, _ = import_env
+    text = """
+    Commander
+    Meren of Clan Nel Toth
+
+    Deck
+    Sol Rng
+    """
+    preview = preview_deck_import(text, db_path=cards_db)
+    assert preview.maindeck[0].status == "resolved"
+    assert preview.maindeck[0].name == "Sol Ring"
+    assert preview.maindeck[0].match_method == "fuzzy"

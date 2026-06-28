@@ -8,16 +8,13 @@ from mtg_deck_tools.service.dto import (
     GenerateRequest,
     GenerateResponse,
     HealthResponse,
+    ImportDeckPreviewResponse,
     ImportDeckRequest,
     ImportRequest,
     ImportResponse,
     PatchDeckRequest,
 )
 from mtg_deck_tools.service.deck_import import import_deck_from_text, preview_deck_import
-from mtg_deck_tools.service.dto import (
-    ImportDeckPreviewResponse,
-    ImportDeckRequest,
-)
 from mtg_deck_tools.service.generate import (
     GenerateResult,
     generate_deck,

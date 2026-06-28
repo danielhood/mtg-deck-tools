@@ -240,8 +240,8 @@ python scripts/export_openapi.py
 | `POST` | `/api/v1/import` | Import oracle JSON → SQLite (body: optional `json_path`, `db_path`) |
 | `POST` | `/api/v1/generate` | Build deck from `DeckCriteria` + flags; response includes `.deck.json` document |
 | `POST` | `/api/v1/generate/from-deck` | Regenerate from `deck_path` or inline `deck` object |
-| `POST` | `/api/v1/decks/import` | Import plain-text deck list → saved library entry (`text`, optional `name` / `commanders`) |
-| `POST` | `/api/v1/decks/import/preview` | Preview parse + resolve without saving (`text`, optional `commanders`) |
+| `POST` | `/api/v1/decks/import` | Import plain-text deck list → saved library entry (`text`, optional `name` / `commanders` / `resolutions`) |
+| `POST` | `/api/v1/decks/import/preview` | Preview parse + resolve without saving (`text`, optional `commanders`, `resolutions`) |
 
 ### Quick checks
 

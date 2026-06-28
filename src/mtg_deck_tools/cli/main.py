@@ -574,6 +574,9 @@ def _print_deck_import_preview(preview: ImportDeckPreviewResponse) -> None:
             line.status,
             line.name or "—",
         )
+        if line.candidates and line.status != "resolved":
+            choices = ", ".join(candidate.name for candidate in line.candidates[:5])
+            table.add_row("", "", "", "", "candidates", choices)
     for line in preview.maindeck:
         table.add_row(
             "Deck",
@@ -583,6 +586,9 @@ def _print_deck_import_preview(preview: ImportDeckPreviewResponse) -> None:
             line.status,
             line.name or "—",
         )
+        if line.candidates and line.status != "resolved":
+            choices = ", ".join(candidate.name for candidate in line.candidates[:5])
+            table.add_row("", "", "", "", "candidates", choices)
     console.print(table)
 
     summary = preview.summary
