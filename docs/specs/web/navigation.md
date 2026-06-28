@@ -91,8 +91,9 @@ Applies to `/deck/:id` edit mode. API: [iterate-api.md](iterate-api.md).
 | Enter edit | **Edit deck** in label row |
 | Lock toggle | Available in view and edit mode — `PATCH` deck body |
 | Slot regen | **Regenerate** on slot heading — confirm → stay on deck view |
-| Swap | Select rows → **Swap (N)** → inline diff → stay on deck view |
-| Cancel selection | **Clear** on swap bar or exit edit mode |
+| Swap | Select rows → **Swap (N)** (center of bar) → inline diff → stay on deck view |
+| Cancel selection | **Clear** (left on swap bar) |
+| Advanced swap | **Advanced…** (right on swap bar) |
 | Loading | Disable iterate controls + footer actions while API in flight |
 | Cache | Update `mtg-deck-cache-{id}` after every successful PATCH/refill/swap |
 

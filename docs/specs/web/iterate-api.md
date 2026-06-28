@@ -75,6 +75,7 @@ Replace one or more **maindeck** cards with new picks under current `DeckCriteri
 | --- | --- | --- | --- |
 | `oracle_ids` | string[] | yes | Cards to replace (maindeck only; duplicates allowed for basics quantity) |
 | `seed` | integer | no | Reproducibility |
+| `force_validation_override` | boolean | no | **UX12** — when `true`, save deck even if post-swap validation fails; default `false` |
 
 **Behavior:**
 
@@ -95,7 +96,7 @@ Replace one or more **maindeck** cards with new picks under current `DeckCriteri
 
 | Code | When |
 | --- | --- |
-| 400 | Commander oracle_id in request; empty selection; engine cannot find replacement; validation failure |
+| 400 | Commander oracle_id in request; empty selection; engine cannot find replacement; validation failure (unless `force_validation_override`) |
 | 404 | Deck id unknown |
 
 ### Existing: `POST /api/v1/generate/from-deck`

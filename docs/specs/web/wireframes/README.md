@@ -334,7 +334,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | Lock pin | 44px tap target on row trailing edge; filled = locked |
 | Slot regen | Text **Regenerate** right-aligned on slot heading row |
 | Selection | Checkbox 44px at row start; commander block not selectable |
-| Swap bar | Sticky above footer — primary **Swap (N)** + secondary **Clear** |
+| Swap bar | Sticky above footer — **Clear** (left) · **Swap (N)** (center) · **Advanced…** (right) |
 | Diff banner | Amber info strip below commander — `Old name → New name` per swap |
 
 **Dev notes only (`.dev-note`):** `PATCH` lock; `POST …/refill-slot`; `POST …/swap` — [iterate-api.md](../iterate-api.md). No repair pass.
@@ -353,7 +353,8 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | --- | --- | --- | --- |
 | **P0** | `deck-view-advanced-swap-sheet.html` | `/deck/:id` | Bottom sheet — strategy chips, filters, cross-slot toggle, preview list, Apply |
 | **P0** | `deck-view-issue-fix-strategies.html` | `/deck/:id` | Issue expanded — strategy chips, **Fix issue…**, **Quick fix** (prototype), **Swap All** |
-| **P0** | `deck-view-named-swap.html` | `/deck/:id` | Named-card search + selected result; validation ok + error states |
+| **P0** | `deck-view-named-swap.html` | `/deck/:id` | Named-card search + selected result; validation ok + override error |
+| **P0** | `deck-view-advanced-swap-override.html` | `/deck/:id` | Validation blocked; override checkbox; Apply anyway |
 
 **In frame (product UI):**
 
@@ -366,7 +367,8 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 | Cross-slot | Expert toggle row — default off (`slot_policy: same`) |
 | Preview | Top 3–8 candidates per position after **Refresh preview** |
 | Issue actions | **Fix issue…** (primary) opens sheet; **Quick fix** purple prototype styling; **Swap All** link retained |
-| Named search | Wizard-style search input; result list; inline legal/budget validation |
+| Named search | Wizard-style search input; result list; inline legal/budget validation + override path |
+| Validation override | Checkbox gates **Apply anyway**; `force_validation_override` on retry |
 
 **Dev notes only (`.dev-note`):** `POST …/swap/preview`; `POST …/swap` with `constraints` + `replacement_oracle_id`; playbook YAML TBD in UX12a.
 

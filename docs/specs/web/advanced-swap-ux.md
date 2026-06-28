@@ -60,7 +60,9 @@ flowchart TD
 | Tier | Entry points | User cost | Engine |
 | --- | --- | --- | --- |
 | **Quick** | Row checkbox → **Swap (N)**; slot **Regenerate**; issue **Swap All** | 1–2 taps | Current `swap_deck_cards` / `refill_deck_slot` |
-| **Advanced** | **Advanced…** on swap bar; **Fix issue…** on dependency row | 3–8 taps | Extended swap/refill with `SwapConstraints` + preview |
+| **Advanced** | **Advanced…** on swap bar (right); **Fix issue…** on dependency row | 3–8 taps | Extended swap/refill with `SwapConstraints` + preview |
+
+**Swap bar layout (UX12):** **Clear** (left) · **Swap (N)** (center) · **Advanced…** (right).
 
 **Deferred entry:** **Adjust curve…** on deck metrics advisories — post-v1 UX12 slice (see [Phased delivery](#phased-delivery)).
 
@@ -96,7 +98,22 @@ Reuse deck-view filter vocabulary where possible (WUBRG pips, type chips) plus s
 | **Mechanic role** | When opened from dependency issue: Producer / Consumer / Equipment / Equip payoff / Vehicle / … | `card_effects` / profile atoms |
 | **Named card** | Autocomplete search → single `oracle_id` | Direct assignment (bypass random pick) |
 
-**Named-card mode:** When user picks a specific card, filters collapse to validation-only (CI, budget, uniqueness). If illegal, inline error before apply.
+**Named-card mode:** When user picks a specific card, filters collapse to validation-only (CI, budget, uniqueness). If illegal, inline error with optional **override** (see below).
+
+### Validation override
+
+Iterate operations normally **block** when post-swap deck validation fails (budget, color identity, strict dependencies, slot counts). Users experimenting with swaps need an explicit escape hatch.
+
+| Aspect | Spec |
+| --- | --- |
+| **Default** | `POST …/swap` / `…/refill-slot` returns **400** with `validation_errors[]` — deck not saved |
+| **Override** | User checks **Override validation and apply anyway** → retry with `force_validation_override: true` |
+| **UI** | Shown in advanced sheet and named-card flow after failed apply; same pattern for quick swap error banner (stretch) |
+| **Apply anyway** | Primary button disabled until override checkbox checked |
+| **Still blocked** | Locked card swap, commander in `oracle_ids`, empty selection, engine cannot find replacement (no pool match) |
+| **After override** | Deck saves; `dependency_report` / metrics may show warn/fail — user accepts |
+
+Wireframe: [deck-view-advanced-swap-override.html](wireframes/deck-view-advanced-swap-override.html).
 
 ### Slot regen (advanced variant)
 
@@ -199,7 +216,8 @@ Extend iterate endpoints; avoid proliferating one-off routes.
     "slot_policy": "same"
   },
   "strategy_id": "add_equipment",
-  "preview_limit": 8
+  "preview_limit": 8,
+  "force_validation_override": false
 }
 ```
 
@@ -211,6 +229,19 @@ Extend iterate endpoints; avoid proliferating one-off routes.
 | `strategy_id` | Telemetry + playbook lookup; server may validate consistency |
 | `replacement_oracle_id` | When set, direct swap if legal |
 | `preview_limit` | Preview endpoint only — max candidates per vacated position (default 8) |
+| `force_validation_override` | When `true`, persist deck even if validation fails; default `false` |
+
+**400 validation response** (when override not set):
+
+```json
+{
+  "detail": "Deck validation failed",
+  "validation_errors": [
+    { "code": "BUDGET_EXCEEDED", "message": "Deck total would be $162.40 (limit $150.00)" },
+    { "code": "COLOR_IDENTITY", "message": "Sword of Fire and Ice is not legal in Orzhov" }
+  ]
+}
+```
 
 ### `POST /api/v1/decks/{id}/swap/preview` (**v1**)
 
@@ -293,6 +324,7 @@ On dependency issue rows, a tertiary **Quick fix** button applies the playbook�
 | 3 | **Curve advisory actions** — deferred to UX12f (after dependency guided swap) |
 | 4 | **repair_dependencies** (D5) — separate future action; do not conflate with user swap |
 | 5 | **Batch strategies** across multiple issues — defer |
+| 6 | **Validation override** — `force_validation_override` on swap/refill; checkbox gates **Apply anyway** |
 
 ## Open decisions
 
@@ -309,7 +341,8 @@ On dependency issue rows, a tertiary **Quick fix** button applies the playbook�
 | --- | --- |
 | `deck-view-advanced-swap-sheet.html` | **Draft** — sheet open from swap bar; filters, cross-slot toggle, Preview + Apply |
 | `deck-view-issue-fix-strategies.html` | **Draft** — issue expanded with strategy chips, Fix issue…, Quick fix (prototype) |
-| `deck-view-named-swap.html` | **Draft** — named card search + validation states |
+| `deck-view-named-swap.html` | **Draft** — named card search + validation/override states |
+| `deck-view-advanced-swap-override.html` | **Draft** — validation blocked + override checkbox + Apply anyway |
 
 Indexed in [wireframes/index.md](wireframes/index.md). Approve P0 files before UX12b implementation.
 
