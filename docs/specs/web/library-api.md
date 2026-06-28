@@ -106,7 +106,8 @@ Response: `{ "id": "…", "name": "…", "saved_at": "…", "deck": { … } }` w
 | Topic | Phase |
 | --- | --- |
 | JSON file download | Post-UX7f |
-| Import uploaded `.deck.json` | Post-UX7f |
+| Import uploaded `.deck.json` | Post-UX7f — **IN-DECK-JSON** |
+| `POST /api/v1/decks/import` (text body) | **UX13-MVP-e** — [deck-input.md](../../product/deck-input.md) § MVP |
 | Save-as / clone / duplicate | Post-UX7f |
 
 Iterate endpoints (`refill-slot`, `swap`): [iterate-api.md](iterate-api.md) — **UX11**.

@@ -40,8 +40,19 @@ See [active.md](../roadmap/active.md) for the active backlog (dependency UX cali
 | Power level / salt | Complicated, context-dependent; not a single dial |
 | Obscure vs new null-price classification | Shipped heuristic favors obscure detection — [card-availability.md](card-availability.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` |
-| **Deck input (UX13)** | File/paste/search/voice/camera paths for loading existing lists — [deck-input.md](../specs/product/deck-input.md); backlog [product-data.md](../roadmap/backlog/product-data.md), [web-ui.md](../roadmap/backlog/web-ui.md) |
+| **Deck input (UX13)** | File/paste/search/voice/camera — [deck-input.md](../specs/product/deck-input.md); **UX13-MVP** text import active |
 | Product auth / accounts | User login, shared hosted multi-user DB — only if scope changes beyond v1 single-instance model |
+
+### UX13-MVP text import (locked 2026-06-28)
+
+| Topic | Decision |
+| --- | --- |
+| Commander | Required — `Commander` section or `--commander` |
+| Unknown names | Fail import; list unresolved lines |
+| Matching | Exact `cards.name` only in MVP |
+| Slots | `lands` for basics; `imported` otherwise |
+| Deck size | Incomplete lists OK; warnings not hard fail |
+| First surface | CLI `deck import --file` before web |
 
 ## Historical
 
