@@ -233,6 +233,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/wizard/cards/search:
+    get:
+      tags:
+      - wizard
+      summary: Wizard Cards Search
+      operationId: wizard_cards_search_api_v1_wizard_cards_search_get
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+          description: Card name substring
+          default: ''
+          title: Q
+        description: Card name substring
+      - name: colors
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          description: WUBRG color filter (subset)
+          default: []
+          title: Colors
+        description: WUBRG color filter (subset)
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 50
+          minimum: 1
+          default: 15
+          title: Limit
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardSearchResult'
+                title: Response Wizard Cards Search Api V1 Wizard Cards Search Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/wizard/rarities:
     get:
       tags:
@@ -514,8 +576,8 @@ paths:
     post:
       tags:
       - library
-      summary: Swap Deck Cards
-      operationId: swap_deck_cards_api_v1_decks__deck_id__swap_post
+      summary: Swap Deck Cards Route
+      operationId: swap_deck_cards_route_api_v1_decks__deck_id__swap_post
       parameters:
       - name: deck_id
         in: path
@@ -556,6 +618,94 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwapCardsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/decks/{deck_id}/swap/preview:
+    post:
+      tags:
+      - library
+      summary: Preview Deck Swap
+      operationId: preview_deck_swap_api_v1_decks__deck_id__swap_preview_post
+      parameters:
+      - name: deck_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Deck Id
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      - name: decks
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Saved deck library path
+          title: Decks
+        description: Saved deck library path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwapCardsRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapPreviewResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/decks/swap-playbooks/{rule_id}:
+    get:
+      tags:
+      - library
+      summary: Get Swap Playbooks
+      operationId: get_swap_playbooks_api_v1_decks_swap_playbooks__rule_id__get
+      parameters:
+      - name: rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Rule Id
+      - name: deficit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Issue detail.deficit filter
+          title: Deficit
+        description: Issue detail.deficit filter
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapPlaybooksResponse'
         '422':
           description: Validation Error
           content:
@@ -715,6 +865,51 @@ components:
       - profile_id
       - prompt_label
       title: ActivatedProfileResponse
+    CardSearchResult:
+      properties:
+        oracle_id:
+          type: string
+          title: Oracle Id
+        name:
+          type: string
+          title: Name
+        type_line:
+          type: string
+          title: Type Line
+          default: ''
+        mana_cost:
+          type: string
+          title: Mana Cost
+          default: ''
+        color_identity:
+          items:
+            type: string
+          type: array
+          title: Color Identity
+        price_usd:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Price Usd
+        price_known:
+          type: boolean
+          title: Price Known
+          default: false
+        image_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Uri
+        rarity:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Rarity
+      type: object
+      required:
+      - oracle_id
+      - name
+      title: CardSearchResult
     CommanderSearchResult:
       properties:
         oracle_id:
@@ -976,6 +1171,19 @@ components:
       - name
       - saved_at
       title: DeckLibraryEntry
+    EffectRoleConstraint:
+      properties:
+        profile_id:
+          type: string
+          title: Profile Id
+        role:
+          type: string
+          title: Role
+      type: object
+      required:
+      - profile_id
+      - role
+      title: EffectRoleConstraint
     FocusLevelOption:
       properties:
         value:
@@ -1233,86 +1441,12 @@ components:
           title: Name
         deck:
           anyOf:
-          - type: object
-            additionalProperties: true
+          - additionalProperties: true
+            type: object
           - type: 'null'
           title: Deck
       type: object
       title: PatchDeckRequest
-    RefillSlotRequest:
-      properties:
-        slot:
-          type: string
-          title: Slot
-        seed:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Seed
-      type: object
-      required:
-      - slot
-      title: RefillSlotRequest
-    SwapCardsRequest:
-      properties:
-        oracle_ids:
-          items:
-            type: string
-          type: array
-          title: Oracle Ids
-        seed:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Seed
-      type: object
-      required:
-      - oracle_ids
-      title: SwapCardsRequest
-    SwapRecordResponse:
-      properties:
-        slot:
-          type: string
-          title: Slot
-        from_oracle_id:
-          type: string
-          title: From Oracle Id
-        from_name:
-          type: string
-          title: From Name
-        to_oracle_id:
-          type: string
-          title: To Oracle Id
-        to_name:
-          type: string
-          title: To Name
-      type: object
-      required:
-      - slot
-      - from_oracle_id
-      - from_name
-      - to_oracle_id
-      - to_name
-      title: SwapRecordResponse
-    SwapCardsResponse:
-      properties:
-        id:
-          type: string
-          title: Id
-        deck:
-          type: object
-          additionalProperties: true
-          title: Deck
-        swaps:
-          items:
-            $ref: '#/components/schemas/SwapRecordResponse'
-          type: array
-          title: Swaps
-      type: object
-      required:
-      - id
-      - deck
-      title: SwapCardsResponse
     PreflightResponse:
       properties:
         warnings:
@@ -1335,6 +1469,28 @@ components:
       - id
       - label
       title: RarityChoiceResponse
+    RefillSlotRequest:
+      properties:
+        slot:
+          type: string
+          title: Slot
+        seed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Seed
+        constraints:
+          anyOf:
+          - $ref: '#/components/schemas/SwapConstraints'
+          - type: 'null'
+        force_validation_override:
+          type: boolean
+          title: Force Validation Override
+          default: false
+      type: object
+      required:
+      - slot
+      title: RefillSlotRequest
     SlotBoundsResponse:
       properties:
         min:
@@ -1389,6 +1545,217 @@ components:
       - maindeck_total
       - deck_total
       title: SlotTemplateDefaultsResponse
+    SwapCardsRequest:
+      properties:
+        oracle_ids:
+          items:
+            type: string
+          type: array
+          title: Oracle Ids
+        seed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Seed
+        constraints:
+          anyOf:
+          - $ref: '#/components/schemas/SwapConstraints'
+          - type: 'null'
+        strategy_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Strategy Id
+        preview_limit:
+          anyOf:
+          - type: integer
+            maximum: 20.0
+            minimum: 1.0
+          - type: 'null'
+          title: Preview Limit
+        force_validation_override:
+          type: boolean
+          title: Force Validation Override
+          default: false
+      type: object
+      required:
+      - oracle_ids
+      title: SwapCardsRequest
+    SwapCardsResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        deck:
+          additionalProperties: true
+          type: object
+          title: Deck
+        swaps:
+          items:
+            $ref: '#/components/schemas/SwapRecordResponse'
+          type: array
+          title: Swaps
+      type: object
+      required:
+      - id
+      - deck
+      title: SwapCardsResponse
+    SwapConstraints:
+      properties:
+        type_lines_any:
+          items:
+            type: string
+          type: array
+          title: Type Lines Any
+        type_lines_none:
+          items:
+            type: string
+          type: array
+          title: Type Lines None
+        colors_all:
+          items:
+            type: string
+          type: array
+          title: Colors All
+        rarities:
+          items:
+            type: string
+          type: array
+          title: Rarities
+        max_price_usd:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Max Price Usd
+        effect_role:
+          anyOf:
+          - $ref: '#/components/schemas/EffectRoleConstraint'
+          - type: 'null'
+        replacement_oracle_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Replacement Oracle Id
+        slot_policy:
+          type: string
+          title: Slot Policy
+          default: same
+      type: object
+      title: SwapConstraints
+    SwapPlaybooksResponse:
+      properties:
+        rule_id:
+          type: string
+          title: Rule Id
+        strategies:
+          items:
+            $ref: '#/components/schemas/SwapStrategyResponse'
+          type: array
+          title: Strategies
+      type: object
+      required:
+      - rule_id
+      title: SwapPlaybooksResponse
+    SwapPreviewCandidateResponse:
+      properties:
+        oracle_id:
+          type: string
+          title: Oracle Id
+        name:
+          type: string
+          title: Name
+        mana_cost:
+          type: string
+          title: Mana Cost
+        price_usd:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Price Usd
+        rarity:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Rarity
+      type: object
+      required:
+      - oracle_id
+      - name
+      - mana_cost
+      title: SwapPreviewCandidateResponse
+    SwapPreviewPositionResponse:
+      properties:
+        from_oracle_id:
+          type: string
+          title: From Oracle Id
+        from_name:
+          type: string
+          title: From Name
+        slot:
+          type: string
+          title: Slot
+        candidates:
+          items:
+            $ref: '#/components/schemas/SwapPreviewCandidateResponse'
+          type: array
+          title: Candidates
+      type: object
+      required:
+      - from_oracle_id
+      - from_name
+      - slot
+      title: SwapPreviewPositionResponse
+    SwapPreviewResponse:
+      properties:
+        candidates_by_position:
+          items:
+            $ref: '#/components/schemas/SwapPreviewPositionResponse'
+          type: array
+          title: Candidates By Position
+      type: object
+      title: SwapPreviewResponse
+    SwapRecordResponse:
+      properties:
+        slot:
+          type: string
+          title: Slot
+        from_oracle_id:
+          type: string
+          title: From Oracle Id
+        from_name:
+          type: string
+          title: From Name
+        to_oracle_id:
+          type: string
+          title: To Oracle Id
+        to_name:
+          type: string
+          title: To Name
+      type: object
+      required:
+      - slot
+      - from_oracle_id
+      - from_name
+      - to_oracle_id
+      - to_name
+      title: SwapRecordResponse
+    SwapStrategyResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        label:
+          type: string
+          title: Label
+        default:
+          type: boolean
+          title: Default
+          default: false
+      type: object
+      required:
+      - id
+      - label
+      title: SwapStrategyResponse
     SynergyContextResponse:
       properties:
         activated_profiles:

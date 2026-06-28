@@ -1,6 +1,6 @@
 # Web UI — deck iterate HTTP API
 
-**Status:** **UX11 shipped (2026-06-26).** Implementation: [user-experience.md](../dependency-engine/user-experience.md) § UX11.
+**Status:** **UX11 shipped (2026-06-26).** **UX12** advanced swap in progress — [advanced-swap-ux.md](advanced-swap-ux.md).
 
 Server-side iterate operations for saved library decks. The SPA does **not** call subprocess CLI; all paths use `service/` facades (same rule as generate).
 
@@ -17,20 +17,23 @@ Contract: [openapi.yaml](openapi.yaml).
 
 ---
 
-## Screen → API map (UX11)
+## Screen → API map
 
 | Route / action | Endpoints |
 | --- | --- |
 | `/deck/:id` — toggle lock | `PATCH /api/v1/decks/{id}` with updated `deck` body (lock flags only; client merges into cached deck) |
 | `/deck/:id` — slot regen | `POST /api/v1/decks/{id}/refill-slot` |
 | `/deck/:id` — swap selected | `POST /api/v1/decks/{id}/swap` |
+| `/deck/:id` — advanced swap / preview | `POST /api/v1/decks/{id}/swap` · `POST /api/v1/decks/{id}/swap/preview` |
+| `/deck/:id` — issue playbooks | `GET /api/v1/decks/swap-playbooks/{rule_id}` |
+| `/deck/:id` — named card search | `GET /api/v1/wizard/cards/search` |
 | `/deck/:id` — load | `GET /api/v1/decks/{id}` on cache miss (unchanged **UX7f**) |
 
 **DB gate:** Same as library — blocked when `db_ready` is false.
 
 ---
 
-## Planned endpoints
+## Endpoints
 
 ### `PATCH /api/v1/decks/{id}` (extend **UX7f**)
 
@@ -75,6 +78,8 @@ Replace one or more **maindeck** cards with new picks under current `DeckCriteri
 | --- | --- | --- | --- |
 | `oracle_ids` | string[] | yes | Cards to replace (maindeck only; duplicates allowed for basics quantity) |
 | `seed` | integer | no | Reproducibility |
+| `constraints` | `SwapConstraints` | no | **UX12** — type, color, rarity, price, role, named card, slot policy |
+| `strategy_id` | string | no | **UX12** — playbook preset (used when `constraints` omitted) |
 | `force_validation_override` | boolean | no | **UX12** — when `true`, save deck even if post-swap validation fails; default `false` |
 
 **Behavior:**
@@ -96,8 +101,37 @@ Replace one or more **maindeck** cards with new picks under current `DeckCriteri
 
 | Code | When |
 | --- | --- |
-| 400 | Commander oracle_id in request; empty selection; engine cannot find replacement; validation failure (unless `force_validation_override`) |
+| 400 | Commander oracle_id in request; empty selection; engine cannot find replacement; validation failure (unless `force_validation_override`) — structured `validation_errors[]` when validation fails |
 | 404 | Deck id unknown |
+
+### `POST /api/v1/decks/{id}/swap/preview` (**UX12**)
+
+Same request body as swap (including `constraints`, `strategy_id`, `preview_limit`). Returns top candidates per vacated position **without persisting**:
+
+```json
+{
+  "candidates_by_position": [
+    {
+      "from_oracle_id": "…",
+      "from_name": "…",
+      "slot": "synergy",
+      "candidates": [
+        { "oracle_id": "…", "name": "…", "mana_cost": "{2}", "price_usd": 1.5, "rarity": "uncommon" }
+      ]
+    }
+  ]
+}
+```
+
+### `GET /api/v1/decks/swap-playbooks/{rule_id}` (**UX12**)
+
+Query `deficit` optional — filters strategies by `when_deficit` in `config/swap-playbooks.yaml`.
+
+Returns `{ rule_id, strategies: [{ id, label, default }] }`.
+
+### `GET /api/v1/wizard/cards/search` (**UX12**)
+
+Named-card replacement search. Query: `q`, `colors[]`, `limit`. Commander-legal cards only.
 
 ### Existing: `POST /api/v1/generate/from-deck`
 
@@ -105,23 +139,23 @@ Replace one or more **maindeck** cards with new picks under current `DeckCriteri
 
 ---
 
-## Explicit non-goals (UX11 API)
+## Explicit non-goals
 
 | Topic | Phase |
 | --- | --- |
 | Profile package swap | UX8 / future |
-| `repair_dependencies` trigger from web | Deferred — not UX11 |
-| Full-deck regen button | **UX11b** uses slot refill only; full `from-deck` regen without slot stays CLI |
+| `repair_dependencies` trigger from web | Deferred |
+| Full-deck regen button | Slot refill only from web |
 | JSON download / import | Post-UX7f |
 | Batch iterate across multiple library decks | Out of scope |
-| Constrained / guided swap (type, role, named card) | **UX12** — [advanced-swap-ux.md](advanced-swap-ux.md) |
-| `POST …/swap/preview` (candidate preview) | **UX12** — ships in first implementation tranche |
+| Curve advisory iterate (`CURVE_*`) | **UX12f** — deferred post-v1 |
 
 ---
 
 ## References
 
-- [user-experience.md](../dependency-engine/user-experience.md) § UX11 — product decisions and slices
+- [user-experience.md](../dependency-engine/user-experience.md) § UX11 / UX12
+- [advanced-swap-ux.md](advanced-swap-ux.md) — UX12 product spec
 - [screens.md](screens.md) § Deck editor
 - [library-api.md](library-api.md) — library persistence
 - [deck-output-format.md](../../product/deck-output-format.md) — `locked` field

@@ -1,7 +1,7 @@
 # Advanced swap & guided rebalance — UX planning (UX12)
 
-**Status:** Planning (2026-06-27). **Active** — [active.md](../../roadmap/active.md). Wireframes: P0 drafts in [wireframes/](wireframes/).  
-**Phase:** Planning only — no implementation or changelog until slices ship.  
+**Status:** Implementation (2026-06-27). **Active** — [active.md](../../roadmap/active.md). Wireframes: approved in [wireframes/](wireframes/).  
+**Phase:** UX12b–e implementation in progress (UX12f deferred).  
 **Depends on:** **UX11** (shipped), **UX7d** dependency dashboard (shipped), **UX10** deck metrics (shipped).  
 **Related:** [iterate-api.md](iterate-api.md) · [user-experience.md](../dependency-engine/user-experience.md) § Understanding and swapping dependencies · [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).
 

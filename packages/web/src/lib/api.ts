@@ -127,25 +127,133 @@ export interface SwapCardsResponse {
   swaps: SwapRecord[];
 }
 
+export interface ValidationErrorItem {
+  code: string;
+  message: string;
+}
+
+export class DeckValidationError extends Error {
+  validationErrors: ValidationErrorItem[];
+
+  constructor(message: string, validationErrors: ValidationErrorItem[]) {
+    super(message);
+    this.name = "DeckValidationError";
+    this.validationErrors = validationErrors;
+  }
+}
+
+export interface EffectRoleConstraint {
+  profile_id: string;
+  role: string;
+}
+
+export interface SwapConstraints {
+  type_lines_any?: string[];
+  type_lines_none?: string[];
+  colors_all?: string[];
+  rarities?: string[];
+  max_price_usd?: number | null;
+  effect_role?: EffectRoleConstraint | null;
+  replacement_oracle_id?: string | null;
+  slot_policy?: "same" | "any";
+}
+
+export interface SwapRequestOptions {
+  seed?: number;
+  constraints?: SwapConstraints | null;
+  strategy_id?: string | null;
+  preview_limit?: number;
+  force_validation_override?: boolean;
+}
+
+export interface SwapPreviewCandidate {
+  oracle_id: string;
+  name: string;
+  mana_cost: string;
+  price_usd: number | null;
+  rarity: string | null;
+}
+
+export interface SwapPreviewPosition {
+  from_oracle_id: string;
+  from_name: string;
+  slot: string;
+  candidates: SwapPreviewCandidate[];
+}
+
+export interface SwapPreviewResponse {
+  candidates_by_position: SwapPreviewPosition[];
+}
+
+export interface SwapStrategy {
+  id: string;
+  label: string;
+  default: boolean;
+}
+
+export interface SwapPlaybooksResponse {
+  rule_id: string;
+  strategies: SwapStrategy[];
+}
+
+export interface CardSearchResult {
+  oracle_id: string;
+  name: string;
+  type_line: string;
+  mana_cost: string;
+  color_identity: string[];
+  price_usd: number | null;
+  price_known: boolean;
+  image_uri: string | null;
+  rarity: string | null;
+}
+
 export type LibrarySort = "saved_at" | "name" | "commander";
+
+function parseApiError(raw: string): Error {
+  try {
+    const parsed = JSON.parse(raw) as {
+      detail?: string | { message?: string; validation_errors?: ValidationErrorItem[]; msg?: string }[] | {
+        message?: string;
+        validation_errors?: ValidationErrorItem[];
+      };
+    };
+    const detail = parsed.detail;
+    if (typeof detail === "string") return new Error(detail);
+    if (detail && typeof detail === "object" && !Array.isArray(detail)) {
+      const message = detail.message || "Request failed";
+      if (detail.validation_errors?.length) {
+        return new DeckValidationError(message, detail.validation_errors);
+      }
+      return new Error(message);
+    }
+    if (Array.isArray(detail) && detail[0]?.msg) {
+      return new Error(detail.map((row) => row.msg).join("; "));
+    }
+  } catch {
+    /* use raw body */
+  }
+  return new Error(raw || "Request failed");
+}
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, init);
   if (!response.ok) {
     const raw = await response.text();
-    let detail = raw;
-    try {
-      const parsed = JSON.parse(raw) as { detail?: string | { msg: string }[] };
-      if (typeof parsed.detail === "string") detail = parsed.detail;
-      else if (Array.isArray(parsed.detail) && parsed.detail[0]?.msg) {
-        detail = parsed.detail.map((row) => row.msg).join("; ");
-      }
-    } catch {
-      /* use raw body */
-    }
-    throw new Error(detail || `Request failed (${response.status})`);
+    throw parseApiError(raw || `Request failed (${response.status})`);
   }
   return response.json() as Promise<T>;
+}
+
+function buildSwapBody(oracleIds: string[], options?: SwapRequestOptions): Record<string, unknown> {
+  const body: Record<string, unknown> = { oracle_ids: oracleIds };
+  if (!options) return body;
+  if (options.seed != null) body.seed = options.seed;
+  if (options.constraints) body.constraints = options.constraints;
+  if (options.strategy_id) body.strategy_id = options.strategy_id;
+  if (options.preview_limit != null) body.preview_limit = options.preview_limit;
+  if (options.force_validation_override) body.force_validation_override = true;
+  return body;
 }
 
 export function getWizardMeta(): Promise<WizardMeta> {
@@ -199,6 +307,10 @@ export function postSynergyContext(criteria: Record<string, unknown>): Promise<S
 
 export function searchCommanders(params: URLSearchParams): Promise<CommanderResult[]> {
   return fetchJson<CommanderResult[]>(`/api/v1/wizard/commanders/search?${params}`);
+}
+
+export function searchCards(params: URLSearchParams): Promise<CardSearchResult[]> {
+  return fetchJson<CardSearchResult[]>(`/api/v1/wizard/cards/search?${params}`);
 }
 
 export function getRarities(): Promise<RarityChoice[]> {
@@ -266,15 +378,34 @@ export function refillDeckSlot(
 export function swapDeckCards(
   id: string,
   oracleIds: string[],
-  seed?: number,
+  options?: SwapRequestOptions,
 ): Promise<SwapCardsResponse> {
-  const body: { oracle_ids: string[]; seed?: number } = { oracle_ids: oracleIds };
-  if (seed != null) body.seed = seed;
   return fetchJson<SwapCardsResponse>(`/api/v1/decks/${encodeURIComponent(id)}/swap`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify(buildSwapBody(oracleIds, options)),
   });
+}
+
+export function previewDeckSwap(
+  id: string,
+  oracleIds: string[],
+  options?: SwapRequestOptions,
+): Promise<SwapPreviewResponse> {
+  return fetchJson<SwapPreviewResponse>(`/api/v1/decks/${encodeURIComponent(id)}/swap/preview`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(buildSwapBody(oracleIds, options)),
+  });
+}
+
+export function getSwapPlaybooks(ruleId: string, deficit?: string): Promise<SwapPlaybooksResponse> {
+  const params = new URLSearchParams();
+  if (deficit) params.set("deficit", deficit);
+  const query = params.toString();
+  return fetchJson<SwapPlaybooksResponse>(
+    `/api/v1/decks/swap-playbooks/${encodeURIComponent(ruleId)}${query ? `?${query}` : ""}`,
+  );
 }
 
 export async function deleteDeck(id: string): Promise<void> {

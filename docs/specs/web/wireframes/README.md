@@ -347,7 +347,7 @@ Minimal set to lock layout before Svelte implementation. Behavior: [screens.md](
 
 ## UX12 wireframe scope
 
-**Status:** **P0 drafts (2026-06-27)** — [advanced-swap-ux.md](../advanced-swap-ux.md), [active.md](../../roadmap/active.md).
+**Status:** **P0 approved (2026-06-27)** — [advanced-swap-ux.md](../advanced-swap-ux.md), [active.md](../../roadmap/active.md).
 
 | Priority | File | Route | States to show |
 | --- | --- | --- | --- |

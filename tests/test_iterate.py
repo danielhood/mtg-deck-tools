@@ -9,10 +9,15 @@ import pytest
 
 from mtg_deck_tools.builder.deck import DeckCard, DeckBuildResult
 from mtg_deck_tools.builder.filler import refill_deck_slot
-from mtg_deck_tools.builder.iterate import swap_deck_cards
+from mtg_deck_tools.builder.iterate import preview_swap_deck_cards, swap_deck_cards
 from mtg_deck_tools.builder.output import build_deck_document
+from mtg_deck_tools.builder.swap_playbooks import (
+    constraints_for_strategy,
+    strategies_for_rule,
+)
 from mtg_deck_tools.db.schema import apply_schema
 from mtg_deck_tools.models.criteria import DeckCriteria
+from mtg_deck_tools.models.swap_constraints import SwapConstraints
 from mtg_deck_tools.wizard.slots import load_slot_template_config
 
 
@@ -80,6 +85,32 @@ def iterate_db() -> sqlite3.Connection:
         INSERT INTO card_mechanic_tags (oracle_id, tag, layer, source)
         VALUES ('syn-b', 'tokens', 'theme', 'test')
         """
+    )
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land,
+            edhrec_rank, price_usd, price_known, oracle_text, rarity
+        ) VALUES (?, ?, ?, '{1}', 1.0, ?, '[]', 1, 0, 0, 500, 3.0, 1, '', 'uncommon')
+        """,
+        ("equip-a", "Test Sword", "Artifact — Equipment", json.dumps(["G"])),
+    )
+    conn.execute(
+        """
+        INSERT INTO card_mechanic_tags (oracle_id, tag, layer, source)
+        VALUES ('equip-a', 'tokens', 'theme', 'test')
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land,
+            edhrec_rank, price_usd, price_known, oracle_text, rarity
+        ) VALUES (?, ?, ?, '{2}', 2.0, ?, '[]', 1, 0, 0, 800, 1.5, 1, '', 'common')
+        """,
+        ("creature-a", "Carrier Elf", "Creature — Elf", json.dumps(["G"])),
     )
     conn.commit()
     return conn
@@ -194,3 +225,89 @@ def test_swap_rejects_commander_oracle_id(iterate_db: sqlite3.Connection) -> Non
             oracle_ids=["cmd"],
             seed=1,
         )
+
+
+def test_swap_with_equipment_constraint(iterate_db: sqlite3.Connection) -> None:
+    slots = dict(load_slot_template_config().default)
+    criteria = DeckCriteria(
+        themes=["tokens"],
+        colors=["G"],
+        commander_oracle_ids=["cmd"],
+        slot_template=slots,
+        seed=5,
+    )
+    fixed = [_deck_card(oracle_id="syn-old", name="Old Card", slot="synergy")]
+    constraints = SwapConstraints(type_lines_any=["Equipment"])
+    _result, swaps = swap_deck_cards(
+        iterate_db,
+        criteria,
+        identity=["G"],
+        commander_oracle_ids=["cmd"],
+        fixed_cards=fixed,
+        oracle_ids=["syn-old"],
+        seed=5,
+        constraints=constraints,
+    )
+    assert len(swaps) == 1
+    assert swaps[0].to_name == "Test Sword"
+
+
+def test_preview_swap_returns_candidates(iterate_db: sqlite3.Connection) -> None:
+    slots = dict(load_slot_template_config().default)
+    criteria = DeckCriteria(
+        themes=["tokens"],
+        colors=["G"],
+        commander_oracle_ids=["cmd"],
+        slot_template=slots,
+        seed=2,
+    )
+    fixed = [_deck_card(oracle_id="syn-old", name="Old Card", slot="synergy")]
+    positions = preview_swap_deck_cards(
+        iterate_db,
+        criteria,
+        identity=["G"],
+        commander_oracle_ids=["cmd"],
+        fixed_cards=fixed,
+        oracle_ids=["syn-old"],
+        constraints=SwapConstraints(type_lines_any=["Equipment"]),
+        preview_limit=3,
+        seed=2,
+    )
+    assert len(positions) == 1
+    assert positions[0].from_name == "Old Card"
+    assert positions[0].candidates
+    assert positions[0].candidates[0].name == "Test Sword"
+
+
+def test_swap_playbooks_load_equipment_strategies() -> None:
+    strategies = strategies_for_rule("EQUIPMENT_BALANCE", deficit="equipment")
+    ids = {row["id"] for row in strategies}
+    assert "add_equipment" in ids
+    constraints = constraints_for_strategy("add_equipment", rule_id="EQUIPMENT_BALANCE")
+    assert constraints is not None
+    assert "Equipment" in constraints.type_lines_any
+
+
+def test_named_card_swap(iterate_db: sqlite3.Connection) -> None:
+    slots = dict(load_slot_template_config().default)
+    criteria = DeckCriteria(
+        themes=["tokens"],
+        colors=["G"],
+        commander_oracle_ids=["cmd"],
+        slot_template=slots,
+        seed=7,
+    )
+    fixed = [_deck_card(oracle_id="syn-old", name="Old Card", slot="synergy")]
+    constraints = SwapConstraints(replacement_oracle_id="equip-a")
+    _result, swaps = swap_deck_cards(
+        iterate_db,
+        criteria,
+        identity=["G"],
+        commander_oracle_ids=["cmd"],
+        fixed_cards=fixed,
+        oracle_ids=["syn-old"],
+        seed=7,
+        constraints=constraints,
+    )
+    assert swaps[0].to_oracle_id == "equip-a"
+    assert swaps[0].to_name == "Test Sword"

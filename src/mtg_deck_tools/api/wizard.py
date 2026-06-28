@@ -9,6 +9,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from mtg_deck_tools.models.criteria import DeckCriteria
 from mtg_deck_tools.service.dto import (
+    CardSearchResult,
     CommanderSearchResult,
     MechanicChoiceResponse,
     PreflightResponse,
@@ -27,6 +28,7 @@ from mtg_deck_tools.service.wizard_catalog import (
     get_wizard_themes,
     run_wizard_preflight,
     search_wizard_commanders,
+    search_wizard_cards,
 )
 
 router = APIRouter(prefix="/api/v1/wizard", tags=["wizard"])
@@ -92,6 +94,24 @@ def wizard_commanders_search(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/cards/search", response_model=list[CardSearchResult])
+def wizard_cards_search(
+    q: Annotated[str, Query(description="Card name substring")] = "",
+    colors: Annotated[list[str], Query(description="WUBRG color filter (subset)")] = [],
+    limit: Annotated[int, Query(ge=1, le=50)] = 15,
+    db: Annotated[str | None, Query(description="SQLite database path")] = None,
+) -> list[CardSearchResult]:
+    try:
+        return search_wizard_cards(
+            name_query=q,
+            colors=colors or None,
+            limit=limit,
+            db_path=Path(db) if db else None,
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @router.get("/rarities", response_model=list[RarityChoiceResponse])

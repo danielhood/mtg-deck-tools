@@ -1,4 +1,7 @@
 <script lang="ts">
+  import AdvancedSwapSheet, {
+    type AdvancedSwapIssueContext,
+  } from "../components/AdvancedSwapSheet.svelte";
   import CardLightbox from "../components/CardLightbox.svelte";
   import DeckMetricsPanel from "../components/DeckMetricsPanel.svelte";
   import DependenciesPanel from "../components/DependenciesPanel.svelte";
@@ -15,6 +18,7 @@
     refillDeckSlot,
     swapDeckCards,
     type SwapRecord,
+    type SwapRequestOptions,
   } from "../lib/api";
   import { resetDraft } from "../lib/criteria";
   import type { DeckCardPreview } from "../lib/deck-cards";
@@ -44,6 +48,7 @@
   } from "../lib/deck-view";
   import { formatTagLabel, pipMiniClass } from "../lib/format";
   import { navigate } from "../lib/router";
+  import type { DependencyIssueRow } from "../lib/dependency-report";
 
   interface Props {
     deckId: string;
@@ -72,6 +77,10 @@
   let iterateError = $state("");
   let iterateBusy = $state(false);
   let swappingIssueKey = $state<string | null>(null);
+  let fixingIssueKey = $state<string | null>(null);
+  let advancedSwapOpen = $state(false);
+  let advancedSwapIds = $state<string[]>([]);
+  let advancedSwapIssue = $state<AdvancedSwapIssueContext | null>(null);
   let regenSlot = $state<string | null>(null);
   let regenBusy = $state(false);
   let swapDiff = $state<SwapRecord[] | null>(null);
@@ -208,13 +217,48 @@
     }
   }
 
-  async function performSwap(oracleIds?: string[]): Promise<void> {
+  const advancedSwapNames = $derived(
+    advancedSwapIds
+      .map((id) => parsed?.cards.find((card) => card.oracle_id === id)?.name ?? id)
+      .filter(Boolean),
+  );
+  const deckColors = $derived(parsed?.filterOptions.colors ?? commander?.color_identity ?? []);
+
+  function openAdvancedSwap(
+    oracleIds: string[],
+    issue: AdvancedSwapIssueContext | null = null,
+  ): void {
+    advancedSwapIds = oracleIds;
+    advancedSwapIssue = issue;
+    advancedSwapOpen = true;
+    iterateError = "";
+  }
+
+  function closeAdvancedSwap(): void {
+    advancedSwapOpen = false;
+    advancedSwapIssue = null;
+    fixingIssueKey = null;
+  }
+
+  function applyAdvancedSwap(deck: Record<string, unknown>, swaps: SwapRecord[]): void {
+    applyDeckUpdate(deck);
+    swapDiff = swaps;
+    newCardIds = new Set(swaps.map((row) => row.to_oracle_id));
+    selectedIds = new Set();
+    swappingIssueKey = null;
+    scrollDeckViewToTop();
+  }
+
+  async function performSwap(
+    oracleIds?: string[],
+    options?: SwapRequestOptions,
+  ): Promise<void> {
     const targets = oracleIds ?? [...selectedIds];
     if (!targets.length || iterateBusy) return;
     iterateBusy = true;
     iterateError = "";
     try {
-      const response = await swapDeckCards(deckId, targets);
+      const response = await swapDeckCards(deckId, targets, options);
       applyDeckUpdate(response.deck);
       swapDiff = response.swaps;
       newCardIds = new Set(response.swaps.map((row) => row.to_oracle_id));
@@ -231,6 +275,30 @@
   async function swapIssueCards(oracleIds: string[], issueKey: string): Promise<void> {
     swappingIssueKey = issueKey;
     await performSwap(oracleIds);
+  }
+
+  function fixIssue(
+    oracleIds: string[],
+    issue: DependencyIssueRow,
+    strategyId: string | null,
+  ): void {
+    fixingIssueKey = `${issue.rule_id}:${issue.message}`;
+    openAdvancedSwap(oracleIds, {
+      ruleId: issue.rule_id,
+      ruleLabel: issue.rule_label,
+      deficit: typeof issue.detail.deficit === "string" ? issue.detail.deficit : null,
+      strategyId,
+    });
+  }
+
+  async function quickFixIssue(
+    oracleIds: string[],
+    issue: DependencyIssueRow,
+    strategyId: string | null,
+  ): Promise<void> {
+    if (!strategyId || !oracleIds.length) return;
+    swappingIssueKey = `${issue.rule_id}:${issue.message}`;
+    await performSwap(oracleIds, { strategy_id: strategyId });
   }
 
   function openRename(): void {
@@ -398,8 +466,11 @@
       cards={parsed.cards}
       swapBusy={iterateBusy}
       swappingIssueKey={swappingIssueKey}
+      fixingIssueKey={fixingIssueKey}
       onShowInDeck={(oracleId) => showInDeck(oracleId)}
       onSwapAll={(oracleIds, issueKey) => void swapIssueCards(oracleIds, issueKey)}
+      onFixIssue={fixIssue}
+      onQuickFix={(oracleIds, issue, strategyId) => void quickFixIssue(oracleIds, issue, strategyId)}
     />
 
     <section class="deck-filters" aria-label="Filters">
@@ -557,6 +628,9 @@
 
   {#if selectionCount > 0}
     <div class="swap-bar" role="toolbar" aria-label="Swap selected cards">
+      <button type="button" class="btn-clear" disabled={iterateBusy} onclick={clearSelection}>
+        Clear
+      </button>
       <button
         type="button"
         class="btn-swap"
@@ -565,11 +639,27 @@
       >
         {iterateBusy ? "Swapping…" : `Swap (${selectionCount})`}
       </button>
-      <button type="button" class="btn-clear" disabled={iterateBusy} onclick={clearSelection}>
-        Clear
+      <button
+        type="button"
+        class="btn-advanced"
+        disabled={iterateBusy}
+        onclick={() => openAdvancedSwap([...selectedIds])}
+      >
+        Advanced…
       </button>
     </div>
   {/if}
+
+  <AdvancedSwapSheet
+    open={advancedSwapOpen}
+    deckId={deckId}
+    oracleIds={advancedSwapIds}
+    cardNames={advancedSwapNames}
+    deckColors={deckColors}
+    issue={advancedSwapIssue}
+    onclose={closeAdvancedSwap}
+    onapplied={applyAdvancedSwap}
+  />
 
   <div class="deck-footer deck-footer-stack" class:deck-footer-with-swap={selectionCount > 0}>
     <button class="btn btn-primary" type="button" onclick={buildAnother}>Build another deck</button>
