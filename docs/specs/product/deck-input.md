@@ -1,28 +1,47 @@
 # Deck input — planning (UX13)
 
-**Status:** **UX13-MVP shipped** (2026-06-28) — text import via CLI and API. **Active** backlog: [web-ui.md](../../roadmap/backlog/web-ui.md) § UX13 (paste/upload).  
-**Phase:** MVP text import shipped; web UI slices remain backlog.  
+**Status:** **UX13-MVP** + **UX13b** shipped (2026-06-28). **Active:** **UX13c** import preview — [active.md](../../roadmap/active.md).  
 **Depends on:** **UX7f** library (shipped), **UX11** editor (shipped).  
 **Related:** [deck-output-format.md](deck-output-format.md) · [library-api.md](../web/library-api.md) · [user-experience.md](../dependency-engine/user-experience.md).
 
 ---
 
-## Problem
+## Shipped summary (2026-06-28)
 
-Today the builder assumes a **generated** deck: wizard criteria → slot fill → save to library. Users who already have a physical pile, a spreadsheet, a text export from another site, or a `.deck.json` from a prior session have **no first-class path** to load that list into the editor for dependency review, metrics, or guided rebalance.
+| Layer | Deliverable |
+| --- | --- |
+| **Parser** | `deck_import/parse_text.py` — Commander/Deck sections, quantities, comments |
+| **Resolver** | Exact `cards.name` match; fail on unknown or ambiguous |
+| **Builder** | Library `.deck.json` with `imported`/`lands` slots, metrics, `dependency_report` |
+| **CLI** | `mtg-deck-tools deck import --file` (`--commander`, `--name`) |
+| **API** | `POST /api/v1/decks/import` |
+| **Web** | Home — paste textarea, file upload, template download → deck view |
 
-Card **database** import (`POST /api/v1/import`) is unrelated — this feature is **deck list** intake.
+**Gap today:** paste/upload commits immediately. Exact-name matching fails on typos and duplicate-name collisions with no recovery UI.
 
 ---
 
-## User goals
+## Roadmap analysis (post–UX13b)
 
-| Goal | Example |
-| --- | --- |
-| **Analyze an existing list** | “I built this on Moxfield — show me dependency gaps.” |
-| **Continue editing** | “I have 60 cards picked — fill the rest under my criteria.” |
-| **Partial import** | “Here are my commanders and a wishlist — slot the remainder.” |
-| **Physical → digital** | “I’m at the table with a pile of cards — get them into the app quickly.” |
+Recommended priority for remaining deck-input work:
+
+| Priority | ID | Topic | Rationale |
+| --- | --- | --- | --- |
+| **1 — active** | **UX13c** | Import preview | Small scope; immediate payoff on shipped paste/upload; no save until user confirms |
+| **2** | Resolver v2 | Fuzzy match + disambiguation | Biggest quality jump for real lists; unlocks **UX13a** search-by-name |
+| **3** | **IN-DECK-JSON** | `.deck.json` upload | Reload saved decks without retyping |
+| **4** | Import + fill | Lock imported cards → generate remainder | Addresses “continue editing” goal (**UX11** locks) |
+| **5** | **IN-DECK-SHEET** / **UX13d** | CSV spreadsheet | After text path stable |
+| **6** | **IN-DECK-EXT** | Site-specific parsers | Moxfield plaintext may already work via text grammar |
+| **7** | **UX13e/f** | Voice / camera | Experimental; after resolver UX solid |
+
+**Not planned:** sideboard/companion, live Scryfall lookup, partial save with placeholders, batch multi-deck import.
+
+---
+
+## Problem
+
+Users need to load an **existing deck** into the builder for dependency review, metrics, and guided rebalance (**UX12**). Card **database** import (`POST /api/v1/import`) is unrelated.
 
 ---
 
@@ -32,47 +51,42 @@ Card **database** import (`POST /api/v1/import`) is unrelated — this feature i
 flowchart LR
   subgraph files [File & paste]
     TXT[Plain text list]
-    CSV[Spreadsheet CSV/XLSX]
+    CSV[Spreadsheet CSV]
     JSON[.deck.json]
     EXT[Third-party exports]
   end
 
   subgraph interactive [Interactive UI]
     SEARCH[Search by name]
-    PASTE[Bulk paste area]
+    PASTE[Paste + preview]
     VOICE[Voice input]
     SCAN[Camera scan]
   end
 
   files --> PARSE[Parse & normalize names]
   interactive --> PARSE
-  PARSE --> RESOLVE[Resolve to oracle_id]
-  RESOLVE --> REVIEW[Ambiguity review]
-  REVIEW --> DECK[Deck skeleton in library]
+  PARSE --> PREVIEW[Preview resolve status]
+  PREVIEW --> RESOLVE[Resolve to oracle_id]
+  RESOLVE --> DECK[Deck skeleton in library]
   DECK --> EDIT[UX11 editor / UX12 rebalance]
 ```
 
 ---
 
-## MVP text import — locked decisions (UX13-MVP)
+## MVP text import — shipped (UX13-MVP + UX13b)
 
-First slice: **plain-text file** → library deck via **CLI**, then API/web. Promoted IDs: **IN-DECK-TEXT**, **IN-DECK-RESOLVE**, **CLI-IN**.
+Promoted IDs: **IN-DECK-TEXT**, **IN-DECK-RESOLVE**, **CLI-IN**, **UX13b**.
 
-### Product decisions
+### Locked decisions (still apply)
 
 | Topic | Decision |
 | --- | --- |
-| **Commander** | **Required.** `Commander` section header + name line, or CLI `--commander "Name"` when the file has no commander block. Partner: second line under `Commander` or repeat `--commander`. |
-| **Unknown names** | **Fail** the import with a list of unresolved lines. No partial save in MVP. |
-| **Name matching** | **Exact match** on `cards.name` only. No fuzzy match or disambiguation UI in MVP. Multiple DB rows with the same name → fail that line as **ambiguous**. |
-| **DFC / split cards** | Match oracle bulk **front-face** name as stored in `cards.db` (user supplies front name only). |
-| **Slot assignment** | `slot: "lands"` for basic lands (`is_basic_land = 1`); `slot: "imported"` for all other maindeck cards. |
-| **Quantities** | Honor `1x`, `14`, `Swamp x14`, etc. Basic lands may have `quantity > 1`. Non-basic with `quantity > 1` → **warning** on deck document; still import. |
-| **Deck size** | **Incomplete lists allowed** (&lt; 99 maindeck). Do **not** call `require_valid_deck()` on import; attach validation **warnings** when size or singleton rules fail. |
-| **Dependency / metrics** | **Run** `validate_dependencies()` and `compute_deck_metrics()` on the imported list; persist `dependency_report` and `stats` like a generated deck. |
-| **Entry surface** | **CLI first:** `mtg-deck-tools deck import --file PATH [--name LABEL] [--commander NAME]`. API `POST /api/v1/decks/import` and web paste/upload follow the same `service/` facade. |
-| **Library** | Always **save** to server library (`save_deck_to_library`); print deck `id` on success. |
-| **Criteria** | Minimal `DeckCriteria`: `commander_oracle_ids`, `colors` from commander CI, default `slot_template`, no themes/mechanics unless later import+fill flow. |
+| **Commander** | Required — `Commander` section or CLI/API `commanders` / `--commander` |
+| **Unknown names** | Fail import with unresolved line list (no partial save) |
+| **Name matching** | Exact `cards.name` only (preview uses same resolver) |
+| **Slots** | `lands` for basics; `imported` otherwise |
+| **Deck size** | Incomplete lists OK; validation warnings, not hard fail on import |
+| **Web entry** | Home — paste, file upload, template download |
 
 ### Text grammar (IN-DECK-TEXT)
 
@@ -85,106 +99,110 @@ Deck
 1 Sol Ring
 14 Swamp
 Forest x13
-# sideboard notes ignored
 ```
 
-| Rule | Detail |
+See [changelog](../../history/changelog.md) 2026-06-28 for ship record.
+
+### MVP slices
+
+| Slice | Status |
 | --- | --- |
-| Sections | Optional headers: `Commander`, `Deck` (case-insensitive). Lines before first header → `Deck`. |
-| Comments | Lines starting with `#` ignored. |
-| Blank lines | Ignored. |
-| Quantity | Optional prefix `Nx`, `N x`, or suffix `x N` (N integer). Default quantity 1. |
-| Sideboard | `Sideboard` header recognized but **ignored** (out of scope Commander v1). |
+| UX13-MVP-a … UX13-MVP-e | Shipped |
+| UX13-MVP-f / **UX13b** (web paste + file + template) | Shipped |
 
-### Resolution pipeline (IN-DECK-RESOLVE)
+---
 
+## Import preview — active (UX13c)
+
+**Goal:** Parse and resolve without saving. User reviews line-level status, then commits only when the preview is clean.
+
+### Product decisions (locked 2026-06-28)
+
+| Topic | Decision |
+| --- | --- |
+| **Save** | Preview **never** writes to library |
+| **Pipeline** | Same `parse_text` + `resolve` as `import_deck_from_text`; skip `build` + `save_deck_to_library` |
+| **Commit gate** | **Import** enabled only when `unknown_count = 0` and `ambiguous_count = 0` |
+| **UI flow** | Home import section: **Preview** → results panel → **Import pasted list** (or auto-preview on file load — implementation choice; minimum is explicit Preview button) |
+| **Line table** | Per line: line number, input name, status (`resolved` \| `unknown` \| `ambiguous`), resolved card name when ok |
+| **Summary** | Counts: commanders, maindeck lines, resolved, unknown, ambiguous |
+| **Errors** | Unknown/ambiguous lines listed with line numbers (same messages as failed import) |
+| **API** | `POST /api/v1/decks/import/preview` — body same as import (`text`, optional `commanders`); response preview DTO only |
+| **CLI** | `deck import --file PATH --dry-run` prints summary table; exit non-zero if unresolved (optional slice UX13c-d) |
+| **Fuzzy / disambiguation** | **Out of scope** for UX13c — preview shows failures; resolver v2 is a later promotion |
+
+### Preview response sketch
+
+```json
+{
+  "commanders": [{ "input_name": "Meren of Clan Nel Toth", "status": "resolved", "name": "Meren of Clan Nel Toth", "oracle_id": "…" }],
+  "maindeck": [
+    { "line_number": 6, "input_name": "Sol Ring", "quantity": 1, "status": "resolved", "name": "Sol Ring", "oracle_id": "…" },
+    { "line_number": 7, "input_name": "Not A Card", "quantity": 1, "status": "unknown" }
+  ],
+  "summary": {
+    "commander_count": 1,
+    "maindeck_line_count": 2,
+    "resolved_count": 1,
+    "unknown_count": 1,
+    "ambiguous_count": 0,
+    "ready": false
+  }
+}
 ```
-trim → exact SELECT … WHERE name = ? → 0 rows: unknown
-                                    → 1 row: resolve
-                                    → 2+ rows: ambiguous
-```
-
-Commanders: `commander_eligible = 1` filter in addition to name match. Maindeck: any commander-legal card in `cards`.
-
-Reuse patterns from `builder/commander_resolve.resolve_commander_oracle_ids` and `pool._row_to_candidate` column set when building `DeckCard` entries.
 
 ### Implementation modules (planned)
 
 | Module | Responsibility |
 | --- | --- |
-| `deck_import/parse_text.py` | Text → `ParsedDeckList` (commanders, maindeck lines with qty) |
-| `deck_import/resolve.py` | Name → card row; `ResolveError` with unknown/ambiguous lists |
-| `deck_import/build.py` | Resolved rows → `DeckBuildResult` → `build_deck_document()` |
-| `service/deck_import.py` | Facade: `import_deck_from_text()` → `DeckLibraryDetailResponse` |
-| `cli/main.py` | `deck import` typer command |
+| `service/deck_import.py` | `preview_deck_import(text, …)` → preview DTO |
+| `service/dto.py` | `ImportDeckPreviewRequest` (reuse import body), `ImportDeckPreviewResponse`, line items |
+| `api/library.py` | `POST /api/v1/decks/import/preview` |
+| `packages/web/…/HomePage.svelte` | Preview UI + gated Import |
+| `cli/main.py` | `--dry-run` on `deck import` (optional) |
 
-### MVP slices
+### UX13c slices
 
 | Slice | Deliverable | Status |
 | --- | --- | --- |
-| **UX13-MVP-a** | Locked decisions + promotion (this doc) | Planning shipped |
-| **UX13-MVP-b** | `parse_text` + unit tests | Shipped |
-| **UX13-MVP-c** | `resolve` + `build` + `service/deck_import` | Shipped |
-| **UX13-MVP-d** | CLI `deck import --file` | Shipped |
-| **UX13-MVP-e** | `POST /api/v1/decks/import` + OpenAPI | Shipped |
-| **UX13-MVP-f** | Web paste / file upload (**UX13b**) | Shipped — template download + `.txt` upload on home |
+| **UX13c-a** | Planning + promotion | Planning shipped |
+| **UX13c-b** | Preview service + API + OpenAPI | Pending |
+| **UX13c-c** | Home preview UI | Pending |
+| **UX13c-d** | CLI `--dry-run` | Pending |
 
-**Parallel OK with:** doc-only, **GATE** (no engine rule changes). **Not parallel** with concurrent edits to `service/library.py` validation without coordination.
-
-### Out of scope (MVP)
-
-- Fuzzy search, printing picker, placeholder cards
-- CSV, `.deck.json` upload, Moxfield-specific parsers
-- Import + auto-fill remainder (separate future flow using UX11 locks)
-- Web UI, voice, camera
+**Parallel OK with:** doc-only, **GATE**. **Depends on:** UX13-MVP resolver (shipped).
 
 ---
 
-## File & structured formats (post-MVP)
+## Backlog (not active)
 
-### Plain text list (IN-DECK-TEXT)
+### Resolver v2 (fuzzy + disambiguation)
 
-See **MVP text grammar** above. Bulk paste in web uses the same grammar (**UX13b**).
-
-### Spreadsheet (IN-DECK-SHEET)
-
-| Column (minimal) | Required | Notes |
-| --- | --- | --- |
-| `name` | yes | Card name as printed |
-| `quantity` | no | Default 1 |
-| `section` | no | `commander` \| `main` |
-
-**Formats:** CSV first; XLSX later. UTF-8.
-
-### Native `.deck.json` (IN-DECK-JSON)
-
-Validate `schema_version`; hydrate library; re-resolve stale `oracle_id` after bulk refresh. See [library-api.md](../web/library-api.md).
-
-### Third-party deck files (IN-DECK-EXT)
-
-| Source | Format | Priority |
-| --- | --- | --- |
-| Moxfield / Archidekt | Plaintext export | P1 — same grammar as MVP text |
-| MTGO | `.dek` XML | P2 |
-| Arena | Copy-paste | P2 |
-
-**Decision:** MVP is **plaintext only**; site-specific parsers deferred until after CLI dogfood.
-
----
-
-## Interactive UI methods (backlog)
+Exact match limitations: typos, punctuation, multiple DB rows per name. Enables **UX13a** search-by-name and richer preview/disambiguation UI. Promote after **UX13c** ships.
 
 ### Search by name (UX13a)
 
-Typeahead against `cards.db` — commander search and **UX12e** named-card swap family. Disambiguation sheet when fuzzy ships.
+Typeahead add-card on deck view / import flow. Depends on resolver v2 for disambiguation.
 
-### Bulk paste (UX13b)
+### Spreadsheet (IN-DECK-SHEET / UX13d)
 
-Textarea + parse preview; same grammar as MVP. **After** CLI/API facade exists.
+CSV columns: `name`, `quantity`, `section`. UTF-8 first.
 
-### Voice input (UX13e) / Camera scan (UX13f)
+### Native `.deck.json` (IN-DECK-JSON)
 
-Experimental mobile; **backlog only** until text import is stable. No feature flag in MVP.
+Validate `schema_version`; hydrate library; re-resolve stale `oracle_id`.
+
+### Third-party exports (IN-DECK-EXT)
+
+Moxfield/Archidekt plaintext (P1 — may work today); MTGO `.dek`, Arena (P2).
+
+### Import + fill (future)
+
+Lock imported cards → wizard/generate fills remainder (**UX11** locks).
+
+### Voice (UX13e) / Camera (UX13f)
+
+Experimental mobile; backlog until text + resolver UX stable.
 
 ---
 
@@ -192,23 +210,22 @@ Experimental mobile; **backlog only** until text import is stable. No feature fl
 
 | Mode | Behavior |
 | --- | --- |
-| **List-only import (MVP)** | `cards[]` with `slot: "imported"` or `"lands"`; metrics + dependency report populated |
-| **Import + fill (future)** | Lock imported cards → generate / refill remainder |
-| **Library** | New `id`; opens in deck view when using web |
-
-Persisted document: [deck-output-format.md](deck-output-format.md) `.deck.json`.
+| **List-only import** | `cards[]` with `slot: "imported"` or `"lands"`; metrics + dependency report |
+| **Import + fill (future)** | Locked imports → generate / refill remainder |
+| **Library** | New `id`; deck view after commit |
 
 ---
 
 ## Resolved / open questions
 
-| # | Question | MVP answer |
+| # | Question | Answer |
 | --- | --- | --- |
-| 1 | Import entry (web) | **Deferred** — CLI first; library “Import” button when **UX13b** promotes |
-| 2 | Commander required? | **Yes** (section or `--commander`) |
-| 3 | Per-site parsers? | **No** — plaintext grammar only |
-| 4 | Voice/camera? | **Backlog** — not in MVP |
-| 5 | Import + auto-fill? | **Separate flow** — MVP is list-only analyze/edit |
+| 1 | Web import entry | **Home** (shipped **UX13b**) |
+| 2 | Commander required? | **Yes** |
+| 3 | Preview before save? | **Yes** — **UX13c** active |
+| 4 | Per-site parsers? | **Deferred** — plaintext grammar first |
+| 5 | Import + auto-fill? | **Separate flow** — backlog |
+| 6 | Fuzzy in preview? | **No** — resolver v2 later |
 
 ---
 
@@ -223,7 +240,8 @@ Persisted document: [deck-output-format.md](deck-output-format.md) `.deck.json`.
 
 ## References
 
-- [deck-output-format.md](deck-output-format.md) — persisted schema
-- [library-api.md](../web/library-api.md) — library HTTP API
-- [iterate-api.md](../web/iterate-api.md) — post-import editing
-- [active.md](../../roadmap/active.md) — **UX13-MVP** register
+- [deck-output-format.md](deck-output-format.md)
+- [library-api.md](../web/library-api.md)
+- [iterate-api.md](../web/iterate-api.md)
+- [active.md](../../roadmap/active.md) — **UX13c**
+- [backlog/web-ui.md](../../roadmap/backlog/web-ui.md)

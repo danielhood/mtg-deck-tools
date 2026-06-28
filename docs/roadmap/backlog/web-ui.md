@@ -8,28 +8,29 @@ Specs: [specs/web/README.md](../../specs/web/README.md) · [architecture.md](../
 
 ## Up next
 
-*No promoted rows — **UX13-MVP** text import shipped; web paste (**UX13b**) in backlog below.*
+*No promoted rows — **UX13c** import preview active in [active.md](../active.md).*
 
 ---
 
 ## Deck input — existing lists (UX13)
 
-Load a deck the user already has (file, paste, or interactive capture) into the library and editor. Cross-format parsers: [deck-input.md](../../specs/product/deck-input.md).
+Cross-format parsers: [deck-input.md](../../specs/product/deck-input.md).
 
-**Active:** text file import (**UX13-MVP**) — CLI first; web paste/upload below follows API.
+**Shipped:** **UX13-MVP** (CLI/API/parser), **UX13b** (home paste + file + template).
+
+**Active:** **UX13c** import preview — [active.md](../active.md).
 
 | ID | Topic | Notes | Spec |
 | --- | --- | --- | --- |
-| **UX13** | Deck input (umbrella) | Home import shipped; further UX13 slices below | [deck-input.md](../../specs/product/deck-input.md) |
-| UX13a | Search by name | Typeahead add-card; disambiguation when fuzzy ships | [deck-input.md](../../specs/product/deck-input.md) § Search |
-| UX13b | Bulk paste + file upload | **Shipped** — home template download + `.txt` upload | [deck-input.md](../../specs/product/deck-input.md) |
-| UX13c | Spreadsheet upload UI | CSV (XLSX later); column mapping step | [deck-input.md](../../specs/product/deck-input.md) § Spreadsheet |
-| UX13e | Voice input (mobile) | Web Speech API → confirm matches; experimental | [deck-input.md](../../specs/product/deck-input.md) § Voice |
-| UX13f | Camera scan (mobile) | Per-card recognition spike; on-device preferred | [deck-input.md](../../specs/product/deck-input.md) § Camera |
+| **UX13** | Deck input (umbrella) | See roadmap analysis in deck-input.md | [deck-input.md](../../specs/product/deck-input.md) |
+| UX13a | Search by name | Typeahead add-card; after resolver v2 | [deck-input.md](../../specs/product/deck-input.md) § Search |
+| UX13d | Spreadsheet upload UI | CSV (XLSX later); was UX13c before preview promotion | [deck-input.md](../../specs/product/deck-input.md) § Spreadsheet |
+| UX13e | Voice input (mobile) | Web Speech API; experimental | [deck-input.md](../../specs/product/deck-input.md) § Voice |
+| UX13f | Camera scan (mobile) | Per-card recognition spike | [deck-input.md](../../specs/product/deck-input.md) § Camera |
 
-**Depends on:** **UX13-MVP** service + API. **After:** **UX13a** before voice/camera (**UX13e/f**).
+**Depends on:** **UX13c** ships before spreadsheet UI. **UX13a** after resolver v2.
 
-**Deferred wireframes:** import hub, paste preview, disambiguation list, mobile capture bar — add under [wireframes/README.md](../../specs/web/wireframes/README.md) when promoted.
+**Deferred wireframes:** import preview panel, disambiguation list, mobile capture bar — [wireframes/README.md](../../specs/web/wireframes/README.md) when promoted.
 
 ---
 

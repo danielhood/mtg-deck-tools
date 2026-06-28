@@ -10,11 +10,11 @@ Promote to [active.md](../active.md) before starting. **Index:** [backlog/README
 
 Users need ways to load an **existing deck** into the builder — not Scryfall oracle bulk (`import`), but **deck list** intake.
 
-**Shipped:** **UX13-MVP** text import (CLI + API). Remaining formats below.
+**Shipped:** **UX13-MVP** (CLI/API/parser), **UX13b** (home paste/file/template). **Active:** **UX13c** preview — [active.md](../active.md).
 
 | ID | Topic | Notes | Spec |
 | --- | --- | --- | --- |
-| IN-DECK-SHEET | Spreadsheet CSV / XLSX | Columns: name, qty, section; UTF-8 CSV first | [deck-input.md](../../specs/product/deck-input.md) § Spreadsheet |
+| IN-DECK-SHEET | Spreadsheet CSV / XLSX | Web **UX13d**; UTF-8 CSV first | [deck-input.md](../../specs/product/deck-input.md) § Spreadsheet |
 | IN-DECK-JSON | Upload `.deck.json` | Validates schema; library entry; re-resolve stale `oracle_id` after bulk refresh | [deck-input.md](../../specs/product/deck-input.md) · [library-api.md](../../specs/web/library-api.md) |
 | IN-DECK-EXT | Third-party deck exports | Moxfield/Archidekt plaintext P1; MTGO `.dek`, Arena P2+ | [deck-input.md](../../specs/product/deck-input.md) § Third-party |
 

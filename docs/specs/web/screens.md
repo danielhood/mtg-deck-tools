@@ -19,7 +19,7 @@ CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md)
 | Build new deck | → `/build/1` when DB ready; disabled when blocked |
 | View last deck | → `/deck/:id` for most recently saved library deck (**UX7f**); hidden when library empty |
 | Saved library | → `/library` when DB ready (**UX7f**) |
-| Import deck | **UX13b** — paste deck list, **Download template**, or **Choose text file** → `POST /api/v1/decks/import` → `/deck/:id` when DB ready |
+| Import deck | **UX13b** shipped — paste, **Download template**, or **Choose text file**; **UX13c** active — **Preview** (`POST /api/v1/decks/import/preview`) → line table → gated **Import** (`POST /api/v1/decks/import`) → `/deck/:id` when DB ready |
 
 **API:** `GET /health`, `GET /api/v1/wizard/meta` (or `GET /api/v1/stats` for DB probe). See [wizard-api.md](wizard-api.md).
 
@@ -218,7 +218,7 @@ Decisions and slices: [user-experience.md](../dependency-engine/user-experience.
 | Search | Filter by user label, commander name, themes |
 | Sort | `saved_at` (default newest), name, commander |
 | Open | Tap entire library card → load deck into session cache → `/deck/:id` |
-| Import | **UX13b** — **Download template** or **Choose text file** → `POST /api/v1/decks/import` → `/deck/:id` |
+| Import | **Home only** (**UX13b**); library import deferred |
 | Rename | **Deck view only** — pencil beside deck label → modal; `PATCH /api/v1/decks/{id}` |
 | Delete | **Deck view only** — footer **Delete deck** → confirm modal — **no actions on library cards** |
 | Empty state | CTA to **Build new deck** or **Import text file** when library empty |
