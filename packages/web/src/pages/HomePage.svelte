@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { importDeckFromText, listDecks } from "../lib/api";
   import type { WizardMeta } from "../lib/api";
-  import { listDecks } from "../lib/api";
   import DbBanner from "../components/DbBanner.svelte";
   import LoadingState from "../components/LoadingState.svelte";
   import { cacheDeck } from "../lib/deck-cache";
   import { IMPORT_BUSY_LEAD, IMPORT_BUSY_NOTE, REFRESH_CONFIRM_MESSAGE, runCardImport } from "../lib/card-import";
+  import { downloadDeckImportTemplate } from "../lib/deck-import-template";
   import { resetDraft } from "../lib/criteria";
   import { navigate } from "../lib/router";
 
@@ -21,8 +22,11 @@
   let importError = $state("");
   let progressMessage = $state(IMPORT_BUSY_LEAD);
   let refreshConfirmOpen = $state(false);
+  let deckImporting = $state(false);
+  let deckImportError = $state("");
+  let deckFileInput = $state<HTMLInputElement | null>(null);
 
-  const actionsDisabled = $derived(!meta.db_ready || importing);
+  const actionsDisabled = $derived(!meta.db_ready || importing || deckImporting);
 
   $effect(() => {
     if (importing) refreshConfirmOpen = false;
@@ -99,6 +103,37 @@
       navigate("/library");
     }
   }
+
+  function openDeckFilePicker(): void {
+    if (deckImporting || importing || !meta.db_ready) return;
+    deckImportError = "";
+    deckFileInput?.click();
+  }
+
+  async function onDeckFileSelected(event: Event): Promise<void> {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    deckImporting = true;
+    deckImportError = "";
+    try {
+      const text = await file.text();
+      const detail = await importDeckFromText({ text });
+      cacheDeck({
+        id: detail.id,
+        name: detail.name,
+        deck: detail.deck,
+        returnTo: "/",
+      });
+      navigate(`/deck/${detail.id}`);
+    } catch (err) {
+      deckImportError = err instanceof Error ? err.message : "Import failed.";
+    } finally {
+      deckImporting = false;
+      input.value = "";
+    }
+  }
 </script>
 
 <DbBanner
@@ -156,6 +191,46 @@
     </button>
   {/if}
 </section>
+
+{#if meta.db_ready}
+  <section class="deck-import-section" aria-label="Import deck from text file">
+    <p class="future-label">Import existing deck</p>
+    <p class="deck-import-copy">
+      Upload a plain-text list of card names. Download the template for the expected format.
+    </p>
+    <div class="deck-import-actions">
+      <button
+        class="btn btn-secondary"
+        type="button"
+        onclick={downloadDeckImportTemplate}
+        disabled={actionsDisabled}
+      >
+        Download template
+      </button>
+      <button
+        class="btn btn-secondary"
+        type="button"
+        onclick={openDeckFilePicker}
+        disabled={actionsDisabled}
+        aria-busy={deckImporting}
+      >
+        {deckImporting ? "Importing…" : "Import text file…"}
+      </button>
+      <input
+        bind:this={deckFileInput}
+        class="deck-import-file"
+        type="file"
+        accept=".txt,text/plain"
+        onchange={(event) => void onDeckFileSelected(event)}
+        aria-hidden="true"
+        tabindex="-1"
+      />
+    </div>
+    {#if deckImportError}
+      <p class="deck-import-error" role="alert">{deckImportError}</p>
+    {/if}
+  </section>
+{/if}
 
 {#if meta.db_ready && libraryReady && !latestDeckId}
   <section class="future-section">
@@ -228,6 +303,50 @@
 
   .actions .btn-secondary {
     width: 100%;
+  }
+
+  .deck-import-section {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .deck-import-copy {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  .deck-import-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .deck-import-actions .btn {
+    width: 100%;
+  }
+
+  .deck-import-file {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .deck-import-error {
+    margin: 0;
+    font-size: 12px;
+    color: var(--red-700, #b91c1c);
   }
 
   .btn-hint {
