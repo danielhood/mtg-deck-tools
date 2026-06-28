@@ -1,6 +1,6 @@
 # Deck input — planning (UX13)
 
-**Status:** **UX13-MVP** + **UX13b** shipped (2026-06-28). **Active:** **UX13c** import preview — [active.md](../../roadmap/active.md).  
+**Status:** **UX13-MVP** + **UX13b** + **UX13c** shipped (2026-06-28). Next: resolver v2 — [backlog/web-ui.md](../../roadmap/backlog/web-ui.md).  
 **Depends on:** **UX7f** library (shipped), **UX11** editor (shipped).  
 **Related:** [deck-output-format.md](deck-output-format.md) · [library-api.md](../web/library-api.md) · [user-experience.md](../dependency-engine/user-experience.md).
 
@@ -15,9 +15,9 @@
 | **Builder** | Library `.deck.json` with `imported`/`lands` slots, metrics, `dependency_report` |
 | **CLI** | `mtg-deck-tools deck import --file` (`--commander`, `--name`) |
 | **API** | `POST /api/v1/decks/import` |
-| **Web** | Home — paste textarea, file upload, template download → deck view |
+| **Web** | Home — paste, file upload, template download, **Preview** → gated import |
 
-**Gap today:** paste/upload commits immediately. Exact-name matching fails on typos and duplicate-name collisions with no recovery UI.
+**Gap today:** exact-name matching fails on typos and duplicate-name collisions; preview shows failures but resolver v2 is needed for recovery.
 
 ---
 
@@ -27,13 +27,12 @@ Recommended priority for remaining deck-input work:
 
 | Priority | ID | Topic | Rationale |
 | --- | --- | --- | --- |
-| **1 — active** | **UX13c** | Import preview | Small scope; immediate payoff on shipped paste/upload; no save until user confirms |
-| **2** | Resolver v2 | Fuzzy match + disambiguation | Biggest quality jump for real lists; unlocks **UX13a** search-by-name |
-| **3** | **IN-DECK-JSON** | `.deck.json` upload | Reload saved decks without retyping |
-| **4** | Import + fill | Lock imported cards → generate remainder | Addresses “continue editing” goal (**UX11** locks) |
-| **5** | **IN-DECK-SHEET** / **UX13d** | CSV spreadsheet | After text path stable |
-| **6** | **IN-DECK-EXT** | Site-specific parsers | Moxfield plaintext may already work via text grammar |
-| **7** | **UX13e/f** | Voice / camera | Experimental; after resolver UX solid |
+| **1** | Resolver v2 | Fuzzy match + disambiguation | Biggest quality jump for real lists; unlocks **UX13a** search-by-name |
+| **2** | **IN-DECK-JSON** | `.deck.json` upload | Reload saved decks without retyping |
+| **3** | Import + fill | Lock imported cards → generate remainder | Addresses “continue editing” goal (**UX11** locks) |
+| **4** | **IN-DECK-SHEET** / **UX13d** | CSV spreadsheet | After text path stable |
+| **5** | **IN-DECK-EXT** | Site-specific parsers | Moxfield plaintext may already work via text grammar |
+| **6** | **UX13e/f** | Voice / camera | Experimental; after resolver UX solid |
 
 **Not planned:** sideboard/companion, live Scryfall lookup, partial save with placeholders, batch multi-deck import.
 
@@ -112,7 +111,7 @@ See [changelog](../../history/changelog.md) 2026-06-28 for ship record.
 
 ---
 
-## Import preview — active (UX13c)
+## Import preview — shipped (UX13c)
 
 **Goal:** Parse and resolve without saving. User reviews line-level status, then commits only when the preview is clean.
 
@@ -165,10 +164,10 @@ See [changelog](../../history/changelog.md) 2026-06-28 for ship record.
 
 | Slice | Deliverable | Status |
 | --- | --- | --- |
-| **UX13c-a** | Planning + promotion | Planning shipped |
-| **UX13c-b** | Preview service + API + OpenAPI | Pending |
-| **UX13c-c** | Home preview UI | Pending |
-| **UX13c-d** | CLI `--dry-run` | Pending |
+| **UX13c-a** | Planning + promotion | Shipped |
+| **UX13c-b** | Preview service + API + OpenAPI | Shipped |
+| **UX13c-c** | Home preview UI | Shipped |
+| **UX13c-d** | CLI `--dry-run` | Shipped |
 
 **Parallel OK with:** doc-only, **GATE**. **Depends on:** UX13-MVP resolver (shipped).
 
@@ -222,7 +221,7 @@ Experimental mobile; backlog until text + resolver UX stable.
 | --- | --- | --- |
 | 1 | Web import entry | **Home** (shipped **UX13b**) |
 | 2 | Commander required? | **Yes** |
-| 3 | Preview before save? | **Yes** — **UX13c** active |
+| 3 | Preview before save? | **Yes** — **UX13c** shipped |
 | 4 | Per-site parsers? | **Deferred** — plaintext grammar first |
 | 5 | Import + auto-fill? | **Separate flow** — backlog |
 | 6 | Fuzzy in preview? | **No** — resolver v2 later |
@@ -243,5 +242,5 @@ Experimental mobile; backlog until text + resolver UX stable.
 - [deck-output-format.md](deck-output-format.md)
 - [library-api.md](../web/library-api.md)
 - [iterate-api.md](../web/iterate-api.md)
-- [active.md](../../roadmap/active.md) — **UX13c**
+- [active.md](../../roadmap/active.md)
 - [backlog/web-ui.md](../../roadmap/backlog/web-ui.md)

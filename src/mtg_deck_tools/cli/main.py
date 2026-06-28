@@ -32,7 +32,8 @@ from mtg_deck_tools.service import (
     ensure_cards_database,
     run_interactive_wizard,
 )
-from mtg_deck_tools.service.deck_import import import_deck_from_text
+from mtg_deck_tools.service.deck_import import import_deck_from_text, preview_deck_import
+from mtg_deck_tools.service.dto import ImportDeckPreviewResponse
 
 app = typer.Typer(
     name="mtg-deck-tools",
@@ -555,6 +556,46 @@ deck_app = typer.Typer(
 app.add_typer(deck_app, name="deck")
 
 
+def _print_deck_import_preview(preview: ImportDeckPreviewResponse) -> None:
+    table = Table(title="Deck import preview")
+    table.add_column("Section", style="cyan")
+    table.add_column("Line")
+    table.add_column("Input")
+    table.add_column("Qty")
+    table.add_column("Status")
+    table.add_column("Resolved name")
+
+    for line in preview.commanders:
+        table.add_row(
+            "Commander",
+            "—",
+            line.input_name,
+            "—",
+            line.status,
+            line.name or "—",
+        )
+    for line in preview.maindeck:
+        table.add_row(
+            "Deck",
+            str(line.line_number or "—"),
+            line.input_name,
+            str(line.quantity or "—"),
+            line.status,
+            line.name or "—",
+        )
+    console.print(table)
+
+    summary = preview.summary
+    console.print(
+        "[dim]"
+        f"Resolved {summary.resolved_count}; "
+        f"unknown {summary.unknown_count}; "
+        f"ambiguous {summary.ambiguous_count}; "
+        f"ready={'yes' if summary.ready else 'no'}"
+        "[/dim]",
+    )
+
+
 @deck_app.command("import")
 def deck_import_cmd(
     file: Annotated[
@@ -572,20 +613,37 @@ def deck_import_cmd(
             help="Commander name when the file has no Commander section (repeat for partners)",
         ),
     ] = None,
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run", help="Parse and resolve without saving to the library"),
+    ] = False,
     db_path: Annotated[Optional[Path], typer.Option("--db", help="SQLite database path")] = None,
 ) -> None:
     """Import a plain-text deck list into the saved deck library."""
     try:
         text = file.read_text(encoding="utf-8")
-        result = import_deck_from_text(
-            text,
-            name=name,
-            commander_names=commander,
-            db_path=db_path,
-        )
+        if dry_run:
+            preview = preview_deck_import(
+                text,
+                commander_names=commander,
+                db_path=db_path,
+            )
+        else:
+            result = import_deck_from_text(
+                text,
+                name=name,
+                commander_names=commander,
+                db_path=db_path,
+            )
     except (FileNotFoundError, ValueError) as exc:
         console.print(f"[red]Import failed:[/red] {exc}")
         raise typer.Exit(1) from exc
+
+    if dry_run:
+        _print_deck_import_preview(preview)
+        if not preview.summary.ready:
+            raise typer.Exit(1)
+        return
 
     console.print(f"[green]Imported[/green] {result.name} (id={result.id})")
 

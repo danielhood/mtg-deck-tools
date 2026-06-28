@@ -124,6 +124,32 @@ class ImportDeckRequest(BaseModel):
     )
 
 
+class ImportDeckPreviewLineItem(BaseModel):
+    input_name: str
+    status: str
+    line_number: int | None = None
+    quantity: int | None = None
+    name: str | None = None
+    oracle_id: str | None = None
+
+
+class ImportDeckPreviewSummary(BaseModel):
+    commander_count: int
+    maindeck_line_count: int
+    resolved_count: int
+    unknown_count: int
+    ambiguous_count: int
+    ready: bool
+
+
+class ImportDeckPreviewResponse(BaseModel):
+    """Parse + resolve preview without saving (UX13c)."""
+
+    commanders: list[ImportDeckPreviewLineItem]
+    maindeck: list[ImportDeckPreviewLineItem]
+    summary: ImportDeckPreviewSummary
+
+
 class RefillSlotRequest(BaseModel):
     slot: str
     seed: int | None = None

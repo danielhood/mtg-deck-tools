@@ -13,7 +13,11 @@ from mtg_deck_tools.service.dto import (
     ImportResponse,
     PatchDeckRequest,
 )
-from mtg_deck_tools.service.deck_import import import_deck_from_text
+from mtg_deck_tools.service.deck_import import import_deck_from_text, preview_deck_import
+from mtg_deck_tools.service.dto import (
+    ImportDeckPreviewResponse,
+    ImportDeckRequest,
+)
 from mtg_deck_tools.service.generate import (
     GenerateResult,
     generate_deck,
@@ -50,6 +54,7 @@ __all__ = [
     "GenerateResponse",
     "GenerateResult",
     "HealthResponse",
+    "ImportDeckPreviewResponse",
     "ImportDeckRequest",
     "ImportRequest",
     "ImportResponse",
@@ -62,6 +67,7 @@ __all__ = [
     "ensure_cards_database",
     "get_library_deck",
     "import_deck_from_text",
+    "preview_deck_import",
     "import_oracle_cards",
     "list_library_decks",
     "patch_library_deck",

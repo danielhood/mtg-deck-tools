@@ -37,7 +37,7 @@ Service facades live in `src/mtg_deck_tools/service/`; handlers in `src/mtg_deck
 | `/` | `GET /api/v1/decks?limit=1` (or dedicated “latest”) for **View last deck** |
 | `/build/review` | `POST /api/v1/generate` — auto-persists new library entry |
 | `/` | `POST /api/v1/decks/import` (**UX13-MVP**; **UX13b** home paste/file) |
-| `/` | `POST /api/v1/decks/import/preview` (**UX13c** active — resolve without save) |
+| `/` | `POST /api/v1/decks/import/preview` (**UX13c** shipped — resolve without save) |
 | `/library` | `GET /api/v1/decks` (list, search, sort) |
 | `/library` | `PATCH /api/v1/decks/{id}` (rename — invoked from deck view only) |
 | `/library` | `DELETE /api/v1/decks/{id}` |
@@ -62,7 +62,7 @@ Iterate detail: [iterate-api.md](iterate-api.md).
 | PATCH | `/api/v1/decks/{id}` | Update metadata (rename `name`); **UX11** — in-place `deck` body (lock toggles) |
 | DELETE | `/api/v1/decks/{id}` | Remove from library |
 | POST | `/api/v1/decks/import` | **UX13-MVP shipped** — import plain-text list → new library entry |
-| POST | `/api/v1/decks/import/preview` | **UX13c active** — parse + resolve without save; same body as import |
+| POST | `/api/v1/decks/import/preview` | **UX13c shipped** — parse + resolve without save; same body as import |
 | POST | `/api/v1/generate` | **Existing** — extended to auto-save new deck (new UUID) and return `id` + `deck` |
 
 ### `POST /api/v1/decks/import` (UX13-MVP)
@@ -77,7 +77,7 @@ Request body:
 
 Response: `DeckLibraryDetailResponse` (`id`, `name`, `saved_at`, `deck`). `400` when names are unknown/ambiguous or commander missing.
 
-### `POST /api/v1/decks/import/preview` (UX13c — planned)
+### `POST /api/v1/decks/import/preview` (UX13c — shipped)
 
 Request body: same as `POST /api/v1/decks/import` (`text`, optional `name`, `commanders`).
 

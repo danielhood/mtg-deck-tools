@@ -241,6 +241,7 @@ python scripts/export_openapi.py
 | `POST` | `/api/v1/generate` | Build deck from `DeckCriteria` + flags; response includes `.deck.json` document |
 | `POST` | `/api/v1/generate/from-deck` | Regenerate from `deck_path` or inline `deck` object |
 | `POST` | `/api/v1/decks/import` | Import plain-text deck list → saved library entry (`text`, optional `name` / `commanders`) |
+| `POST` | `/api/v1/decks/import/preview` | Preview parse + resolve without saving (`text`, optional `commanders`) |
 
 ### Quick checks
 
@@ -277,6 +278,7 @@ mtg-deck-tools generate --seed 42 --colors G --themes tokens
 # Import an existing plain-text deck list into the saved library
 mtg-deck-tools deck import --file my-deck.txt
 mtg-deck-tools deck import --file partial.txt --commander "Meren of Clan Nel Toth"
+mtg-deck-tools deck import --file my-deck.txt --dry-run
 
 # Full wizard: themes, mechanics, synergy controls, colors, budget, commander, rarity
 mtg-deck-tools wizard
@@ -306,7 +308,7 @@ mtg-deck-tools generate --stub --seed 42 --colors B,G --themes aristocrats
 | `dependency-audit` | Scan DB → dependency reports (pattern hits, profiles, tutor predicates, review queue) |
 | `wizard` | Interactive wizard (7 steps + criteria preflight): themes, mechanics, synergy/dependency controls, colors, budget & per-card prices, commander (color + price filters), rarity; after **step 2 onward** and at preflight you can **re-run** the step you just finished, **go back** to an earlier step (downstream steps re-run automatically), or at preflight **re-run criteria review**; step 1 advances directly to step 2; end-of-wizard **criteria linter** warns on conflicting include/avoid, focus vs avoid, heavy theme pairs, and over-constrained budget before showing the summary (criteria only; does not write a deck) |
 | `generate` | Build a 99-card maindeck plus commander metadata → `output/*.deck.json` and `output/*.md` |
-| `deck import` | Import a plain-text card list (`--file`) into the saved deck library; optional `--name` and `--commander` (repeat for partners) |
+| `deck import` | Import a plain-text card list (`--file`) into the saved deck library; optional `--name`, `--commander` (repeat for partners), and `--dry-run` (preview resolve without saving) |
 
 ### `deck import` — plain-text format
 

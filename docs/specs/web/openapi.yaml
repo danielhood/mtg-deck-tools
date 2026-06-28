@@ -428,6 +428,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/decks/import/preview:
+    post:
+      tags:
+      - library
+      summary: Preview Deck Import
+      operationId: preview_deck_import_api_v1_decks_import_preview_post
+      parameters:
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportDeckRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportDeckPreviewResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/decks/{deck_id}:
     get:
       tags:
@@ -1445,6 +1481,89 @@ components:
       - text
       title: ImportDeckRequest
       description: Plain-text deck list import (UX13-MVP).
+    ImportDeckPreviewLineItem:
+      properties:
+        input_name:
+          type: string
+          title: Input Name
+        status:
+          type: string
+          title: Status
+        line_number:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Line Number
+        quantity:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Quantity
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        oracle_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Oracle Id
+      type: object
+      required:
+      - input_name
+      - status
+      title: ImportDeckPreviewLineItem
+    ImportDeckPreviewSummary:
+      properties:
+        commander_count:
+          type: integer
+          title: Commander Count
+        maindeck_line_count:
+          type: integer
+          title: Maindeck Line Count
+        resolved_count:
+          type: integer
+          title: Resolved Count
+        unknown_count:
+          type: integer
+          title: Unknown Count
+        ambiguous_count:
+          type: integer
+          title: Ambiguous Count
+        ready:
+          type: boolean
+          title: Ready
+      type: object
+      required:
+      - commander_count
+      - maindeck_line_count
+      - resolved_count
+      - unknown_count
+      - ambiguous_count
+      - ready
+      title: ImportDeckPreviewSummary
+    ImportDeckPreviewResponse:
+      properties:
+        commanders:
+          items:
+            $ref: '#/components/schemas/ImportDeckPreviewLineItem'
+          type: array
+          title: Commanders
+        maindeck:
+          items:
+            $ref: '#/components/schemas/ImportDeckPreviewLineItem'
+          type: array
+          title: Maindeck
+        summary:
+          $ref: '#/components/schemas/ImportDeckPreviewSummary'
+      type: object
+      required:
+      - commanders
+      - maindeck
+      - summary
+      title: ImportDeckPreviewResponse
+      description: Parse + resolve preview without saving (UX13c).
     ImportRequest:
       properties:
         json_path:

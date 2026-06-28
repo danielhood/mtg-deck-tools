@@ -16,7 +16,10 @@ from fastapi.testclient import TestClient  # noqa: E402
 from mtg_deck_tools.api.app import create_app  # noqa: E402
 from mtg_deck_tools.db.schema import apply_schema  # noqa: E402
 from mtg_deck_tools.deck_import.resolve import ResolveError  # noqa: E402
-from mtg_deck_tools.service.deck_import import import_deck_from_text  # noqa: E402
+from mtg_deck_tools.service.deck_import import (  # noqa: E402
+    import_deck_from_text,
+    preview_deck_import,
+)
 
 
 def _insert_card(
@@ -203,3 +206,50 @@ def test_api_import_deck(import_env: tuple[Path, Path]) -> None:
     body = response.json()
     assert body["id"]
     assert body["deck"]["cards"]
+
+
+def test_preview_deck_import_clean(import_env: tuple[Path, Path]) -> None:
+    cards_db, _ = import_env
+    preview = preview_deck_import(SAMPLE_TEXT, db_path=cards_db)
+    assert preview.summary.ready is True
+    assert preview.summary.unknown_count == 0
+    assert preview.summary.ambiguous_count == 0
+    assert preview.summary.commander_count == 1
+    assert preview.summary.maindeck_line_count == 3
+    assert preview.commanders[0].status == "resolved"
+    assert preview.maindeck[0].name == "Grave Pact"
+
+
+def test_preview_deck_import_unknown(import_env: tuple[Path, Path]) -> None:
+    cards_db, _ = import_env
+    text = """
+    Commander
+    Meren of Clan Nel Toth
+
+    Deck
+    Not A Real Card
+    """
+    preview = preview_deck_import(text, db_path=cards_db)
+    assert preview.summary.ready is False
+    assert preview.summary.unknown_count == 1
+    assert preview.maindeck[0].status == "unknown"
+
+
+def test_preview_does_not_save(import_env: tuple[Path, Path]) -> None:
+    cards_db, decks_db = import_env
+    preview_deck_import(SAMPLE_TEXT, db_path=cards_db)
+    assert not decks_db.exists()
+
+
+def test_api_preview_deck(import_env: tuple[Path, Path]) -> None:
+    cards_db, _ = import_env
+    client = TestClient(create_app())
+    response = client.post(
+        "/api/v1/decks/import/preview",
+        json={"text": SAMPLE_TEXT},
+        params={"db": str(cards_db)},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["summary"]["ready"] is True
+    assert len(body["maindeck"]) == 3

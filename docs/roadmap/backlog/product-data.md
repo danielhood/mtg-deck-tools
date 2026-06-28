@@ -10,7 +10,7 @@ Promote to [active.md](../active.md) before starting. **Index:** [backlog/README
 
 Users need ways to load an **existing deck** into the builder — not Scryfall oracle bulk (`import`), but **deck list** intake.
 
-**Shipped:** **UX13-MVP** (CLI/API/parser), **UX13b** (home paste/file/template). **Active:** **UX13c** preview — [active.md](../active.md).
+**Shipped:** **UX13-MVP** (CLI/API/parser), **UX13b** (home paste/file/template), **UX13c** (preview).
 
 | ID | Topic | Notes | Spec |
 | --- | --- | --- | --- |

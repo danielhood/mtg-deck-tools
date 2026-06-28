@@ -40,7 +40,7 @@ See [active.md](../roadmap/active.md) for the active backlog (dependency UX cali
 | Power level / salt | Complicated, context-dependent; not a single dial |
 | Obscure vs new null-price classification | Shipped heuristic favors obscure detection — [card-availability.md](card-availability.md) |
 | Moxfield / Archidekt export | Translate from `.deck.json` |
-| **Deck input (UX13)** | **UX13-MVP shipped** — CLI `deck import` + `POST /api/v1/decks/import`; web paste/upload in backlog |
+| **Deck input (UX13)** | **UX13-MVP** + **UX13b** + **UX13c** shipped — CLI/API import + preview; home paste/file/template + gated import |
 | Product auth / accounts | User login, shared hosted multi-user DB — only if scope changes beyond v1 single-instance model |
 
 ### UX13-MVP text import (locked 2026-06-28)
