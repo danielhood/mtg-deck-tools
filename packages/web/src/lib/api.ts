@@ -162,6 +162,7 @@ export interface SwapRequestOptions {
   seed?: number;
   constraints?: SwapConstraints | null;
   strategy_id?: string | null;
+  rule_id?: string | null;
   preview_limit?: number;
   force_validation_override?: boolean;
 }
@@ -251,6 +252,7 @@ function buildSwapBody(oracleIds: string[], options?: SwapRequestOptions): Recor
   if (options.seed != null) body.seed = options.seed;
   if (options.constraints) body.constraints = options.constraints;
   if (options.strategy_id) body.strategy_id = options.strategy_id;
+  if (options.rule_id) body.rule_id = options.rule_id;
   if (options.preview_limit != null) body.preview_limit = options.preview_limit;
   if (options.force_validation_override) body.force_validation_override = true;
   return body;

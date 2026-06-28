@@ -67,7 +67,7 @@
   }
 
   function swapTargets(issue: DependencyIssueRow): string[] {
-    return issueSwapOracleIds(issue, cards);
+    return issueSwapOracleIds(issue, cards, strategyForIssue(issue));
   }
 
   async function ensurePlaybooks(issue: DependencyIssueRow): Promise<void> {

@@ -131,12 +131,13 @@ def append_equipment_balance(
                 status=severity,
                 message=msg,
                 profile_id="equipment",
-                detail={
-                    "equipment": equipment_count,
-                    "carriers": carrier_count,
-                    "equip_payoffs": equip_payoffs,
-                    "deficit": "equipment",
-                },
+                    detail={
+                        "equipment": equipment_count,
+                        "carriers": carrier_count,
+                        "equip_payoffs": equip_payoffs,
+                        "equipment_cards": equipment_cards,
+                        "deficit": "equipment",
+                    },
             )
         )
     elif check:
@@ -158,6 +159,7 @@ def append_equipment_balance(
                         "carriers": carrier_count,
                         "equipment_minimum": equipment_min,
                         "carrier_minimum": carrier_min,
+                        "equipment_cards": equipment_cards,
                         "deficit": "equipment",
                     },
                 )
@@ -180,6 +182,7 @@ def append_equipment_balance(
                         "carriers": carrier_count,
                         "equipment_minimum": equipment_min,
                         "carrier_minimum": carrier_min,
+                        "equipment_cards": equipment_cards,
                         "deficit": "carriers",
                     },
                 )

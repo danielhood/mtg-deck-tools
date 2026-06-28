@@ -298,7 +298,7 @@
   ): Promise<void> {
     if (!strategyId || !oracleIds.length) return;
     swappingIssueKey = `${issue.rule_id}:${issue.message}`;
-    await performSwap(oracleIds, { strategy_id: strategyId });
+    await performSwap(oracleIds, { strategy_id: strategyId, rule_id: issue.rule_id });
   }
 
   function openRename(): void {

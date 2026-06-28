@@ -125,6 +125,7 @@ class SwapCardsRequest(BaseModel):
     seed: int | None = None
     constraints: SwapConstraints | None = None
     strategy_id: str | None = None
+    rule_id: str | None = None
     preview_limit: int | None = Field(default=None, ge=1, le=20)
     force_validation_override: bool = False
 

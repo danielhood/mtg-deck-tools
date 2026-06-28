@@ -175,6 +175,7 @@
     return {
       constraints,
       strategy_id: constraints ? undefined : strategyId ?? undefined,
+      rule_id: issue?.ruleId,
       force_validation_override: force || forceOverride,
       preview_limit: 8,
     };

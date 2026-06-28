@@ -608,7 +608,11 @@ def validate_dependencies(
                     f"(e.g. \"whenever you create a token\")."
                 ),
                 profile_id="tokens",
-                detail={"producers": token_producers, "payoffs": []},
+                detail={
+                    "producers": token_producers,
+                    "payoffs": [],
+                    "deficit": "consumers",
+                },
             )
         )
     elif token_warn and token_payoffs and not token_producers:
@@ -620,7 +624,11 @@ def validate_dependencies(
                     f"Deck has {len(token_payoffs)} token payoff(s) but no cards that create tokens."
                 ),
                 profile_id="tokens",
-                detail={"producers": [], "payoffs": token_payoffs},
+                detail={
+                    "producers": [],
+                    "payoffs": token_payoffs,
+                    "deficit": "producers",
+                },
             )
         )
     report.profiles.append(

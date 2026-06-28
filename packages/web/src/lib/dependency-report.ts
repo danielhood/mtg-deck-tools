@@ -96,6 +96,8 @@ const DETAIL_LIST_KEYS = new Set([
   "payoffs",
   "mill_enabler",
   "graveyard_payoff",
+  "equipment_cards",
+  "equip_payoffs",
 ]);
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -164,10 +166,12 @@ export function formatReviewSummary(count: number): string {
 export function issueSwapOracleIds(
   issue: DependencyIssueRow,
   cards: IssueSwapCard[],
+  strategyId?: string | null,
 ): string[] {
   const nameListKeys = [
     ...DETAIL_LIST_KEYS,
     "equip_payoffs",
+    "equipment_cards",
     "tutor",
   ] as const;
 
@@ -192,7 +196,67 @@ export function issueSwapOracleIds(
     const card = cards.find((row) => row.name === name);
     if (card && !card.locked) ids.push(card.oracle_id);
   }
-  return [...new Set(ids)];
+  const unique = [...new Set(ids)];
+  if (unique.length) return unique;
+
+  return issueSwapFallbackTargets(issue, cards, strategyId);
+}
+
+const ISSUE_SWAP_FLEX_SLOTS = new Set(["flex", "synergy"]);
+const ISSUE_SWAP_FALLBACK_LIMIT = 3;
+
+function unlockedIssueCards(cards: IssueSwapCard[]): IssueSwapCard[] {
+  return cards.filter((card) => !card.locked);
+}
+
+function flexSlotTargets(cards: IssueSwapCard[], limit = ISSUE_SWAP_FALLBACK_LIMIT): string[] {
+  return unlockedIssueCards(cards)
+    .filter((card) => card.slot != null && ISSUE_SWAP_FLEX_SLOTS.has(card.slot))
+    .slice(0, limit)
+    .map((card) => card.oracle_id);
+}
+
+function equipmentTypeTargets(cards: IssueSwapCard[]): string[] {
+  return unlockedIssueCards(cards)
+    .filter((card) => (card.type_line ?? "").includes("Equipment"))
+    .map((card) => card.oracle_id);
+}
+
+function vehicleTypeTargets(cards: IssueSwapCard[]): string[] {
+  return unlockedIssueCards(cards)
+    .filter((card) => (card.type_line ?? "").includes("Vehicle"))
+    .map((card) => card.oracle_id);
+}
+
+/** Heuristic vacate targets when the issue detail has counts but no card names. */
+export function issueSwapFallbackTargets(
+  issue: DependencyIssueRow,
+  cards: IssueSwapCard[],
+  strategyId?: string | null,
+): string[] {
+  const deficit = issueDeficit(issue);
+
+  if (issue.rule_id === "EQUIPMENT_BALANCE") {
+    if (strategyId === "trim_equipment") {
+      const equipment = equipmentTypeTargets(cards);
+      if (equipment.length) return equipment;
+    }
+    return flexSlotTargets(cards);
+  }
+
+  if (issue.rule_id === "VEHICLE_BALANCE") {
+    if (strategyId === "add_pilots" || deficit === "creatures") {
+      const vehicles = vehicleTypeTargets(cards);
+      if (vehicles.length) return vehicles.slice(0, ISSUE_SWAP_FALLBACK_LIMIT);
+    }
+    return flexSlotTargets(cards);
+  }
+
+  if (issue.rule_id === "TOKEN_BALANCE" || issue.rule_id === "ENERGY_BALANCE") {
+    return flexSlotTargets(cards);
+  }
+
+  return [];
 }
 
 /** UX12 playbook-backed dependency rules. */
@@ -212,6 +276,8 @@ export interface IssueSwapCard {
   oracle_id: string;
   name: string;
   locked: boolean;
+  slot?: string;
+  type_line?: string;
 }
 
 export function buildDetailBlocks(detail: Record<string, unknown>): DetailBlock[] {
