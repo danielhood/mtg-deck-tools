@@ -260,14 +260,23 @@
 </script>
 
 {#if open}
-  <div class="swap-sheet-scrim" role="presentation" onclick={onclose}>
+  <div
+    class="swap-sheet-scrim"
+    role="presentation"
+    tabindex="-1"
+    onclick={(event) => {
+      if (event.target === event.currentTarget) onclose();
+    }}
+    onkeydown={(event) => {
+      if (event.key === "Escape") onclose();
+    }}
+  >
     <div
       class="swap-sheet"
       role="dialog"
       aria-labelledby="advanced-swap-title"
       aria-modal="true"
       tabindex="-1"
-      onclick={(event) => event.stopPropagation()}
     >
       <div class="swap-sheet-handle" aria-hidden="true"></div>
       <header class="swap-sheet-header">
