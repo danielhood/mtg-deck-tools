@@ -46,6 +46,7 @@ Summary:
 Reuse existing product specs — do not fork schemas in the frontend:
 
 - [deck-output-format.md](../../product/deck-output-format.md) — `.deck.json`, metrics (UX10a–c), lock/swap fields (UX11)
+- [deck-input.md](../../product/deck-input.md) — **planning** — existing deck intake (UX13)
 - [user-experience.md](../dependency-engine/user-experience.md) — wizard flow, UX7c scope, UX roadmap
 - [backlog/web-ui.md](../../roadmap/backlog/web-ui.md) — post-MVP web backlog (UX10/UX11 shipped)
 

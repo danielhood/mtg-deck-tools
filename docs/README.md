@@ -45,6 +45,7 @@ docs/
 | [goals-and-scope.md](product/goals-and-scope.md) | v1 scope, success criteria |
 | [open-questions.md](product/open-questions.md) | Product decisions |
 | [deck-output-format.md](product/deck-output-format.md) | `.deck.json` + Markdown |
+| [deck-input.md](product/deck-input.md) | **Planning** — import existing deck lists (UX13) |
 | [card-availability.md](product/card-availability.md) | Budget / availability |
 
 ## Architecture
