@@ -382,6 +382,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/decks/import:
+    post:
+      tags:
+      - library
+      summary: Import Deck
+      operationId: import_deck_api_v1_decks_import_post
+      parameters:
+      - name: db
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: SQLite database path
+          title: Db
+        description: SQLite database path
+      - name: decks
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Saved deck library path
+          title: Decks
+        description: Saved deck library path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportDeckRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeckLibraryDetailResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/decks/{deck_id}:
     get:
       tags:
@@ -1376,6 +1422,29 @@ components:
       required:
       - version
       title: HealthResponse
+    ImportDeckRequest:
+      properties:
+        text:
+          type: string
+          title: Text
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        commanders:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Commanders
+          description: Commander name(s) when the text omits a Commander section
+      type: object
+      required:
+      - text
+      title: ImportDeckRequest
+      description: Plain-text deck list import (UX13-MVP).
     ImportRequest:
       properties:
         json_path:

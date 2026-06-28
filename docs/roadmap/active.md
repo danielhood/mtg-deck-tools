@@ -10,12 +10,11 @@
 
 | Priority | What | Why now |
 | --- | --- | --- |
-| **UX13-MVP** | Text deck import (CLI first) | Decisions locked; unblocks existing-list analyze/edit |
 | **UX12** | Advanced swap & guided rebalance | Implementation complete — dogfood + ship |
 | **ENG-MAINT** | Engine profile tuning | As needed when touching dependency rules or dogfood matrix |
 | **GATE** | Dogfood gate | Required after any engine change |
 
-**Primary thread:** **UX13-MVP** — parser, resolver, `deck import --file` ([deck-input.md](../specs/product/deck-input.md) § MVP).
+**Primary thread:** **UX12** ship / dogfood — or promote next backlog item from [backlog/](backlog/).
 
 ---
 
@@ -23,24 +22,11 @@
 
 | ID | Component | Task | Status | Depends on | Parallel OK with |
 | --- | --- | --- | --- | --- | --- |
-| **UX13-MVP** | product-data + cli-ui | Text deck import — **IN-DECK-TEXT**, **IN-DECK-RESOLVE**, **CLI-IN**; CLI `deck import --file` then API | Planning locked | **UX7f**, **UX11** (shipped) | doc-only, GATE |
 | **UX12** | web-ui | Advanced swap & guided rebalance — constraints, preview, issue playbooks, named card; Quick fix prototype | Implementation complete — dogfood + ship | **UX11** (shipped) | doc-only, ENG-MAINT |
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | doc-only, dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
 **Not active:** cli-engine expansion (P7 remainder, new profiles); cli-ui UX8; product-data export; UX13 web paste/upload — promote from [backlog/](backlog/) before starting.
-
-### UX13-MVP slices
-
-| Slice | Deliverable | Status |
-| --- | --- | --- |
-| **UX13-MVP-a** | Locked decisions + promotion | Planning shipped |
-| **UX13-MVP-b** | `deck_import/parse_text.py` + tests | Pending |
-| **UX13-MVP-c** | `resolve` + `build` + `service/deck_import` | Pending |
-| **UX13-MVP-d** | CLI `deck import --file` | Pending |
-| **UX13-MVP-e** | `POST /api/v1/decks/import` + OpenAPI | Pending |
-
-Spec: [deck-input.md](../specs/product/deck-input.md) § MVP text import.
 
 ### UX12 slices
 
@@ -62,10 +48,9 @@ Spec: [advanced-swap-ux.md](../specs/web/advanced-swap-ux.md) · Wireframes: [wi
 
 | Stream | Component | Safe in parallel with |
 | --- | --- | --- |
-| A — UX13-MVP deck import | product-data, cli-ui, service | doc-only, GATE |
-| B — UX12 ship / dogfood | web-ui | doc-only |
-| C — Engine maintenance / dogfood | cli-engine | doc-only |
-| D — CLI wizard backlog | cli-ui | *UX8 not active* — [backlog/cli-ui.md](backlog/cli-ui.md) |
+| A — UX12 ship / dogfood | web-ui | doc-only |
+| B — Engine maintenance / dogfood | cli-engine | doc-only |
+| C — CLI wizard backlog | cli-ui | *UX8 not active* — [backlog/cli-ui.md](backlog/cli-ui.md) |
 
 ---
 

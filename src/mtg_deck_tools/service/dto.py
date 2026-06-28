@@ -113,6 +113,17 @@ class PatchDeckRequest(BaseModel):
     deck: dict[str, Any] | None = None
 
 
+class ImportDeckRequest(BaseModel):
+    """Plain-text deck list import (UX13-MVP)."""
+
+    text: str
+    name: str | None = None
+    commanders: list[str] | None = Field(
+        default=None,
+        description="Commander name(s) when the text omits a Commander section",
+    )
+
+
 class RefillSlotRequest(BaseModel):
     slot: str
     seed: int | None = None

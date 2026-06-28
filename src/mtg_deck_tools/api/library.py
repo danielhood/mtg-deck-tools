@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException, Query
 from mtg_deck_tools.service.dto import (
     DeckLibraryDetailResponse,
     DeckLibraryEntry,
+    ImportDeckRequest,
     PatchDeckRequest,
     RefillSlotRequest,
     SwapCardsRequest,
@@ -17,6 +18,7 @@ from mtg_deck_tools.service.dto import (
     SwapPlaybooksResponse,
     SwapPreviewResponse,
 )
+from mtg_deck_tools.service.deck_import import import_deck_from_text
 from mtg_deck_tools.service.iterate import (
     DeckValidationFailure,
     preview_library_deck_swap,
@@ -69,6 +71,27 @@ def list_decks(
         limit=limit,
         decks_path=Path(decks) if decks else None,
     )
+
+
+@router.post("/import", response_model=DeckLibraryDetailResponse)
+def import_deck(
+    body: ImportDeckRequest,
+    db: Annotated[str | None, Query(description="SQLite database path")] = None,
+    decks: Annotated[str | None, Query(description="Saved deck library path")] = None,
+) -> DeckLibraryDetailResponse:
+    _db_gate(Path(db) if db else None)
+    if not body.text.strip():
+        raise HTTPException(status_code=400, detail="text must not be empty")
+    try:
+        return import_deck_from_text(
+            body.text,
+            name=body.name,
+            commander_names=body.commanders,
+            db_path=Path(db) if db else None,
+            decks_path=Path(decks) if decks else None,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get("/{deck_id}", response_model=DeckLibraryDetailResponse)
