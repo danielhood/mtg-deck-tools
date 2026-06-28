@@ -127,7 +127,7 @@ Reuse patterns from `builder/commander_resolve.resolve_commander_oracle_ids` and
 | **UX13-MVP-c** | `resolve` + `build` + `service/deck_import` | Shipped |
 | **UX13-MVP-d** | CLI `deck import --file` | Shipped |
 | **UX13-MVP-e** | `POST /api/v1/decks/import` + OpenAPI | Shipped |
-| **UX13-MVP-f** | Web paste / file upload (**UX13b**) | Shipped — template download + `.txt` upload on `/library` |
+| **UX13-MVP-f** | Web paste / file upload (**UX13b**) | Shipped — template download + `.txt` upload on home |
 
 **Parallel OK with:** doc-only, **GATE** (no engine rule changes). **Not parallel** with concurrent edits to `service/library.py` validation without coordination.
 

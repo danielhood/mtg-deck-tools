@@ -19,6 +19,7 @@ CLI wizard parity: [user-experience.md](../dependency-engine/user-experience.md)
 | Build new deck | → `/build/1` when DB ready; disabled when blocked |
 | View last deck | → `/deck/:id` for most recently saved library deck (**UX7f**); hidden when library empty |
 | Saved library | → `/library` when DB ready (**UX7f**) |
+| Import deck | **UX13b** — **Download template** or **Import text file** → `POST /api/v1/decks/import` → `/deck/:id` when DB ready |
 
 **API:** `GET /health`, `GET /api/v1/wizard/meta` (or `GET /api/v1/stats` for DB probe). See [wizard-api.md](wizard-api.md).
 

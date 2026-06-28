@@ -36,8 +36,8 @@ Service facades live in `src/mtg_deck_tools/service/`; handlers in `src/mtg_deck
 | --- | --- |
 | `/` | `GET /api/v1/decks?limit=1` (or dedicated “latest”) for **View last deck** |
 | `/build/review` | `POST /api/v1/generate` — auto-persists new library entry |
+| `/` | `POST /api/v1/decks/import` (**UX13-MVP** API; **UX13b** home file upload) |
 | `/library` | `GET /api/v1/decks` (list, search, sort) |
-| `/library` | `POST /api/v1/decks/import` (**UX13-MVP** API; **UX13b** web file upload) |
 | `/library` | `PATCH /api/v1/decks/{id}` (rename — invoked from deck view only) |
 | `/library` | `DELETE /api/v1/decks/{id}` |
 | `/deck/:id` | `DELETE /api/v1/decks/{id}` (delete from deck view footer only) |
