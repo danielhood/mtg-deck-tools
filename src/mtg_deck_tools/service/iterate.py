@@ -72,7 +72,7 @@ def _resolve_constraints(body: SwapCardsRequest) -> SwapConstraints | None:
     if body.constraints is not None:
         return body.constraints
     if body.strategy_id:
-        return constraints_for_strategy(body.strategy_id)
+        return constraints_for_strategy(body.strategy_id, rule_id=body.rule_id)
     return None
 
 

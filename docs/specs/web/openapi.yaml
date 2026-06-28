@@ -1566,6 +1566,11 @@ components:
           - type: string
           - type: 'null'
           title: Strategy Id
+        rule_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Rule Id
         preview_limit:
           anyOf:
           - type: integer

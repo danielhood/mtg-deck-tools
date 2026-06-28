@@ -11,13 +11,14 @@ from mtg_deck_tools.builder.deck import DeckCard, DeckBuildResult
 from mtg_deck_tools.builder.filler import refill_deck_slot
 from mtg_deck_tools.builder.iterate import preview_swap_deck_cards, swap_deck_cards
 from mtg_deck_tools.builder.output import build_deck_document
+from mtg_deck_tools.builder.swap_constraints import filter_candidates_by_swap_constraints
 from mtg_deck_tools.builder.swap_playbooks import (
     constraints_for_strategy,
     strategies_for_rule,
 )
 from mtg_deck_tools.db.schema import apply_schema
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.models.swap_constraints import SwapConstraints
+from mtg_deck_tools.models.swap_constraints import EffectRoleConstraint, SwapConstraints
 from mtg_deck_tools.wizard.slots import load_slot_template_config
 
 
@@ -286,6 +287,50 @@ def test_swap_playbooks_load_equipment_strategies() -> None:
     constraints = constraints_for_strategy("add_equipment", rule_id="EQUIPMENT_BALANCE")
     assert constraints is not None
     assert "Equipment" in constraints.type_lines_any
+
+
+
+def test_effect_role_token_payoff_filter(iterate_db: sqlite3.Connection) -> None:
+    iterate_db.execute(
+        """
+        INSERT INTO cards (
+            oracle_id, name, type_line, mana_cost, cmc, color_identity,
+            keywords, commander_legal, commander_eligible, is_basic_land,
+            edhrec_rank, price_usd, price_known, oracle_text
+        ) VALUES (?, ?, ?, '{2}{G}', 3.0, ?, '[]', 1, 0, 0, 550, 2.0, 1, 'Whenever you create a token, draw a card.')
+        """,
+        ("payoff-a", "Token Payoff", "Enchantment", json.dumps(["G"])),
+    )
+    iterate_db.execute(
+        """
+        INSERT INTO card_mechanic_tags (oracle_id, tag, layer, source)
+        VALUES ('payoff-a', 'tokens', 'theme', 'test')
+        """
+    )
+    iterate_db.execute(
+        """
+        INSERT INTO card_effects (
+            oracle_id, face_index, effect_kind, payload, confidence, source
+        ) VALUES ('payoff-a', 0, 'token_payoff', '{}', 1.0, 'test')
+        """
+    )
+    iterate_db.commit()
+
+    row = iterate_db.execute(
+        "SELECT * FROM cards WHERE oracle_id = 'payoff-a'"
+    ).fetchone()
+    from mtg_deck_tools.builder.pool import _row_to_candidate
+
+    candidate = _row_to_candidate(row)
+    constraints = SwapConstraints(
+        effect_role=EffectRoleConstraint(profile_id="tokens", role="consumer"),
+    )
+    filtered = filter_candidates_by_swap_constraints(
+        iterate_db,
+        [candidate, _row_to_candidate(iterate_db.execute("SELECT * FROM cards WHERE oracle_id = 'syn-a'").fetchone())],
+        constraints,
+    )
+    assert [c.oracle_id for c in filtered] == ["payoff-a"]
 
 
 def test_named_card_swap(iterate_db: sqlite3.Connection) -> None:

@@ -97,6 +97,14 @@ def _card_matches_max_price(candidate: CardCandidate, max_price: float | None) -
     return candidate.price_usd <= max_price
 
 
+PROFILE_ROLE_EFFECT_KINDS: dict[tuple[str, str], frozenset[str]] = {
+    ("tokens", "consumer"): frozenset({"token_payoff"}),
+    ("tokens", "producer"): frozenset({"token_produce"}),
+    ("energy", "consumer"): frozenset({"energy_consume"}),
+    ("energy", "producer"): frozenset({"energy_produce"}),
+}
+
+
 def _card_matches_effect_role(
     conn: sqlite3.Connection,
     candidate: CardCandidate,
@@ -110,6 +118,12 @@ def _card_matches_effect_role(
     effects = fetch_card_effects(conn, [candidate.oracle_id]).get(candidate.oracle_id, [])
     profile = role.profile_id.replace("_", "").lower()
     want = role.role.lower()
+    mapped_kinds = PROFILE_ROLE_EFFECT_KINDS.get((role.profile_id.lower(), want))
+    if mapped_kinds is not None:
+        for effect in effects:
+            if effect.effect_kind.lower() in mapped_kinds:
+                return True
+        return False
     for effect in effects:
         kind = effect.effect_kind.lower()
         payload = json.dumps(effect.payload).lower() if effect.payload else ""
