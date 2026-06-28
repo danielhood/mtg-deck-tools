@@ -41,13 +41,56 @@ class SwapRecord:
     to_name: str
 
 
+@dataclass(frozen=True)
+class SwapFailure:
+    slot: str
+    from_oracle_id: str
+    from_name: str
+    message: str
+
+
+def _single_quantity_card(card: DeckCard) -> DeckCard:
+    if card.quantity == 1:
+        return card
+    return DeckCard(
+        oracle_id=card.oracle_id,
+        name=card.name,
+        slot=card.slot,
+        quantity=1,
+        cmc=card.cmc,
+        mana_cost=card.mana_cost,
+        type_line=card.type_line,
+        price_usd=card.price_usd,
+        price_known=card.price_known,
+        scryfall_uri=card.scryfall_uri,
+        image_uri=card.image_uri,
+        mechanic_tags=list(card.mechanic_tags),
+        oracle_text=card.oracle_text,
+        color_identity=list(card.color_identity),
+        produced_mana=list(card.produced_mana),
+        released_at=card.released_at,
+        power=card.power,
+        toughness=card.toughness,
+        rarity=card.rarity,
+        unpriced_classification=card.unpriced_classification,
+        locked=card.locked,
+    )
+
+
+def _restore_removed_card(state: _BuildState, card: DeckCard) -> None:
+    state.cards.append(card)
+    if "Basic" not in card.type_line:
+        state.used_oracle_ids.add(card.oracle_id)
+        state.used_names.add(card.name)
+
+
 def _remove_cards_for_swap(
     cards: list[DeckCard],
     oracle_ids: list[str],
     *,
     commander_oracle_ids: set[str],
-) -> tuple[list[DeckCard], list[tuple[str, str, str]]]:
-    """Return remaining cards and ordered removals (slot, oracle_id, name)."""
+) -> tuple[list[DeckCard], list[DeckCard]]:
+    """Return remaining cards and ordered single-quantity removals."""
     if not oracle_ids:
         raise ValueError("oracle_ids must not be empty.")
 
@@ -57,7 +100,7 @@ def _remove_cards_for_swap(
 
     to_remove = Counter(oracle_ids)
     remaining: list[DeckCard] = []
-    removed: list[tuple[str, str, str]] = []
+    removed: list[DeckCard] = []
 
     for card in cards:
         pending = to_remove.get(card.oracle_id, 0)
@@ -70,7 +113,7 @@ def _remove_cards_for_swap(
         qty_to_remove = min(card.quantity, pending)
         to_remove[card.oracle_id] -= qty_to_remove
         for _ in range(qty_to_remove):
-            removed.append((card.slot, card.oracle_id, card.name))
+            removed.append(_single_quantity_card(card))
 
         leftover = card.quantity - qty_to_remove
         if leftover > 0:
@@ -178,18 +221,18 @@ def preview_swap_deck_cards(
         seed=seed,
     )
     positions: list[SwapPreviewPosition] = []
-    for slot, from_id, from_name in removed:
+    for removed_card in removed:
         candidates = preview_swap_candidates(
             state,
-            slot,
+            removed_card.slot,
             constraints=constraints,
             limit=preview_limit,
         )
         positions.append(
             SwapPreviewPosition(
-                from_oracle_id=from_id,
-                from_name=from_name,
-                slot=slot,
+                from_oracle_id=removed_card.oracle_id,
+                from_name=removed_card.name,
+                slot=removed_card.slot,
                 candidates=candidates,
             )
         )
@@ -207,8 +250,12 @@ def swap_deck_cards(
     seed: int | None = None,
     constraints: SwapConstraints | None = None,
     preferred_replacements: list[SwapPreferredReplacement] | None = None,
-) -> tuple[DeckBuildResult, list[SwapRecord]]:
-    """Replace selected maindeck cards with new picks under current criteria."""
+) -> tuple[DeckBuildResult | None, list[SwapRecord], list[SwapFailure]]:
+    """Replace selected maindeck cards with new picks under current criteria.
+
+    When a position has no eligible replacement, that card is left unchanged and
+    reported in the returned failure list. Other positions still swap.
+    """
     slot_config = load_slot_template_config()
     slots = dict(criteria.slot_template or slot_config.default)
     commander_count = max(1, len(commander_oracle_ids))
@@ -230,9 +277,9 @@ def swap_deck_cards(
         fixed_cards=remaining,
         seed=seed,
     )
-    state.warnings.append(f"Swapped {len(removed)} maindeck card(s).")
 
     swaps: list[SwapRecord] = []
+    failures: list[SwapFailure] = []
     preferred_queues = _preferred_replacement_queues(preferred_replacements)
     use_lands_pipeline = constraints is None or not (
         constraints.type_lines_any
@@ -241,17 +288,23 @@ def swap_deck_cards(
     )
     if preferred_queues:
         use_lands_pipeline = False
-    for slot, from_id, from_name in removed:
+    for removed_card in removed:
+        slot = removed_card.slot
+        from_id = removed_card.oracle_id
+        from_name = removed_card.name
         preferred_id: str | None = None
         if preferred_queues.get(from_id):
             preferred_id = preferred_queues[from_id].popleft()
         position_constraints = _constraints_for_position(constraints, preferred_id)
+        new_card: DeckCard | None = None
+        failure_message: str | None = None
         if slot == "lands" and use_lands_pipeline and not preferred_id:
             card_count_before = len(state.cards)
             _fill_lands(state, 1, mainboard_size=mainboard_size)
             if len(state.cards) <= card_count_before:
-                raise RuntimeError(f"Could not find replacement for {from_name!r} in slot '{slot}'.")
-            new_card = state.cards[-1]
+                failure_message = f"Could not find replacement for {from_name!r} in slot '{slot}'."
+            else:
+                new_card = state.cards[-1]
         else:
             try:
                 pick = pick_swap_replacement(
@@ -261,10 +314,27 @@ def swap_deck_cards(
                     rng=state.rng,
                 )
             except ValueError as exc:
-                raise RuntimeError(str(exc)) from exc
-            if pick is None:
-                raise RuntimeError(f"Could not find replacement for {from_name!r} in slot '{slot}'.")
-            new_card = add_candidate_to_state(state, slot, pick)
+                failure_message = str(exc)
+                pick = None
+            else:
+                if pick is None:
+                    failure_message = (
+                        f"Could not find replacement for {from_name!r} in slot '{slot}'."
+                    )
+                else:
+                    new_card = add_candidate_to_state(state, slot, pick)
+        if failure_message is not None:
+            _restore_removed_card(state, removed_card)
+            failures.append(
+                SwapFailure(
+                    slot=slot,
+                    from_oracle_id=from_id,
+                    from_name=from_name,
+                    message=failure_message,
+                )
+            )
+            continue
+        assert new_card is not None
         swaps.append(
             SwapRecord(
                 slot=slot,
@@ -273,6 +343,16 @@ def swap_deck_cards(
                 to_oracle_id=new_card.oracle_id,
                 to_name=new_card.name,
             )
+        )
+
+    if not swaps:
+        return None, swaps, failures
+
+    if swaps:
+        state.warnings.append(f"Swapped {len(swaps)} maindeck card(s).")
+    if failures:
+        state.warnings.append(
+            f"Could not swap {len(failures)} of {len(removed)} selected card(s)."
         )
 
     cards, budget_spent, warnings = trim_deck_to_budget(
@@ -306,4 +386,5 @@ def swap_deck_cards(
             mana_base=mana_plan,
         ),
         swaps,
+        failures,
     )

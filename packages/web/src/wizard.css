@@ -3575,6 +3575,14 @@
   padding-left: 18px;
 }
 
+.swap-diff-failures-title {
+  margin-top: 10px;
+}
+
+.swap-diff-failures-list {
+  color: #b45309;
+}
+
 .swap-diff-warn {
   font-size: 12px;
   margin-top: 8px;

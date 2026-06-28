@@ -1605,6 +1605,11 @@ components:
             $ref: '#/components/schemas/SwapRecordResponse'
           type: array
           title: Swaps
+        failed_swaps:
+          items:
+            $ref: '#/components/schemas/SwapFailureResponse'
+          type: array
+          title: Failed Swaps
       type: object
       required:
       - id
@@ -1652,6 +1657,27 @@ components:
           default: same
       type: object
       title: SwapConstraints
+    SwapFailureResponse:
+      properties:
+        slot:
+          type: string
+          title: Slot
+        from_oracle_id:
+          type: string
+          title: From Oracle Id
+        from_name:
+          type: string
+          title: From Name
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - slot
+      - from_oracle_id
+      - from_name
+      - message
+      title: SwapFailureResponse
     SwapPlaybooksResponse:
       properties:
         rule_id:

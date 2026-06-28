@@ -121,10 +121,18 @@ export interface SwapRecord {
   to_name: string;
 }
 
+export interface SwapFailure {
+  slot: string;
+  from_oracle_id: string;
+  from_name: string;
+  message: string;
+}
+
 export interface SwapCardsResponse {
   id: string;
   deck: Record<string, unknown>;
   swaps: SwapRecord[];
+  failed_swaps: SwapFailure[];
 }
 
 export interface ValidationErrorItem {

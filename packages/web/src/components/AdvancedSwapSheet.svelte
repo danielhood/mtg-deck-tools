@@ -10,6 +10,7 @@
     type CardSearchResult,
     type SwapConstraints,
     type SwapPreviewPosition,
+    type SwapFailure,
     type SwapRecord,
     type SwapPreferredReplacement,
     type SwapStrategy,
@@ -31,7 +32,7 @@
     deckColors: string[];
     issue?: AdvancedSwapIssueContext | null;
     onclose: () => void;
-    onapplied: (deck: Record<string, unknown>, swaps: SwapRecord[]) => void;
+    onapplied: (deck: Record<string, unknown>, swaps: SwapRecord[], failedSwaps: SwapFailure[]) => void;
   }
 
   let {
@@ -230,7 +231,7 @@
     validationErrors = [];
     try {
       const response = await swapDeckCards(deckId, oracleIds, requestOptions());
-      onapplied(response.deck, response.swaps);
+      onapplied(response.deck, response.swaps, response.failed_swaps ?? []);
       onclose();
     } catch (err) {
       if (err instanceof DeckValidationError) {
