@@ -2805,8 +2805,25 @@
 }
 
 .swap-preview-row {
+  display: block;
+  width: 100%;
   padding: 8px 12px;
+  border: none;
   border-top: 1px solid var(--border);
+  background: var(--bg);
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.swap-preview-row-selected {
+  background: var(--blue-100);
+  box-shadow: inset 3px 0 0 var(--blue-700);
+}
+
+.swap-preview-picked {
+  font-weight: 600;
+  color: var(--blue-700);
 }
 
 .swap-preview-name {

@@ -11,6 +11,7 @@
     type SwapConstraints,
     type SwapPreviewPosition,
     type SwapRecord,
+    type SwapPreferredReplacement,
     type SwapStrategy,
   } from "../lib/api";
   import { formatPrice } from "../lib/format";
@@ -75,6 +76,8 @@
   let validationErrors = $state<{ code: string; message: string }[]>([]);
   let forceOverride = $state(false);
   let previewRows = $state<SwapPreviewPosition[] | null>(null);
+  /** Preview position index → chosen replacement oracle_id */
+  let selectedPreview = $state<Record<number, string>>({});
 
   let cardQuery = $state("");
   let cardResults = $state<CardSearchResult[]>([]);
@@ -97,6 +100,7 @@
     validationErrors = [];
     forceOverride = false;
     previewRows = null;
+    selectedPreview = {};
     cardQuery = "";
     cardResults = [];
     namedCard = null;
@@ -124,12 +128,17 @@
     }
   });
 
+  function clearPreview(): void {
+    previewRows = null;
+    selectedPreview = {};
+  }
+
   function toggleType(type: string): void {
     const next = new Set(selectedTypes);
     if (next.has(type)) next.delete(type);
     else next.add(type);
     selectedTypes = next;
-    previewRows = null;
+    clearPreview();
   }
 
   function toggleRarity(id: string): void {
@@ -137,7 +146,7 @@
     if (next.has(id)) next.delete(id);
     else next.add(id);
     selectedRarities = next;
-    previewRows = null;
+    clearPreview();
   }
 
   function buildConstraints(): SwapConstraints | null {
@@ -170,12 +179,29 @@
     return constraints;
   }
 
+  const selectedPreviewCount = $derived(Object.keys(selectedPreview).length);
+
+  function buildPreferredReplacements(): SwapPreferredReplacement[] | undefined {
+    if (!previewRows?.length) return undefined;
+    const rows: SwapPreferredReplacement[] = [];
+    for (const [idx, replacementId] of Object.entries(selectedPreview)) {
+      const position = previewRows[Number(idx)];
+      if (!position || !replacementId) continue;
+      rows.push({
+        from_oracle_id: position.from_oracle_id,
+        replacement_oracle_id: replacementId,
+      });
+    }
+    return rows.length ? rows : undefined;
+  }
+
   function requestOptions(force = false) {
     const constraints = buildConstraints();
     return {
       constraints,
       strategy_id: constraints ? undefined : strategyId ?? undefined,
       rule_id: issue?.ruleId,
+      preferred_replacements: buildPreferredReplacements(),
       force_validation_override: force || forceOverride,
       preview_limit: 8,
     };
@@ -188,9 +214,10 @@
     try {
       const response = await previewDeckSwap(deckId, oracleIds, requestOptions());
       previewRows = response.candidates_by_position;
+      selectedPreview = {};
     } catch (err) {
       error = err instanceof Error ? err.message : "Preview failed.";
-      previewRows = null;
+      clearPreview();
     } finally {
       previewBusy = false;
     }
@@ -220,7 +247,7 @@
   function scheduleCardSearch(query: string): void {
     cardQuery = query;
     namedCard = null;
-    previewRows = null;
+    clearPreview();
     if (searchTimer) clearTimeout(searchTimer);
     const trimmed = query.trim();
     if (trimmed.length < 2) {
@@ -248,14 +275,23 @@
     namedCard = row;
     cardQuery = row.name;
     cardResults = [];
-    previewRows = null;
+    clearPreview();
   }
 
   function clearNamedCard(): void {
     namedCard = null;
     cardQuery = "";
     cardResults = [];
-    previewRows = null;
+    clearPreview();
+  }
+  function togglePreviewCandidate(positionIndex: number, replacementOracleId: string): void {
+    const next = { ...selectedPreview };
+    if (next[positionIndex] === replacementOracleId) {
+      delete next[positionIndex];
+    } else {
+      next[positionIndex] = replacementOracleId;
+    }
+    selectedPreview = next;
   }
 </script>
 
@@ -304,7 +340,7 @@
                 disabled={namedCardPinned}
                 onclick={() => {
                   strategyId = strategy.id;
-                  previewRows = null;
+                  clearPreview();
                 }}
               >
                 {strategy.label}
@@ -402,7 +438,7 @@
                   selected={selectedColors}
                   onfilterchange={(colors) => {
                     selectedColors = colors;
-                    previewRows = null;
+                    clearPreview();
                   }}
                 />
               {/if}
@@ -429,7 +465,7 @@
                   step="0.01"
                   placeholder="No cap"
                   bind:value={maxPriceText}
-                  oninput={() => (previewRows = null)}
+                  oninput={clearPreview}
                 />
               </label>
             </div>
@@ -441,7 +477,7 @@
             <span class="swap-scope-label">Any eligible slot</span>
             <span class="swap-scope-hint">Expert — may move cards across slots</span>
           </span>
-          <input type="checkbox" bind:checked={crossSlot} onchange={() => (previewRows = null)} />
+          <input type="checkbox" bind:checked={crossSlot} onchange={clearPreview} />
         </label>
 
         {#if showValidationBlock}
@@ -467,14 +503,26 @@
         {/if}
 
         {#if previewRows}
-          <p class="swap-section-label">Preview</p>
+          <p class="swap-section-label">
+            Preview
+            {#if selectedPreviewCount}
+              <span class="swap-preview-picked"> · {selectedPreviewCount} selected</span>
+            {/if}
+          </p>
+          <p class="swap-hint">Tap a candidate to prefer it on apply. Unselected slots use a random pick.</p>
           <div class="swap-preview-list">
-            {#each previewRows as position (position.from_oracle_id)}
+            {#each previewRows as position, positionIndex (position.from_oracle_id + ":" + positionIndex)}
               <div class="swap-preview-group">
                 <div class="swap-preview-from">For {position.from_name}</div>
                 {#if position.candidates.length}
                   {#each position.candidates as candidate (candidate.oracle_id)}
-                    <div class="swap-preview-row">
+                    <button
+                      type="button"
+                      class="swap-preview-row"
+                      class:swap-preview-row-selected={selectedPreview[positionIndex] === candidate.oracle_id}
+                      aria-pressed={selectedPreview[positionIndex] === candidate.oracle_id}
+                      onclick={() => togglePreviewCandidate(positionIndex, candidate.oracle_id)}
+                    >
                       <div class="swap-preview-name">{candidate.name}</div>
                       <div class="swap-preview-meta">
                         <ManaCost cost={candidate.mana_cost} />
@@ -483,7 +531,7 @@
                           {formatPrice(candidate.price_usd)}
                         {/if}
                       </div>
-                    </div>
+                    </button>
                   {/each}
                 {:else}
                   <p class="swap-hint">No candidates match these constraints.</p>

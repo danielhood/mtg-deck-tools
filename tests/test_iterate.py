@@ -18,7 +18,7 @@ from mtg_deck_tools.builder.swap_playbooks import (
 )
 from mtg_deck_tools.db.schema import apply_schema
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.models.swap_constraints import EffectRoleConstraint, SwapConstraints
+from mtg_deck_tools.models.swap_constraints import EffectRoleConstraint, SwapConstraints, SwapPreferredReplacement
 from mtg_deck_tools.wizard.slots import load_slot_template_config
 
 
@@ -356,3 +356,34 @@ def test_named_card_swap(iterate_db: sqlite3.Connection) -> None:
     )
     assert swaps[0].to_oracle_id == "equip-a"
     assert swaps[0].to_name == "Test Sword"
+
+
+def test_preferred_replacement_swap(iterate_db: sqlite3.Connection) -> None:
+    slots = dict(load_slot_template_config().default)
+    criteria = DeckCriteria(
+        themes=["tokens"],
+        colors=["G"],
+        commander_oracle_ids=["cmd"],
+        slot_template=slots,
+        seed=3,
+    )
+    fixed = [_deck_card(oracle_id="syn-old", name="Old Card", slot="synergy")]
+    preferred = [
+        SwapPreferredReplacement(
+            from_oracle_id="syn-old",
+            replacement_oracle_id="syn-b",
+        )
+    ]
+    _result, swaps = swap_deck_cards(
+        iterate_db,
+        criteria,
+        identity=["G"],
+        commander_oracle_ids=["cmd"],
+        fixed_cards=fixed,
+        oracle_ids=["syn-old"],
+        seed=3,
+        preferred_replacements=preferred,
+    )
+    assert len(swaps) == 1
+    assert swaps[0].to_oracle_id == "syn-b"
+    assert swaps[0].to_name == "Other Maker"

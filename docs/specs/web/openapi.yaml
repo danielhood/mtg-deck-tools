@@ -1571,6 +1571,11 @@ components:
           - type: string
           - type: 'null'
           title: Rule Id
+        preferred_replacements:
+          items:
+            $ref: '#/components/schemas/SwapPreferredReplacement'
+          type: array
+          title: Preferred Replacements
         preview_limit:
           anyOf:
           - type: integer
@@ -1661,6 +1666,19 @@ components:
       required:
       - rule_id
       title: SwapPlaybooksResponse
+    SwapPreferredReplacement:
+      properties:
+        from_oracle_id:
+          type: string
+          title: From Oracle Id
+        replacement_oracle_id:
+          type: string
+          title: Replacement Oracle Id
+      type: object
+      required:
+      - from_oracle_id
+      - replacement_oracle_id
+      title: SwapPreferredReplacement
     SwapPreviewCandidateResponse:
       properties:
         oracle_id:

@@ -19,3 +19,8 @@ class SwapConstraints(BaseModel):
     effect_role: EffectRoleConstraint | None = None
     replacement_oracle_id: str | None = None
     slot_policy: str = "same"
+
+
+class SwapPreferredReplacement(BaseModel):
+    from_oracle_id: str
+    replacement_oracle_id: str

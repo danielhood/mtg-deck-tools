@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import random
-from collections import Counter
+from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
 
 import sqlite3
@@ -24,7 +24,7 @@ from mtg_deck_tools.builder.swap_constraints import (
     preview_swap_candidates,
 )
 from mtg_deck_tools.models.criteria import DeckCriteria
-from mtg_deck_tools.models.swap_constraints import SwapConstraints
+from mtg_deck_tools.models.swap_constraints import SwapConstraints, SwapPreferredReplacement
 from mtg_deck_tools.rules.validate import (
     adjust_slot_template_for_commanders,
     mainboard_size_for_commanders,
@@ -107,6 +107,26 @@ def _remove_cards_for_swap(
     return remaining, removed
 
 
+def _preferred_replacement_queues(
+    preferred: list[SwapPreferredReplacement] | None,
+) -> dict[str, deque[str]]:
+    queues: dict[str, deque[str]] = defaultdict(deque)
+    for item in preferred or []:
+        queues[item.from_oracle_id].append(item.replacement_oracle_id)
+    return queues
+
+
+def _constraints_for_position(
+    base: SwapConstraints | None,
+    replacement_oracle_id: str | None,
+) -> SwapConstraints | None:
+    if not replacement_oracle_id:
+        return base
+    if base is None:
+        return SwapConstraints(replacement_oracle_id=replacement_oracle_id)
+    return base.model_copy(update={"replacement_oracle_id": replacement_oracle_id})
+
+
 def _build_swap_state(
     conn: sqlite3.Connection,
     criteria: DeckCriteria,
@@ -186,6 +206,7 @@ def swap_deck_cards(
     oracle_ids: list[str],
     seed: int | None = None,
     constraints: SwapConstraints | None = None,
+    preferred_replacements: list[SwapPreferredReplacement] | None = None,
 ) -> tuple[DeckBuildResult, list[SwapRecord]]:
     """Replace selected maindeck cards with new picks under current criteria."""
     slot_config = load_slot_template_config()
@@ -212,25 +233,35 @@ def swap_deck_cards(
     state.warnings.append(f"Swapped {len(removed)} maindeck card(s).")
 
     swaps: list[SwapRecord] = []
+    preferred_queues = _preferred_replacement_queues(preferred_replacements)
     use_lands_pipeline = constraints is None or not (
         constraints.type_lines_any
         or constraints.replacement_oracle_id
         or constraints.effect_role
     )
+    if preferred_queues:
+        use_lands_pipeline = False
     for slot, from_id, from_name in removed:
-        if slot == "lands" and use_lands_pipeline:
+        preferred_id: str | None = None
+        if preferred_queues.get(from_id):
+            preferred_id = preferred_queues[from_id].popleft()
+        position_constraints = _constraints_for_position(constraints, preferred_id)
+        if slot == "lands" and use_lands_pipeline and not preferred_id:
             card_count_before = len(state.cards)
             _fill_lands(state, 1, mainboard_size=mainboard_size)
             if len(state.cards) <= card_count_before:
                 raise RuntimeError(f"Could not find replacement for {from_name!r} in slot '{slot}'.")
             new_card = state.cards[-1]
         else:
-            pick = pick_swap_replacement(
-                state,
-                slot,
-                constraints=constraints,
-                rng=state.rng,
-            )
+            try:
+                pick = pick_swap_replacement(
+                    state,
+                    slot,
+                    constraints=position_constraints,
+                    rng=state.rng,
+                )
+            except ValueError as exc:
+                raise RuntimeError(str(exc)) from exc
             if pick is None:
                 raise RuntimeError(f"Could not find replacement for {from_name!r} in slot '{slot}'.")
             new_card = add_candidate_to_state(state, slot, pick)

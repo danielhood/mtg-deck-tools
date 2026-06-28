@@ -163,8 +163,14 @@ export interface SwapRequestOptions {
   constraints?: SwapConstraints | null;
   strategy_id?: string | null;
   rule_id?: string | null;
+  preferred_replacements?: SwapPreferredReplacement[];
   preview_limit?: number;
   force_validation_override?: boolean;
+}
+
+export interface SwapPreferredReplacement {
+  from_oracle_id: string;
+  replacement_oracle_id: string;
 }
 
 export interface SwapPreviewCandidate {
@@ -253,6 +259,9 @@ function buildSwapBody(oracleIds: string[], options?: SwapRequestOptions): Recor
   if (options.constraints) body.constraints = options.constraints;
   if (options.strategy_id) body.strategy_id = options.strategy_id;
   if (options.rule_id) body.rule_id = options.rule_id;
+  if (options.preferred_replacements?.length) {
+    body.preferred_replacements = options.preferred_replacements;
+  }
   if (options.preview_limit != null) body.preview_limit = options.preview_limit;
   if (options.force_validation_override) body.force_validation_override = true;
   return body;

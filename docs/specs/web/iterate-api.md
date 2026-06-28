@@ -80,6 +80,7 @@ Replace one or more **maindeck** cards with new picks under current `DeckCriteri
 | `seed` | integer | no | Reproducibility |
 | `constraints` | `SwapConstraints` | no | **UX12** — type, color, rarity, price, role, named card, slot policy |
 | `strategy_id` | string | no | **UX12** — playbook preset (used when `constraints` omitted) |
+| `preferred_replacements` | `SwapPreferredReplacement[]` | no | **UX12** — pin a replacement per vacated card (`from_oracle_id` → `replacement_oracle_id`); typically chosen from preview candidates |
 | `force_validation_override` | boolean | no | **UX12** — when `true`, save deck even if post-swap validation fails; default `false` |
 
 **Behavior:**
@@ -106,7 +107,7 @@ Replace one or more **maindeck** cards with new picks under current `DeckCriteri
 
 ### `POST /api/v1/decks/{id}/swap/preview` (**UX12**)
 
-Same request body as swap (including `constraints`, `strategy_id`, `preview_limit`). Returns top candidates per vacated position **without persisting**:
+Same request body as swap (including `constraints`, `strategy_id`, `preferred_replacements`, `preview_limit`). Returns top candidates per vacated position **without persisting**:
 
 ```json
 {
