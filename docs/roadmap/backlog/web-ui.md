@@ -8,7 +8,7 @@ Specs: [specs/web/README.md](../../specs/web/README.md) · [architecture.md](../
 
 ## Up next
 
-*No promoted rows — see [deck-input.md](../../specs/product/deck-input.md) for next deck-input priorities (resolver v2).*
+*No promoted rows — see [deck-input.md](../../specs/product/deck-input.md) for next deck-input priorities (**IN-DECK-JSON**).*
 
 ---
 
@@ -16,7 +16,7 @@ Specs: [specs/web/README.md](../../specs/web/README.md) · [architecture.md](../
 
 Cross-format parsers: [deck-input.md](../../specs/product/deck-input.md).
 
-**Shipped:** **UX13-MVP** (CLI/API/parser), **UX13b** (home paste/file/template), **UX13c** (preview + gated import).
+**Shipped:** **UX13-MVP** (CLI/API/parser), **UX13b** (home paste/file/template), **UX13c** (preview), **resolver v2** (fuzzy + disambiguation).
 
 | ID | Topic | Notes | Spec |
 | --- | --- | --- | --- |
@@ -26,7 +26,7 @@ Cross-format parsers: [deck-input.md](../../specs/product/deck-input.md).
 | UX13e | Voice input (mobile) | Web Speech API; experimental | [deck-input.md](../../specs/product/deck-input.md) § Voice |
 | UX13f | Camera scan (mobile) | Per-card recognition spike | [deck-input.md](../../specs/product/deck-input.md) § Camera |
 
-**Depends on:** resolver v2 before **UX13a** search-by-name. Spreadsheet (**UX13d**) after resolver UX solid.
+**Depends on:** **UX13a** can promote next. Spreadsheet (**UX13d**) after **IN-DECK-JSON**.
 
 **Deferred wireframes:** import preview panel, disambiguation list, mobile capture bar — [wireframes/README.md](../../specs/web/wireframes/README.md) when promoted.
 

@@ -1,4 +1,4 @@
-"""Deck list import facades (UX13-MVP, UX13c preview)."""
+"""Deck list import facades (UX13-MVP, UX13c preview, resolver v2)."""
 
 from __future__ import annotations
 
@@ -9,16 +9,35 @@ from mtg_deck_tools.deck_import.build import build_imported_deck_document
 from mtg_deck_tools.deck_import.parse_text import parse_text_deck_list
 from mtg_deck_tools.deck_import.resolve import (
     PreviewLineResult,
+    ResolveCandidate,
+    build_resolution_map,
     preview_resolve_parsed_deck,
     resolve_parsed_deck,
 )
 from mtg_deck_tools.service.dto import (
     DeckLibraryDetailResponse,
+    ImportDeckPreviewCandidate,
     ImportDeckPreviewLineItem,
     ImportDeckPreviewResponse,
     ImportDeckPreviewSummary,
+    ImportDeckResolution,
 )
 from mtg_deck_tools.service.library import require_cards_db, save_deck_to_library
+
+
+def _resolution_tuples(
+    resolutions: list[ImportDeckResolution] | None,
+) -> list[tuple[str, int, str]]:
+    return [(item.section, item.index, item.oracle_id) for item in resolutions or []]
+
+
+def _preview_candidate(candidate: ResolveCandidate) -> ImportDeckPreviewCandidate:
+    return ImportDeckPreviewCandidate(
+        oracle_id=candidate.oracle_id,
+        name=candidate.name,
+        type_line=candidate.type_line or None,
+        score=candidate.score,
+    )
 
 
 def _preview_line_item(line: PreviewLineResult) -> ImportDeckPreviewLineItem:
@@ -29,6 +48,8 @@ def _preview_line_item(line: PreviewLineResult) -> ImportDeckPreviewLineItem:
         quantity=line.quantity,
         name=line.name,
         oracle_id=line.oracle_id,
+        match_method=line.match_method,
+        candidates=[_preview_candidate(candidate) for candidate in line.candidates],
     )
 
 
@@ -54,6 +75,7 @@ def preview_deck_import(
     text: str,
     *,
     commander_names: list[str] | None = None,
+    resolutions: list[ImportDeckResolution] | None = None,
     db_path: Path | None = None,
 ) -> ImportDeckPreviewResponse:
     """Parse and resolve a plain-text deck list without saving."""
@@ -65,7 +87,12 @@ def preview_deck_import(
 
     conn = require_db(require_cards_db(db_path))
     try:
-        preview = preview_resolve_parsed_deck(conn, parsed, commander_names=commanders)
+        preview = preview_resolve_parsed_deck(
+            conn,
+            parsed,
+            commander_names=commanders,
+            resolutions=build_resolution_map(_resolution_tuples(resolutions)),
+        )
     finally:
         conn.close()
 
@@ -81,6 +108,7 @@ def import_deck_from_text(
     *,
     name: str | None = None,
     commander_names: list[str] | None = None,
+    resolutions: list[ImportDeckResolution] | None = None,
     db_path: Path | None = None,
     decks_path: Path | None = None,
 ) -> DeckLibraryDetailResponse:
@@ -93,7 +121,12 @@ def import_deck_from_text(
 
     conn = require_db(require_cards_db(db_path))
     try:
-        resolved = resolve_parsed_deck(conn, parsed, commander_names=commanders)
+        resolved = resolve_parsed_deck(
+            conn,
+            parsed,
+            commander_names=commanders,
+            resolutions=build_resolution_map(_resolution_tuples(resolutions)),
+        )
         deck = build_imported_deck_document(conn, resolved)
     finally:
         conn.close()

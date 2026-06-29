@@ -26,7 +26,7 @@
 | **ENG-MAINT** | cli-engine | Threshold tuning vs latest `dependency-audit` when adding profiles | Ongoing | — | doc-only, dogfood gate |
 | **GATE** | cli-engine | `analyze run --fail-on-expect` (**30/30**) after engine changes | Always | Fresh `import` after bulk refresh | Other work if gate unchanged |
 
-**Not active:** cli-engine expansion (P7 remainder, new profiles); cli-ui UX8; product-data export; UX13 resolver v2 / JSON / fill — [backlog/](backlog/) · deck-input: [deck-input.md](../specs/product/deck-input.md).
+**Not active:** cli-engine expansion (P7 remainder, new profiles); cli-ui UX8; product-data export; UX13 JSON / fill — [backlog/](backlog/) · deck-input: [deck-input.md](../specs/product/deck-input.md).
 
 ### UX12 slices
 

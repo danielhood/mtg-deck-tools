@@ -1476,11 +1476,61 @@ components:
           - type: 'null'
           title: Commanders
           description: Commander name(s) when the text omits a Commander section
+        resolutions:
+          items:
+            $ref: '#/components/schemas/ImportDeckResolution'
+          type: array
+          title: Resolutions
+          description: Manual oracle_id picks for ambiguous or unknown preview lines
       type: object
       required:
       - text
       title: ImportDeckRequest
       description: Plain-text deck list import (UX13-MVP).
+    ImportDeckResolution:
+      properties:
+        section:
+          type: string
+          enum:
+          - commander
+          - maindeck
+          title: Section
+        index:
+          type: integer
+          title: Index
+          description: Commander 0-based index or maindeck source line number
+        oracle_id:
+          type: string
+          title: Oracle Id
+      type: object
+      required:
+      - section
+      - index
+      - oracle_id
+      title: ImportDeckResolution
+    ImportDeckPreviewCandidate:
+      properties:
+        oracle_id:
+          type: string
+          title: Oracle Id
+        name:
+          type: string
+          title: Name
+        type_line:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type Line
+        score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Score
+      type: object
+      required:
+      - oracle_id
+      - name
+      title: ImportDeckPreviewCandidate
     ImportDeckPreviewLineItem:
       properties:
         input_name:
@@ -1509,6 +1559,16 @@ components:
           - type: string
           - type: 'null'
           title: Oracle Id
+        match_method:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Match Method
+        candidates:
+          items:
+            $ref: '#/components/schemas/ImportDeckPreviewCandidate'
+          type: array
+          title: Candidates
       type: object
       required:
       - input_name

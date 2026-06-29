@@ -369,6 +369,20 @@ export interface ImportDeckTextRequest {
   text: string;
   name?: string;
   commanders?: string[];
+  resolutions?: ImportDeckResolution[];
+}
+
+export interface ImportDeckResolution {
+  section: "commander" | "maindeck";
+  index: number;
+  oracle_id: string;
+}
+
+export interface ImportDeckPreviewCandidate {
+  oracle_id: string;
+  name: string;
+  type_line?: string | null;
+  score?: number | null;
 }
 
 export interface ImportDeckPreviewLineItem {
@@ -378,6 +392,8 @@ export interface ImportDeckPreviewLineItem {
   quantity?: number | null;
   name?: string | null;
   oracle_id?: string | null;
+  match_method?: string | null;
+  candidates?: ImportDeckPreviewCandidate[];
 }
 
 export interface ImportDeckPreviewSummary {

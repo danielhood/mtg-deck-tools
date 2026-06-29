@@ -4,6 +4,7 @@
     listDecks,
     previewDeckImportFromText,
     type ImportDeckPreviewResponse,
+    type ImportDeckResolution,
   } from "../lib/api";
   import type { WizardMeta } from "../lib/api";
   import DbBanner from "../components/DbBanner.svelte";
@@ -32,6 +33,7 @@
   let deckImportError = $state("");
   let deckImportText = $state("");
   let deckPreview = $state<ImportDeckPreviewResponse | null>(null);
+  let deckResolutions = $state<ImportDeckResolution[]>([]);
   let deckFileInput = $state<HTMLInputElement | null>(null);
 
   const actionsDisabled = $derived(!meta.db_ready || importing || deckImporting || deckPreviewing);
@@ -60,6 +62,14 @@
 
   function clearDeckPreview(): void {
     deckPreview = null;
+    deckResolutions = [];
+  }
+
+  function importRequestBody(text: string) {
+    return {
+      text,
+      resolutions: deckResolutions.length ? deckResolutions : undefined,
+    };
   }
 
   async function startImport(): Promise<void> {
@@ -135,7 +145,7 @@
     deckPreviewing = true;
     deckImportError = "";
     try {
-      deckPreview = await previewDeckImportFromText({ text: trimmed });
+      deckPreview = await previewDeckImportFromText(importRequestBody(trimmed));
     } catch (err) {
       clearDeckPreview();
       deckImportError = err instanceof Error ? err.message : "Preview failed.";
@@ -158,7 +168,7 @@
     deckImporting = true;
     deckImportError = "";
     try {
-      const detail = await importDeckFromText({ text: trimmed });
+      const detail = await importDeckFromText(importRequestBody(trimmed));
       cacheDeck({
         id: detail.id,
         name: detail.name,
@@ -189,11 +199,31 @@
     }
   }
 
+  async function pickDeckResolution(
+    section: "commander" | "maindeck",
+    index: number,
+    oracleId: string,
+  ): Promise<void> {
+    if (deckPreviewing || deckImporting || importing || !meta.db_ready) return;
+    deckResolutions = [
+      ...deckResolutions.filter((item) => !(item.section === section && item.index === index)),
+      { section, index, oracle_id: oracleId },
+    ];
+    await previewDeckImport();
+  }
+
   function previewStatusLabel(status: string): string {
     if (status === "resolved") return "Resolved";
     if (status === "unknown") return "Unknown";
-    if (status === "ambiguous") return "Ambiguous";
+    if (status === "ambiguous") return "Pick a match";
     return status;
+  }
+
+  function matchMethodLabel(method: string | null | undefined): string | null {
+    if (!method || method === "exact" || method === "manual") return null;
+    if (method === "case_insensitive") return "case-insensitive match";
+    if (method === "fuzzy") return "fuzzy match";
+    return method.replaceAll("_", " ");
   }
 </script>
 
@@ -328,7 +358,8 @@
           {:else}
             {deckPreview.summary.resolved_count} resolved,
             {deckPreview.summary.unknown_count} unknown,
-            {deckPreview.summary.ambiguous_count} ambiguous — fix names before importing.
+            {deckPreview.summary.ambiguous_count} need a pick —
+            choose a card below or fix names before importing.
           {/if}
         </p>
         <div class="deck-preview-table-wrap">
@@ -343,7 +374,7 @@
               </tr>
             </thead>
             <tbody>
-              {#each deckPreview.commanders as line}
+              {#each deckPreview.commanders as line, commanderIndex (commanderIndex)}
                 <tr class:deck-preview-row-error={line.status !== "resolved"}>
                   <td>—</td>
                   <td>{line.input_name}</td>
@@ -353,10 +384,34 @@
                       {previewStatusLabel(line.status)}
                     </span>
                   </td>
-                  <td>{line.name ?? "—"}</td>
+                  <td>
+                    {line.name ?? "—"}
+                    {#if matchMethodLabel(line.match_method)}
+                      <span class="deck-preview-match-method">{matchMethodLabel(line.match_method)}</span>
+                    {/if}
+                  </td>
                 </tr>
+                {#if line.candidates?.length && line.status !== "resolved"}
+                  <tr class="deck-preview-candidates-row">
+                    <td colspan="5">
+                      <div class="deck-preview-candidates">
+                        {#each line.candidates as candidate (candidate.oracle_id)}
+                          <button
+                            type="button"
+                            class="deck-preview-candidate"
+                            disabled={actionsDisabled}
+                            onclick={() =>
+                              void pickDeckResolution("commander", commanderIndex, candidate.oracle_id)}
+                          >
+                            {candidate.name}
+                          </button>
+                        {/each}
+                      </div>
+                    </td>
+                  </tr>
+                {/if}
               {/each}
-              {#each deckPreview.maindeck as line}
+              {#each deckPreview.maindeck as line (line.line_number)}
                 <tr class:deck-preview-row-error={line.status !== "resolved"}>
                   <td>{line.line_number ?? "—"}</td>
                   <td>{line.input_name}</td>
@@ -366,8 +421,32 @@
                       {previewStatusLabel(line.status)}
                     </span>
                   </td>
-                  <td>{line.name ?? "—"}</td>
+                  <td>
+                    {line.name ?? "—"}
+                    {#if matchMethodLabel(line.match_method)}
+                      <span class="deck-preview-match-method">{matchMethodLabel(line.match_method)}</span>
+                    {/if}
+                  </td>
                 </tr>
+                {#if line.candidates?.length && line.status !== "resolved" && line.line_number != null}
+                  <tr class="deck-preview-candidates-row">
+                    <td colspan="5">
+                      <div class="deck-preview-candidates">
+                        {#each line.candidates as candidate (candidate.oracle_id)}
+                          <button
+                            type="button"
+                            class="deck-preview-candidate"
+                            disabled={actionsDisabled}
+                            onclick={() =>
+                              void pickDeckResolution("maindeck", line.line_number!, candidate.oracle_id)}
+                          >
+                            {candidate.name}
+                          </button>
+                        {/each}
+                      </div>
+                    </td>
+                  </tr>
+                {/if}
               {/each}
             </tbody>
           </table>
@@ -585,6 +664,40 @@
   .deck-preview-status[data-status="ambiguous"] {
     color: var(--red-700, #b91c1c);
     font-weight: 600;
+  }
+
+  .deck-preview-match-method {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .deck-preview-candidates-row td {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+
+  .deck-preview-candidates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .deck-preview-candidate {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg);
+    padding: 4px 10px;
+    font-size: 11px;
+    line-height: 1.3;
+    cursor: pointer;
+  }
+
+  .deck-preview-candidate:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .deck-import-error {
